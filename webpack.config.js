@@ -1,27 +1,23 @@
-var path = require('path')
+var path = require('path');
 const ModuleFederationPlugin = require("webpack").container.ModuleFederationPlugin;
 
 var serverConfig = {
-  entry: [path.resolve(__dirname, 'src/index.js')],
+  mode: 'development',
+  entry: path.resolve(__dirname, 'src/index.js'),
   target: 'node',
   output: {
-    publicPath: 'http://localhost:3000/',
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'fedmon.bundle.js',
+    // publicPath: path.resolve(__dirname, 'dist')
   },
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    compress: true,
-    port: 3000
+    contentBase: path.resolve(__dirname, 'dist'),
   },
-  mode: 'production',
   module: {
     rules: [
       {
-        // test: /bootstrap\.js$/,
-        // loader: "bundle-loader",
-        // options: {
-        //   lazy: true,
-        // },
-        test: /bootstrap.js?$/,
+        test: /\.js?$/,
+        include: path.resolve(__dirname, 'src'),
         exclude: /(node_modules)/,
         use: {
           loader: 'babel-loader',
