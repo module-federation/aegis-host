@@ -27,11 +27,13 @@ class ObserverImpl extends Observer {
    * @override
    */
   on(eventName, handler) {
-    if (eventHandlers.has(eventName)
-      && typeof handler === 'function') {
+    if (eventName && typeof handler !== 'function') {
+      throw new Error('eventName or handler invalid');
+    }
+    if (eventHandlers.has(eventName)) {
       eventHandlers.get(eventName).push(handler);
     } else {
-      eventHandlers.put(eventName, [handler]);
+      eventHandlers.set(eventName, [handler]);
     }
   }
 
@@ -39,7 +41,9 @@ class ObserverImpl extends Observer {
    * @override
    */
   async notify(event) {
-    if (!event || !event.eventName) throw new Error('event missing or invalid');
+    if (!event || !event.eventName) {
+      throw new Error('event missing or invalid');
+    }
     if (eventHandlers.has(event.eventName)) {
       return await eventHandlers.get(event.eventName).forEach(handler => handler(event));
     }

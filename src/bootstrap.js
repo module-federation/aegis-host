@@ -1,7 +1,7 @@
 'use strict'
 
 import RestControllerFactory from "./controllers";
-import buildCallback from "./controllers/express-callback";
+import buildCallback from "./controllers/build-callback";
 import express from "express";
 import bodyParser from "body-parser";
 

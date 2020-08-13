@@ -13,6 +13,7 @@ export default function postModel1Factory(addModel1) {
       log(source);
 
       const model = await addModel1({ ...modelInfo });
+      log({ function: 'addModel1', modelData: { ...model } });
 
       return {
         headers: {

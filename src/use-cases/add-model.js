@@ -1,14 +1,5 @@
 import ModelFactory from '../models';
 
-async function loadFedMon() {
-  try {
-    let fedmonserv = await import('fedmonserv/service1');
-    fedmonserv.callService1('this function was imported from a remote module');
-  } catch (e) {
-    console.log(e)
-  }
-}
-
 /**
  * 
  * @param {String} modelName 
@@ -23,7 +14,6 @@ export default function addModelFactory(modelName, repository, observer) {
     const event = await factory.createEvent(eventName, modelName, model);
     await repository.save(model);
     await observer.notify(event);
-    await loadFedMon();
     return model;
   }
 }

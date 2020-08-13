@@ -13,7 +13,7 @@ export default function getModel1Factory(listModel1) {
       log(source);
 
       const models = await listModel1();
-      log(models);
+      log({ function: 'listModel1', ...models });
 
       return {
         headers: {
@@ -24,7 +24,6 @@ export default function getModel1Factory(listModel1) {
         body: { models }
       }
     } catch (e) {
-      // TODO: Error logging
       log(e);
 
       return {
