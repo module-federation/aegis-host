@@ -2,8 +2,9 @@
   "name": "federated-monolith",
   "version": "1.0.0",
   "description": "",
+  "main": "dist/index.js",
   "scripts": {
-    "build-webpack": "npm run build && webpack --config webpack.config.js",
+    "build-webpack": "webpack --config webpack.config.js",
     "build": "npm run clean && babel src -d dist",
     "dev": "cd ./src && nodemon --exec babel-node src/index.js",
     "start-webpack": "webpack-dev-server",
@@ -14,22 +15,18 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "@babel/cli": "^7.10.5",
-    "@babel/core": "^7.11.1",
-    "babel-loader": "^8.1.0",
-    "enhanced-resolve": "^4.3.0",
-    "express": "^4.17.1",
-    "express-cli": "0.0.1",
-    "webpack-cli": "^3.3.12",
-    "webpack-dev-middleware": "^4.0.0-rc.3"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.0",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.11.0",
+    "babel-loader": "^8.1.0",
     "webpack": "^5.0.0-beta.25",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "express-cli": "0.0.1",
+    "webpack-dev-middleware": "^4.0.0-rc.3"
   }
 }

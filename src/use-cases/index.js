@@ -11,8 +11,11 @@ const UseCaseFactory = (() => {
   const ds1 = DataSourceFactory.getDataSource1();
   const observer = ObserverFactory.getInstance();
   observer.on(MODEL1_CREATE_EVENT, async (event) => {
-    console.log(MODEL1_CREATE_EVENT);
+    log(`event fired ${MODEL1_CREATE_EVENT}`);
     log(event);
+  });
+  observer.on(MODEL1_CREATE_EVENT, async (event) => {
+    log('attempting to call federated module');
     try {
       let fedmonserv = await import('fedmonserv/service1');
       fedmonserv.callService1(event);

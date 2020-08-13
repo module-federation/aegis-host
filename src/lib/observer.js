@@ -1,7 +1,7 @@
 let eventHandlers;
 
 /**
- * Abstract class
+ * Abstract observer
  */
 export class Observer {
   /**
