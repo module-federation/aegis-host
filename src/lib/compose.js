@@ -1,8 +1,7 @@
 
-export default function compose(...functions) {
-  return function (initialValue) {
-    console.log(initialValue);
-    return functions.reduceRight((v, f) => f(v), initialValue);
+export default function compose(...funcs) {
+  return function (initVal) {
+    return funcs.reduceRight((v, f) => f(v), initVal);
   }
 }
 
@@ -25,7 +24,6 @@ const incrementDecrement = compose(
 );
 
 console.log(incrementDecrement(1));
-
 
 function addId(obj) {
   const _id = obj.generateId();

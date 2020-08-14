@@ -19,7 +19,7 @@ const UseCaseFactory = (() => {
   observer.on(eventName, async (event) => {
     log('attempting to call federated module');
     try {
-      let fedmonserv = await import('fedmonserv/service1');
+      const fedmonserv = await import('fedmonserv/service1');
       fedmonserv.callService1(event);
     } catch (e) {
       log(e);
