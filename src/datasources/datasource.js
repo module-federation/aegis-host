@@ -2,7 +2,7 @@
  * Simple abstract datasource
  */
 export default class DataSource {
-  async save(data) {
+  async save(id, data) {
     throw new Error('abstract method not implemented');
   }
   /**

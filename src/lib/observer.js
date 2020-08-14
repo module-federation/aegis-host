@@ -12,7 +12,7 @@ export class Observer {
   on(eventName, handler) {
     throw new Error('unimplemented abstract method');
   }
-  async notify(event) {
+  async notify(eventName, eventData) {
     throw new Error('unimplemented abstract method');
   }
 }
@@ -40,15 +40,13 @@ class ObserverImpl extends Observer {
   /**
    * @override
    */
-  async notify(event) {
-    if (!event || !event.eventName) {
-      throw new Error('event missing or invalid');
-    }
-    if (eventHandlers.has(event.eventName)) {
-      return await eventHandlers.get(event.eventName).forEach(handler => handler(event));
+  async notify(eventName, eventData) {
+    if (eventHandlers.has(eventName)) {
+      return await eventHandlers.get(eventName).forEach(handler => handler(eventData));
     }
   }
 }
+
 
 const ObserverFactory = (() => {
   let instance;

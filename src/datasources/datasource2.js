@@ -8,8 +8,8 @@ export default class DataSource2 extends DataSource {
     super();
   }
 
-  async save(data) {
-    inMemoryDataSource.set(data.id, data);
+  async save(id, data) {
+    inMemoryDataSource.set(id, data);
   }
 
   async find(id) {

@@ -4,17 +4,19 @@ import editModelFactory from './edit-model';
 import listModelsFactory from './list-models';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
-import { MODEL_NAME as MODEL1 } from '../models/model1'
-import { EVENT_NAME as MODEL1_CREATE_EVENT } from '../models/model1-create-event'
+import ModelFactory from '../models';
+import { MODEL_NAME as MODEL1 } from '../models/model1';
 
 const UseCaseFactory = (() => {
   const ds1 = DataSourceFactory.getDataSource1();
   const observer = ObserverFactory.getInstance();
-  observer.on(MODEL1_CREATE_EVENT, async (event) => {
-    log(`event fired ${MODEL1_CREATE_EVENT}`);
+  const eventType = ModelFactory.eventTypes.CREATE;
+  const eventName = ModelFactory.getEventName(eventType, MODEL1);
+  observer.on(eventName, async (event) => {
+    log(`event fired ${eventName}`);
     log(event);
   });
-  observer.on(MODEL1_CREATE_EVENT, async (event) => {
+  observer.on(eventName, async (event) => {
     log('attempting to call federated module');
     try {
       let fedmonserv = await import('fedmonserv/service1');

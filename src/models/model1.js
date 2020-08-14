@@ -1,6 +1,6 @@
 export const MODEL_NAME = 'model1';
 
-export default function createModel1Factory(uniqueId, hash) {
+export default function createModel1Factory(hash, time) {
   return async function createModel1({
     field1,
     field2,
@@ -13,8 +13,7 @@ export default function createModel1Factory(uniqueId, hash) {
       throw new Error('Field2 invalid or missing');
     }
     return Object.freeze({
-      id: await uniqueId(),
-      modelName: MODEL_NAME,
+      createdAt: await time(),
       secret: await hash(secret),
       field1: field1,
       field2: field2

@@ -1,5 +1,32 @@
+import uuid from '../lib/uuid';
+import compose from '../lib/compose';
+
 let modelFactories;
 let eventFactories;
+
+/**
+ * @typedef {Object} Model
+ * @property {Function} getId
+ * @property {function} getModelName
+ */
+
+/**
+ * @typedef {Object} Event
+ * @property {Function} getId
+ * @property {Function} getEventName
+ */
+
+/**
+ * @typedef {Object} EventTypes
+ * @property {String} CREATE
+ * @property {String} UPDATE
+ * @property {String} DELETE
+ */
+export const EventTypes = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE'
+}
 
 function checkModelName(modelName) {
   if (typeof modelName === 'string') {
@@ -8,32 +35,62 @@ function checkModelName(modelName) {
   throw new Error('modelName missing or invalid');
 }
 
-function checkEventName(eventName) {
-  if (typeof eventName === 'string') {
-    eventName = eventName.toUpperCase();
-    if (Object.keys(Events).includes(eventName)) {
-      return eventName;
+function checkEventType(eventType) {
+  if (typeof eventType === 'string') {
+    eventType = eventType.toUpperCase();
+    if (Object.keys(EventTypes).includes(eventType)) {
+      return eventType;
     }
   }
-  throw new Error('eventlName missing or invalid');
+  throw new Error('eventlType missing or invalid');
 }
 
-/**
- * @typedef {Object} Events
- * @property {String} CREATE
- * @property {String} UPDATE
- */
-export const Events = {
-  CREATE: 'CREATE',
-  UPDATE: 'UPDATE'
+export function createEventName(eventType, modelName) {
+  return checkEventType(eventType) + checkModelName(modelName);
 }
+
+function addId(o) {
+  const _id = o.generateId();
+  return Object.assign({}, o, {
+    id: _id,
+    getId: () => _id
+  });
+}
+
+function addEventName(o) {
+  const { eventType, modelName } = o;
+  const _eventName = createEventName(eventType, modelName);
+  return Object.assign({}, o, {
+    eventName: _eventName,
+    getEventName: () => _eventName,
+  });
+}
+
+function addModelName(o) {
+  const { modelName } = o;
+  return Object.assign({}, o, {
+    modelName: modelName,
+    getModelName: () => modelName
+  });
+}
+
+const enrichModel = compose(
+  addId,
+  addModelName
+);
+
+const enrichEvent = compose(
+  addId,
+  addEventName
+);
 
 export default class ModelFactoryInstance {
   constructor() {
     modelFactories = new Map();
     eventFactories = {
-      [Events.CREATE]: new Map(),
-      [Events.UPDATE]: new Map()
+      [EventTypes.CREATE]: new Map(),
+      [EventTypes.UPDATE]: new Map(),
+      [EventTypes.DELETE]: new Map()
     }
   }
 
@@ -52,15 +109,15 @@ export default class ModelFactoryInstance {
 
   /**
    * Register a factory function to create an event for the model `modelName`
-   * @param {String} eventName Name of event {@link Events}
+   * @param {String} eventType Name of event {@link EventTypes}
    * @param {String} modelName
    * @param {Function} factoryFunction
    */
-  registerEvent(eventName, modelName, factoryFunction) {
+  registerEvent(eventType, modelName, factoryFunction) {
     modelName = checkModelName(modelName);
-    eventName = checkEventName(eventName);
+    eventType = checkEventType(eventType);
     if (typeof factoryFunction === 'function') {
-      eventFactories[eventName].set(modelName, factoryFunction);
+      eventFactories[eventType].set(modelName, factoryFunction);
     }
   }
 
@@ -69,33 +126,48 @@ export default class ModelFactoryInstance {
   }
 
   /**
-   * Call factory function previously registered for `modelName`
+   * Call the factory function previously registered for `modelName`
    * @see {@link registerModel} for further info 
    * @param {String} modelName 
    * @param {*} args
-   * @returns {*} the model instance
+   * @returns {Promise<Model>} the model instance
    */
   async createModel(modelName, args) {
     modelName = checkModelName(modelName);
+
     if (modelFactories.has(modelName)) {
-      return modelFactories.get(modelName)(args);
+      const model = await modelFactories.get(modelName)(args);
+      const params = {
+        generateId: uuid,
+        modelName: modelName
+      };
+      return Object.freeze(enrichModel({ ...model, ...params }));
     }
     throw new Error('unregistered model');
   }
 
   /**
-   * Call factory function previously registered for `eventName`
+   * Call factory function previously registered for `eventType`
    * @see {@link registerEvent}
-   * @param {String} eventName 
+   * @param {String} eventType 
    * @param {String} modelName 
    * @param {*} args 
-   * @returns {*} the event instance
+   * @returns {Promise<Event>} the event instance
    */
-  async createEvent(eventName, modelName, args) {
+  async createEvent(eventType, modelName, args) {
     modelName = checkModelName(modelName);
-    eventName = checkEventName(eventName);
-    if (eventFactories[eventName].has(modelName)) {
-      return eventFactories[eventName].get(modelName)(args);
+    eventType = checkEventType(eventType);
+
+    if (eventFactories[eventType].has(modelName)) {
+      const event = await eventFactories[eventType].get(modelName)(args);
+      const params = {
+        generateId: uuid,
+        eventType: eventType,
+        modelName: modelName
+      }
+      return Object.freeze(enrichEvent({ ...event, ...params }));
+      // const standardizedEvent = standardizeEvent(eventType, modelName, uuid)(event);
+      // return Object.freeze(standardizedEvent);
     }
     throw new Error('unregistered model event');
   }
