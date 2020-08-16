@@ -8,7 +8,6 @@ var serverConfig = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'fedmon.bundle.js',
-    // publicPath: path.resolve(__dirname, 'dist')
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
@@ -32,7 +31,7 @@ var serverConfig = {
     new ModuleFederationPlugin({
       name: "fedmon",
       remotes: {
-        fedmonserv: "http://localhost:3001/remoteEntry.js"
+        fedmonserv: "fedmonserv@http://localhost:3001/remoteEntry.js"
       },
     }),
   ]

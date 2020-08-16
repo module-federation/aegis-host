@@ -42,7 +42,7 @@ function checkEventType(eventType) {
       return eventType;
     }
   }
-  throw new Error('eventlType missing or invalid');
+  throw new Error('eventType missing or invalid');
 }
 
 export function createEventName(eventType, modelName) {
@@ -58,8 +58,16 @@ function addId(o) {
 }
 
 function addEventName(o) {
-  const { eventType, modelName } = o;
-  const _eventName = createEventName(eventType, modelName);
+  const {
+    eventType,
+    modelName
+  } = o;
+
+  const _eventName = createEventName(
+    eventType,
+    modelName
+  );
+
   return Object.assign({}, o, {
     eventName: _eventName,
     getEventName: () => _eventName,
@@ -67,21 +75,51 @@ function addEventName(o) {
 }
 
 function addModelName(o) {
-  const { modelName } = o;
+  const {
+    modelName
+  } = o;
+
   return Object.assign({}, o, {
     modelName: modelName,
     getModelName: () => modelName
   });
 }
 
+function addTimestamp(o) {
+  const {
+    eventType
+  } = o;
+
+  function timeStamp() {
+    return new Date().toUTCString();
+  }
+
+  function propName() {
+    const event = eventType || EventTypes.CREATE
+    return event.toLowerCase() + 'Time';
+  }
+
+  return Object.assign({}, o, {
+    [propName()]: timeStamp(),
+  });
+}
+
+/**
+ * Mix in standard model properties 
+ */
 const enrichModel = compose(
   addId,
-  addModelName
+  addModelName,
+  addTimestamp,
 );
 
+/**
+ * Mix in standard event properties
+ */
 const enrichEvent = compose(
   addId,
-  addEventName
+  addEventName,
+  addTimestamp
 );
 
 export default class ModelFactoryInstance {
@@ -101,6 +139,7 @@ export default class ModelFactoryInstance {
    */
   registerModel(modelName, factoryFunction) {
     modelName = checkModelName(modelName);
+
     if (!modelFactories.has(modelName)
       && typeof factoryFunction === 'function') {
       modelFactories.set(modelName, factoryFunction);
@@ -116,6 +155,7 @@ export default class ModelFactoryInstance {
   registerEvent(eventType, modelName, factoryFunction) {
     modelName = checkModelName(modelName);
     eventType = checkEventType(eventType);
+
     if (typeof factoryFunction === 'function') {
       eventFactories[eventType].set(modelName, factoryFunction);
     }
@@ -139,9 +179,11 @@ export default class ModelFactoryInstance {
       const model = await modelFactories.get(modelName)(args);
       const params = {
         generateId: uuid,
-        modelName: modelName
-      };
-      return Object.freeze(enrichModel({ ...model, ...params }));
+        modelName: modelName,
+      }
+      return Object.freeze(
+        enrichModel({ ...model, ...params })
+      );
     }
     throw new Error('unregistered model');
   }
@@ -162,12 +204,12 @@ export default class ModelFactoryInstance {
       const event = await eventFactories[eventType].get(modelName)(args);
       const params = {
         generateId: uuid,
+        modelName: modelName,
         eventType: eventType,
-        modelName: modelName
       }
-      return Object.freeze(enrichEvent({ ...event, ...params }));
-      // const standardizedEvent = standardizeEvent(eventType, modelName, uuid)(event);
-      // return Object.freeze(standardizedEvent);
+      return Object.freeze(
+        enrichEvent({ ...event, ...params })
+      );
     }
     throw new Error('unregistered model event');
   }

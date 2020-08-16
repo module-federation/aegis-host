@@ -7,7 +7,7 @@
     "build-webpack": "webpack --config webpack.config.js",
     "build": "npm run clean && babel src -d dist",
     "dev": "cd ./src && nodemon --exec babel-node src/index.js",
-    "start-webpack": "webpack-dev-server",
+    "start-webpack": "webpack-dev-server --open",
     "start": "npm run build && cd dist && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist && rm -rf public/server"

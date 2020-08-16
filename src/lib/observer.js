@@ -5,8 +5,8 @@ let eventHandlers;
  */
 export class Observer {
   /**
-   * Register callback to fire on event `eventName`
-   * @param {String} eventName 
+   * Register callback `handler` to fire on event `eventName`
+   * @param {String} eventName   
    * @param {Function} handler 
    */
   on(eventName, handler) {

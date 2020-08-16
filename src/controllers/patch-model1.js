@@ -5,14 +5,13 @@ export default function patchModel1Factory(editModel1) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body
       log({ function: 'patchModel1', ...modelInfo });
+
       source.ip = httpRequest.ip
       source.browser = httpRequest.headers['User-Agent']
       if (httpRequest.headers['Referer']) {
         source.referrer = httpRequest.headers['Referer']
       }
       const id = httpRequest.params.id;
-      log(httpRequest.params);
-      log({ ...modelInfo });
       log(source);
 
       const model = await editModel1(id, { ...modelInfo });
@@ -21,7 +20,7 @@ export default function patchModel1Factory(editModel1) {
       return {
         headers: {
           'Content-Type': 'application/json',
-          'Last-Modified': Date.now().toLocaleString()
+          'Last-Modified': new Date().toUTCString()
         },
         statusCode: 201,
         body: { modelId: model.id }

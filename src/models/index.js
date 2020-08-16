@@ -1,6 +1,9 @@
 import crypto from 'crypto';
 import uuid from '../lib/uuid';
-import ModelFactoryInstance, { EventTypes, createEventName } from './model-factory';
+import ModelFactoryInstance, {
+  EventTypes,
+  createEventName
+} from './model-factory';
 import createModel1Factory from './model1';
 import createModel1EventFactory from './model1-create-event';
 import updateModel1EventFactory from './model1-update-event';
@@ -28,6 +31,11 @@ const ModelFactory = (function () {
       }
       return instance;
     },
+    /**
+     * event name
+     * @param {String} eventType 
+     * @param {String} modelName 
+     */
     getEventName: function (eventType, modelName) {
       return createEventName(eventType, modelName);
     },
@@ -47,7 +55,22 @@ function time() {
 }
 
 const factory = ModelFactory.getInstance();
-factory.registerModel(MODEL1, createModel1Factory(hash, time));
-factory.registerEvent(EventTypes.CREATE, MODEL1, createModel1EventFactory(uuid, time));
-factory.registerEvent(EventTypes.UPDATE, MODEL1, updateModel1EventFactory(uuid, time));
+
+factory.registerModel(
+  MODEL1,
+  createModel1Factory(hash, time)
+);
+
+factory.registerEvent(
+  EventTypes.CREATE,
+  MODEL1,
+  createModel1EventFactory(uuid, time)
+);
+
+factory.registerEvent(
+  EventTypes.UPDATE,
+  MODEL1,
+  updateModel1EventFactory(uuid, time)
+);
+
 export default ModelFactory;

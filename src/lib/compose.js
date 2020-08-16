@@ -1,4 +1,13 @@
 
+/**
+ * Compose functions to execute in left-to-right / top-to-bottom order
+ * ```
+ * compose(func1, func2)(args);
+ * 
+ * i.e. func1(func1(args));
+ * ```
+ * @param  {...any} funcs 
+ */
 export default function compose(...funcs) {
   return function (initVal) {
     return funcs.reduceRight((v, f) => f(v), initVal);
@@ -16,6 +25,8 @@ function decrement(num) {
   console.log(`decrement: ${diff}`);
   return diff;
 }
+
+console.log(compose(increment, decrement)(1));
 
 const incrementDecrement = compose(
   increment,
