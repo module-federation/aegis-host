@@ -1,4 +1,3 @@
-let eventHandlers;
 
 /**
  * Abstract observer
@@ -18,9 +17,9 @@ export class Observer {
 }
 
 class ObserverImpl extends Observer {
-  constructor() {
-    eventHandlers = new Map();
+  constructor(eventHandlers) {
     super();
+    this._handlers = eventHandlers;
   }
 
   /**
@@ -30,10 +29,10 @@ class ObserverImpl extends Observer {
     if (eventName && typeof handler !== 'function') {
       throw new Error('eventName or handler invalid');
     }
-    if (eventHandlers.has(eventName)) {
-      eventHandlers.get(eventName).push(handler);
+    if (this._handlers.has(eventName)) {
+      this._handlers.get(eventName).push(handler);
     } else {
-      eventHandlers.set(eventName, [handler]);
+      this._handlers.set(eventName, [handler]);
     }
   }
 
@@ -41,8 +40,10 @@ class ObserverImpl extends Observer {
    * @override
    */
   async notify(eventName, eventData) {
-    if (eventHandlers.has(eventName)) {
-      return await eventHandlers.get(eventName).forEach(handler => handler(eventData));
+    if (this._handlers.has(eventName)) {
+      await Promise.all(this._handlers.get(eventName).map(
+        async handler => await handler(eventData)
+      ));
     }
   }
 }
@@ -52,7 +53,7 @@ const ObserverFactory = (() => {
   let instance;
 
   function createInstance() {
-    return new ObserverImpl();
+    return new ObserverImpl(new Map());
   }
 
   return Object.freeze({

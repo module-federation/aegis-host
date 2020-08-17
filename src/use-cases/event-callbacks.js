@@ -1,4 +1,4 @@
-import ModelFactory from "../models";
+import ModelFactory from '../models';
 import log from '../lib/logger';
 import { MODEL_NAME as MODEL1 } from '../models/model1';
 
