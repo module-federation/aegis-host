@@ -1,5 +1,6 @@
 import uuid from '../lib/uuid';
 import compose from '../lib/compose';
+import Model from './model';
 
 let modelFactories;
 let eventFactories;
@@ -95,8 +96,8 @@ function addTimestamp(o) {
   }
 
   function propName() {
-    const event = eventType || EventTypes.CREATE
-    return event.toLowerCase() + 'Time';
+    const e = eventType || EventTypes.CREATE
+    return e.toLowerCase() + 'Time';
   }
 
   return Object.assign({}, o, {
@@ -176,14 +177,13 @@ export default class ModelFactoryInstance {
     modelName = checkModelName(modelName);
 
     if (modelFactories.has(modelName)) {
-      const model = await modelFactories.get(modelName)(args);
-      const params = {
-        generateId: uuid,
-        modelName: modelName,
-      }
-      return Object.freeze(
-        enrichModel({ ...model, ...params })
-      );
+      const model = await Model.create({
+        factory: modelFactories.get(modelName),
+        args: args,
+        modelName: modelName
+      });
+
+      return Object.freeze(model);
     }
     throw new Error('unregistered model');
   }
@@ -202,13 +202,14 @@ export default class ModelFactoryInstance {
 
     if (eventFactories[eventType].has(modelName)) {
       const event = await eventFactories[eventType].get(modelName)(args);
-      const params = {
+      const options = {
         generateId: uuid,
         modelName: modelName,
         eventType: eventType,
       }
+
       return Object.freeze(
-        enrichEvent({ ...event, ...params })
+        enrichEvent({ ...event, ...options })
       );
     }
     throw new Error('unregistered model event');

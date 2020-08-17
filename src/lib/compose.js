@@ -4,11 +4,12 @@
  * ```
  * compose(func1, func2)(args);
  * 
- * i.e. func1(func1(args));
+ * // i.e. func2(func1(args));
  * ```
  * @param  {...any} funcs 
  */
-export default function compose(...funcs) {
+export default
+  function compose(...funcs) {
   return function (initVal) {
     return funcs.reduceRight((v, f) => f(v), initVal);
   }
@@ -57,6 +58,92 @@ const enrichEvent = compose(
   addId,
   addEventName
 );
+
+
+function addId2(generateId) {
+  return function (o) {
+    const _id = generateId();
+    return Object.assign({}, o, {
+      id: _id,
+      getId: () => _id
+    });
+  }
+}
+
+function addTimestamp(time) {
+  return function (o) {
+    const _created = time();
+    return Object.assign({}, o, {
+      id: _created,
+      created: () => _created
+    });
+  }
+}
+
+const enrichEvent2 = (id, time) => o => compose(
+  addId2(id),
+  addTimestamp(time)
+)(o);
+
+const myObj = { var1: 'val1' };
+const time = () => new Date().toUTCString();
+const idgen = () => 'id777';
+const enrich = enrichEvent2(idgen, time);
+console.log('#############')
+console.log(enrich(myObj));
+console.log()
+
+const enrichFactory = (function () {
+  function addId(fnGeneratedId) {
+    return function (o) {
+      const _id = fnGeneratedId();
+      return Object.assign({}, o, {
+        id: _id,
+        getId: () => _id
+      });
+    }
+  }
+
+  function addTimestamp(fnTimestamp) {
+    return function (o) {
+      const _created = fnTimestamp();
+      return Object.assign({}, o, {
+        id: _created,
+        created: () => _created
+      });
+    }
+  }
+
+  const _enrichEvent = (id, time, eventType, modelName) => o => compose(
+    addId(id),
+    addTimestamp(time),
+    // addEventName(eventType, modelName)
+  )(o);
+
+  const _enrichModel = (id, time, modelName) => o => compose(
+    addId(id),
+    addTimestamp(time),
+    //  addModelName(modelName)
+  )(o);
+
+  const time = () => new Date().toUTCString();
+  const idgen = () => 'id777';
+  const enrichEvent = _enrichEvent(idgen, time);
+  const enrichModel = _enrichModel();
+
+  return {
+    enrichEvent,
+    enrichModel
+  };
+})();
+
+enrichFactory.enrichEvent(myObj);
+
+console.log('>>>>>>>>>>')
+console.log(myObj);
+
+//const myObjEnriched = enrichEvent2(idgen, time)(myObj);
+//console.log(myObjEnriched);
 
 const eventObj = {
   field1: 'val1',

@@ -6,6 +6,7 @@ export default function createModel1Factory(hash, time) {
     field2,
     secret = field1 + field2
   } = {}) {
+    console.log('createModel1');
     if (!field1) {
       throw new Error('Field1 invalid or missing');
     }

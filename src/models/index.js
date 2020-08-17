@@ -46,6 +46,8 @@ const ModelFactory = (function () {
   };
 })();
 
+
+
 function hash(data) {
   return crypto.createHash('md5').update(data);
 }

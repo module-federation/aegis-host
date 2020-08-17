@@ -14,7 +14,7 @@ export default function eventCallbacks(observer) {
       MODEL1
     ),
     async (event) => {
-      log(`event fired ${eventName}`);
+      log(`event fired ${event.getEventName()}`);
       log(event);
     }
   );
