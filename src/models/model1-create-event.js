@@ -1,10 +1,8 @@
 
-export default function createModel1EventFactory(uniqueId, timeStamp) {
+export default function createModel1EventFactory() {
   return async function createModel1Event(model1) {
     return Object.freeze({
-      eventId: await uniqueId(),
       eventData: { ...model1 },
-      createdAt: await timeStamp()
     });
   }
 } 

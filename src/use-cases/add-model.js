@@ -19,7 +19,7 @@ export default function addModelFactory({
   handlers = []
 } = {}) {
 
-  const eventType = ModelFactory.eventTypes.CREATE;
+  const eventType = ModelFactory.EventTypes.CREATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
   handlers.push(event => log(event));
   handlers.forEach(handler => observer.on(eventName, handler));

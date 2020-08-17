@@ -1,8 +1,6 @@
-const { withId, withTimestamp } = require('./mixins');
-const asyncPipe = require('../lib/async-pipe');
+import { withId, withEventTimestamp } from './mixins';
+import asyncPipe from '../lib/async-pipe';
 import uuid from '../lib/uuid';
-// const uuid = () => 'ID123';
-const utc = () => new Date().toUTCString();
 
 /**
  * @typedef {Object} Event
@@ -27,7 +25,7 @@ const Event = (() => {
 
   const makeEvent = asyncPipe(
     Event,
-    withTimestamp(utc),
+    withEventTimestamp(() => new Date().toUTCString()),
     withId(uuid),
   );
 
@@ -35,31 +33,14 @@ const Event = (() => {
     /**
      * 
      * @param {{factory: Function, args: any, eventType: String, modelName: String}} options 
-     * @returns {Event}
+     * @returns {Promise<Event>}
      */
     create: async function (options) {
-      return await makeEvent(options);
+      return makeEvent(options);
     }
   }
 })();
 
 export default Event;
 
-// const factFunc = (val1) => {
-//   return {
-//     var1: val1,
-//     isValid: function () {
-//       return val1 !== 'undefined';
-//     }
-//   };
-// }
-
-// const m = Model.create({
-//   factory: factFunc,
-//   args: 'arg1',
-//   modelName: 'model1'
-// });
-// console.log(m);
-// console.log(`getModelName: ${m.getModelName()}`);
-// console.log(`isValid: ${m.isValid()}`);
 

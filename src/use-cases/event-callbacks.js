@@ -10,7 +10,7 @@ export default function eventCallbacks(observer) {
 
   observer.on(
     ModelFactory.getEventName(
-      ModelFactory.eventTypes.CREATE,
+      ModelFactory.EventTypes.CREATE,
       MODEL1
     ),
     async (event) => {
@@ -21,7 +21,7 @@ export default function eventCallbacks(observer) {
 
   observer.on(
     ModelFactory.getEventName(
-      ModelFactory.eventTypes.CREATE,
+      ModelFactory.EventTypes.CREATE,
       MODEL1
     ),
     async (event) => {

@@ -20,21 +20,21 @@ export default function editModelFactory({
   handlers = []
 } = {}) {
 
-  const eventType = ModelFactory.eventTypes.UPDATE;
+  const eventType = ModelFactory.EventTypes.UPDATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
   handlers.push(event => log(event));
   handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function editModel(id, changes) {
-    const modelData = await repository.find(id);
-    if (!modelData) {
+    const model = await repository.find(id);
+    if (!model) {
       throw new Error('no such id');
     }
-    const updates = { ...modelData, ...changes };
+    const updated = { ...model, ...changes };
     const factory = ModelFactory.getInstance();
-    const event = await factory.createEvent(eventType, modelName, updates);
-    await repository.save(id, updates);
+    const event = await factory.createEvent(eventType, modelName, updated);
+    await repository.save(id, updated);
     await observer.notify(event.getEventName(), event);
-    return updates;
+    return updated;
   }
 }

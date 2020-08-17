@@ -1,10 +1,8 @@
 
-export default function updateModel1EventFactory(uniqueId, time) {
+export default function updateModel1EventFactory() {
   return async function updateModel1Event(model1) {
     return Object.freeze({
-      eventId: uniqueId(),
       eventData: { ...model1 },
-      updatedAt: time()
     });
   }
 }

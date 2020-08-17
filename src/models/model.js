@@ -1,11 +1,14 @@
-import { withId, withTimestamp } from './mixins';
+import { withId, withTimestamp, utc } from './mixins';
 import asyncPipe from '../lib/async-pipe';
 import uuid from '../lib/uuid';
-const utc = () => new Date().toUTCString();
+
+/**
+ * @callback GetModelName
+ */
 
 /**
  * @typedef {Object} Model
- * @property {Function} getModelName
+ * @property {GetModelName} getModelName
  * @property {String} id
  * @property {String} created
  */
@@ -32,31 +35,13 @@ const Model = (() => {
     /**
      * 
      * @param {{factory: Function, args: any, modelName: String}} options 
-     * @returns {Model}
+     * @returns {Promise<Model>}
      */
     create: async function (options) {
-      return await makeModel(options);
+      return makeModel(options);
     }
   }
 })();
 
 export default Model;
-
-// const factFunc = (val1) => {
-//   return {
-//     var1: val1,
-//     isValid: function () {
-//       return val1 !== 'undefined';
-//     }
-//   };
-// }
-
-// const m = Model.create({
-//   factory: factFunc,
-//   args: 'arg1',
-//   modelName: 'model1'
-// });
-// console.log(m);
-// console.log(`getModelName: ${m.getModelName()}`);
-// console.log(`isValid: ${m.isValid()}`);
 
