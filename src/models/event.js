@@ -1,29 +1,32 @@
-import { withId, withTimestamp } from './mixins';
-import asyncPipe from '../lib/async-pipe';
+const { withId, withTimestamp } = require('./mixins');
+const asyncPipe = require('../lib/async-pipe');
 import uuid from '../lib/uuid';
+// const uuid = () => 'ID123';
 const utc = () => new Date().toUTCString();
 
 /**
- * @typedef {Object} Model
- * @property {Function} getModelName
+ * @typedef {Object} Event
+ * @property {Function} getEventName
  * @property {String} id
- * @property {String} created
+ * @property {String} eventType
+ * @property {String} modelName
  */
 
-const Model = (() => {
+const Event = (() => {
 
-  const Model = ({ factory, args, modelName }) => {
+  const Event = ({ factory, args, eventType, modelName }) => {
     return Promise.resolve(
       factory(args)
-    ).then(model => ({
+    ).then(event => ({
+      getEventName: () => eventType + modelName,
+      eventType: eventType,
       modelName: modelName,
-      getModelName: () => modelName,
-      ...model
+      ...event
     }));
   };
 
-  const makeModel = asyncPipe(
-    Model,
+  const makeEvent = asyncPipe(
+    Event,
     withTimestamp(utc),
     withId(uuid),
   );
@@ -31,16 +34,16 @@ const Model = (() => {
   return {
     /**
      * 
-     * @param {{factory: Function, args: any, modelName: String}} options 
-     * @returns {Model}
+     * @param {{factory: Function, args: any, eventType: String, modelName: String}} options 
+     * @returns {Event}
      */
     create: async function (options) {
-      return await makeModel(options);
+      return await makeEvent(options);
     }
   }
 })();
 
-export default Model;
+export default Event;
 
 // const factFunc = (val1) => {
 //   return {

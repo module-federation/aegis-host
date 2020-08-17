@@ -1,9 +1,9 @@
 import addModelFactory from './add-model';
 import editModelFactory from './edit-model';
 import listModelsFactory from './list-models';
+import eventCallbacks from './event-callbacks';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
-import eventCallbacks from './event-callbacks';
 import { MODEL_NAME as MODEL1 } from '../models/model1';
 
 eventCallbacks(ObserverFactory.getInstance());

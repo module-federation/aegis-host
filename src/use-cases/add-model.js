@@ -10,7 +10,6 @@ import log from '../lib/logger';
  */
 
 /**
- * 
  * @param {ModelParam} param0 
  */
 export default function addModelFactory({

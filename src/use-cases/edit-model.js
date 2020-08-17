@@ -2,8 +2,16 @@ import ModelFactory from '../models';
 import log from '../lib/logger';
 
 /**
+ * @typedef {Object} ModelParam
+ * @property {String} modelName 
+ * @property {import('../datasources/datasource').default} repository 
+ * @property {import('../lib/observer').Observer} observer
+ * @property {...Function} handlers
+ */
+
+/**
  * 
- * @param {*} param0 
+ * @param {ModelParam} param0 
  */
 export default function editModelFactory({
   modelName,
@@ -18,16 +26,15 @@ export default function editModelFactory({
   handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function editModel(id, changes) {
-    const modelData = repository.find(id);
+    const modelData = await repository.find(id);
     if (!modelData) {
       throw new Error('no such id');
     }
     const updates = { ...modelData, ...changes };
     const factory = ModelFactory.getInstance();
-    const model = await factory.createModel(modelName, updates);
-    const event = await factory.createEvent(eventType, modelName, model);
-    await repository.save(model.id, model);
+    const event = await factory.createEvent(eventType, modelName, updates);
+    await repository.save(id, updates);
     await observer.notify(event.getEventName(), event);
-    return model;
+    return updates;
   }
 }

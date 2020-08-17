@@ -1,20 +1,12 @@
-import uuid from '../lib/uuid';
-import compose from '../lib/compose';
 import Model from './model';
+import Event from './event';
 
 let modelFactories;
 let eventFactories;
 
 /**
- * @typedef {Object} Model
- * @property {Function} getId
- * @property {function} getModelName
- */
-
-/**
- * @typedef {Object} Event
- * @property {Function} getId
- * @property {Function} getEventName
+ * @typedef {import('./model').Model} Model
+ * @typedef {import('./event').Event} Event
  */
 
 /**
@@ -49,79 +41,6 @@ function checkEventType(eventType) {
 export function createEventName(eventType, modelName) {
   return checkEventType(eventType) + checkModelName(modelName);
 }
-
-function addId(o) {
-  const _id = o.generateId();
-  return Object.assign({}, o, {
-    id: _id,
-    getId: () => _id
-  });
-}
-
-function addEventName(o) {
-  const {
-    eventType,
-    modelName
-  } = o;
-
-  const _eventName = createEventName(
-    eventType,
-    modelName
-  );
-
-  return Object.assign({}, o, {
-    eventName: _eventName,
-    getEventName: () => _eventName,
-  });
-}
-
-function addModelName(o) {
-  const {
-    modelName
-  } = o;
-
-  return Object.assign({}, o, {
-    modelName: modelName,
-    getModelName: () => modelName
-  });
-}
-
-function addTimestamp(o) {
-  const {
-    eventType
-  } = o;
-
-  function timeStamp() {
-    return new Date().toUTCString();
-  }
-
-  function propName() {
-    const e = eventType || EventTypes.CREATE
-    return e.toLowerCase() + 'Time';
-  }
-
-  return Object.assign({}, o, {
-    [propName()]: timeStamp(),
-  });
-}
-
-/**
- * Mix in standard model properties 
- */
-const enrichModel = compose(
-  addId,
-  addModelName,
-  addTimestamp,
-);
-
-/**
- * Mix in standard event properties
- */
-const enrichEvent = compose(
-  addId,
-  addEventName,
-  addTimestamp
-);
 
 export default class ModelFactoryInstance {
   constructor() {
@@ -162,13 +81,8 @@ export default class ModelFactoryInstance {
     }
   }
 
-  listModels() {
-    return [...modelFactories.values()];
-  }
-
   /**
    * Call the factory function previously registered for `modelName`
-   * @see {@link registerModel} for further info 
    * @param {String} modelName 
    * @param {*} args
    * @returns {Promise<Model>} the model instance
@@ -189,8 +103,7 @@ export default class ModelFactoryInstance {
   }
 
   /**
-   * Call factory function previously registered for `eventType`
-   * @see {@link registerEvent}
+   * Call factory function previously registered for `eventType` and `model`
    * @param {String} eventType 
    * @param {String} modelName 
    * @param {*} args 
@@ -201,17 +114,19 @@ export default class ModelFactoryInstance {
     eventType = checkEventType(eventType);
 
     if (eventFactories[eventType].has(modelName)) {
-      const event = await eventFactories[eventType].get(modelName)(args);
-      const options = {
-        generateId: uuid,
-        modelName: modelName,
+      const event = await Event.create({
+        factory: eventFactories[eventType].get(modelName),
+        args: args,
         eventType: eventType,
-      }
+        modelName: modelName
+      });
 
-      return Object.freeze(
-        enrichEvent({ ...event, ...options })
-      );
+      return Object.freeze(event);
     }
     throw new Error('unregistered model event');
+  }
+
+  listModels() {
+    return [...modelFactories.values()];
   }
 }
