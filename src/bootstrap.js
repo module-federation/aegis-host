@@ -1,3 +1,3 @@
-import server from './server';
+import Server from './server';
 
-server.start();
+Server.start();

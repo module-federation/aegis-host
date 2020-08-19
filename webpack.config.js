@@ -1,28 +1,26 @@
 var path = require('path');
 const ModuleFederationPlugin = require("webpack").container.ModuleFederationPlugin;
 
-var serverConfig = {
+module.exports = {
   mode: 'development',
   entry: path.resolve(__dirname, 'src/index.js'),
   target: 'node',
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'fedmon.bundle.js',
-  },
-  devServer: {
-    contentBase: path.resolve(__dirname, 'dist'),
+    publicPath: "http://localhost:8070/"
+    // path: path.resolve(__dirname, 'dist'),
+    // filename: 'fedmon.bundle.js',
   },
   module: {
     rules: [
       {
         test: /\.js?$/,
-        include: path.resolve(__dirname, 'src'),
-        exclude: /(node_modules)/,
+        // include: path.resolve(__dirname, 'src'),
+        exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env'],
-          }
+          // options: {
+          //   presets: ['@babel/preset-env'],
+          // }
         }
       },
     ]
@@ -30,11 +28,17 @@ var serverConfig = {
   plugins: [
     new ModuleFederationPlugin({
       name: "fedmon",
+      library: { type: "commonjs-module" },
+      filename: "remoteEntry.js",
       remotes: {
-        fedmonserv: "fedmonserv@http://localhost:3001/remoteEntry.js"
+        fedmonserv: path.resolve(
+          __dirname,
+          "../federated-monolith-services/dist/remoteEntry.js"
+        )
       },
+      shared: ['express']
     }),
   ]
 }
 
-module.exports = [serverConfig]
+// module.exports = [serverConfig]

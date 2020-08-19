@@ -1,12 +1,12 @@
 import addModelFactory from './add-model';
 import editModelFactory from './edit-model';
 import listModelsFactory from './list-models';
-import eventCallbacks from './event-callbacks';
+import handleEvents from './handle-events';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
 import { MODEL_NAME as MODEL1 } from '../models/model1';
 
-eventCallbacks(ObserverFactory.getInstance());
+handleEvents(ObserverFactory.getInstance());
 
 const UseCaseFactory = (() => {
   const dataSrc1 = DataSourceFactory.getDataSource1();

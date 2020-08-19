@@ -2,15 +2,16 @@
   "name": "federated-monolith",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "./dist/main.js",
   "scripts": {
     "build-webpack": "webpack --config webpack.config.js",
-    "build": "npm run clean && babel src -d dist",
-    "dev": "cd ./src && nodemon --exec babel-node src/index.js",
-    "start-webpack": "webpack-dev-server --open",
-    "start": "npm run build && cd dist && node index.js",
+    "build": "babel src -d dist",
+    "restart": "npm run clean && npm run build && npm run build-webpack && npm run start-webpack",
+    "start-webpack": "cd dist && node main.js",
+    "start-dev": "cd dist && node index.js",
+    "start": "npm run start-webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rm -rf dist && rm -rf public/server"
+    "clean": "rm -rf dist"
   },
   "author": "Tyson Midboe",
   "license": "MIT",

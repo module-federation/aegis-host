@@ -11,6 +11,11 @@ export class Observer {
   on(eventName, handler) {
     throw new Error('unimplemented abstract method');
   }
+  /**
+   *  
+   * @param {String} eventName 
+   * @param {import('../models/event').Event} eventData 
+   */
   async notify(eventName, eventData) {
     throw new Error('unimplemented abstract method');
   }

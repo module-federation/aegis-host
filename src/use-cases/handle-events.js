@@ -6,16 +6,15 @@ import { MODEL_NAME as MODEL1 } from '../models/model1';
  * 
  * @param {import('../lib/observer').Observer} observer 
  */
-export default function eventCallbacks(observer) {
+export default function handleEvents(observer) {
 
   observer.on(
     ModelFactory.getEventName(
       ModelFactory.EventTypes.CREATE,
       MODEL1
     ),
-    async (event) => {
+    async event => {
       log(`event fired ${event.getEventName()}`);
-      log(event);
     }
   );
 
@@ -24,13 +23,13 @@ export default function eventCallbacks(observer) {
       ModelFactory.EventTypes.CREATE,
       MODEL1
     ),
-    async (event) => {
+    async event => {
       log('attempting to call federated module');
       try {
-        const fedmonserv = await import('fedmonserv/service1');
-        fedmonserv.callService1(event);
-      } catch (e) {
-        log(e);
+        const callService1 = (await import('fedmonserv/service1')).default;
+        callService1(event);
+      } catch (error) {
+        log(error);
       }
     }
   );

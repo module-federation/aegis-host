@@ -48,12 +48,6 @@ import Event from './event';
 const ModelFactory = (() => {
   let instance;
 
-  /**
- * @typedef {Object} EventTypes
- * @property {String} CREATE
- * @property {String} UPDATE
- * @property {String} DELETE
- */
   const EventTypes = {
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
@@ -91,10 +85,10 @@ const ModelFactory = (() => {
 
     return {
       /**
-     * Register a factory function to create the model `modelName`
-     * @param {String} modelName 
-     * @param {Function} factoryFunction 
-     */
+       * Register a factory function to create the model `modelName`
+       * @param {String} modelName 
+       * @param {Function} factoryFunction 
+       */
       registerModel: (modelName, factoryFunction) => {
         modelName = checkModelName(modelName);
 
@@ -140,12 +134,12 @@ const ModelFactory = (() => {
       },
 
       /**
-         * Call factory function previously registered for `eventType` and `model`
-         * @param {String} eventType 
-         * @param {String} modelName 
-         * @param {*} args 
-         * @returns {Readonly<Promise<Event>>} the event instance
-         */
+       * Call factory function previously registered for `eventType` and `model`
+       * @param {String} eventType 
+       * @param {String} modelName 
+       * @param {*} args 
+       * @returns {Readonly<Promise<Event>>} the event instance
+       */
       createEvent: async (eventType, modelName, args) => {
         modelName = checkModelName(modelName);
         eventType = checkEventType(eventType);

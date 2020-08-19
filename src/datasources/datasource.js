@@ -8,13 +8,14 @@ export default class DataSource {
   /**
    * 
    * @param {*} id record id
-   * @returns {*} record
+   * @returns {Promise<any>} record
    */
   async find(id) {
     throw new Error('abstract method not implemented');
   }
   /**
    * list records
+   * @returns {Promise<any>} records
    */
   async list() {
     throw new Error('abstract method not implemented');

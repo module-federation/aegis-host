@@ -4,9 +4,9 @@ import RestControllerFactory from "./controllers";
 import buildCallback from "./controllers/build-callback";
 import express from "express";
 import bodyParser from "body-parser";
+import initMiddleware from './middleware';
 
-
-const server = (() => {
+const Server = (() => {
   const app = express();
   const API_ROOT = "/api";
   const PORT = 8070;
@@ -41,7 +41,7 @@ const server = (() => {
     (req, res) => res.send('Federated Monolith Demo')
   );
 
-  function start() {
+  function run() {
     app.listen(
       PORT,
       () => {
@@ -50,10 +50,14 @@ const server = (() => {
     );
   }
 
+  function start() {
+    initMiddleware(run);
+  }
+
   return {
     start
   }
 
 })();
 
-export default server;
+export default Server;

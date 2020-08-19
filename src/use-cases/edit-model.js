@@ -1,5 +1,6 @@
 import ModelFactory from '../models';
 import log from '../lib/logger';
+import Model from '../models/model';
 
 /**
  * @typedef {Object} ModelParam
@@ -30,7 +31,13 @@ export default function editModelFactory({
     if (!model) {
       throw new Error('no such id');
     }
+
     const updated = { ...model, ...changes };
+    const valid = await Model.validate(updated);
+    if (!valid) {
+      throw new Error('invalid model');
+    }
+
     const factory = ModelFactory.getInstance();
     const event = await factory.createEvent(eventType, modelName, updated);
     await repository.save(id, updated);
