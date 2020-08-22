@@ -4,11 +4,12 @@
   "description": "",
   "main": "./dist/main.js",
   "scripts": {
+    "build": "npm run clean && npm run build-webpack",
     "build-webpack": "webpack --config webpack.config.js",
-    "build": "babel src -d dist",
-    "restart": "npm run clean && npm run build && npm run build-webpack && npm run start-webpack",
-    "start-webpack": "cd dist && node main.js",
-    "start-dev": "cd dist && node index.js",
+    "build-dev": "babel src -d dist",
+    "restart": "npm run build && npm run start",
+    "start-webpack": "node dist/main.js",
+    "start-dev": "node dist/index.js",
     "start": "npm run start-webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist"

@@ -35,8 +35,9 @@ module.exports = {
           __dirname,
           "../federated-monolith-services/dist/remoteEntry.js"
         )
+        // fedmonserv: 'http://localhost:8080/remoteEntry.js'
       },
-      shared: ['express']
+      // shared: ['express']
     }),
   ]
 }

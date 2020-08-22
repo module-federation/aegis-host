@@ -18,7 +18,7 @@ export default function postModel1Factory(addModel1) {
       return {
         headers: {
           'Content-Type': 'application/json',
-          'Last-Modified': Date.now().toLocaleString()
+          'Last-Modified': new Date().toUTCString()
         },
         statusCode: 201,
         body: { modelId: model.id }
