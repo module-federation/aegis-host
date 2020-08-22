@@ -21,7 +21,7 @@ export default function addModelFactory({
 
   const eventType = ModelFactory.EventTypes.CREATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
-  handlers.push(async event => log(event));
+  handlers.push(async event => log({ event }));
   handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function addModel(input) {

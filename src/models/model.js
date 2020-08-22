@@ -5,20 +5,20 @@ import log from '../lib/logger';
 
 /**
  * @typedef {Object} Model
- * @property {Function} getModelName
- * @property {String} id
- * @property {String} created
- * @property {Function} isValid
+ * @property {String} id - unique id
+ * @property {String} modelName - model name
+ * @property {String} created - time created
+ * @property {Function} isValid - check model is valid
  */
 
 const Model = (() => {
 
-  const Model = ({ factory, args, modelName, validate = () => true }) => {
+  const Model = ({ factory, args, modelName, isValid = async () => true }) => {
     return Promise.resolve(
       factory(args)
     ).then(model => ({
       modelName: modelName,
-      isValid: async () => validate(),
+      isValid: isValid,
       ...model
     }));
   }
@@ -33,7 +33,7 @@ const Model = (() => {
    * 
    * @param {Model} model 
    */
-  const _validate = async model => {
+  const validate = async model => {
     try {
       return await model.isValid();
     } catch (e) {
@@ -45,14 +45,14 @@ const Model = (() => {
   return {
     /**
      * 
-     * @param {{factory: Function, args: any, modelName: String}} options 
+     * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options 
      * @returns {Promise<Model>}
      */
     create: async function (options) {
       return makeModel(options);
     },
 
-    validate: _validate
+    validate
   }
 })();
 

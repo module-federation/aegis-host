@@ -51,7 +51,7 @@ const Server = (() => {
   }
 
   function start() {
-    initMiddleware(run);
+    initMiddleware(app, run);
   }
 
   return {

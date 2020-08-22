@@ -8,12 +8,14 @@ import Event from './event';
 
 /**
  * @callback factoryFunc
+ * @callback validateFunc
  */
 
 /**
  * @callback registerModel
  * @param {String} modelName
  * @param {factoryFunc} factory
+ * @param {validateFunc?} validate
  */
 
 /**
@@ -87,14 +89,19 @@ const ModelFactory = (() => {
       /**
        * Register a factory function to create the model `modelName`
        * @param {String} modelName 
-       * @param {Function} factoryFunction 
+       * @param {Function} factoryFunc
+       * @param {Function?} validateFunc
        */
-      registerModel: (modelName, factoryFunction) => {
+      registerModel: (modelName, factoryFunc, validateFunc = async () => true) => {
         modelName = checkModelName(modelName);
 
         if (!modelFactories.has(modelName)
-          && typeof factoryFunction === 'function') {
-          modelFactories.set(modelName, factoryFunction);
+          && typeof factoryFunc === 'function'
+          && typeof validateFunc === 'function') {
+          modelFactories.set(modelName, {
+            factory: factoryFunc,
+            validate: validateFunc
+          });
         }
       },
 
@@ -117,16 +124,17 @@ const ModelFactory = (() => {
        * Call the factory function previously registered for `modelName`
        * @param {String} modelName 
        * @param {*} args
-       * @returns {Readonly<Promise<Model>>} the model instance
+       * @returns {Promise<Readonly<Model>>} the model instance
        */
       createModel: async (modelName, args) => {
         modelName = checkModelName(modelName);
 
         if (modelFactories.has(modelName)) {
           const model = await Model.create({
-            factory: modelFactories.get(modelName),
+            factory: modelFactories.get(modelName).factory,
             args: args,
-            modelName: modelName
+            modelName: modelName,
+            isValid: modelFactories.get(modelName).validate
           });
           return Object.freeze(model);
         }
@@ -138,7 +146,7 @@ const ModelFactory = (() => {
        * @param {String} eventType 
        * @param {String} modelName 
        * @param {*} args 
-       * @returns {Readonly<Promise<Event>>} the event instance
+       * @returns {Promise<Readonly<Event>>} the event instance
        */
       createEvent: async (eventType, modelName, args) => {
         modelName = checkModelName(modelName);

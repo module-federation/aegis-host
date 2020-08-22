@@ -1,11 +1,10 @@
 import log from './lib/logger';
 
-export default () => async (...args) => {
+export default () => async (req, res) => {
   try {
     const callService1 = (await import('fedmonserv/service1')).default;
-    const ret = callService1(args);
-    const callService2 = (await import('fedmonserv/service2')).default;
-    await callService2();
+    const ret = await callService1();
+    await res.send(ret);
     return ret;
   } catch (error) {
     log(error);

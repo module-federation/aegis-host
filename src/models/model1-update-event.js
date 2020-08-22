@@ -1,8 +1,9 @@
 
 export default function updateModel1EventFactory() {
-  return async function updateModel1Event(model1) {
+  return async function updateModel1Event({ updated, changes }) {
     return Object.freeze({
-      eventData: { ...model1 },
+      updated: { ...updated },
+      changes: { ...changes }
     });
   }
 }

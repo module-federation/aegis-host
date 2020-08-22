@@ -26,8 +26,8 @@ export default function handleEvents(observer) {
     async event => {
       log('attempting to call federated module');
       try {
-        const callService1 = (await import('fedmonserv/service1')).default;
-        callService1(event);
+        const publishEvent = (await import('fedmonserv/publish-event')).default;
+        await publishEvent(event);
       } catch (error) {
         log(error);
       }

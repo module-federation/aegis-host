@@ -1,10 +1,9 @@
 import crypto from 'crypto';
 import ModelFactory from './model-factory';
-import createModel1Factory from './model1';
+import createModel1Factory, {validateModel1Factory} from './model1';
 import createModel1EventFactory from './model1-create-event';
 import updateModel1EventFactory from './model1-update-event';
 import { MODEL_NAME as MODEL1 } from './model1';
-import Model from './model';
 
 function hash(data) {
   return crypto.createHash('md5').update(data);
@@ -14,7 +13,8 @@ const factory = ModelFactory.getInstance();
 
 factory.registerModel(
   MODEL1,
-  createModel1Factory(hash)
+  createModel1Factory(hash),
+  validateModel1Factory()
 );
 
 factory.registerEvent(

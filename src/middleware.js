@@ -1,11 +1,10 @@
 import log from './lib/logger';
 
-export default async (done) => {
+export default async (app, done) => {
   try {
     const importService = require('./remote-service').default;
     const remoteService = importService();
-    const output = await remoteService('imported remote service');
-    log(output);
+    app.get('/remote-service', remoteService);
   } catch (error) {
     log(error);
   }
