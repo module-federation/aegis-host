@@ -6,12 +6,12 @@ export const withId = (fnCreateId) => o => ({
 });
 
 export const withTimestamp = (fnTimestamp) => o => ({
-  created: fnTimestamp(),
+  createTime: fnTimestamp(),
   ...o,
 });
 
 export const withEventTimestamp = (fnTimestamp) => o => {
-  const propName = () => o.eventType.toLowerCase() + 'd';
+  const propName = () => o.eventType.toLowerCase() + 'Time';
   return {
     [propName()]: fnTimestamp(),
     ...o

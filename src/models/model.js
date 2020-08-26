@@ -1,4 +1,5 @@
 import { withId, withTimestamp, utc } from './mixins';
+import regeneratorRuntime from 'regenerator-runtime';
 import asyncPipe from '../lib/async-pipe';
 import uuid from '../lib/uuid';
 import log from '../lib/logger';
@@ -7,18 +8,18 @@ import log from '../lib/logger';
  * @typedef {Object} Model
  * @property {String} id - unique id
  * @property {String} modelName - model name
- * @property {String} created - time created
+ * @property {String} createTime - time created
  * @property {Function} isValid - check model is valid
  */
 
 const Model = (() => {
 
-  const Model = ({ factory, args, modelName, isValid = async () => true }) => {
+  const Model = ({ factory, args, modelName, isValid = () => true }) => {
     return Promise.resolve(
       factory(args)
     ).then(model => ({
-      modelName: modelName,
-      isValid: isValid,
+      modelName,
+      isValid,
       ...model
     }));
   }
@@ -33,9 +34,9 @@ const Model = (() => {
    * 
    * @param {Model} model 
    */
-  const validate = async model => {
+  const validate = model => {
     try {
-      return await model.isValid();
+      return model.isValid();
     } catch (e) {
       log(e);
     }
@@ -48,7 +49,7 @@ const Model = (() => {
      * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options 
      * @returns {Promise<Model>}
      */
-    create: async function (options) {
+    create: function (options) {
       return makeModel(options);
     },
 

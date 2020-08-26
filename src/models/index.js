@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import ModelFactory from './model-factory';
-import createModel1Factory, {validateModel1Factory} from './model1';
+import createModel1Factory, { validateModel1Factory } from './model1';
 import createModel1EventFactory from './model1-create-event';
 import updateModel1EventFactory from './model1-update-event';
 import { MODEL_NAME as MODEL1 } from './model1';

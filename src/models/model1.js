@@ -7,26 +7,22 @@ export default function createModel1Factory(hash) {
     secret = field1 + field2
   } = {}) {
     const secretHash = hash(secret);
-    const checkRequired = () => {
-      if (!field1) {
-        throw new Error('Field1 invalid or missing');
-      }
-      if (!field2) {
-        throw new Error('Field2 invalid or missing');
-      }
+    if (!field1) {
+      throw new Error('Field1 invalid or missing');
     }
-    checkRequired();
+    if (!field2) {
+      throw new Error('Field2 invalid or missing');
+    }
     return Object.freeze({
       secret: secretHash,
       field1: field1,
-      field2: field2,
-      checkRequired
+      field2: field2
     });
   }
 }
 
 export function validateModel1Factory() {
-  return async function validate() {
-    return this.checkRequired();
+  return function validateModel1() {
+    return this.field1 && this.field2;
   }
 }

@@ -8,18 +8,19 @@ import Event from './event';
 
 /**
  * @callback factoryFunc
- * @callback validateFunc
+ * @param {*} args
  */
 
 /**
  * @callback registerModel
  * @param {String} modelName
  * @param {factoryFunc} factory
- * @param {validateFunc?} validate
+ * @param {Function?} isValid
  */
 
 /**
- * @callback registerModel
+ * @callback registerEvent
+ * @param {String} eventType
  * @param {String} modelName
  * @param {factoryFunc} factory
  */
@@ -90,17 +91,17 @@ const ModelFactory = (() => {
        * Register a factory function to create the model `modelName`
        * @param {String} modelName 
        * @param {Function} factoryFunc
-       * @param {Function?} validateFunc
+       * @param {Function?} isValidFunc
        */
-      registerModel: (modelName, factoryFunc, validateFunc = async () => true) => {
+      registerModel: (modelName, factoryFunc, isValidFunc = () => true) => {
         modelName = checkModelName(modelName);
 
         if (!modelFactories.has(modelName)
           && typeof factoryFunc === 'function'
-          && typeof validateFunc === 'function') {
+          && typeof isValidFunc === 'function') {
           modelFactories.set(modelName, {
             factory: factoryFunc,
-            validate: validateFunc
+            isValid: isValidFunc
           });
         }
       },
@@ -109,14 +110,14 @@ const ModelFactory = (() => {
        * Register a factory function to create an event for the model `modelName`
        * @param {String} eventType Name of event {@link EventTypes}
        * @param {String} modelName
-       * @param {Function} factoryFunction
+       * @param {Function} factoryFn
        */
-      registerEvent: (eventType, modelName, factoryFunction) => {
+      registerEvent: (eventType, modelName, factoryFn) => {
         modelName = checkModelName(modelName);
         eventType = checkEventType(eventType);
 
-        if (typeof factoryFunction === 'function') {
-          eventFactories[eventType].set(modelName, factoryFunction);
+        if (typeof factoryFn === 'function') {
+          eventFactories[eventType].set(modelName, factoryFn);
         }
       },
 
@@ -131,10 +132,10 @@ const ModelFactory = (() => {
 
         if (modelFactories.has(modelName)) {
           const model = await Model.create({
+            isValid: modelFactories.get(modelName).isValid,
             factory: modelFactories.get(modelName).factory,
-            args: args,
             modelName: modelName,
-            isValid: modelFactories.get(modelName).validate
+            args: args
           });
           return Object.freeze(model);
         }
