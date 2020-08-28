@@ -1,4 +1,4 @@
-import { withId, withEventTimestamp } from './mixins';
+import { withId, withEventTimestamp, utc } from './mixins';
 import asyncPipe from '../lib/async-pipe';
 import uuid from '../lib/uuid';
 
@@ -12,7 +12,12 @@ import uuid from '../lib/uuid';
 
 const Event = (() => {
 
-  const Event = ({ factory, args, eventType, modelName }) => {
+  /**
+   * 
+   * @param {{factory: Function, args: any, eventType: string, modelName: string}} options 
+   * @returns {Promise<Event>}
+   */
+  const Event = async ({ factory, args, eventType, modelName }) => {
     return Promise.resolve(
       factory(args)
     ).then(event => ({
@@ -25,7 +30,7 @@ const Event = (() => {
 
   const makeEvent = asyncPipe(
     Event,
-    withEventTimestamp(() => new Date().toUTCString()),
+    withEventTimestamp(utc),
     withId(uuid),
   );
 

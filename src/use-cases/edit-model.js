@@ -1,6 +1,6 @@
 import ModelFactory from '../models';
-import log from '../lib/logger';
 import Model from '../models/model';
+import log from '../lib/logger';
 
 /**
  * @typedef {Object} ModelParam
@@ -33,15 +33,15 @@ export default function editModelFactory({
     }
 
     const updated = { ...model, ...changes };
-    log({ updated });
     const valid = await Model.validate(updated);
     if (!valid) {
-      log({ valid: "false", updated });
-      // throw new Error('invalid model');
+      throw new Error('invalid model');
     }
 
     const factory = ModelFactory.getInstance();
-    const event = await factory.createEvent(eventType, modelName, { updated, changes });
+    const event = await factory.createEvent(
+      eventType, modelName, { updated, changes }
+    );
     await repository.save(id, updated);
     await observer.notify(event.getEventName(), event);
     return updated;

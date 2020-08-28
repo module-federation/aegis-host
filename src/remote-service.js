@@ -2,8 +2,8 @@ import log from './lib/logger';
 
 export default () => async (req, res) => {
   try {
-    const service1 = await import('fedmonserv/service1');
-    await service1(body => {
+    const service1 = (await import('fedmonserv/service1')).default;
+    service1(body => {
       const status = body ? 200 : 500;
       res.status(status).send(body);
     });

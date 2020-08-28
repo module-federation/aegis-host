@@ -27,7 +27,7 @@ export default function handleEvents(observer) {
       log('attempting to call federated module');
       try {
         const publishEvent = (await import('fedmonserv/publish-event')).default;
-        await publishEvent(event);
+        publishEvent(event);
       } catch (error) {
         log(error);
       }

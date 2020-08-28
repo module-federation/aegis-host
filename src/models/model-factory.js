@@ -15,7 +15,7 @@ import Event from './event';
  * @callback registerModel
  * @param {String} modelName
  * @param {factoryFunc} factory
- * @param {Function?} isValid
+ * @param {Function | null} isValid
  */
 
 /**
@@ -29,7 +29,7 @@ import Event from './event';
  * @callback createModel
  * @param {String} modelName
  * @param {*} args
- * @returns {Readonly<Promise<Model>>}
+ * @returns {Promise<Readonly<Model>>}
  */
 
 /**
@@ -37,7 +37,7 @@ import Event from './event';
  * @param {String} eventType
  * @param {String} modelName
  * @param {*} args
- * @returns {Readonly<Promise<Event>>}
+ * @returns {Promise<Readonly<Event>>}
  */
 
 /**
@@ -90,34 +90,31 @@ const ModelFactory = (() => {
       /**
        * Register a factory function to create the model `modelName`
        * @param {String} modelName 
-       * @param {Function} factoryFunc
-       * @param {Function?} isValidFunc
+       * @param {Function} fnFactory
+       * @param {Function?} fnIsValid
        */
-      registerModel: (modelName, factoryFunc, isValidFunc = () => true) => {
+      registerModel: (modelName, fnFactory, fnIsValid = () => true) => {
         modelName = checkModelName(modelName);
 
         if (!modelFactories.has(modelName)
-          && typeof factoryFunc === 'function'
-          && typeof isValidFunc === 'function') {
-          modelFactories.set(modelName, {
-            factory: factoryFunc,
-            isValid: isValidFunc
-          });
+          && typeof fnFactory === 'function'
+          && typeof fnIsValid === 'function') {
+          modelFactories.set(modelName, { fnFactory, fnIsValid });
         }
       },
 
       /**
        * Register a factory function to create an event for the model `modelName`
-       * @param {String} eventType Name of event {@link EventTypes}
-       * @param {String} modelName
-       * @param {Function} factoryFn
+       * @param {String} eventType type of event {@link EventTypes}
+       * @param {String} modelName model the event is about
+       * @param {Function} fnFactory - factory function
        */
-      registerEvent: (eventType, modelName, factoryFn) => {
+      registerEvent: (eventType, modelName, fnFactory) => {
         modelName = checkModelName(modelName);
         eventType = checkEventType(eventType);
 
-        if (typeof factoryFn === 'function') {
-          eventFactories[eventType].set(modelName, factoryFn);
+        if (typeof fnFactory === 'function') {
+          eventFactories[eventType].set(modelName, fnFactory);
         }
       },
 
@@ -132,8 +129,8 @@ const ModelFactory = (() => {
 
         if (modelFactories.has(modelName)) {
           const model = await Model.create({
-            isValid: modelFactories.get(modelName).isValid,
-            factory: modelFactories.get(modelName).factory,
+            isValid: modelFactories.get(modelName).fnIsValid,
+            factory: modelFactories.get(modelName).fnFactory,
             modelName: modelName,
             args: args
           });

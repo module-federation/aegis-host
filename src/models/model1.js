@@ -15,8 +15,8 @@ export default function createModel1Factory(hash) {
     }
     return Object.freeze({
       secret: secretHash,
-      field1: field1,
-      field2: field2
+      field1,
+      field2
     });
   }
 }

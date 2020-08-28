@@ -1,15 +1,12 @@
 import log from './lib/logger';
-//import service1 from 'fedmonserv/service1';
 
-export default async (app, done) => {
+export default async (app, path, next) => {
   try {
-    // const service1 = (await import('fedmonserv/service1')).default;
-    // const importService = require('./remote-service').default;
-    // const remoteService = importService();
-    // const s1 = await service1();
-    // app.get('/remote-service', s1);
+    const importService = require('./remote-service').default;
+    const remoteService = importService();
+    app.get(path + '/remote-service', remoteService);
   } catch (error) {
     log(error);
   }
-  done();
+  next();
 };

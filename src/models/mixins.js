@@ -1,4 +1,4 @@
-
+'use strict'
 
 export const withId = (fnCreateId) => o => ({
   id: fnCreateId(),

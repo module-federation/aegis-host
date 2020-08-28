@@ -14,7 +14,12 @@ import log from '../lib/logger';
 
 const Model = (() => {
 
-  const Model = ({ factory, args, modelName, isValid = () => true }) => {
+  /**
+   * 
+   * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options
+   * @returns {Promise<Model>}  
+   */
+  const Model = async ({ factory, args, modelName, isValid = () => true }) => {
     return Promise.resolve(
       factory(args)
     ).then(model => ({

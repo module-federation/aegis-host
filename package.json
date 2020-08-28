@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/main.js",
   "scripts": {
-    "build": "npm run clean && npm run build-dev && npm run build-webpack",
+    "build": "npm run clean && npm run build-webpack",
     "build-webpack": "webpack --config webpack.config.js",
     "build-dev": "babel src -d dist",
     "restart": "npm run build && npm run start",
@@ -17,21 +17,19 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "express": "^4.17.1",
-    "regenerator-runtime": "^0.13.7",
-    "webpack": "^5.0.0-beta.25"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.0",
     "@babel/node": "^7.10.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.11.0",
     "babel-loader": "^8.1.0",
-    "webpack": "^5.0.0-beta.25",
     "express-cli": "0.0.1",
+    "regenerator-runtime": "^0.13.7",
+    "webpack": "^5.0.0-beta.28",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-middleware": "^4.0.0-rc.3",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-node-externals": "^2.5.2"
   }
 }
