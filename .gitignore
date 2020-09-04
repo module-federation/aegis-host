@@ -1,3 +1,7 @@
 node_modules
 dist
 webpack
+.vscode
+.prettierrc.json
+package-lock.json
+vscode-profile-2020-08-02-18-18-42.cpuprofile
