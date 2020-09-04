@@ -1,21 +1,22 @@
 var path = require('path');
-const ModuleFederationPlugin = require("webpack").container.ModuleFederationPlugin;
+const ModuleFederationPlugin = require('webpack').container.ModuleFederationPlugin;
 const nodeExternals = require('webpack-node-externals');
 
-var serverConfig = {
+module.exports = {
+  target: 'async-node',
   mode: 'development',
-  entry: [
-    path.resolve(__dirname, "src/index.js")
-  ],
-  target: 'node',
+  devtool: false,
+  entry: [path.resolve(__dirname, 'src/index.js')],
   output: {
+    publicPath: 'http://localhost:8070',
+    path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'commonjs',
   },
-  externals: nodeExternals({
-    allowlist: [/webpack\/container/],
-  }),
+  // externals: nodeExternals({
+  //   allowlist: [/webpack\/container/],
+  // }),
   resolve: {
-    extensions: [".js"],
+    extensions: ['.js'],
   },
   module: {
     rules: [
@@ -33,18 +34,14 @@ var serverConfig = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "fedmon",
-      library: { type: "commonjs-module" },
-      filename: "remoteEntry.js",
+      name: 'fedmon',
+      library: { type: 'commonjs-module' },
+      filename: 'remoteEntry.js',
       remotes: {
         fedmonserv: path.resolve(
-          __dirname, "../federated-monolith-services/dist/remoteEntry.js"
-        )
-        // fedmonserv: 'fedmonserv@http://localhost:8060/remoteEntry.js'
+          __dirname, '../federated-monolith-services/dist/remoteEntry.js'
+        ),
       },
-      shared: ['express']
     }),
   ]
 }
-
-module.exports = [serverConfig]

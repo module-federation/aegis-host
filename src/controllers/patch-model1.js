@@ -11,8 +11,8 @@ export default function patchModel1Factory(editModel1) {
       if (httpRequest.headers['Referer']) {
         source.referrer = httpRequest.headers['Referer']
       }
-      const id = httpRequest.params.id;
       log(source);
+      const id = httpRequest.params.id;
 
       const model = await editModel1(id, { ...modelInfo });
       log({ function: 'editModel1', modelData: { ...model } });

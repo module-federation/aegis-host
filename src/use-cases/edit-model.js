@@ -43,7 +43,7 @@ export default function editModelFactory({
       eventType, modelName, { updated, changes }
     );
     await repository.save(id, updated);
-    await observer.notify(event.getEventName(), event);
+    await observer.notify(event.eventName, event);
     return updated;
   }
 }

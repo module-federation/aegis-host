@@ -6,7 +6,6 @@ export default function createModel1Factory(hash) {
     field2,
     secret = field1 + field2
   } = {}) {
-    const secretHash = hash(secret);
     if (!field1) {
       throw new Error('Field1 invalid or missing');
     }
@@ -14,7 +13,7 @@ export default function createModel1Factory(hash) {
       throw new Error('Field2 invalid or missing');
     }
     return Object.freeze({
-      secret: secretHash,
+      secret: hash(secret),
       field1,
       field2
     });

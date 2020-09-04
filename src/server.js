@@ -1,4 +1,4 @@
-'use strict'
+  'use strict'
 
 import RestControllerFactory from "./controllers";
 import buildCallback from "./controllers/build-callback";

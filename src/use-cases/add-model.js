@@ -29,7 +29,7 @@ export default function addModelFactory({
     const model = await factory.createModel(modelName, input);
     const event = await factory.createEvent(eventType, modelName, model);
     await repository.save(model.id, model);
-    await observer.notify(event.getEventName(), event);
+    await observer.notify(event.eventName, event);
     return model;
   }
 }

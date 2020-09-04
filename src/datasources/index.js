@@ -6,11 +6,11 @@ const DataSourceFactory = (() => {
   let dataSource2;
 
   function createDataSource1() {
-    return new DataSource1();
+    return new DataSource1(new Map());
   }
 
   function createDataSource2() {
-    return new DataSource2();
+    return new DataSource2(new Map());
   }
 
   return Object.freeze({

@@ -5,15 +5,22 @@ export const withId = (fnCreateId) => o => ({
   ...o,
 });
 
-export const withTimestamp = (fnTimestamp) => o => ({
-  createTime: fnTimestamp(),
+export const withTimestamp = (
+  propName = 'timestamp',
+  fnTimestamp = utc
+) => o => ({
+  [propName]: fnTimestamp(),
   ...o,
 });
 
-export const withEventTimestamp = (fnTimestamp) => o => {
-  const propName = () => o.eventType.toLowerCase() + 'Time';
+export const withPropertyTimestamp = (
+  p,
+  fn_p = (p) => p.toLowerCase() + 'Time',
+  fnTimestamp = utc
+) => o => {
+  const propName = fn_p(((o.hasOwnProperty(p)) ? o[p] : 'event'));
   return {
-    [propName()]: fnTimestamp(),
+    [propName]: fnTimestamp(),
     ...o
   }
 }

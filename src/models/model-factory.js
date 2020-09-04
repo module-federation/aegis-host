@@ -7,22 +7,37 @@ import Event from './event';
  */
 
 /**
- * @callback factoryFunc
+ * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType 
+ */
+
+/**
+ * @callback modelFactoryFunc
  * @param {*} args
+ * @returns {Promise<Readonly<Model>>}
+ */
+
+/**
+ * @callback eventFactoryFunc
+ * @param {*} args
+ * @returns {Promise<Readonly<Event>>}
+ */
+
+/**
+ * @callback isValidFunc
+ * @returns {Promise<boolean>}
  */
 
 /**
  * @callback registerModel
  * @param {String} modelName
- * @param {factoryFunc} factory
- * @param {Function | null} isValid
+ * @param {modelFactoryFunc} factory
  */
 
 /**
  * @callback registerEvent
  * @param {String} eventType
  * @param {String} modelName
- * @param {factoryFunc} factory
+ * @param {eventFactoryFunc} factory
  */
 
 /**
@@ -34,7 +49,7 @@ import Event from './event';
 
 /**
  * @callback createEvent
- * @param {String} eventType
+ * @param {EventType} eventType
  * @param {String} modelName
  * @param {*} args
  * @returns {Promise<Readonly<Event>>}
@@ -51,12 +66,19 @@ import Event from './event';
 const ModelFactory = (() => {
   let instance;
 
+  /**
+   * @readonly
+   * @enum {EventType}
+   */
   const EventTypes = {
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
     DELETE: 'DELETE'
   }
 
+  /**
+   * @param {String} modelName
+   */
   function checkModelName(modelName) {
     if (typeof modelName === 'string') {
       return modelName.toUpperCase();
@@ -64,21 +86,35 @@ const ModelFactory = (() => {
     throw new Error('modelName missing or invalid');
   }
 
+  /**
+   * 
+   * @param {EventType} eventType 
+   */
   function checkEventType(eventType) {
     if (typeof eventType === 'string') {
       eventType = eventType.toUpperCase();
-      if (Object.keys(EventTypes).includes(eventType)) {
+      if (Object.values(EventTypes).includes(eventType)) {
         return eventType;
       }
     }
     throw new Error('eventType missing or invalid');
   }
 
+  /**
+   * 
+   * @param {EventType} eventType 
+   * @param {String} modelName 
+   */
   function createEventName(eventType, modelName) {
     return checkEventType(eventType) + checkModelName(modelName);
   }
 
+  /**
+   * @returns {ModelFactory} instance
+   * 
+   */
   function init() {
+
     const modelFactories = new Map();
     const eventFactories = {
       [EventTypes.CREATE]: new Map(),
@@ -90,8 +126,8 @@ const ModelFactory = (() => {
       /**
        * Register a factory function to create the model `modelName`
        * @param {String} modelName 
-       * @param {Function} fnFactory
-       * @param {Function?} fnIsValid
+       * @param {modelFactoryFunc} fnFactory
+       * @param {isValidFunc} [fnIsValid]
        */
       registerModel: (modelName, fnFactory, fnIsValid = () => true) => {
         modelName = checkModelName(modelName);
@@ -105,9 +141,9 @@ const ModelFactory = (() => {
 
       /**
        * Register a factory function to create an event for the model `modelName`
-       * @param {String} eventType type of event {@link EventTypes}
+       * @param {EventType} eventType type of event
        * @param {String} modelName model the event is about
-       * @param {Function} fnFactory - factory function
+       * @param {Function} fnFactory factory function
        */
       registerEvent: (eventType, modelName, fnFactory) => {
         modelName = checkModelName(modelName);
@@ -129,9 +165,9 @@ const ModelFactory = (() => {
 
         if (modelFactories.has(modelName)) {
           const model = await Model.create({
+            modelName: modelName,
             isValid: modelFactories.get(modelName).fnIsValid,
             factory: modelFactories.get(modelName).fnFactory,
-            modelName: modelName,
             args: args
           });
           return Object.freeze(model);
@@ -141,7 +177,7 @@ const ModelFactory = (() => {
 
       /**
        * Call factory function previously registered for `eventType` and `model`
-       * @param {String} eventType 
+       * @param {EventType} eventType
        * @param {String} modelName 
        * @param {*} args 
        * @returns {Promise<Readonly<Event>>} the event instance
@@ -176,6 +212,10 @@ const ModelFactory = (() => {
       return instance;
     },
 
+    /**
+     * @param {EventType} eventType
+     * @param {String} modelName
+     */
     getEventName: (eventType, modelName) => {
       return createEventName(eventType, modelName);
     },
@@ -183,6 +223,8 @@ const ModelFactory = (() => {
     EventTypes
   }
 })();
+
+
 
 export default ModelFactory;
 

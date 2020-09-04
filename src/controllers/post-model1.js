@@ -14,7 +14,7 @@ export default function postModel1Factory(addModel1) {
 
       const model = await addModel1({ ...modelInfo });
       log({ function: 'addModel1', modelData: { ...model } });
-      ``
+
       return {
         headers: {
           'Content-Type': 'application/json',

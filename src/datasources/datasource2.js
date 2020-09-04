@@ -1,23 +1,21 @@
 import DataSource from "./datasource";
 
-let inMemoryDataSource;
-
 export default class DataSource2 extends DataSource {
-  constructor() {
-    inMemoryDataSource = new Map();
-    super();
+
+  constructor(dataSource) {
+    super(dataSource);
   }
 
   async save(id, data) {
-    inMemoryDataSource.set(id, data);
+    this._dataSource.set(id, data);
   }
 
   async find(id) {
-    return inMemoryDataSource.get(id);
+    return this._dataSource.get(id);
   }
 
   async list() {
-    return inMemoryDataSource.entries();
+    return [...this._dataSource.entries()];
   }
 
 }

@@ -1,12 +1,24 @@
+/**
+ * @typedef {import('../models/event').Event} Event
+ */
+
+/**
+ * @callback eventHandler
+ * @param {Event} event
+ */
 
 /**
  * Abstract observer
  */
 export class Observer {
+  constructor(eventHandlers) {
+    this._handlers = eventHandlers;
+  }
+
   /**
    * Register callback `handler` to fire on event `eventName`
    * @param {String} eventName   
-   * @param {Function} handler 
+   * @param {eventHandler} handler 
    */
   on(eventName, handler) {
     throw new Error('unimplemented abstract method');
@@ -14,17 +26,18 @@ export class Observer {
   /**
    *  
    * @param {String} eventName 
-   * @param {import('../models/event').Event} eventData 
+   * @param {Event} eventData 
    */
   async notify(eventName, eventData) {
     throw new Error('unimplemented abstract method');
   }
 }
-
+/**
+ * @extends Observer
+ */
 class ObserverImpl extends Observer {
   constructor(eventHandlers) {
-    super();
-    this._handlers = eventHandlers;
+    super(eventHandlers);
   }
 
   /**
@@ -49,11 +62,16 @@ class ObserverImpl extends Observer {
       await Promise.all(this._handlers.get(eventName).map(
         async handler => await handler(eventData)
       ));
+      if (eventName !== '*') {
+        await this.notify('*', eventData);
+      }
     }
   }
 }
 
-
+/**
+ * Observer is a singleton
+ */
 const ObserverFactory = (() => {
   let instance;
 
@@ -63,7 +81,7 @@ const ObserverFactory = (() => {
 
   return Object.freeze({
     /**
-     * @returns {Observer} observer singleton
+     * @returns {Observer} singleton
      */
     getInstance: function () {
       if (!instance) {
