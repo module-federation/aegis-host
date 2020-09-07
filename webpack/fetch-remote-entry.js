@@ -22,6 +22,7 @@ module.exports = (remoteEntry) => {
       entry.name,
       '.js'
     ].join('_');
+
     _path = entry.path.concat(_path);
     console.log(_path);
 

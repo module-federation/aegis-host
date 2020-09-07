@@ -8,7 +8,7 @@ import { MODEL_NAME as MODEL1 } from './model1';
 import { MODEL_NAME as MODEL2 } from './model2';
 
 function hash(data) {
-  return crypto.createHash('md5').update(data);
+  return crypto.createHash('sha1').update(data).digest('hex');
 }
 
 const factory = ModelFactory.getInstance();
