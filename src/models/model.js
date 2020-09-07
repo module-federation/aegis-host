@@ -14,12 +14,16 @@ import log from '../lib/logger';
 
 const Model = (() => {
 
+  const _isValid = () => {
+    return this.id && this.modelName;
+  }
+
   /**
    * 
    * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options
    * @returns {Promise<Model>}  
    */
-  const Model = async ({ factory, args, modelName, isValid = () => true }) => {
+  const Model = async ({ factory, args, modelName, isValid = _isValid }) => {
     return Promise.resolve(
       factory(args)
     ).then(model => ({
@@ -35,33 +39,28 @@ const Model = (() => {
     withId(uuid),
   );
 
-  /**
-   * 
-   * @param {Model} model 
-   */
-  const validate = model => {
-    try {
-      return model.isValid();
-    } catch (error) {
-      log(error);
-    }
-    return false;
-  }
-
   return {
     /**
      * 
      * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options 
      * @returns {Promise<Model>}
      */
-    create: function (options) {
+    create: (options) => {
       return makeModel(options);
     },
 
     /**
-     * Call the model's validation method
+     * 
+     * @param {Model} model 
      */
-    validate
+    validate: (model) => {
+      try {
+        return model.isValid();
+      } catch (error) {
+        log(error);
+      }
+      return false;
+    }
   }
 })();
 

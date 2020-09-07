@@ -1,4 +1,4 @@
-  'use strict'
+'use strict'
 
 import RestControllerFactory from "./controllers";
 import buildCallback from "./controllers/build-callback";
@@ -35,6 +35,10 @@ const Server = (() => {
   app.get(
     `${API_ROOT}/model1`,
     buildCallback(RestControllerFactory.getModel1)
+  );
+  app.post(
+    `${API_ROOT}/model2`,
+    buildCallback(RestControllerFactory.postModel2)
   );
   app.get(
     '/',

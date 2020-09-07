@@ -5,7 +5,7 @@ const fs = require('fs');
 /**
  * Download remote container entries
  * @param {{url: string, path: string}[]} remoteEntry `url` - to remote container, `path` - local path to download to
- * @returns {Promise<string>} local path to downloaded entry
+ * @returns {Promise<string[]>} local path to downloaded entry
  */
 module.exports = (remoteEntry) => {
   console.log(remoteEntry);
