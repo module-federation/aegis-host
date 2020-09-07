@@ -11,6 +11,10 @@
  * Abstract observer
  */
 export class Observer {
+  /**
+   * 
+   * @param {Map<string, eventHandler[]>} eventHandlers 
+   */
   constructor(eventHandlers) {
     this._handlers = eventHandlers;
   }
@@ -32,10 +36,14 @@ export class Observer {
     throw new Error('unimplemented abstract method');
   }
 }
+
 /**
  * @extends Observer
  */
 class ObserverImpl extends Observer {
+  /**
+   * @override 
+   */
   constructor(eventHandlers) {
     super(eventHandlers);
   }

@@ -1,4 +1,4 @@
-import log from './lib/logger';
+import log from '../lib/logger';
 
 export default () => async (req, res) => {
   try {

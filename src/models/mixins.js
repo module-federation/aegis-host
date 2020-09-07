@@ -14,11 +14,13 @@ export const withTimestamp = (
 });
 
 export const withPropertyTimestamp = (
-  p,
-  fn_p = (p) => p.toLowerCase() + 'Time',
+  prop,
+  fnProp = (p) => p.toLowerCase() + 'Time',
   fnTimestamp = utc
 ) => o => {
-  const propName = fn_p(((o.hasOwnProperty(p)) ? o[p] : 'event'));
+  const propName = fnProp(
+    ((o.hasOwnProperty(prop)) ? o[prop] : 'event')
+  );
   return {
     [propName]: fnTimestamp(),
     ...o

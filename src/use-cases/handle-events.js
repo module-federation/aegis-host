@@ -1,4 +1,4 @@
-import log from '../lib/logger';
+import publishEvent from '../services/publish-event';
 
 /**
  * 
@@ -6,14 +6,6 @@ import log from '../lib/logger';
  */
 export default function (observer) {
 
-  observer.on('*', async event => {
-    log('attempting to call federated module');
-    try {
-      const publishEvent = (await import('fedmonserv/publish-event')).default;
-      publishEvent(event);
-    } catch (error) {
-      log(error);
-    }
-  });
+  observer.on('*', async event => publishEvent(event));
 
 }
