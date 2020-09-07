@@ -1,10 +1,10 @@
 import log from '../lib/logger';
 
-export default function patchModel1Factory(editModel1) {
-  return async function patchModel1(httpRequest) {
+export default function patchModelFactory(editModel) {
+  return async function patchModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body
-      log({ function: 'patchModel1', ...modelInfo });
+      log({ function: 'patchModel', ...modelInfo });
 
       source.ip = httpRequest.ip
       source.browser = httpRequest.headers['User-Agent']
@@ -14,8 +14,8 @@ export default function patchModel1Factory(editModel1) {
       log(source);
       const id = httpRequest.params.id;
 
-      const model = await editModel1(id, { ...modelInfo });
-      log({ function: 'editModel1', modelData: { ...model } });
+      const model = await editModel(id, { ...modelInfo });
+      log({ function: editModel.name, modelData: { ...model } });
 
       return {
         headers: {

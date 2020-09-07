@@ -28,11 +28,17 @@ const UseCaseFactory = (() => {
     repository: dataSrc1,
     observer: observer
   });
+  const editModel2 = editModelFactory({
+    modelName: MODEL2,
+    repository: dataSrc1,
+    observer: observer
+  });
   return Object.freeze({
     addModel1,
     editModel1,
     listModel1,
-    addModel2
+    addModel2,
+    editModel2
   });
 })();
 

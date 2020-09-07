@@ -1,10 +1,10 @@
 import log from '../lib/logger';
 
-export default function getModel1Factory(listModel1) {
-  return async function getModel1(httpRequest) {
-    log({ function: 'getModel1' });
+export default function postModelFactory(addModel) {
+  return async function postModel(httpRequest) {
     try {
-      const { source = {} } = httpRequest.body
+      const { source = {}, ...modelInfo } = httpRequest.body
+      log({ function: 'postModel', ...modelInfo });
       source.ip = httpRequest.ip
       source.browser = httpRequest.headers['User-Agent']
       if (httpRequest.headers['Referer']) {
@@ -12,16 +12,16 @@ export default function getModel1Factory(listModel1) {
       }
       log(source);
 
-      const models = await listModel1();
-      log({ function: 'listModel1', ...models });
+      const model = await addModel({ ...modelInfo });
+      log({ function: addModel.name, modelData: { ...model } });
 
       return {
         headers: {
           'Content-Type': 'application/json',
-          'Last-Modified': Date.now().toLocaleString()
+          'Last-Modified': new Date().toUTCString()
         },
-        statusCode: 200,
-        body: { models }
+        statusCode: 201,
+        body: { modelId: model.id }
       }
     } catch (e) {
       log(e);

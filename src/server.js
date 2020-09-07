@@ -10,14 +10,6 @@ const Server = (() => {
   const app = express();
   const API_ROOT = "/api";
   const PORT = 8070;
-  //const webpack = require('webpack');
-  // const webpackDevMiddleware = require('webpack-dev-middleware');
-  // const config = require('../webpack.config.js');
-  // const compiler = webpack(config);
-
-  // app.use(webpackDevMiddleware(compiler, {
-  //   publicPath: config.output.publicPath,
-  // }));
 
   app.use(bodyParser.json());
   app.post(
@@ -39,6 +31,14 @@ const Server = (() => {
   app.post(
     `${API_ROOT}/model2`,
     buildCallback(RestControllerFactory.postModel2)
+  );
+  app.patch(
+    `${API_ROOT}/model2/:id`,
+    buildCallback(RestControllerFactory.patchModel2)
+  );
+  app.put(
+    `${API_ROOT}/model2/:id`,
+    buildCallback(RestControllerFactory.patchModel2)
   );
   app.get(
     '/',
