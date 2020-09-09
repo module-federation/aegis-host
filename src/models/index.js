@@ -6,12 +6,18 @@ import updateModel1EventFactory from './model1-update-event';
 import createModel2Factory from './model2';
 import { MODEL_NAME as MODEL1 } from './model1';
 import { MODEL_NAME as MODEL2 } from './model2';
+import initRemoteModels from '../services/init-remote-models';
 
 function hash(data) {
   return crypto.createHash('sha1').update(data).digest('hex');
 }
 
 const factory = ModelFactory.getInstance();
+
+export async function initModels() {
+  await initRemoteModels(ModelFactory.getInstance());
+}
+
 
 factory.registerModel(
   MODEL1,
@@ -47,6 +53,5 @@ createModel2Factory().then((fn) => {
     })
   );
 });
-
 
 export default ModelFactory;

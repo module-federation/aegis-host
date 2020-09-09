@@ -1,10 +1,15 @@
 'use strict'
 
-import RestControllerFactory from "./controllers";
+import RestControllerFactory, {
+  postModels,
+  patchModels
+} from "./controllers";
+import { initModels } from './models';
 import buildCallback from "./controllers/build-callback";
 import express from "express";
 import bodyParser from "body-parser";
 import initMiddleware from './middleware';
+import initRemoteModels from "./services/init-remote-models";
 
 const Server = (() => {
   const app = express();
@@ -45,13 +50,30 @@ const Server = (() => {
     (req, res) => res.send('Federated Monolith Demo')
   );
 
+  function make(path, app, method, controllers) {
+    controllers().map(controller => {
+      console.log(controller);
+      app[method](
+        path(controller.modelName),
+        buildCallback(controller.factory)
+      );
+    });
+  }
+
   function run() {
-    app.listen(
-      PORT,
-      () => {
-        console.log(`Server listening on port ${PORT}`);
-      }
-    );
+    initModels().then(() => {
+      return Promise.all([
+        make((p) => `${API_ROOT}/${p}`, app, 'post', postModels),
+        make((p) => `${API_ROOT}/${p}/:id`, app, 'patch', patchModels)
+      ]);
+    }).then(() => {
+      app.listen(
+        PORT,
+        () => {
+          console.log(`Server listening on port ${PORT}`);
+        }
+      )
+    });
   }
 
   function start() {

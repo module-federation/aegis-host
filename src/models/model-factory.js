@@ -30,12 +30,14 @@ import Event from './event';
 /**
  * @callback registerModel
  * @param {String} modelName
- * @param {modelFactoryFunc} factory
+ * @param {modelFactoryFunc} fnFactory
+ * @param {isValidFunc} [fnIsValid]
+ * @param {boolean} [isRemote]
  */
 
 /**
  * @callback registerEvent
- * @param {String} eventType
+ * @param {EventType} eventType
  * @param {String} modelName
  * @param {eventFactoryFunc} factory
  */
@@ -61,6 +63,7 @@ import Event from './event';
  * @property {registerEvent} registerEvent
  * @property {createModel} createModel
  * @property {createEvent} createEvent
+ * @property {{CREATE:string, UPDATE:string, DELETE:string}} EventTypes
  */
 
 const ModelFactory = (() => {
@@ -114,7 +117,6 @@ const ModelFactory = (() => {
    * 
    */
   function init() {
-
     const modelFactories = new Map();
     const eventFactories = {
       [EventTypes.CREATE]: new Map(),
@@ -127,15 +129,21 @@ const ModelFactory = (() => {
        * Register a factory function to create the model `modelName`
        * @param {String} modelName 
        * @param {modelFactoryFunc} fnFactory
+       * @param {boolean} [isRemote]
        * @param {isValidFunc} [fnIsValid]
        */
-      registerModel: (modelName, fnFactory, fnIsValid = () => true) => {
+      registerModel: (
+        modelName,
+        fnFactory,
+        fnIsValid = () => true,
+        isRemote = false
+      ) => {
         modelName = checkModelName(modelName);
 
         if (!modelFactories.has(modelName)
           && typeof fnFactory === 'function'
           && typeof fnIsValid === 'function') {
-          modelFactories.set(modelName, { fnFactory, fnIsValid });
+          modelFactories.set(modelName, { fnFactory, fnIsValid, isRemote });
         }
       },
 
@@ -197,6 +205,18 @@ const ModelFactory = (() => {
         }
         throw new Error('unregistered model event');
       },
+
+      getRemoteModels: () => {
+        let models = [];
+        for (let [k, v] of modelFactories) {
+          if (v.isRemote) {
+            models.push(k);
+          }
+        }
+        return models;
+      },
+
+      EventTypes
     }
   }
 

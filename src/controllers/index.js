@@ -1,7 +1,11 @@
-import UseCaseFactory from "../use-cases";
+import UseCaseFactory, {
+  addModels,
+  editModels
+} from "../use-cases";
 import postModelFactory from "./post-model";
 import patchModelFactory from "./patch-model";
 import getModelFactory from './get-model';
+import Model from "../models/model";
 
 const RestControllerFactory = (() => {
   const postModel1 = postModelFactory(UseCaseFactory.addModel1);
@@ -18,4 +22,18 @@ const RestControllerFactory = (() => {
   };
 })();
 
+
 export default RestControllerFactory;
+
+function make(useCases, controllerFactory) {
+  console.log(useCases);
+  return useCases().map(useCase => ({
+    modelName: useCase.modelName,
+    factory: controllerFactory(useCase.factory)
+  }));
+}
+
+
+export const postModels = () => make(addModels, postModelFactory);
+export const patchModels = () => make(editModels, patchModelFactory);
+

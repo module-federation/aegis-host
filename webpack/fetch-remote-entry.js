@@ -3,45 +3,44 @@ const http = require('http');
 const fs = require('fs');
 
 /**
- * Download remote container entries
- * @param {{name: string, url: string, path: string}[]} remoteEntry `url` - to remote container, `path` - local path to download to
- * @returns {Promise<{name: string, name2: string}>} local path to downloaded entry
+ * Download remote container bundles
+ * @param {{name: string, url: string, path: string}[]} remoteEntry `name` of app, `url` of remote entry, download file to `path` 
+ * @returns {Promise<{[index: string]: string}>} local paths to downloaded entries
  */
-module.exports = (remoteEntry) => {
+module.exports = async (remoteEntry) => {
   console.log(remoteEntry);
   const entries = Array.isArray(remoteEntry)
     ? remoteEntry
     : [remoteEntry];
 
-  return Promise.all(entries.map(entry => {
-    var _url = new URL(entry.url);
-    var _path = [
-      _url.pathname.replace('.', '_'),
-      _url.hostname,
-      _url.port,
-      entry.name,
-      '.js'
-    ].join('_');
+  const remotes = await Promise.all(entries.map(entry => {
+    var url = new URL(entry.url);
+    var path = [
+      url.pathname.replace('.js', ''),
+      url.hostname.replace('.', '-'),
+      url.port,
+      entry.name.concat('.js')
+    ].join('-');
 
-    _path = entry.path.concat(_path);
-    console.log(_path);
+    path = entry.path.concat(path);
+    console.log(path);
 
-    return new Promise(function (resolve, reject) {
-      var req = http.request(_url, function (res) {
+    return new Promise((resolve, reject) => {
+      var req = http.request(url, (res) => {
         if (res.statusCode < 200 || res.statusCode >= 300) {
           return reject(new Error('statusCode=' + res.statusCode));
         }
-        res.pipe(fs.createWriteStream(_path));
-        res.on('end', function () {
-          resolve({
-            [entry.name]: _path,
-          });
+        res.pipe(fs.createWriteStream(path));
+        res.on('end', () => {
+          resolve({ [entry.name]: path });
         });
       });
-      req.on('error', function (err) {
+      req.on('error', (err) => {
         reject(err);
       });
       req.end();
     });
-  })).then(rmts => rmts.reduce((p, c) => ({ ...c, ...p })));
+  }));
+
+  return remotes.reduce((p, c) => ({ ...c, ...p }));
 }

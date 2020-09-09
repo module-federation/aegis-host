@@ -6,6 +6,7 @@ import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
 import { MODEL_NAME as MODEL1 } from '../models/model1';
 import { MODEL_NAME as MODEL2 } from '../models/model2';
+import ModelFactory from '../models';
 
 handleEvents(ObserverFactory.getInstance());
 
@@ -43,3 +44,22 @@ const UseCaseFactory = (() => {
 })();
 
 export default UseCaseFactory;
+
+function make(factory) {
+  const models = ModelFactory.getInstance().getRemoteModels();
+  const dataSrc1 = DataSourceFactory.getDataSource1();
+  const observer = ObserverFactory.getInstance();
+  return models.map(model => ({
+    modelName: model,
+    factory: factory({
+      modelName: model,
+      repository: dataSrc1,
+      observer: observer
+    })
+  }));
+}
+
+export const addModels = () => make(addModelFactory);
+export const editModels = () => make(editModelFactory);
+
+
