@@ -20,7 +20,7 @@
   postButton.onclick = function () {
     fetch('/api/' + document.getElementById('model').value, {
       method: "POST",
-      body: document.getElementById('body').innerHTML,
+      body: document.getElementById('body').value,
       headers: { 'Content-Type': 'application/json' }
     }).then(handleResponse)
       .then(showMessage)
@@ -30,9 +30,10 @@
   }
 
   patchButton.onclick = function () {
-    fetch('/api/' + document.getElementById('model').value, {
+    fetch('/api/' + document.getElementById('model').value +
+      '/' + document.getElementById('modelId').value, {
       method: "PATCH",
-      body: document.getElementById('body').innerHTML,
+      body: document.getElementById('body').value,
       headers: { 'Content-Type': 'application/json' }
     }).then(handleResponse)
       .then(showMessage)

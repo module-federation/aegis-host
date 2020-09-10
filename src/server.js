@@ -19,10 +19,6 @@ const Server = (() => {
 
   app.use(bodyParser.json());
   app.use(express.static('public'));
-  // app.get(
-  //   '/',
-  //   (req, res) => res.send('Federated Monolith Demo')
-  // );
 
   function make(path, app, method, controllers) {
     controllers().map(cntrl => {
