@@ -14,7 +14,6 @@ export default async (factory) => {
   const models = (await import('fedmonserv/models')).default;
 
   models.forEach(model => {
-    console.log(model.modelName);
 
     factory.registerModel(
       model.modelName,

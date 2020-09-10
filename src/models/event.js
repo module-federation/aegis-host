@@ -1,4 +1,4 @@
-import { withId, withTimestamp, withPropertyTimestamp } from './mixins';
+import { withId, withTimestamp } from './mixins';
 import asyncPipe from '../lib/async-pipe';
 import uuid from '../lib/uuid';
 
