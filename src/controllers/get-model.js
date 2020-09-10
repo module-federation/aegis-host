@@ -1,8 +1,8 @@
 import log from '../lib/logger';
 
-export default function getModelFactory(listModel) {
+export default function getModelFactory(listModels) {
   return async function getModel(httpRequest) {
-    log({ function: 'getModel1' });
+    log({ function: 'getModel' });
     try {
       const { source = {} } = httpRequest.body
       source.ip = httpRequest.ip
@@ -12,8 +12,8 @@ export default function getModelFactory(listModel) {
       }
       log(source);
 
-      const models = await listModel();
-      log({ function: listModel.name, ...models });
+      const models = await listModels();
+      log({ function: listModels.name, ...models });
 
       return {
         headers: {

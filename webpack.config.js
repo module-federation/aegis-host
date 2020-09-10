@@ -1,5 +1,5 @@
 const path = require('path');
-const ModuleFederationPlugin = require('webpack').container.ModuleFederationPlugin;
+const ContainerReferencePlugin = require('webpack').container.ContainerReferencePlugin;
 const nodeExternals = require('webpack-node-externals');
 const fetchRemoteEntry = require('./webpack/fetch-remote-entry');
 const remoteEntries = require('./webpack/remote-entries');
@@ -38,10 +38,8 @@ module.exports = () => {
           ]
         },
         plugins: [
-          new ModuleFederationPlugin({
-            name: 'fedmon',
-            library: { type: 'commonjs-module' },
-            filename: 'remoteEntry.js',
+          new ContainerReferencePlugin({
+            remoteType: 'commonjs-module',
             remotes: remotes
           }),
         ]

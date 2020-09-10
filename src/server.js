@@ -18,48 +18,31 @@ const Server = (() => {
   const PORT = 8070;
 
   app.use(bodyParser.json());
-  app.get(
-    '/',
-    (req, res) => res.send('Federated Monolith Demo')
-  );
+  app.use(express.static('public'));
+  // app.get(
+  //   '/',
+  //   (req, res) => res.send('Federated Monolith Demo')
+  // );
 
   function make(path, app, method, controllers) {
-    controllers().map(controller => {
-      log(controller);
-      app[method](
-        path(controller.modelName),
-        buildCallback(controller.fn)
-      );
+    controllers().map(cntrl => {
+      log(cntrl);
+      app[method](path(cntrl.modelName), buildCallback(cntrl.fn));
     });
   }
 
   function run() {
     initModels().then(() => {
       return Promise.all([
-        make(
-          (model) => `${API_ROOT}/${model}`,
-          app,
-          'post',
-          postModels
-        ),
-        make(
-          (model) => `${API_ROOT}/${model}/:id`,
-          app,
-          'patch',
-          patchModels
-        ),
-        make(
-          (model) => `${API_ROOT}/${model}`,
-          app,
-          'get',
-          getModels
-        )
+        make(m => `${API_ROOT}/${m}`, app, 'post', postModels),
+        make(m => `${API_ROOT}/${m}`, app, 'get', getModels),
+        make(m => `${API_ROOT}/${m}/:id`, app, 'patch', patchModels)
       ]);
     }).then(() => {
       app.listen(
         PORT,
         () => {
-          console.log(`Server listening on port ${PORT}`);
+          console.log(`Server listening on http://localhost:${PORT}`);
         }
       )
     });
