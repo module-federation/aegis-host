@@ -10,7 +10,7 @@ import getModelFactory from './get-model';
 function make(useCases, controllerFactory) {
   return useCases().map(useCase => ({
     modelName: useCase.modelName,
-    factory: controllerFactory(useCase.factory)
+    fn: controllerFactory(useCase.fn)
   }));
 }
 

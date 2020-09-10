@@ -28,7 +28,7 @@ const Server = (() => {
       log(controller);
       app[method](
         path(controller.modelName),
-        buildCallback(controller.factory)
+        buildCallback(controller.fn)
       );
     });
   }

@@ -25,7 +25,7 @@ function make(factory) {
   }
   return models.map(model => ({
     modelName: model.modelName,
-    factory: factory(buildOptions(model))
+    fn: factory(buildOptions(model))
   }));
 }
 
