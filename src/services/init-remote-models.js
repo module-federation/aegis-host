@@ -15,12 +15,13 @@ export default async (factory) => {
 
   models.forEach(model => {
 
-    factory.registerModel(
-      model.modelName,
-      model.factory,
-      model.isValid,
-      true
-    );
+    factory.registerModel({
+      modelName: model.modelName,
+      fnFactory: model.factory,
+      fnIsValid: model.isValid,
+      fnHandler: model.handler,
+      isRemote: true
+    });
 
     factory.registerEvent(
       factory.EventTypes.CREATE,

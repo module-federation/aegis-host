@@ -12,13 +12,20 @@ function make(factory) {
   const models = ModelFactory.getInstance().getRemoteModels();
   const dataSrc1 = DataSourceFactory.getDataSource1();
   const observer = ObserverFactory.getInstance();
-  return models.map(model => ({
-    modelName: model,
-    factory: factory({
-      modelName: model,
+  function buildOptions(model) {
+    let options = {
+      modelName: model.modelName,
       repository: dataSrc1,
       observer: observer
-    })
+    }
+    if (typeof model.fnHandler === 'function') {
+      options.handlers = [model.fnHandler];
+    }
+    return options;
+  }
+  return models.map(model => ({
+    modelName: model.modelName,
+    factory: factory(buildOptions(model))
   }));
 }
 

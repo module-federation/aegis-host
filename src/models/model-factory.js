@@ -11,40 +11,48 @@ import Event from './event';
  */
 
 /**
- * @callback modelFactoryFunc
+ * @callback fnModelFactory
  * @param {*} args
  * @returns {Promise<Readonly<Model>>}
  */
 
 /**
- * @callback eventFactoryFunc
+ * @callback fnEventFactory
  * @param {*} args
  * @returns {Promise<Readonly<Event>>}
  */
 
 /**
- * @callback isValidFunc
+ * @callback fnIsValid
  * @returns {Promise<boolean>}
  */
 
 /**
+ * @callback fnHandler
+ * @param {Event} event
+ * @returns {Promise<void>}
+ */
+
+/**
  * @callback registerModel
- * @param {String} modelName
- * @param {modelFactoryFunc} fnFactory
- * @param {isValidFunc} [fnIsValid]
- * @param {boolean} [isRemote]
+ * @param {{modelName: string,
+ *  fnFactory:fnModelFactory,
+ *  fnIsValid:fnIsValid,
+ *  fnHandler:fnHandler,
+ *  isRemote:boolean
+ * }} options
  */
 
 /**
  * @callback registerEvent
  * @param {EventType} eventType
  * @param {String} modelName
- * @param {eventFactoryFunc} factory
+ * @param {fnEventFactory} factory
  */
 
 /**
  * @callback createModel
- * @param {String} modelName
+ * @param {string} modelName
  * @param {*} args
  * @returns {Promise<Readonly<Model>>}
  */
@@ -52,7 +60,7 @@ import Event from './event';
 /**
  * @callback createEvent
  * @param {EventType} eventType
- * @param {String} modelName
+ * @param {string} modelName
  * @param {*} args
  * @returns {Promise<Readonly<Event>>}
  */
@@ -127,23 +135,22 @@ const ModelFactory = (() => {
     return {
       /**
        * Register a factory function to create the model `modelName`
-       * @param {String} modelName 
-       * @param {modelFactoryFunc} fnFactory
-       * @param {boolean} [isRemote]
-       * @param {isValidFunc} [fnIsValid]
        */
-      registerModel: (
+      registerModel: ({
         modelName,
         fnFactory,
         fnIsValid = () => true,
+        fnHandler,
         isRemote = false
-      ) => {
+      }) => {
         modelName = checkModelName(modelName);
 
         if (!modelFactories.has(modelName)
           && typeof fnFactory === 'function'
           && typeof fnIsValid === 'function') {
-          modelFactories.set(modelName, { fnFactory, fnIsValid, isRemote });
+          modelFactories.set(modelName, {
+            fnFactory, fnIsValid, fnHandler, isRemote
+          });
         }
       },
 
@@ -210,7 +217,10 @@ const ModelFactory = (() => {
         let models = [];
         for (let [k, v] of modelFactories) {
           if (v.isRemote) {
-            models.push(k);
+            models.push({
+              modelName: k,
+              ...v
+            });
           }
         }
         return models;
