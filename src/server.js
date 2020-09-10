@@ -1,15 +1,16 @@
 'use strict'
 
-import RestControllerFactory, {
+import {
   postModels,
-  patchModels
+  patchModels,
+  getModels
 } from "./controllers";
 import { initModels } from './models';
 import buildCallback from "./controllers/build-callback";
 import express from "express";
 import bodyParser from "body-parser";
 import initMiddleware from './middleware';
-import initRemoteModels from "./services/init-remote-models";
+import log from './lib/logger';
 
 const Server = (() => {
   const app = express();
@@ -17,34 +18,6 @@ const Server = (() => {
   const PORT = 8070;
 
   app.use(bodyParser.json());
-  app.post(
-    `${API_ROOT}/model1`,
-    buildCallback(RestControllerFactory.postModel1)
-  );
-  app.patch(
-    `${API_ROOT}/model1/:id`,
-    buildCallback(RestControllerFactory.patchModel1)
-  );
-  app.put(
-    `${API_ROOT}/model1/:id`,
-    buildCallback(RestControllerFactory.patchModel1)
-  );
-  app.get(
-    `${API_ROOT}/model1`,
-    buildCallback(RestControllerFactory.getModel1)
-  );
-  app.post(
-    `${API_ROOT}/model2`,
-    buildCallback(RestControllerFactory.postModel2)
-  );
-  app.patch(
-    `${API_ROOT}/model2/:id`,
-    buildCallback(RestControllerFactory.patchModel2)
-  );
-  app.put(
-    `${API_ROOT}/model2/:id`,
-    buildCallback(RestControllerFactory.patchModel2)
-  );
   app.get(
     '/',
     (req, res) => res.send('Federated Monolith Demo')
@@ -52,7 +25,7 @@ const Server = (() => {
 
   function make(path, app, method, controllers) {
     controllers().map(controller => {
-      console.log(controller);
+      log(controller);
       app[method](
         path(controller.modelName),
         buildCallback(controller.factory)
@@ -63,8 +36,24 @@ const Server = (() => {
   function run() {
     initModels().then(() => {
       return Promise.all([
-        make((p) => `${API_ROOT}/${p}`, app, 'post', postModels),
-        make((p) => `${API_ROOT}/${p}/:id`, app, 'patch', patchModels)
+        make(
+          (model) => `${API_ROOT}/${model}`,
+          app,
+          'post',
+          postModels
+        ),
+        make(
+          (model) => `${API_ROOT}/${model}/:id`,
+          app,
+          'patch',
+          patchModels
+        ),
+        make(
+          (model) => `${API_ROOT}/${model}`,
+          app,
+          'get',
+          getModels
+        )
       ]);
     }).then(() => {
       app.listen(
