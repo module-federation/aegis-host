@@ -3,7 +3,8 @@
 import {
   postModels,
   patchModels,
-  getModels
+  getModels,
+  getModelsById
 } from "./controllers";
 import { initModels } from './models';
 import buildCallback from "./controllers/build-callback";
@@ -32,7 +33,8 @@ const Server = (() => {
       return Promise.all([
         make(m => `${API_ROOT}/${m}`, app, 'post', postModels),
         make(m => `${API_ROOT}/${m}`, app, 'get', getModels),
-        make(m => `${API_ROOT}/${m}/:id`, app, 'patch', patchModels)
+        make(m => `${API_ROOT}/${m}/:id`, app, 'patch', patchModels),
+        make(m => `${API_ROOT}/${m}/:id`, app, 'get', getModelsById)
       ]);
     }).then(() => {
       app.listen(

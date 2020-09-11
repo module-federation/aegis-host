@@ -20,7 +20,7 @@ export default function editModelFactory({
   observer,
   handlers = []
 } = {}) {
-
+  
   const eventType = ModelFactory.EventTypes.UPDATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
   handlers.push(async event => log({ event }));

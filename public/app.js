@@ -5,6 +5,32 @@
   const patchButton = document.querySelector('#patch');
   const getButton = document.querySelector('#get');
   const clearButton = document.querySelector('#clear');
+  const modelText = document.querySelector('#model');
+  const modelIdText = document.querySelector('#modelId');
+
+  function getUrl() {
+    const model = document.getElementById('model').value;
+    const id = document.getElementById('modelId').value;
+    const url = [
+      'api',
+      model,
+      id.replace('id', '')
+    ].join('/');
+
+    document.getElementById('url').textContent = [
+      `http://${location.host}`, url
+    ].join('/');
+
+    return url;
+  }
+
+  modelText.onchange = function () {
+    getUrl();
+  }
+
+  modelIdText.onchange = function () {
+    getUrl();
+  }
 
   function showMessage(message) {
     messages.textContent += `\n${message}`;
@@ -12,13 +38,20 @@
   }
 
   function handleResponse(response) {
-    return response.ok
-      ? response.json().then((data) => JSON.stringify(data, null, 2))
-      : Promise.reject(new Error('Unexpected response'));
+    try {
+      return [200, 201, 400].includes(response.status)
+        ? response.json().then(data => JSON.stringify(data, null, 2))
+        : Promise.reject(new Error([
+          response.status, 
+          response.statusText
+        ].join(': ')));
+    } catch (error) {
+      return error.message;
+    }
   }
 
   postButton.onclick = function () {
-    fetch('/api/' + document.getElementById('model').value, {
+    fetch(getUrl(), {
       method: "POST",
       body: document.getElementById('body').value,
       headers: { 'Content-Type': 'application/json' }
@@ -30,8 +63,7 @@
   }
 
   patchButton.onclick = function () {
-    fetch('/api/' + document.getElementById('model').value +
-      '/' + document.getElementById('modelId').value, {
+    fetch(getUrl(), {
       method: "PATCH",
       body: document.getElementById('body').value,
       headers: { 'Content-Type': 'application/json' }
@@ -43,7 +75,7 @@
   }
 
   getButton.onclick = function () {
-    fetch('/api/' + document.getElementById('model').value)
+    fetch(getUrl())
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -54,6 +86,5 @@
   clearButton.onclick = function () {
     messages.textContent = '';
   }
-
 
 })();
