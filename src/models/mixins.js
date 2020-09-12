@@ -1,5 +1,14 @@
 'use strict'
 
+import uuid from "../lib/uuid";
+
+export const getModelMixins = () => {
+  return [
+    withTimestamp('createTime'),
+    withId(uuid)
+  ];
+}
+
 export const withId = (fnCreateId) => o => ({
   id: fnCreateId(),
   ...o,

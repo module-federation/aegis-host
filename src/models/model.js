@@ -1,6 +1,7 @@
 import { withId, withTimestamp } from './mixins';
-import regeneratorRuntime from 'regenerator-runtime';
+import regeneratorRuntime, { async } from 'regenerator-runtime';
 import asyncPipe from '../lib/async-pipe';
+import compose from '../lib/compose';
 import uuid from '../lib/uuid';
 import log from '../lib/logger';
 
@@ -14,16 +15,17 @@ import log from '../lib/logger';
 
 const Model = (() => {
 
-  const _isValid = () => {
-    return this.id && this.modelName;
-  }
-
   /**
    * 
    * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options
    * @returns {Promise<Model>}  
    */
-  const Model = async ({ factory, args, modelName, isValid = _isValid }) => {
+  const Model = async ({
+    factory,
+    args,
+    modelName,
+    isValid = () => this.id && this.modelName,
+  }) => {
     return Promise.resolve(
       factory(args)
     ).then(model => ({
@@ -46,7 +48,10 @@ const Model = (() => {
      * @returns {Promise<Model>}
      */
     create: (options) => {
-      return makeModel(options);
+      log(options);
+      return makeModel(options).then(
+        model => compose(...options.mixins)(model)
+      );
     },
 
     /**

@@ -4,17 +4,17 @@
  * ```
  * compose(func1, func2)(args);
  * 
- * // i.e. func2(func1(args));
+ * // eqivalent to func2(func1(args));
  * ```
  * @param  {...any} funcs 
  */
-export default
-  function compose(...funcs) {
+export default function compose(...funcs) {
   return function (initVal) {
     return funcs.reduceRight((v, f) => f(v), initVal);
   }
 }
 
+/*
 function increment(num) {
   const sum = num + 1;
   console.log(`increment: ${sum}`);
@@ -176,3 +176,4 @@ console.log(
 console.log(
   enrichedEvent.generateId()
 )
+*/

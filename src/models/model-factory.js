@@ -141,7 +141,8 @@ const ModelFactory = (() => {
         fnFactory,
         fnIsValid = () => true,
         fnHandler,
-        isRemote = false
+        isRemote = false,
+        mixins = []
       }) => {
         modelName = checkModelName(modelName);
 
@@ -149,7 +150,7 @@ const ModelFactory = (() => {
           && typeof fnFactory === 'function'
           && typeof fnIsValid === 'function') {
           modelFactories.set(modelName, {
-            fnFactory, fnIsValid, fnHandler, isRemote
+            fnFactory, fnIsValid, fnHandler, isRemote, mixins
           });
         }
       },
@@ -183,7 +184,8 @@ const ModelFactory = (() => {
             modelName: modelName,
             isValid: modelFactories.get(modelName).fnIsValid,
             factory: modelFactories.get(modelName).fnFactory,
-            args: args
+            mixins: modelFactories.get(modelName).mixins,
+            args: args,
           });
           return Object.freeze(model);
         }

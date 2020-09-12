@@ -9,6 +9,7 @@ const fs = require('fs');
  */
 module.exports = async (remoteEntry) => {
   console.log(remoteEntry);
+  //TODO: call container registry to get remote entries
   const entries = Array.isArray(remoteEntry)
     ? remoteEntry
     : [remoteEntry];

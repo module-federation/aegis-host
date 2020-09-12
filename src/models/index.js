@@ -20,7 +20,8 @@ export async function initModels() {
       fnFactory: model.factory,
       fnIsValid: model.isValid,
       fnHandler: model.handler,
-      isRemote: true
+      mixins: model.mixins,
+      isRemote: true,
     });
 
     factory.registerEvent(
