@@ -20,7 +20,7 @@ export default function editModelFactory({
   observer,
   handlers = []
 } = {}) {
-  
+
   const eventType = ModelFactory.EventTypes.UPDATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
   handlers.push(async event => log({ event }));
@@ -32,7 +32,7 @@ export default function editModelFactory({
       throw new Error('no such id');
     }
 
-    const updated = { ...model, ...changes };
+    const updated = { ...model, ...changes, id };
     const valid = await Model.validate(updated);
     if (!valid) {
       throw new Error('invalid model');

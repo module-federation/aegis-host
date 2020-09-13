@@ -47,11 +47,9 @@ const Model = (() => {
      * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options 
      * @returns {Promise<Model>}
      */
-    create: (options) => {
-      log(options);
-      return makeModel(options).then(
-        model => compose(...options.mixins)(model)
-      );
+    create: async (options) => {
+      const model = await makeModel(options);
+      return compose(...options.mixins)(model);
     },
 
     /**
@@ -60,7 +58,10 @@ const Model = (() => {
      */
     validate: (model) => {
       try {
-        return model.isValid();
+        if (model['id'] && model['modelName']) {
+          return model.isValid();
+        }
+        return false;
       } catch (error) {
         log(error);
       }

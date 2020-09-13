@@ -17,10 +17,12 @@ export const withId = (fnCreateId) => o => ({
 export const withTimestamp = (
   propName = 'timestamp',
   fnTimestamp = utc
-) => o => ({
-  [propName]: fnTimestamp(),
-  ...o,
-});
+) => {
+  return (o) => ({
+    [propName]: fnTimestamp(),
+    ...o,
+  });
+};
 
 export const withPropertyTimestamp = (
   prop,
