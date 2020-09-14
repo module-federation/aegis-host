@@ -31,10 +31,10 @@ const Event = (() => {
     return Promise.resolve(
       factory(args)
     ).then(event => ({
+      ...event,
       eventName: (eventType + modelName).toUpperCase(),
       eventType,
-      modelName,
-      ...event
+      modelName
     }));
   };
 

@@ -84,7 +84,10 @@ const ModelFactory = (() => {
   const EventTypes = {
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
-    DELETE: 'DELETE'
+    DELETE: 'DELETE',
+    BEFORE_CREATE: 'BEFORE_CREATE',
+    BEFORE_UPDATE: 'BEFORE_UPDATE',
+    BEFORE_DELETE: 'BEFORE_DELETE',
   }
 
   /**

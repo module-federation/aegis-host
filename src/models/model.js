@@ -17,7 +17,13 @@ const Model = (() => {
 
   /**
    * 
-   * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options
+   * @param {{
+   *  factory: Function, 
+   *  args: any, 
+   *  modelName: String, 
+   *  isValid?: Function, 
+   *  mixins: Array<import('./mixins').mixinFunction>
+   * }} options
    * @returns {Promise<Model>}  
    */
   const Model = async ({
@@ -25,20 +31,25 @@ const Model = (() => {
     args,
     modelName,
     isValid = () => this.id && this.modelName,
-  }) => {
-    return Promise.resolve(
-      factory(args)
-    ).then(model => ({
-      modelName,
-      isValid,
-      ...model
-    }));
-  }
+    allowUpdates = true,
+    mixins
+  }) => Promise.resolve(
+    factory(args)
+  ).then(model => ({
+    ...compose(...mixins)(model),
+    isValid,
+    modelName
+  }))
 
   const makeModel = asyncPipe(
     Model,
     withTimestamp('createTime'),
     withId(uuid),
+    // withImmutableProps(
+    //   'modelName', 
+    //   'createTime', 
+    //   'id'
+    // )
   );
 
   return {
@@ -47,19 +58,16 @@ const Model = (() => {
      * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options 
      * @returns {Promise<Model>}
      */
-    create: async (options) => {
-      const model = await makeModel(options);
-      return compose(...options.mixins)(model);
-    },
+    create: makeModel,
 
     /**
      * 
-     * @param {Model} model 
+     * @param {{model: Model, changes: any[]}} model 
      */
-    validate: (model) => {
+    validate: ({ model, changes }) => {
       try {
-        if (model['id'] && model['modelName']) {
-          return model.isValid();
+        if (model.permitUpdate(changes)) {
+          return model.isValid(changes);
         }
         return false;
       } catch (error) {

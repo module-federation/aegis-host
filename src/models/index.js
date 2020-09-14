@@ -2,7 +2,7 @@ import ModelFactory from './model-factory';
 import importRemoteModels from '../services/import-remote-models';
 
 const createEventFactory = (model) => ({
-  eventData: { ...model }
+  modelData: { ...model }
 });
 
 const updateEventFactory = ({ updated, changes }) => ({
@@ -19,7 +19,7 @@ export async function initModels() {
       modelName: model.modelName,
       fnFactory: model.factory,
       fnIsValid: model.isValid,
-      fnHandler: model.handler,
+      fnUpdated: model.updated,
       mixins: model.mixins,
       isRemote: true,
     });

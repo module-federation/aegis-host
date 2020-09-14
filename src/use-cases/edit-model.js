@@ -7,7 +7,7 @@ import log from '../lib/logger';
  * @property {String} modelName 
  * @property {import('../datasources/datasource').default} repository 
  * @property {import('../lib/observer').Observer} observer
- * @property {...Function} handlers
+ * @property {Function[]} handlers
  */
 
 /**
@@ -32,16 +32,17 @@ export default function editModelFactory({
       throw new Error('no such id');
     }
 
-    const updated = { ...model, ...changes, id };
-    const valid = await Model.validate(updated);
+    const valid = await Model.validate(changes);
     if (!valid) {
       throw new Error('invalid model');
     }
 
+    const updated = { ...model, ...changes, id };
     const factory = ModelFactory.getInstance();
     const event = await factory.createEvent(
       eventType, modelName, { updated, changes }
     );
+
     await repository.save(id, updated);
     await observer.notify(event.eventName, event);
     return updated;

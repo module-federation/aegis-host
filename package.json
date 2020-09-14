@@ -17,7 +17,8 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",

@@ -1,28 +1,52 @@
 'use strict'
+/**
+ * @callback mixinFunction
+ * @param {Object} o Object to compose
+ * @returns {Object} Composed object
+ */
+
+/**
+ * @callback functionalMixin
+ * @param {*} mixinParams params for mixin function 
+ * @returns {mixinFunction}
+ */
+
 
 import uuid from "../lib/uuid";
 
-export const getModelMixins = () => {
-  return [
-    withTimestamp('createTime'),
-    withId(uuid)
-  ];
-}
-
+/**
+ * @type {functionalMixin}
+ * @param {Function} fnCreateId function that returns unique id
+ */
 export const withId = (fnCreateId) => o => ({
-  id: fnCreateId(),
   ...o,
+  id: fnCreateId()
 });
 
+/**
+ * @type {functionalMixin}
+ * @param {string} [propName]
+ * @param {Function} [fnTimestamp]
+ */
 export const withTimestamp = (
   propName = 'timestamp',
   fnTimestamp = utc
 ) => {
   return (o) => ({
-    [propName]: fnTimestamp(),
     ...o,
+    [propName]: fnTimestamp()
   });
 };
+
+// export const withImmutableProps = (
+//   ...properties
+// ) => {
+//   return (o) => ({
+//     ...o,
+
+//   });
+// };
+
 
 export const withPropertyTimestamp = (
   prop,

@@ -2,13 +2,16 @@
 /**
  * Compose functions to execute in left-to-right / top-to-bottom order
  * ```
- * compose(func1, func2)(args);
+ * compose(func1, func2)(ObjectToCompose);
  * 
- * // eqivalent to func2(func1(args));
+ * // eqivalent to func2(func1(ObjectToCompose));
  * ```
  * @param  {...any} funcs 
  */
 export default function compose(...funcs) {
+  /**
+   * @param {Object} initVal e.g. object to compose
+   */
   return function (initVal) {
     return funcs.reduceRight((v, f) => f(v), initVal);
   }
