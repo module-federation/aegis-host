@@ -24,7 +24,10 @@ const Server = (() => {
   function make(path, app, method, controllers) {
     controllers().map(cntrl => {
       log(cntrl);
-      app[method](path(cntrl.modelName), buildCallback(cntrl.fn));
+      app[method](
+        path(cntrl.modelName),
+        buildCallback(cntrl.fn)
+      );
     });
   }
 

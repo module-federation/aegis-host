@@ -1,3 +1,6 @@
+'use strict'
+
+import * as models from '../models'
 
 /**
  * Compose functions to execute in left-to-right / top-to-bottom order
@@ -9,9 +12,6 @@
  * @param  {...any} funcs 
  */
 export default function compose(...funcs) {
-  /**
-   * @param {Object} initVal e.g. object to compose
-   */
   return function (initVal) {
     return funcs.reduceRight((v, f) => f(v), initVal);
   }

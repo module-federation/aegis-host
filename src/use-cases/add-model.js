@@ -1,4 +1,5 @@
 import ModelFactory from '../models';
+import Model from '../models/model';
 import log from '../lib/logger';
 
 /**
@@ -18,7 +19,6 @@ export default function addModelFactory({
   observer,
   handlers = []
 } = {}) {
-
   const eventType = ModelFactory.EventTypes.CREATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
   handlers.push(async event => log({ event }));
@@ -28,7 +28,7 @@ export default function addModelFactory({
     const factory = ModelFactory.getInstance();
     const model = await factory.createModel(modelName, input);
     const event = await factory.createEvent(eventType, modelName, model);
-    await repository.save(model.id, model);
+    await repository.save(model[Model.getKey('id')], model);
     await observer.notify(event.eventName, event);
     return model;
   }

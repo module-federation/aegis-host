@@ -1,27 +1,41 @@
-import { withId, withTimestamp } from './mixins';
+import {
+  withId,
+  withTimestamp,
+  withSymbolsInJSON
+} from './mixins';
 import regeneratorRuntime, { async } from 'regenerator-runtime';
 import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
-import log from '../lib/logger';
 
 /**
  * @typedef {Object} Model
  * @property {String} id - unique id
- * @property {String} modelName - model name
+ * @property {String } modelName - model name
  * @property {String} createTime - time created
- * @property {Function} [isValid] - check model is valid
+ * @property {Function} [onUpdate] - check model is valid
  */
 
 const Model = (() => {
 
+  const ID = Symbol('id');
+  const MODELNAME = Symbol('modelName');
+  const CREATETIME = Symbol('createTime');
+  const ONUPDATE = Symbol('onUpdate');
+
+  const keyMap = {
+    id: ID,
+    modelName: MODELNAME,
+    createTime: CREATETIME,
+    onUpdate: ONUPDATE,
+  }
+
   /**
-   * 
    * @param {{
    *  factory: Function, 
    *  args: any, 
    *  modelName: String, 
-   *  isValid?: Function, 
+   *  onUpdate: Function, 
    *  mixins: Array<import('./mixins').mixinFunction>
    * }} options
    * @returns {Promise<Model>}  
@@ -30,32 +44,36 @@ const Model = (() => {
     factory,
     args,
     modelName,
-    isValid = () => this.id && this.modelName,
-    allowUpdates = true,
-    mixins
+    mixins = [],
+    onUpdate
   }) => Promise.resolve(
     factory(args)
   ).then(model => ({
     ...compose(...mixins)(model),
-    isValid,
-    modelName
-  }))
+    [MODELNAME]: modelName,
+    [ONUPDATE]: onUpdate
+  }));
 
   const makeModel = asyncPipe(
     Model,
-    withTimestamp('createTime'),
-    withId(uuid),
-    // withImmutableProps(
-    //   'modelName', 
-    //   'createTime', 
-    //   'id'
-    // )
+    withTimestamp(CREATETIME),
+    withId(ID, uuid),
+    withSymbolsInJSON(keyMap)
   );
+
+  function getKey(key) {
+    return keyMap[key];
+  }
 
   return {
     /**
-     * 
-     * @param {{factory: Function, args: any, modelName: String, isValid?: Function}} options 
+     * @param {{
+     *  factory: Function, 
+     *  args: any, 
+     *  modelName: String, 
+     *  onUpdate: Function, 
+     *  mixins: Array<import('./mixins').mixinFunction>
+     * }} options 
      * @returns {Promise<Model>}
      */
     create: makeModel,
@@ -65,16 +83,11 @@ const Model = (() => {
      * @param {{model: Model, changes: any[]}} model 
      */
     validate: ({ model, changes }) => {
-      try {
-        if (model.permitUpdate(changes)) {
-          return model.isValid(changes);
-        }
-        return false;
-      } catch (error) {
-        log(error);
-      }
-      return false;
-    }
+      model[ONUPDATE]({model, changes});
+    },
+
+    getKey
+
   }
 })();
 

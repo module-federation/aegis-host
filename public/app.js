@@ -11,16 +11,9 @@
   function getUrl() {
     const model = document.getElementById('model').value;
     const id = document.getElementById('modelId').value;
-    const url = [
-      'api',
-      model,
-      id.replace('id', '')
-    ].join('/');
-
-    document.getElementById('url').textContent = [
-      `http://${location.host}`, url
-    ].join('/');
-
+    const url = ['api', model, id].join('/');
+    document.getElementById('url').textContent =
+      [`http://${location.host}`, url].join('/');
     return url;
   }
 
@@ -42,7 +35,7 @@
       return [200, 201, 400].includes(response.status)
         ? response.json().then(data => JSON.stringify(data, null, 2))
         : Promise.reject(new Error([
-          response.status, 
+          response.status,
           response.statusText
         ].join(': ')));
     } catch (error) {
@@ -53,7 +46,7 @@
   postButton.onclick = function () {
     fetch(getUrl(), {
       method: "POST",
-      body: document.getElementById('body').value,
+      body: document.getElementById('payload').value,
       headers: { 'Content-Type': 'application/json' }
     }).then(handleResponse)
       .then(showMessage)
@@ -65,7 +58,7 @@
   patchButton.onclick = function () {
     fetch(getUrl(), {
       method: "PATCH",
-      body: document.getElementById('body').value,
+      body: document.getElementById('payload').value,
       headers: { 'Content-Type': 'application/json' }
     }).then(handleResponse)
       .then(showMessage)

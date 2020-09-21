@@ -1,6 +1,5 @@
 const path = require('path');
 const ContainerReferencePlugin = require('webpack').container.ContainerReferencePlugin;
-// const ModuleFederationPlugin = require('webpack').container.ModuleFederationPlugin;
 const nodeExternals = require('webpack-node-externals');
 const fetchRemoteEntry = require('./webpack/fetch-remote-entry');
 const remoteEntries = require('./webpack/remote-entries');
@@ -44,16 +43,6 @@ module.exports = () => {
             remoteType: 'commonjs-module',
             remotes: remotes
           }),
-          // new ModuleFederationPlugin({
-          //   remoteType: 'commonjs-module',
-          //   remotes: remotes,
-          //   shared: {
-          //     ...sharedDependencies,
-          //     uuid: {
-          //       eager: true
-          //     }
-          //   }
-          // })
         ]
       }));
   });

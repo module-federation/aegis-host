@@ -41,7 +41,7 @@ const Event = (() => {
   const makeEvent = asyncPipe(
     Event,
     withTimestamp('eventTime'),
-    withId(uuid),
+    withId('id', uuid)
   );
 
   return {

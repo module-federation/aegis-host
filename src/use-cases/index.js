@@ -2,10 +2,10 @@ import addModelFactory from './add-model';
 import editModelFactory from './edit-model';
 import listModelsFactory from './list-models';
 import findModelFactory from './find-model';
-import handleEvents from './handle-events';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
 import ModelFactory from '../models';
+import handleEvents from './handle-events';
 
 handleEvents(ObserverFactory.getInstance());
 
@@ -20,12 +20,12 @@ function make(factory) {
       observer: observer
     }
 
-    if (typeof model.fnHandler === 'function') {
-      options.handlers = [model.fnHandler];
+    if (typeof model.handler === 'function') {
+      options.handlers = [model.handler];
     }
     return options;
   }
-  
+
   return models.map(model => ({
     modelName: model.modelName,
     fn: factory(buildOptions(model))

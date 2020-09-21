@@ -13,28 +13,31 @@ const updateEventFactory = ({ updated, changes }) => ({
 export async function initModels() {
   const factory = ModelFactory.getInstance();
   const models = await importRemoteModels();
+  console.log(models);
 
-  models.forEach(model => {
-    factory.registerModel({
-      modelName: model.modelName,
-      fnFactory: model.factory,
-      fnIsValid: model.isValid,
-      fnUpdated: model.updated,
-      mixins: model.mixins,
-      isRemote: true,
-    });
+  Object.values(models).forEach(model => {
+    if (model.hasOwnProperty('modelName')) {
+      
+      factory.registerModel({
+        modelName: model.modelName,
+        factory: model.factory,
+        onUpdate: model.onUpdate,
+        mixins: model.mixins,
+        isRemote: true,
+      });
 
-    factory.registerEvent(
-      factory.EventTypes.CREATE,
-      model.modelName,
-      createEventFactory
-    );
+      factory.registerEvent(
+        factory.EventTypes.CREATE,
+        model.modelName,
+        createEventFactory
+      );
 
-    factory.registerEvent(
-      factory.EventTypes.UPDATE,
-      model.modelName,
-      updateEventFactory
-    );
+      factory.registerEvent(
+        factory.EventTypes.UPDATE,
+        model.modelName,
+        updateEventFactory
+      );
+    }
   });
 }
 

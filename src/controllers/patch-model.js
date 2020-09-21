@@ -1,4 +1,5 @@
 import log from '../lib/logger';
+import Model from '../models/model';
 
 export default function patchModelFactory(editModel) {
   return async function patchModel(httpRequest) {
@@ -23,7 +24,7 @@ export default function patchModelFactory(editModel) {
           'Last-Modified': new Date().toUTCString()
         },
         statusCode: 201,
-        body: { modelId: model.id }
+        body: { modelId: model[Model.getKey('id')] }
       }
     } catch (e) {
       log(e);

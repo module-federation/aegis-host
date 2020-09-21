@@ -34,12 +34,19 @@ import Event from './event';
  */
 
 /**
+ * @callback fnOnUpdate
+ * @param {{model: Model, changes: Object}} event
+ * @returns {Promise<void>}
+ */
+
+/**
  * @callback registerModel
- * @param {{modelName: string,
- *  fnFactory:fnModelFactory,
- *  fnIsValid:fnIsValid,
- *  fnHandler:fnHandler,
- *  isRemote:boolean
+ * @param {{ 
+ *  modelName: string,
+ *  factory: fnModelFactory,
+ *  onUpdate: fnOnUpdate,
+ *  handler: fnHandler,
+ *  isRemote: boolean
  * }} options
  */
 
@@ -85,9 +92,6 @@ const ModelFactory = (() => {
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
     DELETE: 'DELETE',
-    BEFORE_CREATE: 'BEFORE_CREATE',
-    BEFORE_UPDATE: 'BEFORE_UPDATE',
-    BEFORE_DELETE: 'BEFORE_DELETE',
   }
 
   /**
@@ -136,24 +140,25 @@ const ModelFactory = (() => {
     }
 
     return {
+
       /**
        * Register a factory function to create the model `modelName`
        */
       registerModel: ({
         modelName,
-        fnFactory,
-        fnIsValid = () => true,
-        fnHandler,
+        factory,
+        handler,
+        onUpdate,
         isRemote = false,
         mixins = []
       }) => {
         modelName = checkModelName(modelName);
 
         if (!modelFactories.has(modelName)
-          && typeof fnFactory === 'function'
-          && typeof fnIsValid === 'function') {
+          && typeof factory === 'function'
+          && typeof onUpdate === 'function') {
           modelFactories.set(modelName, {
-            fnFactory, fnIsValid, fnHandler, isRemote, mixins
+            factory, onUpdate, handler, isRemote, mixins
           });
         }
       },
@@ -162,14 +167,14 @@ const ModelFactory = (() => {
        * Register a factory function to create an event for the model `modelName`
        * @param {EventType} eventType type of event
        * @param {String} modelName model the event is about
-       * @param {Function} fnFactory factory function
+       * @param {Function} factory factory function
        */
-      registerEvent: (eventType, modelName, fnFactory) => {
+      registerEvent: (eventType, modelName, factory) => {
         modelName = checkModelName(modelName);
         eventType = checkEventType(eventType);
 
-        if (typeof fnFactory === 'function') {
-          eventFactories[eventType].set(modelName, fnFactory);
+        if (typeof factory === 'function') {
+          eventFactories[eventType].set(modelName, factory);
         }
       },
 
@@ -184,11 +189,11 @@ const ModelFactory = (() => {
 
         if (modelFactories.has(modelName)) {
           const model = await Model.create({
-            modelName: modelName,
-            isValid: modelFactories.get(modelName).fnIsValid,
-            factory: modelFactories.get(modelName).fnFactory,
+            modelName,
+            onUpdate: modelFactories.get(modelName).onUpdate,
+            factory: modelFactories.get(modelName).factory,
             mixins: modelFactories.get(modelName).mixins,
-            args: args,
+            args
           });
           return Object.freeze(model);
         }
@@ -208,8 +213,8 @@ const ModelFactory = (() => {
 
         if (eventFactories[eventType].has(modelName)) {
           const event = await Event.create({
-            factory: eventFactories[eventType].get(modelName),
             args: args,
+            factory: eventFactories[eventType].get(modelName),
             eventType: eventType,
             modelName: modelName
           });
@@ -251,15 +256,11 @@ const ModelFactory = (() => {
      * @param {EventType} eventType
      * @param {String} modelName
      */
-    getEventName: (eventType, modelName) => {
-      return createEventName(eventType, modelName);
-    },
+    getEventName: createEventName,
 
     EventTypes
   }
 })();
-
-
 
 export default ModelFactory;
 

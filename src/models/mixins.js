@@ -1,30 +1,28 @@
 'use strict'
+
 /**
  * @callback mixinFunction
- * @param {Object} o Object to compose
- * @returns {Object} Composed object
+ * @param {Object} o - Object to compose
+ * @returns {Object} - Composed object
  */
 
 /**
- * @callback functionalMixin
- * @param {*} mixinParams params for mixin function 
+ * @callback functionalMixinFactory
+ * @param {*} mixinFunctionParams params for mixin function 
  * @returns {mixinFunction}
  */
 
-
-import uuid from "../lib/uuid";
+export const utc = () => new Date().toUTCString();
 
 /**
- * @type {functionalMixin}
  * @param {Function} fnCreateId function that returns unique id
  */
-export const withId = (fnCreateId) => o => ({
+export const withId = (propName, fnCreateId) => o => ({
   ...o,
-  id: fnCreateId()
+  [propName]: fnCreateId()
 });
 
 /**
- * @type {functionalMixin}
  * @param {string} [propName]
  * @param {Function} [fnTimestamp]
  */
@@ -38,15 +36,46 @@ export const withTimestamp = (
   });
 };
 
-// export const withImmutableProps = (
-//   ...properties
-// ) => {
-//   return (o) => ({
+/*
+ * @param  {...string} propNames 
+ */
+// export const withImmutableProperties = (...propNames) => (o) => {
+//   const preventUpdates = (changes) => {
+//     const readonly = Object.keys(changes)
+//       .filter(key => propNames.includes(key));
+
+//     if (readonly?.length > 0) {
+//       throw new Error(`cannot update readonly properties: ${readonly}`);
+//     }
+//   }
+
+//   return {
 //     ...o,
+//     [Symbol.for('preventUpdates')]: preventUpdates
+//   }
+// }
 
-//   });
-// };
+/**
+ * 
+ * @param {{key: string, value: Symbol}} keyMap 
+ */
+export const withSymbolsInJSON = (keyMap) => (o) => {
+  function toJSON() {
+    const symbols = Object.keys(keyMap)
+      .map(k => ({ [k]: o[keyMap[k]] }))
+      .reduce((p, c) => ({ ...c, ...p }))
 
+    return {
+      ...o,
+      ...symbols
+    }
+  }
+
+  return {
+    ...o,
+    toJSON
+  }
+}
 
 export const withPropertyTimestamp = (
   prop,
@@ -61,8 +90,6 @@ export const withPropertyTimestamp = (
     ...o
   }
 }
-
-export const utc = () => new Date().toUTCString();
 
 
 

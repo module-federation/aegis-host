@@ -1,6 +1,7 @@
 const { URL } = require('url');
 const http = require('http');
 const fs = require('fs');
+const e = require('express');
 
 /**
  * Download remote container bundles
@@ -10,11 +11,11 @@ const fs = require('fs');
 module.exports = async (remoteEntry) => {
   console.log(remoteEntry);
   //TODO: call container registry to get remote entries
-  const entries = Array.isArray(remoteEntry)
+  var entries = Array.isArray(remoteEntry)
     ? remoteEntry
     : [remoteEntry];
 
-  const remotes = await Promise.all(entries.map(entry => {
+  var getPath = (entry) => {
     var url = new URL(entry.url);
     var path = [
       url.pathname.replace('.js', ''),
@@ -23,13 +24,17 @@ module.exports = async (remoteEntry) => {
       entry.name.concat('.js')
     ].join('-');
 
-    path = entry.path.concat(path);
+    return entry.path.concat(path);
+  }
+
+  const remotes = await Promise.all(entries.map(entry => {
+    var path = getPath(entry);
     console.log(path);
 
     return new Promise((resolve, reject) => {
-      var req = http.request(url, (res) => {
+      var req = http.request(entry.url, (res) => {
         if (res.statusCode < 200 || res.statusCode >= 300) {
-          return reject(new Error('statusCode=' + res.statusCode));
+          return reject({ [entry.name]: path });
         }
         res.pipe(fs.createWriteStream(path));
         res.on('end', () => {
@@ -37,11 +42,18 @@ module.exports = async (remoteEntry) => {
         });
       });
       req.on('error', (err) => {
-        reject(err);
+        reject({ [entry.name]: path });
       });
       req.end();
-    });
-  }));
+    }).catch(() => ({
+      [entry.name]: path
+    }));
+  })).catch(() => {
+    var remotes = remoteEntry.map(entry => ({
+      [entry.name]: getPath(entry)
+    }));
+    return Promise.resolve(remotes);
+  });
 
   return remotes.reduce((p, c) => ({ ...c, ...p }));
 }

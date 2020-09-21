@@ -6,14 +6,44 @@
   </head>
   <body>
     <h2>Call APIs</h2>
-    <input id="model" value="user"></input><pre></pre>
-    <input id="modelId" value="id"></input><pre></pre>
-    <textarea id="body" style="height: 65px; width: 200px;">
-  {
-    "userName":"user1",
-    "password":"secret"
-  }
-    </textarea>
+    <table>
+      <tr>
+        <td>
+          <label for="model">Model</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+           <input id="model" value="user"></input><pre></pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="modelId">Model ID</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input id="modelId"></input><pre></pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="payload">Payload</label>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <textarea id="payload" style="height: 80px; width: 200px;">
+{
+  "userName":"user1",
+  "password":"secret",
+  "firstName":"Bob"
+}
+          </textarea>          
+        </td>
+      </tr>
+    </table>
     <pre id="url"></pre>
     <button id="post" type="button" title="post">Post</button>
     <button id="patch" type="button" title="patch">Patch</button>
