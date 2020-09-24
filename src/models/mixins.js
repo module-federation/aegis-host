@@ -36,25 +36,6 @@ export const withTimestamp = (
   });
 };
 
-/*
- * @param  {...string} propNames 
- */
-// export const withImmutableProperties = (...propNames) => (o) => {
-//   const preventUpdates = (changes) => {
-//     const readonly = Object.keys(changes)
-//       .filter(key => propNames.includes(key));
-
-//     if (readonly?.length > 0) {
-//       throw new Error(`cannot update readonly properties: ${readonly}`);
-//     }
-//   }
-
-//   return {
-//     ...o,
-//     [Symbol.for('preventUpdates')]: preventUpdates
-//   }
-// }
-
 /**
  * 
  * @param {{key: string, value: Symbol}} keyMap 
@@ -62,11 +43,11 @@ export const withTimestamp = (
 export const withSymbolsInJSON = (keyMap) => (o) => {
   function toJSON() {
     const symbols = Object.keys(keyMap)
-      .map(k => ({ [k]: o[keyMap[k]] }))
+      .map(k => ({ [k]: this[keyMap[k]] }))
       .reduce((p, c) => ({ ...c, ...p }))
 
     return {
-      ...o,
+      ...this,
       ...symbols
     }
   }

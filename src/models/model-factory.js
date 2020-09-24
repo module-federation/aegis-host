@@ -72,7 +72,7 @@ import Event from './event';
  * @returns {Promise<Readonly<Event>>}
  */
 
-/**
+/*
  * @typedef {Object} ModelFactory
  * @property {registerModel} registerModel
  * @property {registerEvent} registerEvent
@@ -127,17 +127,19 @@ const ModelFactory = (() => {
     return checkEventType(eventType) + checkModelName(modelName);
   }
 
-  /**
+  /*
    * @returns {ModelFactory} instance
    * 
    */
   function init() {
+    //const modelSingleton = Model.getInstance();
     const modelFactories = new Map();
     const eventFactories = {
       [EventTypes.CREATE]: new Map(),
       [EventTypes.UPDATE]: new Map(),
       [EventTypes.DELETE]: new Map()
     }
+
 
     return {
 
@@ -236,12 +238,20 @@ const ModelFactory = (() => {
         return models;
       },
 
+      // updateModel: function (model, changes) {
+      //   return Model.update(model, changes);
+      // },
+
+      // getId: function (model) {
+      //   return Model.getId(model);
+      // },
+
       EventTypes
     }
   }
 
   return {
-    /**
+    /*
      * Get singleton
      * @returns {ModelFactory}
      */

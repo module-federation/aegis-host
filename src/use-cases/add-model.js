@@ -2,6 +2,7 @@ import ModelFactory from '../models';
 import Model from '../models/model';
 import log from '../lib/logger';
 
+
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName 
@@ -28,7 +29,7 @@ export default function addModelFactory({
     const factory = ModelFactory.getInstance();
     const model = await factory.createModel(modelName, input);
     const event = await factory.createEvent(eventType, modelName, model);
-    await repository.save(model[Model.getKey('id')], model);
+    await repository.save(Model.getId(model), model);
     await observer.notify(event.eventName, event);
     return model;
   }

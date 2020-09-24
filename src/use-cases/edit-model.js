@@ -31,15 +31,16 @@ export default function editModelFactory({
       throw new Error('no such id');
     }
 
-    Model.validate({ model, changes });
-    const updated = { ...model, ...changes };
+    const updated = Model.update(model, changes);
+    if (Model.getId(updated) !== id) {
+      throw new Error('IDs do not match');
+    }
+    await repository.save(id, updated);
 
     const factory = ModelFactory.getInstance();
     const event = await factory.createEvent(
       eventType, modelName, { updated, changes }
     );
-
-    await repository.save(id, updated);
     await observer.notify(event.eventName, event);
     return updated;
   }

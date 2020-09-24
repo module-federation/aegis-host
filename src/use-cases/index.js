@@ -9,23 +9,16 @@ import handleEvents from './handle-events';
 
 handleEvents(ObserverFactory.getInstance());
 
+function buildOptions(model) {
+  return {
+    modelName: model.modelName,
+    repository: DataSourceFactory.getDataSource(model.modelName),
+    observer: ObserverFactory.getInstance()
+  }
+}
+
 function make(factory) {
   const models = ModelFactory.getInstance().getRemoteModels();
-  const observer = ObserverFactory.getInstance();
-
-  function buildOptions(model) {
-    let options = {
-      modelName: model.modelName,
-      repository: DataSourceFactory.getDataSource(model.modelName),
-      observer: observer
-    }
-
-    if (typeof model.handler === 'function') {
-      options.handlers = [model.handler];
-    }
-    return options;
-  }
-
   return models.map(model => ({
     modelName: model.modelName,
     fn: factory(buildOptions(model))

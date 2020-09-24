@@ -24,7 +24,7 @@ export default function patchModelFactory(editModel) {
           'Last-Modified': new Date().toUTCString()
         },
         statusCode: 201,
-        body: { modelId: model[Model.getKey('id')] }
+        body: { modelId: Model.getId(model) }
       }
     } catch (e) {
       log(e);

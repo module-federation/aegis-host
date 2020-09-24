@@ -1,7 +1,6 @@
 const { URL } = require('url');
 const http = require('http');
 const fs = require('fs');
-const e = require('express');
 
 /**
  * Download remote container bundles
@@ -45,10 +44,10 @@ module.exports = async (remoteEntry) => {
         reject({ [entry.name]: path });
       });
       req.end();
-    }).catch(() => ({
-      [entry.name]: path
-    }));
-  })).catch(() => {
+    }).catch(e => {
+      e.then(() => Promise.resolve({[entry.name]: path}));
+    });
+  })).catch(e => {
     var remotes = remoteEntry.map(entry => ({
       [entry.name]: getPath(entry)
     }));

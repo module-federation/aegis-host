@@ -8,7 +8,7 @@ import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
 
-/**
+/*
  * @typedef {Object} Model
  * @property {String} id - unique id
  * @property {String } modelName - model name
@@ -30,13 +30,18 @@ const Model = (() => {
     onUpdate: ONUPDATE,
   }
 
+  const defUpdateFn = (model, changes) => ({
+    ...model,
+    ...changes
+  })
+
   /**
    * @param {{
    *  factory: Function, 
    *  args: any, 
    *  modelName: String, 
-   *  onUpdate: Function, 
-   *  mixins: Array<import('./mixins').mixinFunction>
+   *  onUpdate?: Function, 
+   *  mixins?: Array<import('./mixins').mixinFunction>
    * }} options
    * @returns {Promise<Model>}  
    */
@@ -45,14 +50,14 @@ const Model = (() => {
     args,
     modelName,
     mixins = [],
-    onUpdate
+    onUpdate = defUpdateFn
   }) => Promise.resolve(
     factory(args)
   ).then(model => ({
     ...compose(...mixins)(model),
     [MODELNAME]: modelName,
     [ONUPDATE]: onUpdate
-  }));
+  }))
 
   const makeModel = asyncPipe(
     Model,
@@ -61,33 +66,34 @@ const Model = (() => {
     withSymbolsInJSON(keyMap)
   );
 
-  function getKey(key) {
-    return keyMap[key];
-  }
-
   return {
     /**
      * @param {{
      *  factory: Function, 
      *  args: any, 
      *  modelName: String, 
-     *  onUpdate: Function, 
-     *  mixins: Array<import('./mixins').mixinFunction>
+     *  onUpdate?: Function, 
+     *  mixins?: Array<import('./mixins').mixinFunction>
      * }} options 
      * @returns {Promise<Model>}
      */
-    create: makeModel,
+    create: async (options) => makeModel(options),
 
     /**
      * 
      * @param {{model: Model, changes: any[]}} model 
      */
-    validate: ({ model, changes }) => {
-      model[ONUPDATE]({model, changes});
+    update: (model, changes) => {
+      return model[ONUPDATE](model, changes);
     },
 
-    getKey
+    getKey: function (key) {
+      return keyMap[key];
+    },
 
+    getId: function (model) {
+      return model[keyMap['id']];
+    }
   }
 })();
 
