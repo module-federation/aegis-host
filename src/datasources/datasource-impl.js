@@ -24,7 +24,15 @@ export default class DataSourceImpl extends DataSource {
    * @override
    */
   async list() {
-    return [...this._dataSource.entries()];
+    return [...this._dataSource.values()];
+  }
+
+  /**
+   * 
+   * @override 
+   */
+  async delete(id) {
+    this._dataSource.delete(id);
   }
 
 }

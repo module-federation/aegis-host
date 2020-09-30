@@ -16,12 +16,14 @@ export async function initModels() {
   console.log(models);
 
   Object.values(models).forEach(model => {
-    if (model.hasOwnProperty('modelName')) {
-      
+    if (model.hasOwnProperty('modelName')
+      && model.hasOwnProperty('factory')) {
+
       factory.registerModel({
         modelName: model.modelName,
         factory: model.factory,
         onUpdate: model.onUpdate,
+        onDelete: model.onDelete,
         mixins: model.mixins,
         isRemote: true,
       });
@@ -36,6 +38,12 @@ export async function initModels() {
         factory.EventTypes.UPDATE,
         model.modelName,
         updateEventFactory
+      );
+
+      factory.registerEvent(
+        factory.EventTypes.DELETE,
+        model.modelName,
+        createEventFactory
       );
     }
   });

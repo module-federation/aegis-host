@@ -1,5 +1,4 @@
 import ModelFactory from '../models';
-import Model from '../models/model';
 import log from '../lib/logger';
 
 /**
@@ -30,14 +29,12 @@ export default function editModelFactory({
     if (!model) {
       throw new Error('no such id');
     }
-
-    const updated = Model.update(model, changes);
-    if (Model.getId(updated) !== id) {
+    const factory = ModelFactory.getInstance();
+    const updated = factory.updateModel(model, changes);
+    if (factory.getModelId(updated) !== id) {
       throw new Error('IDs do not match');
     }
     await repository.save(id, updated);
-
-    const factory = ModelFactory.getInstance();
     const event = await factory.createEvent(
       eventType, modelName, { updated, changes }
     );

@@ -1,6 +1,4 @@
-import ModelFactory from '../models';
-import Model from '../models/model';
-import log from '../lib/logger';
+'use strict'
 
 /**
  * @typedef {Object} ModelParam

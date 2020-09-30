@@ -11,15 +11,13 @@
     "start-webpack": "node dist/main.js",
     "start-dev": "node dist/index.js",
     "start": "npm run start-webpack",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "open http://localhost:8070",
     "clean": "rm -rf dist"
   },
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "express": "^4.17.1",
-    "uuid": "^8.3.0"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -27,6 +25,7 @@
     "@babel/node": "^7.10.5",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.11.0",
+    "babel-polyfill": "^6.26.0",
     "babel-loader": "^8.1.0",
     "express-cli": "0.0.1",
     "regenerator-runtime": "^0.13.7",

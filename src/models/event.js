@@ -1,9 +1,20 @@
+'use strict'
+
 import { withId, withTimestamp } from './mixins';
 import asyncPipe from '../lib/async-pipe';
 import uuid from '../lib/uuid';
 
 /**
  * @typedef {import('../models/model-factory').EventType} EventType
+ */
+
+/** 
+ * @typedef {{
+ *  factory: function(*):any, 
+ *  args: any, 
+ *  eventType: EventType, 
+ *  modelName: String
+ * }} options 
  */
 
 /**
@@ -17,26 +28,30 @@ import uuid from '../lib/uuid';
  */
 
 /**
- * 
+ * @namespace
  */
-
 const Event = (() => {
 
   /**
-   * 
-   * @param {{factory: Function, args: any, eventType: EventType, modelName: string}} options 
-   * @returns {Promise<Event>}
+   * @lends Event
+   * @namespace
+   * @class
+   * @param {options} options
+   * @returns {Promise<Readonly<Event>>}
    */
-  const Event = async ({ factory, args, eventType, modelName }) => {
-    return Promise.resolve(
-      factory(args)
-    ).then(event => ({
-      ...event,
-      eventName: (eventType + modelName).toUpperCase(),
-      eventType,
-      modelName
-    }));
-  };
+  const Event = async ({
+    factory,
+    args,
+    eventType,
+    modelName
+  }) => Promise.resolve(
+    factory(args)
+  ).then(event => ({
+    ...event,
+    eventName: (eventType + modelName).toUpperCase(),
+    eventType,
+    modelName
+  }))
 
   const makeEvent = asyncPipe(
     Event,
@@ -47,12 +62,10 @@ const Event = (() => {
   return {
     /**
      * 
-     * @param {{factory: Function, args: any, eventType: EventType, modelName: String}} options 
-     * @returns {Promise<Event>}
+     * @param {options} options
+     * @returns {Promise<Readonly<Event>>}
      */
-    create: async function (options) {
-      return makeEvent(options);
-    }
+    create: async (options) => Object.freeze(makeEvent(options))
   }
 })();
 

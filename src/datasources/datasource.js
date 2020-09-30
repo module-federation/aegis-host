@@ -32,4 +32,8 @@ export default class DataSource {
     throw new Error('abstract method not implemented');
   }
 
+  async delete(id) {
+    throw new Error('abstract method not implemented');
+  }
+
 }

@@ -4,7 +4,8 @@ import {
   postModels,
   patchModels,
   getModels,
-  getModelsById
+  getModelsById, 
+  deleteModels
 } from "./controllers";
 import { initModels } from './models';
 import buildCallback from "./controllers/build-callback";
@@ -22,11 +23,11 @@ const Server = (() => {
   app.use(express.static('public'));
 
   function make(path, app, method, controllers) {
-    controllers().map(cntrl => {
-      log(cntrl);
+    controllers().map(cntrlr => {
+      log(cntrlr);
       app[method](
-        path(cntrl.modelName),
-        buildCallback(cntrl.fn)
+        path(cntrlr.modelName),
+        buildCallback(cntrlr.fn)
       );
     });
   }
@@ -37,7 +38,8 @@ const Server = (() => {
         make(m => `${API_ROOT}/${m}`, app, 'post', postModels),
         make(m => `${API_ROOT}/${m}`, app, 'get', getModels),
         make(m => `${API_ROOT}/${m}/:id`, app, 'patch', patchModels),
-        make(m => `${API_ROOT}/${m}/:id`, app, 'get', getModelsById)
+        make(m => `${API_ROOT}/${m}/:id`, app, 'get', getModelsById),
+        make(m => `${API_ROOT}/${m}/:id`, app, 'delete', deleteModels)
       ]);
     }).then(() => {
       app.listen(

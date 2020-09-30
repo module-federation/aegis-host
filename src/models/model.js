@@ -8,55 +8,53 @@ import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
 
-/*
- * @typedef {Object} Model
- * @property {String} id - unique id
- * @property {String } modelName - model name
- * @property {String} createTime - time created
- * @property {Function} [onUpdate] - check model is valid
+/**
+ * @namespace
  */
-
 const Model = (() => {
 
   const ID = Symbol('id');
   const MODELNAME = Symbol('modelName');
   const CREATETIME = Symbol('createTime');
   const ONUPDATE = Symbol('onUpdate');
+  const ONDELETE = Symbol('onDelete');
 
   const keyMap = {
     id: ID,
     modelName: MODELNAME,
     createTime: CREATETIME,
     onUpdate: ONUPDATE,
+    onDelete: ONDELETE
   }
 
-  const defUpdateFn = (model, changes) => ({
+  const defUpdate = (model, changes) => ({
     ...model,
     ...changes
   })
 
+  const defDelete = (model) => ({
+    ...withTimestamp('deleteTime')(model)
+  })
+
   /**
-   * @param {{
-   *  factory: Function, 
-   *  args: any, 
-   *  modelName: String, 
-   *  onUpdate?: Function, 
-   *  mixins?: Array<import('./mixins').mixinFunction>
-   * }} options
-   * @returns {Promise<Model>}  
+   * @lends Model
+   * @namespace
+   * @class
    */
   const Model = async ({
     factory,
     args,
     modelName,
     mixins = [],
-    onUpdate = defUpdateFn
+    onUpdate = defUpdate,
+    onDelete = defDelete
   }) => Promise.resolve(
     factory(args)
   ).then(model => ({
     ...compose(...mixins)(model),
     [MODELNAME]: modelName,
-    [ONUPDATE]: onUpdate
+    [ONUPDATE]: onUpdate,
+    [ONDELETE]: onDelete
   }))
 
   const makeModel = asyncPipe(
@@ -69,30 +67,62 @@ const Model = (() => {
   return {
     /**
      * @param {{
-     *  factory: Function, 
+     *  factory: function(*):any, 
      *  args: any, 
      *  modelName: String, 
-     *  onUpdate?: Function, 
+     *  onUpdate?: function(Model,*):Model,
+     *  onDelete?: function(Model):Model, 
      *  mixins?: Array<import('./mixins').mixinFunction>
      * }} options 
-     * @returns {Promise<Model>}
+     * 
+     * @returns {Promise<Readonly<Model>>}
      */
-    create: async (options) => makeModel(options),
+    create: async (options) => Object.freeze(makeModel(options)),
 
     /**
      * 
-     * @param {{model: Model, changes: any[]}} model 
+     * @param {Model} model
+     * @param {Object} changes
+     * @returns {Model} updated model
+     * 
      */
     update: (model, changes) => {
       return model[ONUPDATE](model, changes);
     },
 
-    getKey: function (key) {
+    /**
+     * @param {Model} model
+     * @returns {Model}
+     */
+    delete: (model) => {
+      return model[ONDELETE](model);
+    },
+
+    /**
+     * Get private symbol for `key`
+     * @param {string} key 
+     * @returns {Symbol}
+     */
+    getKey: (key) => {
       return keyMap[key];
     },
 
-    getId: function (model) {
-      return model[keyMap['id']];
+    /**
+     * Get model ID
+     * @param {Model} model 
+     * @returns {string} model ID
+     */
+    getId: (model) => {
+      return model[ID];
+    },
+
+    /**+
+     * Get model name
+     * @param {Model} model
+     * @returns {string} model name
+     */
+    getName: (model) => {
+      return model[MODELNAME];
     }
   }
 })();

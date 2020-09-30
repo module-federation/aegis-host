@@ -12,29 +12,26 @@
  * @returns {mixinFunction}
  */
 
+/**
+ * 
+ */
 export const utc = () => new Date().toUTCString();
 
 /**
  * @param {Function} fnCreateId function that returns unique id
  */
-export const withId = (propName, fnCreateId) => o => ({
-  ...o,
-  [propName]: fnCreateId()
-});
+export const withId = (propName, fnCreateId) => {
+  return (o) => ({ ...o, [propName]: fnCreateId() })
+}
 
 /**
- * @param {string} [propName]
+ * @param {string} propName
  * @param {Function} [fnTimestamp]
  */
-export const withTimestamp = (
-  propName = 'timestamp',
-  fnTimestamp = utc
-) => {
-  return (o) => ({
-    ...o,
-    [propName]: fnTimestamp()
-  });
-};
+export const withTimestamp = (propName, fnTimestamp = utc) => {
+  return (o) => ({ ...o, [propName]: fnTimestamp() })
+}
+
 
 /**
  * 
@@ -55,20 +52,6 @@ export const withSymbolsInJSON = (keyMap) => (o) => {
   return {
     ...o,
     toJSON
-  }
-}
-
-export const withPropertyTimestamp = (
-  prop,
-  fnProp = (p) => p.toLowerCase() + 'Time',
-  fnTimestamp = utc
-) => o => {
-  const propName = fnProp(
-    ((o.hasOwnProperty(prop)) ? o[prop] : 'event')
-  );
-  return {
-    [propName]: fnTimestamp(),
-    ...o
   }
 }
 

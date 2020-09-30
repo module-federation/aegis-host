@@ -4,12 +4,17 @@ const fs = require('fs');
 
 /**
  * Download remote container bundles
- * @param {{name: string, url: string, path: string}[]} remoteEntry `name` of app, `url` of remote entry, download file to `path` 
+ * @param {{
+ *  name: string, 
+ *  url: string, 
+ *  path: string
+ * }[]} remoteEntry `name` of app, `url` of remote entry, download file to `path` 
+ * 
  * @returns {Promise<{[index: string]: string}>} local paths to downloaded entries
  */
 module.exports = async (remoteEntry) => {
   console.log(remoteEntry);
-  //TODO: call container registry to get remote entries
+  //TODO: call container "registry" to get remote entries
   var entries = Array.isArray(remoteEntry)
     ? remoteEntry
     : [remoteEntry];
@@ -26,32 +31,26 @@ module.exports = async (remoteEntry) => {
     return entry.path.concat(path);
   }
 
-  const remotes = await Promise.all(entries.map(entry => {
+  const remotes = await Promise.all(entries.map(async entry => {
     var path = getPath(entry);
     console.log(path);
-
     return new Promise((resolve, reject) => {
+      const rslv = () => resolve({ [entry.name]: path });
       var req = http.request(entry.url, (res) => {
+        res.on('error', rslv);
         if (res.statusCode < 200 || res.statusCode >= 300) {
-          return reject({ [entry.name]: path });
+          return rslv();
         }
         res.pipe(fs.createWriteStream(path));
-        res.on('end', () => {
-          resolve({ [entry.name]: path });
-        });
+        res.on('end', rslv);
       });
-      req.on('error', (err) => {
-        reject({ [entry.name]: path });
-      });
+      req.on('error', rslv);
       req.end();
-    }).catch(e => {
-      e.then(() => Promise.resolve({[entry.name]: path}));
     });
-  })).catch(e => {
-    var remotes = remoteEntry.map(entry => ({
+  })).catch((e) => {
+    return entries.map(entry => ({
       [entry.name]: getPath(entry)
-    }));
-    return Promise.resolve(remotes);
+    }))
   });
 
   return remotes.reduce((p, c) => ({ ...c, ...p }));

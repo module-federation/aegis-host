@@ -4,6 +4,7 @@
   const postButton = document.querySelector('#post');
   const patchButton = document.querySelector('#patch');
   const getButton = document.querySelector('#get');
+  const deleteButton = document.querySelector('#delete');
   const clearButton = document.querySelector('#clear');
   const modelText = document.querySelector('#model');
   const modelIdText = document.querySelector('#modelId');
@@ -12,8 +13,9 @@
     const model = document.getElementById('model').value;
     const id = document.getElementById('modelId').value;
     const url = ['api', model, id].join('/');
-    document.getElementById('url').textContent =
-      [`http://${location.host}`, url].join('/');
+    document.getElementById('url').textContent = [
+      `http://${location.host}`, url
+    ].join('/');
     return url;
   }
 
@@ -70,6 +72,17 @@
   getButton.onclick = function () {
     fetch(getUrl())
       .then(handleResponse)
+      .then(showMessage)
+      .catch(function (err) {
+        showMessage(err.message);
+      });
+  }
+
+  deleteButton.onclick = function () {
+    fetch(getUrl(), {
+      method: "DELETE",
+      headers: { 'Content-Type': 'application/json' }
+    }).then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
         showMessage(err.message);

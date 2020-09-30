@@ -3,7 +3,7 @@
 import * as models from '../models'
 
 /**
- * Compose functions to execute in left-to-right / top-to-bottom order
+ * Compose functions to execute in left-to-right order
  * ```
  * compose(func1, func2)(ObjectToCompose);
  * 

@@ -73,6 +73,8 @@ class ObserverImpl extends Observer {
       if (eventName !== '*') {
         await this.notify('*', eventData);
       }
+    } else if (eventName !== '*') {
+      await this.notify('*', eventData);
     }
   }
 }
