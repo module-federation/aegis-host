@@ -34,8 +34,10 @@ module.exports = async (remoteEntry) => {
   const remotes = await Promise.all(entries.map(async entry => {
     var path = getPath(entry);
     console.log(path);
+
     return new Promise((resolve, reject) => {
       const rslv = () => resolve({ [entry.name]: path });
+
       var req = http.request(entry.url, (res) => {
         res.on('error', rslv);
         if (res.statusCode < 200 || res.statusCode >= 300) {
@@ -44,6 +46,7 @@ module.exports = async (remoteEntry) => {
         res.pipe(fs.createWriteStream(path));
         res.on('end', rslv);
       });
+
       req.on('error', rslv);
       req.end();
     });

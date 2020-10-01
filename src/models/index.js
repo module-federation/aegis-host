@@ -1,6 +1,6 @@
+import Model from './model';
 import ModelFactory from './model-factory';
 import importRemoteModels from '../services/import-remote-models';
-import Model from './model';
 
 const createEventFactory = (model) => ({
   modelData: { ...model }
