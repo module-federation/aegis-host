@@ -1,5 +1,6 @@
 import ModelFactory from './model-factory';
 import importRemoteModels from '../services/import-remote-models';
+import Model from './model';
 
 const createEventFactory = (model) => ({
   modelData: { ...model }
@@ -8,6 +9,11 @@ const createEventFactory = (model) => ({
 const updateEventFactory = ({ updated, changes }) => ({
   updated: { ...updated },
   changes: { ...changes }
+});
+
+const deleteEventFactory = (model) => ({
+  modelId: Model.getId(model),
+  modelData: { ...model }
 });
 
 export async function initModels() {
@@ -43,7 +49,7 @@ export async function initModels() {
       factory.registerEvent(
         factory.EventTypes.DELETE,
         model.modelName,
-        createEventFactory
+        deleteEventFactory
       );
     }
   });
