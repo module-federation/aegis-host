@@ -56,7 +56,8 @@ const Event = (() => {
   const makeEvent = asyncPipe(
     Event,
     withTimestamp('eventTime'),
-    withId('id', uuid)
+    withId('id', uuid),
+    Object.freeze
   );
 
   return {
@@ -65,7 +66,7 @@ const Event = (() => {
      * @param {options} options
      * @returns {Promise<Readonly<Event>>}
      */
-    create: async (options) => Object.freeze(makeEvent(options))
+    create: async (options) => makeEvent(options)
   }
 })();
 

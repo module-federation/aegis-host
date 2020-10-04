@@ -7,6 +7,7 @@ module.exports = () => {
   return new Promise((resolve, reject) => {
     fetchRemoteEntry(remoteEntries)
       .then(remotes => resolve({
+        // module.exports = {
         target: 'async-node',
         mode: 'development',
         devtool: false,
@@ -37,6 +38,11 @@ module.exports = () => {
           new ContainerReferencePlugin({
             remoteType: 'commonjs-module',
             remotes: remotes
+            // remotes: {
+            //   fedmonserv: {
+            //     external: 'http://localhost:8060/remoteEntry.js'
+            //   }
+            // }
           }),
         ]
       }));

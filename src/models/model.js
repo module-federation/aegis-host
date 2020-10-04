@@ -13,6 +13,7 @@ import uuid from '../lib/uuid';
  */
 const Model = (() => {
 
+  // Use symbols to prevent overwrite
   const ID = Symbol('id');
   const MODELNAME = Symbol('modelName');
   const CREATETIME = Symbol('createTime');
@@ -37,6 +38,7 @@ const Model = (() => {
   })
 
   /**
+   * Create model from factory, mixins and request input
    * @lends Model
    * @namespace
    * @class
@@ -49,23 +51,29 @@ const Model = (() => {
     onUpdate = defUpdate,
     onDelete = defDelete
   }) => Promise.resolve(
+    // Call registered fn with input from request 
     factory(args)
   ).then(model => ({
+    // Execute any mixins provided
     ...compose(...mixins)(model),
+    // Use symbols as keys to prevent overwrite
     [MODELNAME]: modelName,
     [ONUPDATE]: onUpdate,
     [ONDELETE]: onDelete
   }))
 
+  // Partial app to create model, add metadata, etc
   const makeModel = asyncPipe(
     Model,
     withTimestamp(CREATETIME),
     withId(ID, uuid),
-    withSymbolsInJSON(keyMap)
+    withSymbolsInJSON(keyMap),
+    Object.freeze
   );
 
   return {
     /**
+     * Create a new model instance
      * @param {{
      *  factory: function(*):any, 
      *  args: any, 
@@ -77,12 +85,13 @@ const Model = (() => {
      * 
      * @returns {Promise<Readonly<Model>>}
      */
-    create: async (options) => Object.freeze(makeModel(options)),
+    create: async (options) => makeModel(options),
 
     /**
-     * 
-     * @param {Model} model
-     * @param {Object} changes
+     * Process model update request. 
+     * (Invokes provided `onUpdate` callback.)
+     * @param {Model} model - model instance to update
+     * @param {Object} changes - Object containing changes
      * @returns {Model} updated model
      * 
      */
@@ -91,39 +100,33 @@ const Model = (() => {
     },
 
     /**
+     * Process model delete request. 
+     * (Invokes provided `onDelete` callback.)
      * @param {Model} model
      * @returns {Model}
      */
-    delete: (model) => {
-      return model[ONDELETE](model);
-    },
+    delete: (model) => model[ONDELETE](model),
 
     /**
      * Get private symbol for `key`
      * @param {string} key 
-     * @returns {Symbol}
+     * @returns {Symbol} unique symbol
      */
-    getKey: (key) => {
-      return keyMap[key];
-    },
+    getKey: (key) => keyMap[key],
 
     /**
      * Get model ID
      * @param {Model} model 
-     * @returns {string} model ID
+     * @returns {string} model's ID
      */
-    getId: (model) => {
-      return model[ID];
-    },
+    getId: (model) => model[ID],
 
-    /**+
+    /**
      * Get model name
      * @param {Model} model
-     * @returns {string} model name
+     * @returns {string} model's name
      */
-    getName: (model) => {
-      return model[MODELNAME];
-    }
+    getName: (model) => model[MODELNAME],
   }
 })();
 

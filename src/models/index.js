@@ -16,6 +16,9 @@ const deleteEventFactory = (model) => ({
   modelData: { ...model }
 });
 
+/**
+ * Import and register remote models.
+ */
 export async function initModels() {
   const factory = ModelFactory.getInstance();
   const models = await importRemoteModels();
