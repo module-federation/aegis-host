@@ -1,4 +1,3 @@
-import Model from './model';
 import ModelFactory from './model-factory';
 import importRemoteModels from '../services/import-remote-models';
 
@@ -12,7 +11,7 @@ const updateEventFactory = ({ updated, changes }) => ({
 });
 
 const deleteEventFactory = (model) => ({
-  modelId: Model.getId(model),
+  modelId: ModelFactory.getModelId(model),
   modelData: { ...model }
 });
 
@@ -20,7 +19,6 @@ const deleteEventFactory = (model) => ({
  * Import and register remote models.
  */
 export async function initModels() {
-  const factory = ModelFactory.getInstance();
   const models = await importRemoteModels();
   console.log(models);
 
@@ -28,29 +26,30 @@ export async function initModels() {
     if (model.hasOwnProperty('modelName')
       && model.hasOwnProperty('factory')) {
 
-      factory.registerModel({
+      ModelFactory.registerModel({
         modelName: model.modelName,
         factory: model.factory,
         onUpdate: model.onUpdate,
         onDelete: model.onDelete,
         mixins: model.mixins,
+        eventHandlers: model.eventHandlers,
         isRemote: true,
       });
 
-      factory.registerEvent(
-        factory.EventTypes.CREATE,
+      ModelFactory.registerEvent(
+        ModelFactory.EventTypes.CREATE,
         model.modelName,
         createEventFactory
       );
 
-      factory.registerEvent(
-        factory.EventTypes.UPDATE,
+      ModelFactory.registerEvent(
+        ModelFactory.EventTypes.UPDATE,
         model.modelName,
         updateEventFactory
       );
 
-      factory.registerEvent(
-        factory.EventTypes.DELETE,
+      ModelFactory.registerEvent(
+        ModelFactory.EventTypes.DELETE,
         model.modelName,
         deleteEventFactory
       );

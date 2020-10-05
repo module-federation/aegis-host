@@ -62,7 +62,7 @@ const Event = (() => {
 
   return {
     /**
-     * 
+     * Create event
      * @param {options} options
      * @returns {Promise<Readonly<Event>>}
      */

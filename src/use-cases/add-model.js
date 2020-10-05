@@ -14,10 +14,7 @@ import log from '../lib/logger';
  * @param {ModelParam} param0 
  */
 export default function addModelFactory({
-  modelName,
-  repository,
-  observer,
-  handlers = []
+  modelName, repository, observer, handlers = []
 } = {}) {
   const eventType = ModelFactory.EventTypes.CREATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
@@ -25,11 +22,17 @@ export default function addModelFactory({
   handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function addModel(input) {
-    const factory = ModelFactory.getInstance();
-    const model = await factory.createModel(modelName, input);
-    const event = await factory.createEvent(eventType, modelName, model);
-    await repository.save(factory.getModelId(model), model);
-    await observer.notify(event.eventName, event);
+    const model = await ModelFactory.createModel(modelName, input);
+    const event = await ModelFactory.createEvent(eventType, modelName, model);
+
+    await Promise.all([
+      repository.save(ModelFactory.getModelId(model), model),
+      observer.notify(event.eventName, event)
+    ]).catch(async (error) => {
+      await repository.delete(ModelFactory.getModelId(model));
+      throw new Error(error);
+    });
+
     return model;
   }
 }

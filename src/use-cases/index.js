@@ -14,12 +14,14 @@ function buildOptions(model) {
   return {
     modelName: model.modelName,
     repository: DataSourceFactory.getDataSource(model.modelName),
-    observer: ObserverFactory.getInstance()
+    observer: ObserverFactory.getInstance(),
+    handlers: model.eventHandlers
   }
 }
 
 function make(factory) {
-  const models = ModelFactory.getInstance().getRemoteModels();
+  //const models = ModelFactory.getInstance().getRemoteModels();
+  const models = ModelFactory.getRemoteModels();
   return models.map(model => ({
     modelName: model.modelName,
     fn: factory(buildOptions(model))

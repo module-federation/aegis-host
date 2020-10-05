@@ -14,10 +14,7 @@ import log from '../lib/logger';
  * @param {ModelParam} param0 
  */
 export default function editModelFactory({
-  modelName,
-  repository,
-  observer,
-  handlers = []
+  modelName, repository, observer, handlers = []
 } = {}) {
   const eventType = ModelFactory.EventTypes.UPDATE;
   const eventName = ModelFactory.getEventName(eventType, modelName);
@@ -29,16 +26,20 @@ export default function editModelFactory({
     if (!model) {
       throw new Error('no such id');
     }
-    const factory = ModelFactory.getInstance();
-    const updated = factory.updateModel(model, changes);
-    if (factory.getModelId(updated) !== id) {
-      throw new Error('IDs do not match');
-    }
-    await repository.save(id, updated);
-    const event = await factory.createEvent(
+
+    const updated = ModelFactory.updateModel(model, changes);
+    const event = await ModelFactory.createEvent(
       eventType, modelName, { updated, changes }
     );
-    await observer.notify(event.eventName, event);
+
+    await Promise.all([
+      repository.save(id, updated),
+      observer.notify(event.eventName, event)
+    ]).catch(async (error) => {
+      await repository.save(id, model);
+      throw new Error(error);
+    });
+
     return updated;
   }
 }

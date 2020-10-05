@@ -4,9 +4,9 @@ import {
   listModels,
   findModels,
   removeModels
-} from "../use-cases";
-import postModelFactory from "./post-model";
-import patchModelFactory from "./patch-model";
+} from '../use-cases';
+import postModelFactory from './post-model';
+import patchModelFactory from './patch-model';
 import getModelFactory from './get-model';
 import getModelByIdFactory from './get-model-by-id';
 import deleteModelFactory from "./delete-model";

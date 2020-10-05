@@ -8,11 +8,25 @@ import Event from './event';
  */
 
 /**
+ * @typedef {{
+ *  id:string,
+ *  createTime:string,
+ *  modelName:string,
+ *  onUpdate:function(Model,*):Model,
+ *  onDelete:function(Model):Model
+ * }} Model
+ */
+
+/**
  * @typedef {{ 
  *  modelName: string,
  *  factory: function(*): any,
  *  onUpdate?: function(Model,*): Model,
  *  onDelete?: function(Model): Model,
+ *  eventHandlers?: Array<function({
+ *    eventName:string, 
+ *    eventData:any[]
+ *  }):Promise<void>>
  *  mixins?: Array<import('./mixins').mixinFunction>,
  *  isRemote?: boolean
  * }} options
@@ -68,7 +82,7 @@ const eventFactories = {
   [EventTypes.DELETE]: new Map()
 };
 
-const _ModelFactory = {
+const ModelFactory = {
   /**
    * Register a factory function to create the model `modelName`
    * @param {options} options
@@ -78,6 +92,7 @@ const _ModelFactory = {
     factory,
     onUpdate,
     onDelete,
+    eventHandlers = [],
     isRemote = false,
     mixins = []
   }) => {
@@ -86,7 +101,7 @@ const _ModelFactory = {
     if (!modelFactories.has(modelName)
       && typeof factory === 'function') {
       modelFactories.set(modelName, {
-        factory, onUpdate, onDelete, isRemote, mixins
+        factory, onUpdate, onDelete, eventHandlers, isRemote, mixins
       });
     }
   },
@@ -108,15 +123,15 @@ const _ModelFactory = {
 
   /**
    * Call the factory function previously registered for `modelName`
-   * @param {String} modelName
-   * @param {*} args
+   * @param {String} modelName - model's name
+   * @param {*} args - input sent in the request
    * @returns {Promise<Readonly<Model>>} the model instance
    */
   createModel: async (modelName, args) => {
     modelName = checkModelName(modelName);
 
     if (modelFactories.has(modelName)) {
-      const model = await Model.create({
+      return Model.create({
         modelName,
         onUpdate: modelFactories.get(modelName).onUpdate,
         onDelete: modelFactories.get(modelName).onDelete,
@@ -124,7 +139,6 @@ const _ModelFactory = {
         mixins: modelFactories.get(modelName).mixins,
         args
       });
-      return Object.freeze(model);
     }
     throw new Error('unregistered model');
   },
@@ -141,13 +155,12 @@ const _ModelFactory = {
     eventType = checkEventType(eventType);
 
     if (eventFactories[eventType].has(modelName)) {
-      const event = await Event.create({
+      return Event.create({
         eventType,
         modelName,
         factory: eventFactories[eventType].get(modelName),
         args
       });
-      return Object.freeze(event);
     }
     throw new Error('unregistered model event');
   },
@@ -191,21 +204,6 @@ const _ModelFactory = {
     return Model.getName(model);
   },
 
-  EventTypes
-}
-
-const ModelFactory = {
-  /**
-   * Get singleton
-   */
-  getInstance: () => {
-    return _ModelFactory;
-  },
-
-  /**
-   * @param {EventType} eventType
-   * @param {String} modelName
-   */
   getEventName: createEventName,
 
   EventTypes
@@ -213,12 +211,8 @@ const ModelFactory = {
 
 Object.freeze(modelFactories);
 Object.freeze(eventFactories);
-Object.freeze(_ModelFactory);
 Object.freeze(ModelFactory);
 
-/**
- * 
- */
 export default ModelFactory;
 
 

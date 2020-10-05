@@ -1,16 +1,17 @@
 'use strict'
 
+import express from 'express';
+import bodyParser from 'body-parser';
+
 import {
   postModels,
   patchModels,
   getModels,
-  getModelsById, 
+  getModelsById,
   deleteModels
-} from "./controllers";
+} from './controllers';
 import { initModels } from './models';
-import buildCallback from "./controllers/build-callback";
-import express from "express";
-import bodyParser from "body-parser";
+import callback from './controllers/build-callback';
 import initMiddleware from './middleware';
 import log from './lib/logger';
 
@@ -18,36 +19,44 @@ const Server = (() => {
   const app = express();
   const API_ROOT = "/api";
   const PORT = 8070;
+  const ENDPOINT = (e) => `${API_ROOT}/${e}`;
+  const ENDPOINTID = (e) => `${API_ROOT}/${e}/:id`;
 
   app.use(bodyParser.json());
   app.use(express.static('public'));
 
-  function make(path, app, method, controllers) {
-    controllers().map(cntrlr => {
-      log(cntrlr);
-      app[method](
-        path(cntrlr.modelName),
-        buildCallback(cntrlr.fn)
-      );
+  async function make(path, app, method, controllers) {
+    controllers().forEach(ctlr => {
+      log(ctlr);
+      app[method](path(ctlr.modelName), callback(ctlr.fn));
     });
   }
 
   function run() {
+    const importStartTime = Date.now();
+
     initModels().then(() => {
-      return Promise.all([
-        make(m => `${API_ROOT}/${m}`, app, 'post', postModels),
-        make(m => `${API_ROOT}/${m}`, app, 'get', getModels),
-        make(m => `${API_ROOT}/${m}/:id`, app, 'patch', patchModels),
-        make(m => `${API_ROOT}/${m}/:id`, app, 'get', getModelsById),
-        make(m => `${API_ROOT}/${m}/:id`, app, 'delete', deleteModels)
-      ]);
-    }).then(() => {
+      log('\n%dms to import & register models\n',
+        Date.now() - importStartTime);
+        
+      const makeEPStartTime = Date.now();
+
+      make(ENDPOINT, app, 'post', postModels);
+      make(ENDPOINT, app, 'get', getModels);
+      make(ENDPOINTID, app, 'patch', patchModels);
+      make(ENDPOINTID, app, 'get', getModelsById);
+      make(ENDPOINTID, app, 'delete', deleteModels);
+
+      log('\n%dms to create endpoints\n',
+        Date.now() - makeEPStartTime);
+
       app.listen(
         PORT,
         () => {
           console.log(`Server listening on http://localhost:${PORT}`);
         }
-      )
+      );
+
     });
   }
 
