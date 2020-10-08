@@ -82,6 +82,9 @@ const eventFactories = {
   [EventTypes.DELETE]: new Map()
 };
 
+/**
+ * Register and create models.
+ */
 const ModelFactory = {
   /**
    * Register a factory function to create the model `modelName`
@@ -165,6 +168,9 @@ const ModelFactory = {
     throw new Error('unregistered model event');
   },
 
+  /**
+   * Get models imported from remote server
+   */
   getRemoteModels: () => {
     let models = [];
     for (let [k, v] of modelFactories) {
@@ -200,10 +206,16 @@ const ModelFactory = {
     return Model.getId(model);
   },
 
+  /**
+   * Get model's name
+   */
   getModelName: (model) => {
     return Model.getName(model);
   },
 
+  /**
+   * Get `eventName` value 
+   */
   getEventName: createEventName,
 
   EventTypes
