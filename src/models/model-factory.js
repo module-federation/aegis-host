@@ -20,6 +20,7 @@ import Event from './event';
 /**
  * @typedef {{ 
  *  modelName: string,
+ *  endpoint: string,
  *  factory: function(*): any,
  *  onUpdate?: function(Model,*): Model,
  *  onDelete?: function(Model): Model,
@@ -92,6 +93,7 @@ const ModelFactory = {
    */
   registerModel: ({
     modelName,
+    endpoint,
     factory,
     onUpdate,
     onDelete,
@@ -102,9 +104,16 @@ const ModelFactory = {
     modelName = checkModelName(modelName);
 
     if (!modelFactories.has(modelName)
-      && typeof factory === 'function') {
+      && typeof factory === 'function'
+    ) {
       modelFactories.set(modelName, {
-        factory, onUpdate, onDelete, eventHandlers, isRemote, mixins
+        factory,
+        onUpdate,
+        onDelete,
+        eventHandlers,
+        isRemote,
+        mixins,
+        endpoint
       });
     }
   },

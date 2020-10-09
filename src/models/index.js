@@ -42,6 +42,7 @@ export async function initModels() {
 
       ModelFactory.registerModel({
         modelName: model.modelName,
+        endpoint: model.endpoint,
         factory: model.factory,
         onUpdate: model.onUpdate,
         onDelete: model.onDelete,

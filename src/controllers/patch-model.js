@@ -1,6 +1,6 @@
 import log from '../lib/logger';
 
-export default function patchModelFactory(editModel, getModelId) {
+export default function patchModelFactory(editModel, getModelId, hash) {
   return async function patchModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body
@@ -20,7 +20,8 @@ export default function patchModelFactory(editModel, getModelId) {
       return {
         headers: {
           'Content-Type': 'application/json',
-          'Last-Modified': new Date().toUTCString()
+          'Last-Modified': new Date().toUTCString(),
+          'ETag': hash(JSON.stringify(model))
         },
         statusCode: 201,
         body: { modelId: getModelId(model) }

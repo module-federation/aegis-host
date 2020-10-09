@@ -28,7 +28,7 @@ const Server = (() => {
   function make(path, app, method, controllers) {
     controllers().forEach(ctlr => {
       log(ctlr);
-      app[method](path(ctlr.modelName), callback(ctlr.fn));
+      app[method](path(ctlr.endpoint), callback(ctlr.fn));
     });
   }
 

@@ -11,11 +11,13 @@ import patchModelFactory from './patch-model';
 import getModelFactory from './get-model';
 import getModelByIdFactory from './get-model-by-id';
 import deleteModelFactory from "./delete-model";
+import hash from '../lib/hash';
 
 function make(useCases, controllerFactory) {
   return useCases().map(useCase => ({
+    endpoint: useCase.endpoint,
     modelName: useCase.modelName,
-    fn: controllerFactory(useCase.fn, getModelId)
+    fn: controllerFactory(useCase.fn, getModelId, hash)
   }));
 }
 

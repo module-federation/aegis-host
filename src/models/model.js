@@ -3,7 +3,6 @@ import {
   withTimestamp,
   withSymbolsInJSON
 } from './mixins';
-import regeneratorRuntime, { async } from 'regenerator-runtime';
 import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';

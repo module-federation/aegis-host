@@ -1,6 +1,6 @@
 import log from '../lib/logger';
 
-export default function postModelFactory(addModel, getModelId) {
+export default function postModelFactory(addModel, getModelId, hash) {
   return async function postModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body
@@ -18,7 +18,8 @@ export default function postModelFactory(addModel, getModelId) {
       return {
         headers: {
           'Content-Type': 'application/json',
-          'Last-Modified': new Date().toUTCString()
+          'Last-Modified': new Date().toUTCString(),
+          'ETag': hash(JSON.stringify(model))
         },
         statusCode: 201,
         body: { modelId: getModelId(model) }

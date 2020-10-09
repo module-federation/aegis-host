@@ -10,7 +10,7 @@ module.exports = () => {
         target: 'async-node',
         mode: 'development',
         devtool: false,
-        entry: [path.resolve(__dirname, 'src/index.js')],
+        entry: ['@babel/polyfill', path.resolve(__dirname, 'src/index.js')],
         output: {
           publicPath: 'http://localhost:8070',
           path: path.resolve(__dirname, 'dist'),
