@@ -20,7 +20,6 @@ function buildOptions(model) {
 }
 
 function make(factory) {
-  //const models = ModelFactory.getInstance().getRemoteModels();
   const models = ModelFactory.getRemoteModels();
   return models.map(model => ({
     modelName: model.modelName,

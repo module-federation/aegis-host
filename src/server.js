@@ -25,7 +25,7 @@ const Server = (() => {
   app.use(bodyParser.json());
   app.use(express.static('public'));
 
-  async function make(path, app, method, controllers) {
+  function make(path, app, method, controllers) {
     controllers().forEach(ctlr => {
       log(ctlr);
       app[method](path(ctlr.modelName), callback(ctlr.fn));
@@ -38,7 +38,7 @@ const Server = (() => {
     initModels().then(() => {
       log('\n%dms to import & register models\n',
         Date.now() - importStartTime);
-        
+
       const makeEPStartTime = Date.now();
 
       make(ENDPOINT, app, 'post', postModels);
