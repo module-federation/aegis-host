@@ -1,6 +1,20 @@
 import ModelFactory from './model-factory';
 import importRemoteModels from '../services/import-remote-models';
 
+/**
+ * 
+ * @typedef ModelFactory
+ * @property {function(string,*):Promise<Readonly<any>>} createModel
+ * @property {function(string,string,*):Promise<Readonly<any>>} createEvent
+ * @property {function(string,string):string} getEventName
+ * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
+ * @property {function(any):string} getModelId
+ */
+
+/**
+ * 
+ * @param {*} model 
+ */
 const createEventFactory = (model) => ({
   modelData: { ...model }
 });

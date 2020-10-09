@@ -1,3 +1,5 @@
+'use strict'
+
 import addModelFactory from './add-model';
 import editModelFactory from './edit-model';
 import listModelsFactory from './list-models';
@@ -13,6 +15,7 @@ handleEvents(ObserverFactory.getInstance());
 function buildOptions(model) {
   return {
     modelName: model.modelName,
+    models: ModelFactory,
     repository: DataSourceFactory.getDataSource(model.modelName),
     observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers
@@ -32,5 +35,4 @@ export const editModels = () => make(editModelFactory);
 export const listModels = () => make(listModelsFactory);
 export const findModels = () => make(findModelFactory);
 export const removeModels = () => make(removeModelFactory);
-
-
+export const getModelId = (model) => ModelFactory.getModelId(model);

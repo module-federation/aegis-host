@@ -1,10 +1,9 @@
-import ModelFactory from '../models';
 import log from '../lib/logger';
-
 
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName 
+ * @property {import('../models/index').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository 
  * @property {import('../lib/observer').Observer} observer
  * @property {...Function} handlers
@@ -14,22 +13,22 @@ import log from '../lib/logger';
  * @param {ModelParam} param0 
  */
 export default function addModelFactory({
-  modelName, repository, observer, handlers = []
+  modelName, models, repository, observer, handlers = []
 } = {}) {
-  const eventType = ModelFactory.EventTypes.CREATE;
-  const eventName = ModelFactory.getEventName(eventType, modelName);
+  const eventType = models.EventTypes.CREATE;
+  const eventName = models.getEventName(eventType, modelName);
   handlers.push(async event => log({ event }));
   handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function addModel(input) {
-    const model = await ModelFactory.createModel(modelName, input);
-    const event = await ModelFactory.createEvent(eventType, modelName, model);
+    const model = await models.createModel(modelName, input);
+    const event = await models.createEvent(eventType, modelName, model);
 
     await Promise.all([
-      repository.save(ModelFactory.getModelId(model), model),
+      repository.save(models.getModelId(model), model),
       observer.notify(event.eventName, event)
     ]).catch(async (error) => {
-      await repository.delete(ModelFactory.getModelId(model));
+      await repository.delete(models.getModelId(model));
       throw new Error(error);
     });
 

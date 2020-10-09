@@ -1,7 +1,6 @@
 import log from '../lib/logger';
-import Model from '../models/model';
 
-export default function postModelFactory(addModel) {
+export default function postModelFactory(addModel, getModelId) {
   return async function postModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body
@@ -22,7 +21,7 @@ export default function postModelFactory(addModel) {
           'Last-Modified': new Date().toUTCString()
         },
         statusCode: 201,
-        body: { modelId: Model.getId(model) }
+        body: { modelId: getModelId(model) }
       }
     } catch (e) {
       log(e);

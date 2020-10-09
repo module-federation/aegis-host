@@ -1,7 +1,6 @@
 import log from '../lib/logger';
-import Model from '../models/model';
 
-export default function deleteModelFactory(removeModel) {
+export default function deleteModelFactory(removeModel, getModelId) {
   return async function deleteModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body
@@ -24,7 +23,7 @@ export default function deleteModelFactory(removeModel) {
           'Last-Modified': new Date().toUTCString()
         },
         statusCode: 201,
-        body: { modelId: Model.getId(model) }
+        body: { modelId: getModelId(model) }
       }
     } catch (e) {
       log(e);

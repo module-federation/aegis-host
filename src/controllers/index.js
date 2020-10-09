@@ -3,7 +3,8 @@ import {
   editModels,
   listModels,
   findModels,
-  removeModels
+  removeModels,
+  getModelId,
 } from '../use-cases';
 import postModelFactory from './post-model';
 import patchModelFactory from './patch-model';
@@ -14,7 +15,7 @@ import deleteModelFactory from "./delete-model";
 function make(useCases, controllerFactory) {
   return useCases().map(useCase => ({
     modelName: useCase.modelName,
-    fn: controllerFactory(useCase.fn)
+    fn: controllerFactory(useCase.fn, getModelId)
   }));
 }
 

@@ -46,13 +46,11 @@ export const withSymbolsInJSON = (keyMap) => (o) => {
     const symbols = Object.keys(keyMap)
       .map(k => ({ [k]: this[keyMap[k]] }))
       .reduce((p, c) => ({ ...c, ...p }))
-
     return {
       ...this,
       ...symbols
     }
   }
-
   return {
     ...o,
     toJSON
