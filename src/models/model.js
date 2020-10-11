@@ -12,7 +12,7 @@ import uuid from '../lib/uuid';
  */
 const Model = (() => {
 
-  // Use symbols to prevent overwrite
+  // Render props immutable w/ local symbols
   const ID = Symbol('id');
   const MODELNAME = Symbol('modelName');
   const CREATETIME = Symbol('createTime');
@@ -50,18 +50,18 @@ const Model = (() => {
     onUpdate = defUpdate,
     onDelete = defDelete
   }) => Promise.resolve(
-    // Call registered fn with input from request 
+    // Create model w/ input from request 
     factory(args)
   ).then(model => ({
-    // Execute any mixins provided
+    // Apply mixins defined for model
     ...compose(...mixins)(model),
-    // Use symbols as keys to prevent overwrite
+    // Render immutable w/ symbols
     [MODELNAME]: modelName,
     [ONUPDATE]: onUpdate,
     [ONDELETE]: onDelete
   }))
 
-  // Partial app to create model, add metadata, etc
+  // Add common behavior & data
   const makeModel = asyncPipe(
     Model,
     withTimestamp(CREATETIME),

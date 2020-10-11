@@ -14,10 +14,9 @@ import deleteModelFactory from "./delete-model";
 import hash from '../lib/hash';
 
 function make(useCases, controllerFactory) {
-  return useCases().map(useCase => ({
-    endpoint: useCase.endpoint,
-    modelName: useCase.modelName,
-    fn: controllerFactory(useCase.fn, getModelId, hash)
+  return useCases().map(uc => ({
+    endpoint: uc.endpoint,
+    fn: controllerFactory(uc.fn, getModelId, hash)
   }));
 }
 

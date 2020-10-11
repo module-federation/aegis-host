@@ -9,7 +9,7 @@ module.exports = () => {
       .then(remotes => resolve({
         target: 'async-node',
         mode: 'development',
-        devtool: false,
+        devtool: 'source-map',
         entry: ['@babel/polyfill', path.resolve(__dirname, 'src/index.js')],
         output: {
           publicPath: 'http://localhost:8070',

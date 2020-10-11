@@ -1,11 +1,11 @@
 'use strict'
 
-import handleEvents from './handle-events';
 import addModelFactory from './add-model';
 import editModelFactory from './edit-model';
 import listModelsFactory from './list-models';
 import findModelFactory from './find-model';
 import removeModelFactory from './remove-model';
+import handleEvents from './handle-events';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
 import ModelFactory from '../models';
@@ -26,7 +26,6 @@ function make(factory) {
   const models = ModelFactory.getRemoteModels();
   return models.map(model => ({
     endpoint: model.endpoint,
-    modelName: model.modelName,
     fn: factory(buildOptions(model))
   }));
 }

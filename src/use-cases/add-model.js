@@ -1,7 +1,7 @@
 import log from '../lib/logger';
 
 /**
- * @typedef {Object} ModelParam
+ * @typedef {Object} dependencies
  * @property {String} modelName 
  * @property {import('../models/index').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository 
@@ -10,7 +10,7 @@ import log from '../lib/logger';
  */
 
 /**
- * @param {ModelParam} param0 
+ * @param {dependencies} param0 
  */
 export default function addModelFactory({
   modelName, models, repository, observer, handlers = []

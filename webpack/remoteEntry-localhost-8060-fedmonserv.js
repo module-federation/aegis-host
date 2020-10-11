@@ -1,11 +1,3 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is not neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -19,7 +11,39 @@ module.exports =
 /*! runtime requirements: __webpack_require__.d, __webpack_require__.o, __webpack_exports__, __webpack_require__.e, __webpack_require__, __webpack_require__.* */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-eval("var moduleMap = {\n\t\"./service1\": () => {\n\t\treturn __webpack_require__.e(\"src_services_service1_js\").then(() => () => (__webpack_require__(/*! ./src/services/service1 */ \"./src/services/service1.js\")));\n\t},\n\t\"./publish-event\": () => {\n\t\treturn __webpack_require__.e(\"src_services_publish-event_js\").then(() => () => (__webpack_require__(/*! ./src/services/publish-event */ \"./src/services/publish-event.js\")));\n\t},\n\t\"./models\": () => {\n\t\treturn __webpack_require__.e(\"src_models_index_js\").then(() => () => (__webpack_require__(/*! ./src/models */ \"./src/models/index.js\")));\n\t}\n};\nvar get = (module) => {\n\treturn (\n\t\t__webpack_require__.o(moduleMap, module)\n\t\t\t? moduleMap[module]()\n\t\t\t: Promise.resolve().then(() => {\n\t\t\t\tthrow new Error('Module \"' + module + '\" does not exist in container.');\n\t\t\t})\n\t);\n};\nvar init = (shareScope) => {\n\tvar oldScope = __webpack_require__.S[\"default\"];\n\tvar name = \"default\"\n\tif(oldScope && oldScope !== shareScope) throw new Error(\"Container initialization failed as it has already been initialized with a different share scope\");\n\t__webpack_require__.S[name] = shareScope;\n\treturn __webpack_require__.I(name);\n};\n\n// This exports getters to disallow modifications\n__webpack_require__.d(exports, {\n\tget: () => get,\n\tinit: () => init\n});\n\n//# sourceURL=webpack://federated-monolith-services/container_entry?");
+var moduleMap = {
+	"./service1": () => {
+		return __webpack_require__.e("src_services_service1_js").then(() => () => (__webpack_require__(/*! ./src/services/service1 */ "./src/services/service1.js")));
+	},
+	"./publish-event": () => {
+		return __webpack_require__.e("src_services_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services/publish-event */ "./src/services/publish-event.js")));
+	},
+	"./models": () => {
+		return __webpack_require__.e("src_models_index_js").then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+	}
+};
+var get = (module) => {
+	return (
+		__webpack_require__.o(moduleMap, module)
+			? moduleMap[module]()
+			: Promise.resolve().then(() => {
+				throw new Error('Module "' + module + '" does not exist in container.');
+			})
+	);
+};
+var init = (shareScope) => {
+	var oldScope = __webpack_require__.S["default"];
+	var name = "default"
+	if(oldScope && oldScope !== shareScope) throw new Error("Container initialization failed as it has already been initialized with a different share scope");
+	__webpack_require__.S[name] = shareScope;
+	return __webpack_require__.I(name);
+};
+
+// This exports getters to disallow modifications
+__webpack_require__.d(exports, {
+	get: () => get,
+	init: () => init
+});
 
 /***/ }),
 
@@ -31,7 +55,7 @@ eval("var moduleMap = {\n\t\"./service1\": () => {\n\t\treturn __webpack_require
 /*! runtime requirements: module */
 /***/ ((module) => {
 
-eval("module.exports = require(\"crypto\");\n\n//# sourceURL=webpack://federated-monolith-services/external_%22crypto%22?");
+module.exports = require("crypto");
 
 /***/ }),
 
@@ -43,7 +67,7 @@ eval("module.exports = require(\"crypto\");\n\n//# sourceURL=webpack://federated
 /*! runtime requirements: module */
 /***/ ((module) => {
 
-eval("module.exports = require(\"http\");\n\n//# sourceURL=webpack://federated-monolith-services/external_%22http%22?");
+module.exports = require("http");
 
 /***/ })
 
@@ -278,3 +302,4 @@ eval("module.exports = require(\"http\");\n\n//# sourceURL=webpack://federated-m
 /******/ 	return __webpack_require__("webpack/container/entry/fedmonserv");
 /******/ })()
 ;
+//# sourceMappingURL=remoteEntry.js.map

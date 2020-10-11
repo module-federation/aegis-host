@@ -18,7 +18,6 @@ export default function getModelFactory(listModels) {
       return {
         headers: {
           'Content-Type': 'application/json',
-          'Last-Modified': Date.now().toLocaleString()
         },
         statusCode: 200,
         body: { models }

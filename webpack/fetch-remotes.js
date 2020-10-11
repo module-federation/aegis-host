@@ -14,7 +14,6 @@ const fs = require('fs');
  */
 module.exports = async (remoteEntry) => {
   console.log(remoteEntry);
-  //TODO: call container "registry" to get remote entries
   var entries = Array.isArray(remoteEntry)
     ? remoteEntry
     : [remoteEntry];
@@ -50,10 +49,10 @@ module.exports = async (remoteEntry) => {
       req.on('error', rslv);
       req.end();
     });
-  })).catch((e) => {
+  })).catch(() => {
     return entries.map(entry => ({
       [entry.name]: getPath(entry)
-    }))
+    }));
   });
 
   return remotes.reduce((p, c) => ({ ...c, ...p }));

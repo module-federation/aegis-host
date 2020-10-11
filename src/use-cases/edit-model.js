@@ -5,7 +5,7 @@ import log from '../lib/logger';
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName 
- * @property {import('../models').default} models
+ * @property {import('../models').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository 
  * @property {import('../lib/observer').Observer} observer
  * @property {Function[]} handlers

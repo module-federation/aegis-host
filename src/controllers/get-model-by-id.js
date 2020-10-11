@@ -19,7 +19,6 @@ export default function getModelByIdFactory(findModel) {
       return {
         headers: {
           'Content-Type': 'application/json',
-          'Last-Modified': Date.now().toLocaleString()
         },
         statusCode: 200,
         body: { model }

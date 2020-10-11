@@ -17,7 +17,7 @@ import log from './lib/logger';
 
 const Server = (() => {
   const app = express();
-  const API_ROOT = "/api";
+  const API_ROOT = '/api';
   const PORT = 8070;
   const ENDPOINT = (e) => `${API_ROOT}/${e}`;
   const ENDPOINTID = (e) => `${API_ROOT}/${e}/:id`;
