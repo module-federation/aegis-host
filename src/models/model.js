@@ -37,29 +37,33 @@ const Model = (() => {
   })
 
   /**
-   * Create model from factory, mixins and request input
+   * Calls factory with user input and 
+   * mixin pipeline to create model.
    * @lends Model
    * @namespace
    * @class
    */
   const Model = async ({
-    factory,
-    args,
-    modelName,
-    mixins = [],
-    onUpdate = defUpdate,
-    onDelete = defDelete
+    spec: {
+      factory,
+      modelName,
+      mixins = [],
+      onUpdate = defUpdate,
+      onDelete = defDelete
+    },
+    args
   }) => Promise.resolve(
-    // Create model w/ input from request 
-    factory(args)
+    factory(...args) // factory with user input
   ).then(model => ({
-    // Apply mixins defined for model
-    ...compose(...mixins)(model),
-    // Render immutable w/ symbols
-    [MODELNAME]: modelName,
-    [ONUPDATE]: onUpdate,
-    [ONDELETE]: onDelete
-  }))
+    ...compose(...mixins)(model), // optn'l mixins
+    [ONUPDATE](changes) {
+      return onUpdate(this, changes);
+    },
+    [ONDELETE]() {
+      return onDelete(this);
+    },
+    [MODELNAME]: modelName
+  }));
 
   // Add common behavior & data
   const makeModel = asyncPipe(
@@ -74,17 +78,19 @@ const Model = (() => {
     /**
      * Create a new model instance
      * @param {{
-     *  factory: function(*):any, 
-     *  args: any, 
-     *  modelName: String, 
-     *  onUpdate?: function(Model,*):Model,
-     *  onDelete?: function(Model):Model, 
-     *  mixins?: Array<import('./mixins').mixinFunction>
-     * }} options 
+     *  spec: {
+     *    factory: function(*):any, 
+     *    modelName: String, 
+     *    onUpdate?: function(Model,*):Model,
+     *    onDelete?: function(Model):Model, 
+     *    mixins?: Array<import('./mixins').mixinFunction>
+     *  }, 
+     *  args: any[]
+     * }} modelInfo 
      * 
      * @returns {Promise<Readonly<Model>>}
      */
-    create: async (options) => makeModel(options),
+    create: async (modelInfo) => makeModel(modelInfo),
 
     /**
      * Process model update request. 
@@ -94,9 +100,7 @@ const Model = (() => {
      * @returns {Model} updated model
      * 
      */
-    update: (model, changes) => {
-      return model[ONUPDATE](model, changes);
-    },
+    update: (model, changes) => model[ONUPDATE](changes),
 
     /**
      * Process model delete request. 
@@ -104,7 +108,7 @@ const Model = (() => {
      * @param {Model} model
      * @returns {Model}
      */
-    delete: (model) => model[ONDELETE](model),
+    delete: (model) => model[ONDELETE](),
 
     /**
      * Get private symbol for `key`

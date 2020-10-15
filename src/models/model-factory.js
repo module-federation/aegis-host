@@ -21,16 +21,20 @@ import Event from './event';
  * @typedef {{ 
  *  modelName: string,
  *  endpoint: string,
- *  factory: function(*): any,
+ *  factory: function(*):function(*):any,
+ *  dependencies: any,
  *  onUpdate?: function(Model,*): Model,
  *  onDelete?: function(Model): Model,
  *  eventHandlers?: Array<function({
- *    eventName:string, 
- *    eventData:any[]
+ *    eventName:string,
+ *    eventType:string,
+ *    eventTime:string,
+ *    modelName:string,
+ *    model:Model
  *  }):Promise<void>>
  *  mixins?: Array<import('./mixins').mixinFunction>,
  *  isRemote?: boolean
- * }} options
+ * }} ModelSpecification
  */
 
 /**
@@ -89,25 +93,26 @@ const eventFactories = {
 const ModelFactory = {
   /**
    * Register a factory function to create the model `modelName`
-   * @param {options} options
+   * @param {ModelSpecification} spec
    */
   registerModel: ({
     modelName,
     endpoint,
+    dependencies,
     factory,
     onUpdate,
     onDelete,
     eventHandlers = [],
-    isRemote = false,
+    isRemote = true,
     mixins = []
   }) => {
-    modelName = checkModelName(modelName);
+    const name = checkModelName(modelName);
 
-    if (!modelFactories.has(modelName)
-      && typeof factory === 'function'
-    ) {
-      modelFactories.set(modelName, {
-        factory,
+    if (!modelFactories.has(name)) {
+
+      modelFactories.set(name, {
+        modelName: name,
+        factory: factory(dependencies),
         onUpdate,
         onDelete,
         eventHandlers,
@@ -139,18 +144,11 @@ const ModelFactory = {
    * @param {*} args - input sent in the request
    * @returns {Promise<Readonly<Model>>} the model instance
    */
-  createModel: async (modelName, args) => {
-    modelName = checkModelName(modelName);
-
-    if (modelFactories.has(modelName)) {
-      return Model.create({
-        modelName,
-        onUpdate: modelFactories.get(modelName).onUpdate,
-        onDelete: modelFactories.get(modelName).onDelete,
-        factory: modelFactories.get(modelName).factory,
-        mixins: modelFactories.get(modelName).mixins,
-        args
-      });
+  createModel: async (modelName, ...args) => {
+    const name = checkModelName(modelName);
+    const spec = modelFactories.get(name);
+    if (spec) {
+      return Model.create({ spec, args });
     }
     throw new Error('unregistered model');
   },

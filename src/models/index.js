@@ -30,19 +30,19 @@ import importRemoteModels from '../services/import-remote-models';
  * 
  * @param {Model} model 
  */
-const createEventFactory = (model) => ({
+const createEvent = (model) => ({
   model: model
 });
 
 /**
  * @param {{updated:Model,changes:Object}} param0
  */
-const updateEventFactory = ({ updated, changes }) => ({
+const updateEvent = ({ updated, changes }) => ({
   model: updated,
   changes: { ...changes },
 });
 
-const deleteEventFactory = (model) => ({
+const deleteEvent = (model) => ({
   modelId: ModelFactory.getModelId(model),
   model: model
 });
@@ -59,33 +59,24 @@ export async function initModels() {
       && model.hasOwnProperty('factory')
       && model.hasOwnProperty('endpoint')) {
 
-      ModelFactory.registerModel({
-        modelName: model.modelName,
-        endpoint: model.endpoint,
-        factory: model.factory,
-        onUpdate: model.onUpdate,
-        onDelete: model.onDelete,
-        mixins: model.mixins,
-        eventHandlers: model.eventHandlers,
-        isRemote: true,
-      });
+      ModelFactory.registerModel(model);
 
       ModelFactory.registerEvent(
         ModelFactory.EventTypes.CREATE,
         model.modelName,
-        createEventFactory
+        createEvent
       );
 
       ModelFactory.registerEvent(
         ModelFactory.EventTypes.UPDATE,
         model.modelName,
-        updateEventFactory
+        updateEvent
       );
 
       ModelFactory.registerEvent(
         ModelFactory.EventTypes.DELETE,
         model.modelName,
-        deleteEventFactory
+        deleteEvent
       );
     }
   });
