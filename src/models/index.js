@@ -62,6 +62,7 @@ export async function initModels() {
       && model.hasOwnProperty('factory')
       && model.hasOwnProperty('endpoint')) {
 
+      // Overwrite mock dependencies with real ones!
       const deps = { ...model.dependencies, ...services };
 
       ModelFactory.registerModel({
