@@ -7,8 +7,10 @@ export default async () => {
 
   let remoteModels = [];
   for (const entry of remoteEntries) {
-    const models = await entry.importRemote();
-    remoteModels.push(models);
+    if (entry.type === 'model') {
+      const models = await entry.importRemote();
+      remoteModels.push(models);
+    }
   }
 
   console.log("\n%dms to import remote models\n",

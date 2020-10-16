@@ -93,32 +93,12 @@ const eventFactories = {
 const ModelFactory = {
   /**
    * Register a factory function to create the model `modelName`
-   * @param {ModelSpecification} spec
+   * @param {ModelSpecification} model
    */
-  registerModel: ({
-    modelName,
-    endpoint,
-    dependencies,
-    factory,
-    onUpdate,
-    onDelete,
-    eventHandlers = [],
-    isRemote = true,
-    mixins = []
-  }) => {
-    const name = checkModelName(modelName);
-
+  registerModel: (model) => {
+    const name = checkModelName(model.modelName);
     if (!modelFactories.has(name)) {
-      modelFactories.set(name, {
-        modelName: name,
-        factory: factory(dependencies),
-        onUpdate,
-        onDelete,
-        eventHandlers,
-        isRemote,
-        mixins,
-        endpoint
-      });
+      modelFactories.set(name, model);
     }
   },
 

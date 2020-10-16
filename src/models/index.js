@@ -1,5 +1,6 @@
 import ModelFactory from './model-factory';
 import importRemoteModels from '../services/import-remote-models';
+import { importRemoteServices } from '../services/import-remote-services';
 
 /**
  * @typedef {Object} Model
@@ -52,14 +53,22 @@ const deleteEvent = (model) => ({
  */
 export async function initModels() {
   const models = await importRemoteModels();
+  const services = await importRemoteServices();
   console.log(models);
+  console.log(services);
 
   Object.values(models).forEach(model => {
     if (model.hasOwnProperty('modelName')
       && model.hasOwnProperty('factory')
       && model.hasOwnProperty('endpoint')) {
 
-      ModelFactory.registerModel(model);
+      const deps = { ...model.dependencies, ...services };
+
+      ModelFactory.registerModel({
+        ...model,
+        factory: model.factory(deps),
+        isRemote: true
+      });
 
       ModelFactory.registerEvent(
         ModelFactory.EventTypes.CREATE,
