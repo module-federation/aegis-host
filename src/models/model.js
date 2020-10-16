@@ -12,7 +12,7 @@ import uuid from '../lib/uuid';
  */
 const Model = (() => {
 
-  // Render props immutable w/ local symbols
+  // Render immutable w/ local symbols
   const ID = Symbol('id');
   const MODELNAME = Symbol('modelName');
   const CREATETIME = Symbol('createTime');
@@ -37,25 +37,28 @@ const Model = (() => {
   })
 
   /**
-   * Calls factory with user input and 
-   * mixin pipeline to create model.
+   * Call factory with user input & 
+   * mixin pipeline to create model
    * @lends Model
    * @namespace
    * @class
    */
   const Model = async ({
+    args,
     spec: {
       factory,
       modelName,
       mixins = [],
       onUpdate = defUpdate,
       onDelete = defDelete
-    },
-    args
+    }
   }) => Promise.resolve(
-    factory(...args) // factory with user input
+    // Call factory
+    factory(...args)
   ).then(model => ({
-    ...compose(...mixins)(model), // optn'l mixins
+    // Optional mixins
+    ...compose(...mixins)(model),
+    // Immutable props...
     [ONUPDATE](changes) {
       return onUpdate(this, changes);
     },

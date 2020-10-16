@@ -109,7 +109,6 @@ const ModelFactory = {
     const name = checkModelName(modelName);
 
     if (!modelFactories.has(name)) {
-
       modelFactories.set(name, {
         modelName: name,
         factory: factory(dependencies),

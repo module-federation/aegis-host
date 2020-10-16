@@ -42,18 +42,17 @@ export const withTimestamp = (propName, fnTimestamp = utc) => {
  * @param {{key: string, value: Symbol}} keyMap 
  */
 export const withSymbolsInJSON = (keyMap) => (o) => {
-  function toJSON() {
-    const symbols = Object.keys(keyMap)
-      .map(k => ({ [k]: this[keyMap[k]] }))
-      .reduce((p, c) => ({ ...c, ...p }))
-    return {
-      ...this,
-      ...symbols
-    }
-  }
   return {
     ...o,
-    toJSON
+    toJSON() {
+      const symbols = Object.keys(keyMap)
+        .map(k => ({ [k]: this[keyMap[k]] }))
+        .reduce((p, c) => ({ ...c, ...p }))
+      return {
+        ...this,
+        ...symbols
+      }
+    }
   }
 }
 
