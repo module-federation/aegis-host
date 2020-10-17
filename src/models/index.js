@@ -1,6 +1,8 @@
 import ModelFactory from './model-factory';
-import importRemoteModels from '../services/import-remote-models';
-import { importRemoteServices } from '../services/import-remote-services';
+import { 
+  importRemoteModels,
+  importRemoteServices,
+ } from '../services/import-remotes';
 
 /**
  * @typedef {Object} Model
@@ -54,7 +56,9 @@ const deleteEvent = (model) => ({
 export async function initModels() {
   const models = await importRemoteModels();
   const services = await importRemoteServices();
+  console.log('models');
   console.log(models);
+  console.log('services');
   console.log(services);
 
   Object.values(models).forEach(model => {

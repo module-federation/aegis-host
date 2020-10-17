@@ -1,8 +1,9 @@
 import remoteEntries from '../../webpack/remote-entries';
+
 /**
  *
  */
-export default async () => {
+export async function importRemoteModels () {
   const importStartTime = Date.now();
 
   let remoteModels = [];
@@ -18,4 +19,17 @@ export default async () => {
 
   return remoteModels.map(m => ({ ...m }))
     .reduce((p, c) => ({ ...c, ...p }));
+}
+
+
+export async function importRemoteServices() {
+  let services = [];
+  for (const entry of remoteEntries) {
+    if (entry.type === 'service') {
+      const service = await entry.importRemote();
+      services.push(service);
+    }
+  }
+  return services.reduce((p, c) => ({...c, ...p}));
+
 }
