@@ -9346,7 +9346,7 @@ var moduleMap = {
 	"./models": () => {
 		return __webpack_require__.e("src_models_index_js").then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
-	"./order-service": () => {
+	"./orderService": () => {
 		return __webpack_require__.e("src_services_order-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
 	},
 	"./paymentService": () => {
@@ -9355,8 +9355,8 @@ var moduleMap = {
 	"./shippingService": () => {
 		return __webpack_require__.e("src_services_real-shipping-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/real-shipping-service */ "./src/services/real-shipping-service.js")));
 	},
-	"./address-service": () => {
-		return __webpack_require__.e("src_services_address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/address-service */ "./src/services/address-service.js")));
+	"./addressService": () => {
+		return __webpack_require__.e("src_services_real-address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/real-address-service */ "./src/services/real-address-service.js")));
 	}
 };
 var get = (module) => {
@@ -9813,7 +9813,7 @@ module.exports = require("zlib");
 /******/ 			"src_services_order-service_js": [
 /******/ 				"webpack/sharing/consume/default/axios/axios"
 /******/ 			],
-/******/ 			"src_services_address-service_js": [
+/******/ 			"src_services_real-address-service_js": [
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			]
 /******/ 		};
