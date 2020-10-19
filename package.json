@@ -7,7 +7,8 @@
     "build": "npm run clean && webpack --config webpack.config.js",
     "start": "node dist/main.js",
     "restart": "npm run build && npm run start",
-    "test": "open http://localhost:8070",
+    "test": "mocha --recursive -r esm",
+    "demo": "open http://localhost:8070",
     "clean": "rm -rf dist"
   },
   "author": "Tyson Midboe",
@@ -25,7 +26,9 @@
     "@babel/preset-env": "^7.11.0",
     "babel-loader": "^8.1.0",
     "enhanced-resolve": "^5.2.0",
+    "esm": "^3.2.25",
     "express-cli": "0.0.1",
+    "mocha": "^8.2.0",
     "webpack": "^5.0.0-beta.28",
     "webpack-cli": "^3.3.12",
     "webpack-node-externals": "^2.5.2"
