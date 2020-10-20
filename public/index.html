@@ -14,7 +14,7 @@
       </tr>
       <tr>
         <td>
-           <input id="model" value="users"></input><pre></pre>
+           <input id="model" value="orders"></input><pre></pre>
         </td>
       </tr>
       <tr>
@@ -34,11 +34,16 @@
       </tr>
       <tr>
         <td>
-          <textarea id="payload" style="height: 80px; width: 200px;">
+          <textarea id="payload" style="height: 150px; width: 420px;">
 {
-  "userName":"user1",
-  "password":"secret",
-  "firstName":"Bob"
+  "customerInfo": "user1",
+  "orderItems":[
+     {"itemId":"item1","price":12.22},
+     {"itemId":"item2","price":15.35}
+   ],
+   "creditCardNumber":"378282246310005",
+   "shippingAddress":"123 Park Ave. NY, NY 45678",
+   "billingAddress":"123 Park Ave. NY, NY 45678"
 }
           </textarea>          
         </td>

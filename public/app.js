@@ -9,23 +9,23 @@
   const modelText = document.querySelector('#model');
   const modelIdText = document.querySelector('#modelId');
 
+  function updateUrl(url) {
+    document.getElementById('url').textContent = [
+      `http://${location.host}`,
+      url
+    ].join('/');
+  }
+
   function getUrl() {
     const model = document.getElementById('model').value;
     const id = document.getElementById('modelId').value;
     const url = ['api', model, id].join('/');
-    document.getElementById('url').textContent = [
-      `http://${location.host}`, url
-    ].join('/');
+    updateUrl(url);
     return url;
   }
 
-  modelText.onchange = function () {
-    getUrl();
-  }
-
-  modelIdText.onchange = function () {
-    getUrl();
-  }
+  modelText.onchange = getUrl;
+  modelIdText.onchange = getUrl;
 
   function showMessage(message) {
     messages.textContent += `\n${message}`;

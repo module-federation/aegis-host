@@ -7,6 +7,7 @@
     "build": "npm run clean && webpack --config webpack.config.js",
     "start": "node dist/main.js",
     "restart": "npm run build && npm run start",
+    "compile": "babel src -d dist",
     "test": "mocha --recursive -r esm",
     "demo": "open http://localhost:8070",
     "clean": "rm -rf dist"
