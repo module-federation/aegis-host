@@ -23,6 +23,8 @@ export async function importRemoteModels () {
 
 
 export async function importRemoteServices() {
+  const importStartTime = Date.now();
+
   let services = [];
   for (const entry of remoteEntries) {
     if (entry.type === 'service') {
@@ -30,6 +32,9 @@ export async function importRemoteServices() {
       services.push(service);
     }
   }
-  return services.reduce((p, c) => ({...c, ...p}));
 
+  console.log("\n%dms to import remote services\n",
+    Date.now() - importStartTime);
+
+  return services.reduce((p, c) => ({...c, ...p}));
 }
