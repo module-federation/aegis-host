@@ -8,3 +8,4 @@ webpack/remoteEntry_js_localhost_8060_.js
 webpack/remoteEntry_js_localhost_8060_fedmonserv_.js
 src/.DS_Store
 .env
+coverage
