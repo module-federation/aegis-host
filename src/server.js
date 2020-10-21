@@ -10,8 +10,10 @@ import {
   patchModels,
   getModels,
   getModelsById,
-  deleteModels
+  deleteModels,
+  consumeEvents
 } from './controllers';
+
 import { initModels } from './models';
 import callback from './controllers/build-callback';
 import initMiddleware from './middleware';
@@ -37,7 +39,7 @@ const Server = (() => {
   function run() {
     const importStartTime = Date.now();
 
-    initModels().then(() => {
+    initModels({ consumeEvents }).then(() => {
       log('\n%dms to import & register models\n',
         Date.now() - importStartTime);
 

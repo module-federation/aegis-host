@@ -14,7 +14,7 @@ export default function getModelByIdFactory(findModel) {
       const id = httpRequest.params.id;
 
       const model = await findModel(id);
-      log({ function: findModel.name, ...model });
+      // log({ function: findModel.name, ...model });
 
       return {
         headers: {

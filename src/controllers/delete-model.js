@@ -15,7 +15,7 @@ export default function deleteModelFactory(removeModel, getModelId, hash) {
       const id = httpRequest.params.id;
 
       const model = await removeModel(id);
-      log({ function: removeModel.name, modelData: { ...model } });
+      // log({ function: removeModel.name, modelData: { ...model } });
 
       return {
         headers: {

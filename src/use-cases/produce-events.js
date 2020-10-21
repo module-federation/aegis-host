@@ -7,3 +7,4 @@ import publishEvent from '../services/publish-event';
 export default function (observer) {
   observer.on('*', async event => publishEvent(event));
 }
+

@@ -1,3 +1,5 @@
+'use strict'
+
 import {
   addModels,
   editModels,
@@ -25,4 +27,4 @@ export const patchModels = () => make(editModels, patchModelFactory);
 export const getModels = () => make(listModels, getModelFactory);
 export const getModelsById = () => make(findModels, getModelByIdFactory);
 export const deleteModels = () => make(removeModels, deleteModelFactory);
-
+export { consumeEvents } from './kafka-consumer';

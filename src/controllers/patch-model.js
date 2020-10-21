@@ -15,7 +15,7 @@ export default function patchModelFactory(editModel, getModelId, hash) {
       const id = httpRequest.params.id;
 
       const model = await editModel(id, { ...modelInfo });
-      log({ function: editModel.name, modelData: { ...model } });
+      // log({ function: editModel.name, modelData: { ...model } });
 
       return {
         headers: {

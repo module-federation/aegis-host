@@ -1,9 +1,11 @@
+'use strict'
+
 import remoteEntries from '../../webpack/remote-entries';
 
 /**
  *
  */
-export async function importRemoteModels () {
+export async function importRemoteModels() {
   const importStartTime = Date.now();
 
   let remoteModels = [];
@@ -36,5 +38,29 @@ export async function importRemoteServices() {
   console.log("\n%dms to import remote services\n",
     Date.now() - importStartTime);
 
-  return services.reduce((p, c) => ({...c, ...p}));
+  return services.reduce((p, c) => ({ ...c, ...p }));
 }
+
+
+// function loadComponent(scope, module) {
+//   return async () => {
+//     // Initializes the share scope. This fills it with known provided modules from this build and all remotes
+//     await __webpack_init_sharing__("default");
+//     const container = global[scope]; // or get the container somewhere else
+//     // Initialize the container, it may provide shared modules
+//     await container.init(__webpack_share_scopes__.default);
+//     console.log(container);
+//     const factory = await container.get(module);
+//     console.log(factory);
+//     const Module = factory();
+//     console.log(Module);
+//     return Module;
+//   };
+// }
+
+// export function findRemoteServices(...services) {
+//   const services = await Promise.all(services.map(async s => {
+//     await loadComponent('servicesRemote', s);
+//   }));
+//   return services;
+// }

@@ -13,7 +13,7 @@ export default function getModelFactory(listModels) {
       log(source);
 
       const models = await listModels();
-      log({ function: listModels.name, ...models });
+      // log({ function: listModels.name, ...models });
 
       return {
         headers: {

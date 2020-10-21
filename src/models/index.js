@@ -1,8 +1,9 @@
 import ModelFactory from './model-factory';
-import { 
+import {
   importRemoteModels,
   importRemoteServices,
- } from '../services/import-remotes';
+  // findRemoteServices
+} from '../services/import-remotes';
 
 /**
  * @typedef {Object} Model
@@ -53,9 +54,14 @@ const deleteEvent = (model) => ({
 /**
  * Import and register remote models.
  */
-export async function initModels() {
+export async function initModels(plugins) {
   const models = await importRemoteModels();
-  const services = await importRemoteServices();
+  const svcs = await importRemoteServices();
+  const services = { ...svcs, ...plugins };
+  // const dynRemSrvcs = await findRemoteServices();
+  // const module = await dynRemSrvcs();
+  // console.log(module);
+
   console.log('models');
   console.log(models);
   console.log('services');

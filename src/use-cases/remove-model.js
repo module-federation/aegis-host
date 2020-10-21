@@ -20,7 +20,6 @@ export default function removeModelFactory({
 } = {}) {
   const eventType = models.EventTypes.DELETE;
   const eventName = models.getEventName(eventType, modelName);
-  handlers.push(async event => log({ event }));
   handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function removeModel(id) {

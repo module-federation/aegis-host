@@ -9807,7 +9807,7 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 		// no consumes in initial chunks
 /******/ 		var chunkMapping = {
-/******/ 			"src_services_order-service_js": [
+/******/ 			"src_models_index_js": [
 /******/ 				"webpack/sharing/consume/default/axios/axios"
 /******/ 			],
 /******/ 			"src_services_real-address-service_js": [

@@ -13,7 +13,7 @@ export default function postModelFactory(addModel, getModelId, hash) {
       log(source);
 
       const model = await addModel({ ...modelInfo });
-      log({ function: addModel.name, modelData: { ...model } });
+      // log({ function: addModel.name, modelData: { ...model } });
 
       return {
         headers: {
