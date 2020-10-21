@@ -63,9 +63,9 @@ function checkModelName(modelName) {
  */
 function checkEventType(eventType) {
   if (typeof eventType === 'string') {
-    eventType = eventType.toUpperCase();
-    if (Object.values(EventTypes).includes(eventType)) {
-      return eventType;
+    const upper = eventType.toUpperCase();
+    if (Object.values(EventTypes).includes(upper)) {
+      return upper;
     }
   }
   throw new Error('eventType missing or invalid');
