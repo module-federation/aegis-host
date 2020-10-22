@@ -8,12 +8,12 @@
 /**
  * @callback eventHandler
  * @param {string} topic
- * @param {{value: string}} message
+ * @param {{value: string}} event
  */
 
 /**
  * @callback subscriptionCallback
- * @param {string} topic
+ * @param {string | RegExp} topic
  * @param {eventHandler} eventHandler
  */
 
@@ -73,8 +73,8 @@ export default function consumerFactory(eventSource) {
     subscriptions.set(topic, new Map().set(id, callback));
     eventSource.subscribe(topic, function (eventData) {
       subscriptions.get(topic).forEach(function (callback, id) {
-        const message = { ...eventData, consumer: EventConsumer(topic, id) };
-        callback(message);
+        const event = { ...eventData, consumer: EventConsumer(topic, id) };
+        callback(event);
       });
     });
     return consumer;
