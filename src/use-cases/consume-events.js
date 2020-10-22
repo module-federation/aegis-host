@@ -23,9 +23,6 @@ export const EventSource = function (client, callback) {
   return {
     subscribe(topic, filter) {
       return callback(topic, filter);
-    },
-    getSubscriptions() {
-      return [...subscriptions.entries()];
     }
   }
 }
@@ -43,6 +40,12 @@ const EventConsumer = function (eventSource) {
   return {
     subscribe(adapter) {
       adapter.invoke(eventSource);
+    },
+    getSubscriptions() {
+      return [...subscriptions.entries()];
+    },
+    unsubscribe(topic, id) {
+      subscriptions.get(topic).delete(id);
     }
   }
 }
@@ -53,13 +56,21 @@ const EventConsumer = function (eventSource) {
  * @returns {function(*,function(EventSource))):any}
  */
 export default function consumerFactory(eventSource) {
-  return async function consumeEvents(service, adapterFn) {
-    if (subscriptions.has(adapterFn)) {
+  return async function consumeEvents(topic, id, callback) {
+    if (subscriptions.has(topic)) {
+      subscriptions.get(topic).set(id, callback);
       return;
     }
-    subscriptions.set(adapterFn, service);
-    const serviceAdapter = InterfaceAdapter(service);
-    serviceAdapter.add(eventSource, adapterFn);
-    EventConsumer(eventSource).subscribe(serviceAdapter);
+    subscriptions.set(topic, new Map());
+    subscriptions.get(topic).set(id, callback);
+    const serviceAdapter = InterfaceAdapter(topic);
+    serviceAdapter.add(eventSource, function (eventSource) {
+      eventSource.subscribe(topic, function (eventData) {
+        subscriptions.get(topic).forEach(s => s.callback(eventData));
+      });
+    });
+    const consumer = EventConsumer(eventSource);
+    consumer.subscribe(serviceAdapter);
+    return consumer;
   }
 }
