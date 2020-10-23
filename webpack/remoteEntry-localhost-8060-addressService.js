@@ -9347,7 +9347,7 @@ var moduleMap = {
 		return __webpack_require__.e("src_models_index_js").then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
 	"./orderService": () => {
-		return __webpack_require__.e("src_services_order-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
+		return Promise.all([__webpack_require__.e("src_models_index_js"), __webpack_require__.e("src_services_order-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
 	},
 	"./paymentService": () => {
 		return __webpack_require__.e("src_services_real-payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/real-payment-service */ "./src/services/real-payment-service.js")));
@@ -9802,15 +9802,12 @@ module.exports = require("zlib");
 /******/ 		});
 /******/ 		var installedModules = {};
 /******/ 		var moduleToHandlerMapping = {
-/******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js")),
-/******/ 			"webpack/sharing/consume/default/axios/axios": () => loadStrictVersionCheckFallback("default", "axios", [2,0,20,0], () => () => __webpack_require__(/*! axios */ "./node_modules/axios/index.js"))
+/******/ 			"webpack/sharing/consume/default/axios/axios": () => loadStrictVersionCheckFallback("default", "axios", [2,0,20,0], () => () => __webpack_require__(/*! axios */ "./node_modules/axios/index.js")),
+/******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js"))
 /******/ 		};
 /******/ 		// no consumes in initial chunks
 /******/ 		var chunkMapping = {
 /******/ 			"src_models_index_js": [
-/******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
-/******/ 			],
-/******/ 			"src_services_order-service_js": [
 /******/ 				"webpack/sharing/consume/default/axios/axios"
 /******/ 			],
 /******/ 			"src_services_real-address-service_js": [

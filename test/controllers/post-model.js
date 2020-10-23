@@ -34,7 +34,7 @@ describe('Controllers', function () {
         addModel,
         ModelFactory.getModelId,
         hash
-      )({body:{a: 'a'}, headers:{'User-Agent': 'test'}, ip:'127.0.0.1'});
+      )({ body: { a: 'a' }, headers: { 'User-Agent': 'test' }, ip: '127.0.0.1' });
       assert.strictEqual(resp.statusCode, 201);
     });
   });

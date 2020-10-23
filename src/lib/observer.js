@@ -21,7 +21,7 @@ export class Observer {
 
   /**
    * Register callback `handler` to fire on event `eventName`
-   * @param {String} eventName   
+   * @param {String | RegExp} eventName   
    * @param {eventHandler} handler 
    */
   on(eventName, handler) {
@@ -50,6 +50,7 @@ class ObserverImpl extends Observer {
 
   /**
    * @override
+   * 
    */
   on(eventName, handler) {
     if (eventName && typeof handler !== 'function') {
@@ -100,6 +101,7 @@ const ObserverFactory = (() => {
       return instance;
     }
   });
+
 })();
 
 export default ObserverFactory;
