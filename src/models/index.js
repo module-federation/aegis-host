@@ -1,8 +1,10 @@
+'use strict'
+
 import ModelFactory from './model-factory';
 import {
   importRemoteModels,
   importRemoteServices,
-  // findRemoteServices
+  importRemoteAdapters
 } from '../services/import-remotes';
 
 /**
@@ -10,7 +12,7 @@ import {
  * @property {Symbol} id
  * @property {Symbol} modelName
  * @property {Symbol} createTime
- * @property {Symbol} onUpdate
+ * @property {Symbol(function)} onUpdate
  * @property {Symbol} onDelete
  */
 
@@ -51,33 +53,58 @@ const deleteEvent = (model) => ({
   model: model
 });
 
-/**
- * Import and register remote models.
- */
-export async function initModels(plugins) {
-  const models = await importRemoteModels();
-  const svcs = await importRemoteServices();
-  const services = { ...svcs, ...plugins };
-  // const dynRemSrvcs = await findRemoteServices();
-  // const module = await dynRemSrvcs();
-  // console.log(module);
+function makeAdapters(ports, adapters, services) {
+  if (!ports || !adapters || !services) {
+    return;
+  }
+  return Object.keys(ports).map(port => {
+    try {
+      if (services[ports[port].service]) {
+        return {
+          [port]: adapters[port](
+            services[ports[port].service]
+          )
+        }
+      }
+    } catch (e) {
+      console.warn(e.message);
+    }
+  }).reduce((p, c) => ({ ...c, ...p }));
+}
 
-  console.log('models');
+async function initModels(services, adapters) {
+  const models = await importRemoteModels();
+
+  console.log('\nmodels');
   console.log(models);
-  console.log('services');
-  console.log(services);
 
   Object.values(models).forEach(model => {
     if (model.hasOwnProperty('modelName')
       && model.hasOwnProperty('factory')
       && model.hasOwnProperty('endpoint')) {
 
-      // Overwrite mock dependencies with real ones!
-      const deps = { ...model.dependencies, ...services };
+      console.log({
+        model: model.modelName,
+        dependencies: model.dependencies
+      });
+
+      const serviceAdapters = makeAdapters(
+        model.ports,
+        adapters,
+        services
+      );
+
+      // override adapters
+      const dependencies = {
+        ...model.dependencies,
+        ...serviceAdapters
+      };
+
+      model.dependencies = dependencies;
 
       ModelFactory.registerModel({
         ...model,
-        factory: model.factory(deps),
+        factory: model.factory(dependencies),
         isRemote: true
       });
 
@@ -102,4 +129,33 @@ export async function initModels(plugins) {
   });
 }
 
-export default ModelFactory;
+/**
+ * Import remote models, services, and adapters.
+ * 
+ * @param {*} overrides - override services and adapters
+ */
+export async function initRemotes(overrides) {
+  const services = await importRemoteServices();
+  const adapters = await importRemoteAdapters();
+
+  console.log({
+    services,
+    adapters,
+    overrides
+  });
+
+  console.log({ ...services, ...overrides});
+
+  await initModels(
+    {
+      ...services,
+      ...overrides,
+    },
+    {
+      ...adapters,
+      ...overrides
+    }
+  );
+}
+
+export default ModelFactory

@@ -1,5 +1,5 @@
 import makeConsumer from '../use-cases/consume-events'
-import { EventSource } from '../use-cases/consume-events'
+import { EventSource } from '../adapters/event-source'
 import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
@@ -9,7 +9,7 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: 'test-group' });
 
-const eventSource = EventSource(consumer, async (topic, callback) => {
+const eventSource = EventSource(async (topic, callback) => {
   console.log('EventSource: topic: %s, callback: %s', topic, callback);
   try {
     await consumer.connect();

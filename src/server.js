@@ -11,11 +11,12 @@ import {
   getModels,
   getModelsById,
   deleteModels,
-  consumeEvents
 } from './controllers';
 
-import { initModels } from './models';
-import callback from './controllers/build-callback';
+import { initRemotes } from './models';
+import { listen, notify } from './adapters/event-adapter';
+import { Event } from './services/event-service';
+import callback from './adapters/http-callback';
 import initMiddleware from './middleware';
 import log from './lib/logger';
 
@@ -38,8 +39,9 @@ const Server = (() => {
 
   function run() {
     const importStartTime = Date.now();
+    const overrides = { listen, notify, Event };
 
-    initModels({ consumeEvents }).then(() => {
+    initRemotes(overrides).then(() => {
       log('\n%dms to import & register models\n',
         Date.now() - importStartTime);
 

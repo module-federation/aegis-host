@@ -11,9 +11,9 @@ const { Kafka } = require('kafkajs');
 
   await producer.connect()
   await producer.send({
-    topic: 'shipping',
+    topic: 'orderShipped',
     messages: [
-      { value: '{ eventName: ORDERSHIPPED, orderNo: 123 }' },
+      { value: 'order shipped' },
     ],
   })
 

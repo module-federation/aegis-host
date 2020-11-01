@@ -37,6 +37,31 @@ const Model = (() => {
   })
 
   /**
+   * Generates functions to handle I/O between
+   * the domain and application layers
+   * @param {*} ports - the domain interfaces 
+   * @param {*} adapters - the application adapters 
+   */
+  function makePorts(ports, adapters) {
+    if (!ports || !adapters) {
+      return;
+    }
+    return Object.keys(ports).map(function (port) {
+      if (port.disabled) {
+        return;
+      }
+      return {
+        async [port](...args) {
+          return adapters[port]({
+            model: this,
+            parms: args
+          });
+        }
+      }
+    }).reduce((p, c) => ({ ...c, ...p }));
+  }
+
+  /**
    * Call factory with user input & 
    * mixin pipeline to create model
    * @lends Model
@@ -50,7 +75,9 @@ const Model = (() => {
       modelName,
       mixins = [],
       onUpdate = defUpdate,
-      onDelete = defDelete
+      onDelete = defDelete,
+      dependencies,
+      ports
     }
   }) => Promise.resolve(
     // Call factory
@@ -58,6 +85,8 @@ const Model = (() => {
   ).then(model => ({
     // Optional mixins
     ...compose(...mixins)(model),
+    // Domain I/O 
+    ...makePorts.call(model, ports, dependencies),
     // Immutable props...
     [ONUPDATE](changes) {
       return onUpdate(this, changes);
@@ -87,10 +116,16 @@ const Model = (() => {
      *    onUpdate?: function(Model,*):Model,
      *    onDelete?: function(Model):Model, 
      *    mixins?: Array<import('./mixins').mixinFunction>
+     *    ports?: {
+     *      [x: string]: {
+     *        service: string,
+     *        type?:'inbound'|'outbound',
+     *        disabled?: boolean
+     *      }
+     *    }
      *  }, 
      *  args: any[]
      * }} modelInfo 
-     * 
      * @returns {Promise<Readonly<Model>>}
      */
     create: async (modelInfo) => makeModel(modelInfo),

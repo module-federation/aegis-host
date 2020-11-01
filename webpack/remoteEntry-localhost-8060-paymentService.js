@@ -9344,10 +9344,13 @@ var moduleMap = {
 		return __webpack_require__.e("src_services_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services/publish-event */ "./src/services/publish-event.js")));
 	},
 	"./models": () => {
-		return __webpack_require__.e("src_models_index_js").then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+	},
+	"./adapters": () => {
+		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./orderService": () => {
-		return Promise.all([__webpack_require__.e("src_models_index_js"), __webpack_require__.e("src_services_order-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
+		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js"), __webpack_require__.e("src_services_order-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
 	},
 	"./paymentService": () => {
 		return __webpack_require__.e("src_services_real-payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/real-payment-service */ "./src/services/real-payment-service.js")));
@@ -9807,7 +9810,7 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 		// no consumes in initial chunks
 /******/ 		var chunkMapping = {
-/******/ 			"src_models_index_js": [
+/******/ 			"src_services_order-service_js": [
 /******/ 				"webpack/sharing/consume/default/axios/axios"
 /******/ 			],
 /******/ 			"src_services_real-address-service_js": [

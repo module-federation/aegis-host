@@ -11,6 +11,16 @@ module.exports = [
     }
   },
   {
+    name: 'serviceAdapters',
+    url: 'http://localhost:8060/remoteEntry.js',
+    path: __dirname,
+    type: 'adapter',
+    importRemote: async () => {
+      const services = await import('orderService/adapters');
+      return services;
+    }
+  },
+  {
     name: 'paymentService',
     url: 'http://localhost:8060/remoteEntry.js',
     path: __dirname,
@@ -39,5 +49,5 @@ module.exports = [
       const services = await import('orderService/addressService');
       return services;
     }
-  }
+  },
 ]

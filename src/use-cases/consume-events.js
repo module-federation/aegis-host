@@ -1,82 +1,38 @@
 'use strict'
 
+import { Subscription } from '../adapters/event-source'
+
 /**
- * @typedef EventSubscriber
- * @property {subscriptionCallback} subscribe
+ * @typedef {import('../adapters/event-source').eventHandler} eventHandler
  */
 
 /**
- * @callback eventHandler
- * @param {string} topic
- * @param {{value: string}} event
- */
-
-/**
- * @callback subscriptionCallback
- * @param {string | RegExp} topic
- * @param {eventHandler} eventHandler
- */
-
-/**
- * @callback EventSource
- * @param {*} client 
- * @param {subscriptionCallback} callback
- * @returns {EventSubscriber} 
- */
-
-const subscriptions = new Map();
-
-/**
- * @type {EventSource}
- */
-export const EventSource = function (client, callback) {
-  return {
-    subscribe(topic, eventHandler) {
-      return callback(topic, eventHandler);
-    }
-  }
-}
-
-/**
- * @typedef Consumer
- * @property {Function} getSubscriptions
- * @property {Function} unsubscribe
- */
-
-/**
- * 
- * @returns {Consumer}
- */
-const EventConsumer = function (topic, id) {
-  return {
-    getSubscriptions() {
-      return [...subscriptions.entries()];
-    },
-    unsubscribe() {
-      subscriptions.get(topic).delete(id);
-    }
-  }
-}
-
-/**
- * 
- * @param {EventSubscriber} eventSource 
- * @returns {function(*,function(EventSource))):any}
+ * @param {import('../adapters/event-source').EventSourceAdapter} eventSource
+ * @returns {function(string|RegExp,string,eventHandler))):any}
  */
 export default function consumerFactory(eventSource) {
-  return async function consumeEvents(topic, id, callback) {
+  return async function consumeEvents(topic, id, handler) {
     const consumer = EventConsumer(topic, id);
+    const subscriptions = eventSource.getSubscriptions();
+
     if (subscriptions.has(topic)) {
-      subscriptions.get(topic).set(id, callback);
+      subscriptions.get(topic).set(id, handler);
       return consumer;
     }
-    subscriptions.set(topic, new Map().set(id, callback));
-    eventSource.subscribe(topic, function (eventData) {
-      subscriptions.get(topic).forEach(function (callback, id) {
-        const event = { ...eventData, consumer: EventConsumer(topic, id) };
-        callback(event);
+
+    subscriptions.set(topic, new Map().set(id, handler));
+
+    eventSource.subscribe(topic, (eventData) => {
+      subscriptions.get(topic).forEach((handle, id) => {
+        const event = {
+          ...eventData,
+          consumer: EventConsumer(topic, id)
+        };
+        handle(event);
       });
     });
+
     return consumer;
   }
 }
+

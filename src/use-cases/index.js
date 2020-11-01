@@ -6,12 +6,12 @@ import listModelsFactory from './list-models';
 import findModelFactory from './find-model';
 import removeModelFactory from './remove-model';
 import consumerFactory from './consume-events';
-import produceEvents from './produce-events';
+import handleEvents from './produce-events';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
 import ModelFactory from '../models';
 
-produceEvents(ObserverFactory.getInstance());
+handleEvents(ObserverFactory.getInstance());
 
 function buildOptions(model) {
   return {
@@ -38,4 +38,5 @@ export const findModels = () => make(findModelFactory);
 export const removeModels = () => make(removeModelFactory);
 export const getModelId = (model) => ModelFactory.getModelId(model);
 export const makeConsumer = (eventSource) => consumerFactory(eventSource);
+
 

@@ -3,7 +3,7 @@
 import remoteEntries from '../../webpack/remote-entries';
 
 /**
- *
+ * 
  */
 export async function importRemoteModels() {
   const importStartTime = Date.now();
@@ -23,7 +23,9 @@ export async function importRemoteModels() {
     .reduce((p, c) => ({ ...c, ...p }));
 }
 
-
+/**
+ * Imports remote service modules.    
+ */
 export async function importRemoteServices() {
   const importStartTime = Date.now();
 
@@ -39,6 +41,23 @@ export async function importRemoteServices() {
     Date.now() - importStartTime);
 
   return services.reduce((p, c) => ({ ...c, ...p }));
+}
+
+export async function importRemoteAdapters() {
+  const importStartTime = Date.now();
+
+  let useCases = [];
+  for (const entry of remoteEntries) {
+    if (entry.type === 'adapter') {
+      const useCase = await entry.importRemote();
+      useCases.push(useCase);
+    }
+  }
+
+  console.log("\n%dms to import remote services\n",
+    Date.now() - importStartTime);
+
+  return useCases.reduce((p, c) => ({ ...c, ...p }));
 }
 
 

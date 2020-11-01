@@ -10,7 +10,8 @@
     "compile": "babel src -d dist",
     "test": "mocha --recursive -r esm",
     "demo": "open http://localhost:8070",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "event": "node src/lib/kafka-producer.js"
   },
   "author": "Tyson Midboe",
   "license": "MIT",
