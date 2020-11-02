@@ -71,13 +71,13 @@ const Model = (() => {
   const Model = async ({
     args,
     spec: {
+      ports,
       factory,
       modelName,
       mixins = [],
+      dependencies,
       onUpdate = defUpdate,
       onDelete = defDelete,
-      dependencies,
-      ports
     }
   }) => Promise.resolve(
     // Call factory

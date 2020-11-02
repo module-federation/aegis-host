@@ -10,6 +10,7 @@ import handleEvents from './produce-events';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
 import ModelFactory from '../models';
+// import { EventService } from '../adapters/event-adapter';
 
 handleEvents(ObserverFactory.getInstance());
 

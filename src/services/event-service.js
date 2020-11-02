@@ -13,12 +13,14 @@ const producer = kafka.producer();
 export const Event = {
 
   async listen(topic, callback) {
-    console.log('EventSource: topic: %s, callback: %s', topic, callback);
+    console.log('listen: topic: %s, callback: %s', topic, callback);
     try {
       await consumer.connect();
       await consumer.subscribe({ topic: topic, fromBeginning: true });
       await consumer.run({
-        eachMessage: callback
+        eachMessage: async ({ topic, message }) => callback({
+          topic, message: message.value.toString()
+        })
       });
     } catch (e) {
       throw e;

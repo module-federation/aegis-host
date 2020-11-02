@@ -17,16 +17,25 @@ import uuid from '../lib/uuid';
  * @returns {function(topic, eventHandler)} 
  */
 
+/**
+ * @type {Map<any,Map<string,Subscription>>}
+ */
 const subscriptions = new Map();
 
-const Subscription = function ({ id, callback, topic, filter, once }) {
+const Subscription = function ({ id, callback, topic, filter, once, model }) {
   return {
     unsubscribe() {
-      subscriptions.get(topic).delete(id);
+      console.log('subscriptions.get(%s).delete(%s)', topic, id);
+      console.log(subscriptions);
+      return subscriptions.get(topic) && subscriptions.get(topic).delete(id);
     },
 
     getId() {
       return id;
+    },
+
+    getModel() {
+      return model;
     },
 
     async filter(message) {
@@ -36,8 +45,8 @@ const Subscription = function ({ id, callback, topic, filter, once }) {
       const regex = new RegExp(filter);
       if (regex.test(message)) {
         await callback({
-          event: message,
-          subscription: this
+          message: message,
+          subscription: this,
         });
         if (once) {
           this.unsubscribe();
@@ -56,24 +65,21 @@ export function listen(service) {
   return async function ({
     model, parms: [{ topic, callback, filter, once, id }]
   }) {
-    console.log('listen: %s %s', model.modelName, topic);
-    const subscription = Subscription(id, callback, filter, once);
+    console.log('listen: %s %s', model, topic);
+    const subscription = Subscription({ id, topic, callback, filter, once, model });
 
     if (subscriptions.has(topic)) {
       subscriptions.get(topic).set(id, subscription);
       return;
     }
-    subscriptions.set(new Map().set(id, subscription));
+    subscriptions.set(topic, new Map().set(id, subscription));
 
-    service.listen(topic, function ({ topic, message }) {
+    service.listen(topic, async function ({ topic, message }) {
       subscriptions.get(topic).forEach(async subscription => {
-        if (subscription.filter(message.value)) {
+        if (subscription.filter(message)) {
           return;
         }
-        await subscription.callback({
-          event: message.value,
-          subscription
-        });
+        await subscription.callback({ message, subscription });
       });
     });
     return subscription;

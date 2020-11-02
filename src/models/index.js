@@ -83,11 +83,6 @@ async function initModels(services, adapters) {
       && model.hasOwnProperty('factory')
       && model.hasOwnProperty('endpoint')) {
 
-      console.log({
-        model: model.modelName,
-        dependencies: model.dependencies
-      });
-
       const serviceAdapters = makeAdapters(
         model.ports,
         adapters,
@@ -143,8 +138,6 @@ export async function initRemotes(overrides) {
     adapters,
     overrides
   });
-
-  console.log({ ...services, ...overrides});
 
   await initModels(
     {
