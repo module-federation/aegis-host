@@ -3,7 +3,7 @@
 import remoteEntries from '../../webpack/remote-entries';
 
 /**
- * 
+ * @returns {import('../models').ModelSpecification[]}
  */
 export async function importRemoteModels() {
   const importStartTime = Date.now();
@@ -40,24 +40,28 @@ export async function importRemoteServices() {
   console.log("\n%dms to import remote services\n",
     Date.now() - importStartTime);
 
+  if (services.length === 0) return {};
+
   return services.reduce((p, c) => ({ ...c, ...p }));
 }
 
 export async function importRemoteAdapters() {
   const importStartTime = Date.now();
 
-  let useCases = [];
+  let adapters = [];
   for (const entry of remoteEntries) {
     if (entry.type === 'adapter') {
-      const useCase = await entry.importRemote();
-      useCases.push(useCase);
+      const adapter = await entry.importRemote();
+      adapters.push(adapter);
     }
   }
 
   console.log("\n%dms to import remote services\n",
     Date.now() - importStartTime);
 
-  return useCases.reduce((p, c) => ({ ...c, ...p }));
+  if (adapters.length === 0) return {};
+
+  return adapters.reduce((p, c) => ({ ...c, ...p }));
 }
 
 
@@ -79,7 +83,7 @@ export async function importRemoteAdapters() {
 
 // export function findRemoteServices(...services) {
 //   const services = await Promise.all(services.map(async s => {
-//     await loadComponent('servicesRemote', s);
+//     await require('remoteEntry').get('eventService');
 //   }));
 //   return services;
 // }

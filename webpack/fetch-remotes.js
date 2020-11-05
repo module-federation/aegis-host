@@ -1,8 +1,6 @@
 const { URL } = require('url');
 const http = require('http');
 const fs = require('fs');
-const e = require('express');
-const { url } = require('inspector');
 
 /**
  * Download remote container bundles
@@ -31,19 +29,6 @@ module.exports = async (remoteEntry) => {
 
     return entry.path.concat(path);
   }
-
-  // const dedup = Array.from(entries.sort(
-  //   (a, b) => {
-  //     if (a.url === b.url) {
-  //       return 0;
-  //     }
-  //     return a.url > b.url ? 1 : -1;
-  //   }
-  // ).reduce(
-  //   (p, c) => p.url === c.url
-  //     ? { ...c, url: p.path }
-  //     : e
-  // ));
 
   const remotes = await Promise.all(entries.map(async entry => {
     const path = getPath(entry);

@@ -12,16 +12,9 @@ import {
  * @property {Symbol} id
  * @property {Symbol} modelName
  * @property {Symbol} createTime
- * @property {Symbol(function)} onUpdate
+ * @property {Symbol} onUpdate
  * @property {Symbol} onDelete
- */
-
-/**
  * @typedef {import('../models/event').Event} Event
- */
-
-/**
- * 
  * @typedef {Object} ModelFactory
  * @property {function(string,*):Promise<Readonly<Model>>} createModel
  * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
@@ -30,6 +23,42 @@ import {
  * @property {function(string,string):string} getEventName
  * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
  * @property {function(any):string} getModelId
+ * @typedef {Object} Model
+ * @property {Symbol} id 
+ * @property {Symbol} modelName
+ * @property {Symbol} createTime
+ * @property {Symbol} onUpdate
+ * @callback onUpdate
+ * @param {Model} model
+ * @param {Object} changes
+ * @returns {Model | Error} updated model or throw
+ * @callback onDelete
+ * @param {Model} model
+ * @returns {Model | Error} updated model or throw
+ *  @typedef {{
+ *  [x: string]: {
+ *    service: string,
+ *    type?:'inbound'|'outbound',
+ *    disabled?: boolean
+ *    adapter?: string
+ *  }
+ * }} port
+ * @typedef {Object} ModelSpecification Specify model data and behavior 
+ * @property {string} modelName name of model (case-insenstive)
+ * @property {string} endpoint URI reference (e.g. plural of `modelName`)
+ * @property {function(...args): any} factory factory function that creates model
+ * @property {object} dependencies injected into the model for inverted control
+ * @property {Array<import("./mixins").mixinFunction>} [mixins] functional mixins
+ * @property {onUpdate} [onUpdate] function called to handle update requests
+ * @property {onDelete} [onDelete] function called before deletion
+ * @property {port[]} [ports] input/output ports for the domain
+ * @property {Array<function({
+ *  eventName:string,
+ *  eventType:string,
+ *  eventTime:string,
+ *  modelName:string,
+ *  model:Model
+ * }):Promise<void>>} [eventHandlers] callbacks invoked when model events occur 
  */
 
 /**
@@ -53,13 +82,23 @@ const deleteEvent = (model) => ({
   model: model
 });
 
+/**
+ * In a hex arch, ports and adapters control I/O between 
+ * the domain or application core and the outside world. 
+ * This function calls adapter factory functions passing
+ * in their service dependencies. Adapters and/or services 
+ * can be overridden at runtime by remote imports.
+ * @param {port} ports - domain interfaces
+ * @param {{[x:string]:function(*):function(*):any}} adapters - service adapters 
+ * @param {*} services - (micro-)services 
+ */
 function makeAdapters(ports, adapters, services) {
   if (!ports || !adapters || !services) {
     return;
   }
   return Object.keys(ports).map(port => {
     try {
-      if (services[ports[port].service]) {
+      if (services[ports[port].service] && adapters[port]) {
         return {
           [port]: adapters[port](
             services[ports[port].service]
@@ -127,7 +166,7 @@ async function initModels(services, adapters) {
 /**
  * Import remote models, services, and adapters.
  * 
- * @param {*} overrides - override services and adapters
+ * @param {*} overrides - override services or adapters
  */
 export async function initRemotes(overrides) {
   const services = await importRemoteServices();

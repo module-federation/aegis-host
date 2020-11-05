@@ -5,3 +5,4 @@ export function save(service) {
     service.save(model);
   }
 }
+

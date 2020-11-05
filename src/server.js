@@ -41,7 +41,7 @@ const Server = (() => {
 
   function run() {
     const importStartTime = Date.now();
-    const overrides = { listen, notify, Event, save, Persistence };
+    const overrides = { save, Persistence };
 
     initRemotes(overrides).then(() => {
       log('\n%dms to import & register models\n',

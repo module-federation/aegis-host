@@ -9352,14 +9352,17 @@ var moduleMap = {
 	"./orderService": () => {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js"), __webpack_require__.e("src_services_order-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
 	},
+	"./eventService": () => {
+		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_services-prod_event-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services-prod/event-service */ "./src/services-prod/event-service.js")));
+	},
 	"./paymentService": () => {
-		return __webpack_require__.e("src_services_real-payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/real-payment-service */ "./src/services/real-payment-service.js")));
+		return __webpack_require__.e("src_services-prod_payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services-prod/payment-service */ "./src/services-prod/payment-service.js")));
 	},
 	"./shippingService": () => {
-		return __webpack_require__.e("src_services_real-shipping-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/real-shipping-service */ "./src/services/real-shipping-service.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_services-prod_shipping-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services-prod/shipping-service */ "./src/services-prod/shipping-service.js")));
 	},
 	"./addressService": () => {
-		return __webpack_require__.e("src_services_real-address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/real-address-service */ "./src/services/real-address-service.js")));
+		return __webpack_require__.e("src_services-prod_address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services-prod/address-service */ "./src/services-prod/address-service.js")));
 	}
 };
 var get = (module) => {
@@ -9426,6 +9429,19 @@ module.exports = require("domain");
 
 /***/ }),
 
+/***/ "events":
+/*!*************************!*\
+  !*** external "events" ***!
+  \*************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("events");
+
+/***/ }),
+
 /***/ "fs":
 /*!*********************!*\
   !*** external "fs" ***!
@@ -9488,6 +9504,19 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("stream");
+
+/***/ }),
+
+/***/ "tls":
+/*!**********************!*\
+  !*** external "tls" ***!
+  \**********************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("tls");
 
 /***/ }),
 
@@ -9562,7 +9591,7 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -9813,7 +9842,7 @@ module.exports = require("zlib");
 /******/ 			"src_services_order-service_js": [
 /******/ 				"webpack/sharing/consume/default/axios/axios"
 /******/ 			],
-/******/ 			"src_services_real-address-service_js": [
+/******/ 			"src_services-prod_address-service_js": [
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			]
 /******/ 		};
