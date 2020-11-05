@@ -14,7 +14,9 @@ import {
  * @property {Symbol} createTime
  * @property {Symbol} onUpdate
  * @property {Symbol} onDelete
+ * 
  * @typedef {import('../models/event').Event} Event
+ * 
  * @typedef {Object} ModelFactory
  * @property {function(string,*):Promise<Readonly<Model>>} createModel
  * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
@@ -23,19 +25,17 @@ import {
  * @property {function(string,string):string} getEventName
  * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
  * @property {function(any):string} getModelId
- * @typedef {Object} Model
- * @property {Symbol} id 
- * @property {Symbol} modelName
- * @property {Symbol} createTime
- * @property {Symbol} onUpdate
+ * 
  * @callback onUpdate
  * @param {Model} model
  * @param {Object} changes
  * @returns {Model | Error} updated model or throw
+ * 
  * @callback onDelete
  * @param {Model} model
  * @returns {Model | Error} updated model or throw
- *  @typedef {{
+ * 
+ * @typedef {{
  *  [x: string]: {
  *    service: string,
  *    type?:'inbound'|'outbound',
@@ -43,6 +43,7 @@ import {
  *    adapter?: string
  *  }
  * }} port
+ * 
  * @typedef {Object} ModelSpecification Specify model data and behavior 
  * @property {string} modelName name of model (case-insenstive)
  * @property {string} endpoint URI reference (e.g. plural of `modelName`)
@@ -84,10 +85,11 @@ const deleteEvent = (model) => ({
 
 /**
  * In a hex arch, ports and adapters control I/O between 
- * the domain or application core and the outside world. 
+ * the application core (domain) and the outside world. 
  * This function calls adapter factory functions passing
- * in their service dependencies. Adapters and/or services 
- * can be overridden at runtime by remote imports.
+ * in their service dependencies. Using module federation,
+ * adapters and services are overridden at runtime to rewire
+ * ports to the actual service entry points.
  * @param {port} ports - domain interfaces
  * @param {{[x:string]:function(*):function(*):any}} adapters - service adapters 
  * @param {*} services - (micro-)services 
@@ -111,10 +113,16 @@ function makeAdapters(ports, adapters, services) {
   }).reduce((p, c) => ({ ...c, ...p }));
 }
 
+/**
+ * Import remote models and override existing service adapters
+ * with those passed into the function by the remotes config.
+ * @param {*} services - services on which the model depends
+ * @param {*} adapters - adapters for talking to the services
+ */
 async function initModels(services, adapters) {
   const models = await importRemoteModels();
 
-  console.log('\nmodels');
+  console.log('models');
   console.log(models);
 
   Object.values(models).forEach(model => {

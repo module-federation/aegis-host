@@ -80,7 +80,15 @@ export async function importRemoteAdapters() {
 //     return Module;
 //   };
 // }
+// (async () => {
+//   __webpack_public_path__ = 'http://localhost:8060/'
+//   const factory = await __webpack_require__('http://localhost:8060/remoteEntry.js')//.get('service1');
+//   //const factory = await require('webpack/container/entry/service1').get('service1');
 
+//   const Module = factory();
+//   __webpack_public_path__ = "http://localhost:8070/"
+//   console.log(Module);
+// })();
 // export function findRemoteServices(...services) {
 //   const services = await Promise.all(services.map(async s => {
 //     await require('remoteEntry').get('eventService');

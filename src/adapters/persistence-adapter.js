@@ -6,3 +6,8 @@ export function save(service) {
   }
 }
 
+export function find(service) {
+  return async function ({ model }) {
+    service.find(model);
+  }
+}
