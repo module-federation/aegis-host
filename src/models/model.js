@@ -47,7 +47,11 @@ const Model = (() => {
       return;
     }
     return Object.keys(ports).map(function (port) {
-      if (port.disabled) {
+      if (port.disabled || !adapters[port]) {
+        console.warn(
+          'warning: port disabled or adapter missing: %s',
+          port
+        );
         return;
       }
       return {
@@ -62,8 +66,8 @@ const Model = (() => {
   }
 
   /**
-   * Call factory with user input & 
-   * mixin pipeline to create model
+   * Call factory with user input, generate port functions 
+   * and run functional mixin pipeline to create model
    * @lends Model
    * @namespace
    * @class
@@ -83,10 +87,10 @@ const Model = (() => {
     // Call factory
     factory(...args)
   ).then(model => ({
+    // Create ports for domain I/O 
+    ...makePorts.call(model, ports, dependencies),
     // Optional mixins
     ...compose(...mixins)(model),
-    // Domain I/O 
-    ...makePorts.call(model, ports, dependencies),
     // Immutable props...
     [ONUPDATE](changes) {
       return onUpdate(this, changes);

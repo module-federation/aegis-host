@@ -64,34 +64,3 @@ export async function importRemoteAdapters() {
   return adapters.reduce((p, c) => ({ ...c, ...p }));
 }
 
-
-// function loadComponent(scope, module) {
-//   return async () => {
-//     // Initializes the share scope. This fills it with known provided modules from this build and all remotes
-//     await __webpack_init_sharing__("default");
-//     const container = global[scope]; // or get the container somewhere else
-//     // Initialize the container, it may provide shared modules
-//     await container.init(__webpack_share_scopes__.default);
-//     console.log(container);
-//     const factory = await container.get(module);
-//     console.log(factory);
-//     const Module = factory();
-//     console.log(Module);
-//     return Module;
-//   };
-// }
-// (async () => {
-//   __webpack_public_path__ = 'http://localhost:8060/'
-//   const factory = await __webpack_require__('http://localhost:8060/remoteEntry.js')//.get('service1');
-//   //const factory = await require('webpack/container/entry/service1').get('service1');
-
-//   const Module = factory();
-//   __webpack_public_path__ = "http://localhost:8070/"
-//   console.log(Module);
-// })();
-// export function findRemoteServices(...services) {
-//   const services = await Promise.all(services.map(async s => {
-//     await require('remoteEntry').get('eventService');
-//   }));
-//   return services;
-// }

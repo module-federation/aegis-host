@@ -5,7 +5,7 @@ import {
   importRemoteModels,
   importRemoteServices,
   importRemoteAdapters
-} from '../services/import-remotes';
+} from '../services/federation-service';
 
 /**
  * @typedef {Object} Model

@@ -16,7 +16,7 @@ import {
 import { initRemotes } from './models';
 import { Persistence } from './services/persistence-service';
 import { save, find } from './adapters/persistence-adapter';
-import callback from './adapters/http-callback';
+import adapter from './adapters/http-adapter';
 import initMiddleware from './middleware';
 import log from './lib/logger';
 
@@ -33,7 +33,7 @@ const Server = (() => {
   function make(path, app, method, controllers) {
     controllers().forEach(ctlr => {
       log(ctlr);
-      app[method](path(ctlr.endpoint), callback(ctlr.fn));
+      app[method](path(ctlr.endpoint), adapter(ctlr.fn));
     });
   }
 

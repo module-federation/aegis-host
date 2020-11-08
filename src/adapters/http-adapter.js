@@ -1,3 +1,5 @@
+'use strict'
+
 export default function buildCallback(controller) {
   return (req, res) => {
     const httpRequest = {
