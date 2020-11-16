@@ -4,6 +4,7 @@ var assert = require('assert');
 
 import Model from '../../src/models/model'
 
+
 describe('Model', function () {
   describe('#create()', function () {
     it('should return new model', async function () {
@@ -17,16 +18,54 @@ describe('Model', function () {
       assert.ok(model)
     });
   });
-  describe('#getId()', function () {
-    it('should return model ID', async function () {
+  describe('#injection()', function () {
+    it('dependency injection should work', async function () {
+      function make(dependencies) {
+        return async (...b) => ({
+          a: 'a',
+          b,
+          injection: dependencies.injection
+        })
+      }
+      const dependencies = {
+        injection() {
+          return this;
+        }
+      }
       const model = await Model.create({
         spec: {
           modelName: 'ABC',
-          factory: (...b) => ({ a: 'a', b }),
+          factory: make(dependencies),
         },
         args: [{ c: 'c' }]
       });
-      assert.ok(Model.getId(model));
+      assert.strictEqual(model, model.injection());
+    });
+  });
+  describe('#port()', function () {
+    it('should generate port and attach to adapter', async function () {
+      function make() {
+        return (...b) => ({ a: 'a', b });
+      }
+      const adapters = {
+        async port({ model: ABC, resolve }) {
+          return resolve(ABC);
+        }
+      }
+      const model = await Model.create({
+        spec: {
+          modelName: 'ABC',
+          factory: make(),
+          ports: {
+            port: {
+              type: 'outbound'
+            }
+          },
+          dependencies: adapters
+        },
+        args: [{ c: 'c' }]
+      });
+      assert.strictEqual(model, await model.port());
     });
   });
   describe('#getName()', function () {
@@ -38,6 +77,7 @@ describe('Model', function () {
         },
         args: [{ b: 'c' }]
       });
+      assert.ok(Model.getId(model));
       assert.strictEqual(Model.getName(model), 'ABC');
     });
   });
@@ -50,11 +90,11 @@ describe('Model', function () {
         },
         args: [{ b: 'c' }]
       });
-      assert.strictEqual(model.a, { a: 'a', b: 'c' }.a);
+      assert.strictEqual(model.a, 'a');
     });
   });
   describe('#b', function () {
-    it('should return model prop', async function () {
+    it('should return model prop with args value', async function () {
       const model = await Model.create({
         spec: {
           modelName: 'ABC',
@@ -62,7 +102,7 @@ describe('Model', function () {
         },
         args: [{ b: 'c' }]
       });
-      assert.strictEqual(model.b, { a: 'a', b: 'c' }.b);
+      assert.strictEqual(model.b, 'c');
     });
   });
   describe('#getKey()', function () {
@@ -86,8 +126,9 @@ describe('Model', function () {
         },
         args: [{ b: 'c' }]
       });
+      assert.strictEqual(model.a, 'a');
       const updated = model[Model.getKey('onUpdate')]({ a: 'b' });
-      assert.strictEqual(updated.a, { a: 'b' }.a);
+      assert.strictEqual(updated.a, 'b');
     });
   });
 });

@@ -9338,31 +9338,34 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 "use strict";
 var moduleMap = {
 	"./service1": () => {
-		return __webpack_require__.e("src_services_service1_js").then(() => () => (__webpack_require__(/*! ./src/services/service1 */ "./src/services/service1.js")));
+		return __webpack_require__.e("src_services-mock_service1_js").then(() => () => (__webpack_require__(/*! ./src/services-mock/service1 */ "./src/services-mock/service1.js")));
 	},
 	"./publish-event": () => {
-		return __webpack_require__.e("src_services_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services/publish-event */ "./src/services/publish-event.js")));
+		return __webpack_require__.e("src_services-mock_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services-mock/publish-event */ "./src/services-mock/publish-event.js")));
 	},
 	"./models": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
 	"./adapters": () => {
-		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_adapters_index_js")]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./orderService": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js"), __webpack_require__.e("src_services_order-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js"), __webpack_require__.e("src_services_order-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
 	},
 	"./eventService": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_services-prod_event-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services-prod/event-service */ "./src/services-prod/event-service.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_services_event-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/event-service */ "./src/services/event-service.js")));
 	},
 	"./paymentService": () => {
-		return __webpack_require__.e("src_services-prod_payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services-prod/payment-service */ "./src/services-prod/payment-service.js")));
+		return __webpack_require__.e("src_services_payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/payment-service */ "./src/services/payment-service.js")));
 	},
 	"./shippingService": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_services-prod_shipping-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services-prod/shipping-service */ "./src/services-prod/shipping-service.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_kafkajs_index_js"), __webpack_require__.e("src_services_shipping-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/shipping-service */ "./src/services/shipping-service.js")));
 	},
 	"./addressService": () => {
-		return __webpack_require__.e("src_services-prod_address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services-prod/address-service */ "./src/services-prod/address-service.js")));
+		return __webpack_require__.e("src_services_address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/address-service */ "./src/services/address-service.js")));
+	},
+	"./inventoryService": () => {
+		return __webpack_require__.e("src_services_inventory-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/inventory-service */ "./src/services/inventory-service.js")));
 	}
 };
 var get = (module) => {
@@ -9842,7 +9845,7 @@ module.exports = require("zlib");
 /******/ 			"src_services_order-service_js": [
 /******/ 				"webpack/sharing/consume/default/axios/axios"
 /******/ 			],
-/******/ 			"src_services-prod_address-service_js": [
+/******/ 			"src_services_address-service_js": [
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			]
 /******/ 		};

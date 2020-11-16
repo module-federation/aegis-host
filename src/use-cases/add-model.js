@@ -21,6 +21,8 @@ export default function addModelFactory({
 
   return async function addModel(input) {
     const model = await models.createModel(modelName, input);
+    console.log(addModel)
+    console.log(model)
     const event = await models.createEvent(eventType, modelName, model);
 
     await Promise.all([
@@ -28,6 +30,7 @@ export default function addModelFactory({
       observer.notify(event.eventName, event)
     ]).catch(async (error) => {
       await repository.delete(models.getModelId(model));
+      console.error(error)
       throw new Error(error);
     });
 

@@ -1,7 +1,6 @@
 'use strict'
 
 /**
- * @typedef {import('../models/order').Order} Order
  * @typedef {string|RegExp} topic
  * @callback eventHandler
  * @param {string} eventData
@@ -27,7 +26,7 @@ const subscriptions = new Map();
  *  id:string,
  *  callback:function(message,Subscription),
  *  topic:topic,
- *  filter:RegExp,
+ *  filter:string|RegExp,
  *  once:boolean,
  *  model:object
  * }} options
@@ -51,6 +50,10 @@ const Subscription = function ({
       return model;
     },
 
+    getSubscriptions() {
+      return [...subscriptions.entries()];
+    },
+
     /**
      * Filter message and invoke callback
      * @param {string} message 
@@ -60,26 +63,25 @@ const Subscription = function ({
         const regex = new RegExp(filter);
 
         if (regex.test(message)) {
-          await callback({ message, subscription: this });
-
           if (once) {
             this.unsubscribe();
           }
+          callback({ message, subscription: this });
         }
         return;
       }
-      await callback({ message, subscription: this });
+      callback({ message, subscription: this });
     }
   }
 }
 
 /**
+ *
  * @type {adapterFactory}
  */
 export function listen(service) {
-
   return async function ({
-    model, parms: [{ topic, callback, filter, once, id }]
+    model, resolve, args: [{ topic, callback, filter, once, id }]
   }) {
     const subscription = Subscription({
       id, topic, callback, filter, once, model
@@ -87,6 +89,7 @@ export function listen(service) {
 
     if (subscriptions.has(topic)) {
       subscriptions.get(topic).set(id, subscription);
+      resolve(subscription);
       return;
     }
 
@@ -96,7 +99,7 @@ export function listen(service) {
         subscription.filter(message);
       });
     });
-    return subscription;
+    resolve(subscription);
   }
 }
 
@@ -105,7 +108,7 @@ export function listen(service) {
  * @returns {function(topic, eventData)}
  */
 export async function notify(service) {
-  return async function ({ parms: [topic, message] }) {
+  return async function ({ topic, message }) {
     service.notify(topic, message);
   }
 }

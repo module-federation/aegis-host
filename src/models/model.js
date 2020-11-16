@@ -6,6 +6,7 @@ import {
 import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
+import { Module } from 'webpack';
 
 /**
  * @namespace
@@ -37,10 +38,12 @@ const Model = (() => {
   })
 
   /**
-   * Generates functions to handle I/O between
-   * the domain and application layers
-   * @param {*} ports - the domain interfaces 
-   * @param {*} adapters - the application adapters 
+   * Generate functions to handle I/O between
+   * the domain and application layers. Each port
+   * is assigned an adapter, which either invokes
+   * the port (outbound) or is invoked by it (inbound).
+   * @param {Module} ports - the domain interfaces 
+   * @param {Module} adapters - the application adapters 
    */
   function makePorts(ports, adapters) {
     if (!ports || !adapters) {
@@ -56,9 +59,15 @@ const Model = (() => {
       }
       return {
         async [port](...args) {
-          return adapters[port]({
-            model: this,
-            parms: args
+          const self = this;
+          return new Promise(async function (resolve, reject) {
+            try {
+              return await adapters[port]({
+                model: self, resolve, args
+              });
+            } catch (error) {
+              reject(error);
+            }
           });
         }
       }
