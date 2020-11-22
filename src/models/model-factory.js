@@ -127,7 +127,10 @@ const ModelFactory = {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
     if (spec) {
-      return Model.create({ spec, args });
+      return Model.create({
+        spec,
+        args
+      });
     }
     throw new Error('unregistered model');
   },
@@ -210,7 +213,6 @@ const ModelFactory = {
 Object.freeze(modelFactories);
 Object.freeze(eventFactories);
 Object.freeze(ModelFactory);
+Object.freeze(EventTypes);
 
 export default ModelFactory;
-
-

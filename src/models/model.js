@@ -6,7 +6,9 @@ import {
 import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
-import { Module } from 'webpack';
+import {
+  Module
+} from 'webpack';
 
 /**
  * @namespace
@@ -50,21 +52,26 @@ const Model = (() => {
       return;
     }
     return Object.keys(ports).map(function (port) {
+      const disabled = ports[port].disabled || !adapters[port];
+      if (disabled) {
+        console.warn(
+          'warning: port disabled or adapter missing: %s',
+          port
+        );
+      }
       return {
         async [port](...args) {
           const self = this;
           return new Promise(async function (resolve, reject) {
-            if (port.disabled || !adapters[port]) {
-              console.warn(
-                'warning: port disabled or adapter missing: %s',
-                port
-              );
+            if (disabled) {
               resolve(self);
               return;
             }
             try {
               return await adapters[port]({
-                model: self, resolve, args
+                model: self,
+                resolve,
+                args
               });
             } catch (error) {
               reject(error);
@@ -72,12 +79,15 @@ const Model = (() => {
           });
         }
       }
-    }).reduce((p, c) => ({ ...c, ...p }));
+    }).reduce((p, c) => ({
+      ...c,
+      ...p
+    }));
   }
 
   /**
    * Call factory with user input, generate port functions 
-   * and run functional mixin pipeline to create model
+   * and compose functional mixins to create model.
    * @lends Model
    * @namespace
    * @class
@@ -186,4 +196,3 @@ const Model = (() => {
 })();
 
 export default Model;
-

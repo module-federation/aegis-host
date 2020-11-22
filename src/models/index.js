@@ -73,9 +73,14 @@ const createEvent = (model) => ({
 /**
  * @param {{updated:Model,changes:Object}} param0
  */
-const updateEvent = ({ updated, changes }) => ({
+const updateEvent = ({
+  updated,
+  changes
+}) => ({
   model: updated,
-  changes: { ...changes },
+  changes: {
+    ...changes
+  }
 });
 
 const deleteEvent = (model) => ({
@@ -86,10 +91,10 @@ const deleteEvent = (model) => ({
 /**
  * In a hex arch, ports and adapters control I/O between 
  * the application core (domain) and the outside world. 
- * This function calls adapter factory functions passing
- * in their service dependencies. Using module federation,
+ * This function calls adapter factory functions, injecting
+ * any service dependencies. Using module federation,
  * adapters and services are overridden at runtime to rewire
- * ports to the actual service entry points.
+ * ports to their actual service entry points.
  * @param {port} ports - domain interfaces
  * @param {{[x:string]:function(*):function(*):any}} adapters 
  * - service adapters 
@@ -101,7 +106,7 @@ function makeAdapters(ports, adapters, services) {
   }
   return Object.keys(ports).map(port => {
     try {
-      if (adapters[port] && !port.disabled) {
+      if (adapters[port] && !ports[port].disabled) {
         return {
           [port]: adapters[port](services[ports[port].service])
         }
@@ -109,25 +114,27 @@ function makeAdapters(ports, adapters, services) {
     } catch (e) {
       console.warn(e.message);
     }
-  }).reduce((p, c) => ({ ...c, ...p }));
+  }).reduce((p, c) => ({
+    ...c,
+    ...p
+  }));
 }
 
 /**
- * Import remote models and override existing service adapters
- * with those passed into the function by the remotes config.
+ * Imports remote models and overrides their service adapters
+ * with those specified by the host config.
  * @param {*} services - services on which the model depends
  * @param {*} adapters - adapters for talking to the services
  */
 async function initModels(services, adapters) {
   const models = await importRemoteModels();
 
-  console.log('models');
-  console.log(models);
+  console.log('models', models);
 
   Object.values(models).forEach(model => {
-    if (model.hasOwnProperty('modelName')
-      && model.hasOwnProperty('factory')
-      && model.hasOwnProperty('endpoint')) {
+    if (model.hasOwnProperty('modelName') &&
+      model.hasOwnProperty('factory') &&
+      model.hasOwnProperty('endpoint')) {
 
       const serviceAdapters = makeAdapters(
         model.ports,
@@ -185,16 +192,13 @@ export async function initRemotes(overrides) {
     overrides
   });
 
-  await initModels(
-    {
-      ...services,
-      ...overrides,
-    },
-    {
-      ...adapters,
-      ...overrides
-    }
-  );
+  await initModels({
+    ...services,
+    ...overrides,
+  }, {
+    ...adapters,
+    ...overrides
+  });
 }
 
 export default ModelFactory
