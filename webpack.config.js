@@ -14,7 +14,7 @@ module.exports = () => {
         output: {
           publicPath: 'http://localhost:8070',
           path: path.resolve(__dirname, 'dist'),
-          libraryTarget: 'commonjs',
+          libraryTarget: 'commonjs2',
         },
         resolve: {
           extensions: ['.js'],

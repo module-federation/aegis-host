@@ -8,21 +8,20 @@
   },
   "scripts": {
     "build": "npm run clean && webpack --config webpack.config.js",
-    "start": "node dist/main.js",
+    "start": "node -r dotenv/config dist/main.js",
+    "dev-start": "nodemon --watch src --exec npm restart",
     "restart": "npm run build && npm run start",
-    "compile": "babel src -d dist",
+    "transpile": "babel src -d dist",
     "test": "mocha --recursive -r esm",
     "demo": "open http://localhost:8070",
-    "clean": "rm -rf dist",
-    "event": "node src/lib/kafka-producer.js"
+    "clean": "rm -rf dist"
   },
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "kafkajs": "^1.14.0"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -31,11 +30,10 @@
     "@babel/polyfill": "^7.11.5",
     "@babel/preset-env": "^7.11.0",
     "babel-loader": "^8.1.0",
-    "enhanced-resolve": "^5.3.1",
     "esm": "^3.2.25",
     "express-cli": "0.0.1",
     "mocha": "^8.2.0",
-    "pnpapi": "0.0.0",
+    "nodemon": "^2.0.6",
     "webpack": "^5.4.0",
     "webpack-cli": "^3.3.12"
   }

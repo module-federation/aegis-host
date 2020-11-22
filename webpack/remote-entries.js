@@ -69,5 +69,5 @@ module.exports = [
       const services = await import('orderService/inventoryService');
       return services;
     }
-  },
+  }
 ]

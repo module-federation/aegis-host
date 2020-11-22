@@ -1,3 +1,4 @@
+'use strict'
 
 import DataSource from '../datasources';
 import Model from '../models/model';

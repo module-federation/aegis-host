@@ -7,13 +7,13 @@ const kafka = new Kafka({
   brokers: ['localhost:9092']
 })
 
-const consumer = kafka.consumer({ groupId: 'test-group' });
+const groupId = process.env.KAFKA_GROUP_ID;
+const consumer = kafka.consumer({ groupId });
 const producer = kafka.producer();
 
 export const Event = {
 
   async listen(topic, callback) {
-    console.log('listen: topic: %s, callback: %s', topic, callback);
     try {
       await consumer.connect();
       await consumer.subscribe({ topic: topic, fromBeginning: true });

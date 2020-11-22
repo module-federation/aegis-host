@@ -33,13 +33,13 @@ export default function editModelFactory({
       eventType, modelName, { updated, changes }
     );
 
-    await Promise.all([
-      repository.save(id, updated),
-      observer.notify(event.eventName, event)
-    ]).catch(async (error) => {
+    try {
+      await repository.save(id, updated);
+      await observer.notify(event.eventName, event);
+    } catch (error) {
       await repository.save(id, model);
       throw new Error(error);
-    });
+    }
 
     return updated;
   }

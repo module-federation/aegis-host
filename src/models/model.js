@@ -41,7 +41,7 @@ const Model = (() => {
    * Generate functions to handle I/O between
    * the domain and application layers. Each port
    * is assigned an adapter, which either invokes
-   * the port (outbound) or is invoked by it (inbound).
+   * the port (inbound) or is invoked by it (outbound).
    * @param {Module} ports - the domain interfaces 
    * @param {Module} adapters - the application adapters 
    */
@@ -50,17 +50,18 @@ const Model = (() => {
       return;
     }
     return Object.keys(ports).map(function (port) {
-      if (port.disabled || !adapters[port]) {
-        console.warn(
-          'warning: port disabled or adapter missing: %s',
-          port
-        );
-        return;
-      }
       return {
         async [port](...args) {
           const self = this;
           return new Promise(async function (resolve, reject) {
+            if (port.disabled || !adapters[port]) {
+              console.warn(
+                'warning: port disabled or adapter missing: %s',
+                port
+              );
+              resolve(self);
+              return;
+            }
             try {
               return await adapters[port]({
                 model: self, resolve, args

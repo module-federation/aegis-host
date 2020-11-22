@@ -3,8 +3,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
-require('dotenv').config();
-
 import {
   postModels,
   patchModels,

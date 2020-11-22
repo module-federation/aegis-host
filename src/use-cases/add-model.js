@@ -1,19 +1,23 @@
-import log from '../lib/logger';
+'use strict'
 
 /**
- * @typedef {Object} dependencies
- * @property {String} modelName 
- * @property {import('../models/index').ModelFactory} models
- * @property {import('../datasources/datasource').default} repository 
- * @property {import('../lib/observer').Observer} observer
- * @property {...Function} handlers
+ * @typedef {Object} dependencies injected dependencies
+ * @property {String} modelName - name of the domain model
+ * @property {import('../models/index').ModelFactory} models - model factory
+ * @property {import('../datasources/datasource').default} repository - persistence service
+ * @property {import('../lib/observer').Observer} observer - application events, propagated to domain
+ * @property {...Function} handlers - event handlers can be registered by the domain
  */
 
 /**
  * @param {dependencies} param0 
  */
 export default function addModelFactory({
-  modelName, models, repository, observer, handlers = []
+  modelName,
+  models,
+  repository,
+  observer,
+  handlers = []
 } = {}) {
   const eventType = models.EventTypes.CREATE;
   const eventName = models.getEventName(eventType, modelName);
@@ -21,18 +25,15 @@ export default function addModelFactory({
 
   return async function addModel(input) {
     const model = await models.createModel(modelName, input);
-    console.log(addModel)
-    console.log(model)
     const event = await models.createEvent(eventType, modelName, model);
 
-    await Promise.all([
-      repository.save(models.getModelId(model), model),
-      observer.notify(event.eventName, event)
-    ]).catch(async (error) => {
+    try {
+      await repository.save(models.getModelId(model), model);
+      await observer.notify(event.eventName, event);
+    } catch (error) {
       await repository.delete(models.getModelId(model));
-      console.error(error)
       throw new Error(error);
-    });
+    }
 
     return model;
   }

@@ -126,7 +126,6 @@ const ModelFactory = {
   createModel: async (modelName, ...args) => {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
-    console.log(ModelFactory.createModel)
     if (spec) {
       return Model.create({ spec, args });
     }
@@ -146,10 +145,10 @@ const ModelFactory = {
 
     if (eventFactories[eventType].has(modelName)) {
       return Event.create({
+        args,
         eventType,
         modelName,
         factory: eventFactories[eventType].get(modelName),
-        args
       });
     }
     throw new Error('unregistered model event');

@@ -91,20 +91,19 @@ const deleteEvent = (model) => ({
  * adapters and services are overridden at runtime to rewire
  * ports to the actual service entry points.
  * @param {port} ports - domain interfaces
- * @param {{[x:string]:function(*):function(*):any}} adapters - service adapters 
+ * @param {{[x:string]:function(*):function(*):any}} adapters 
+ * - service adapters 
  * @param {*} services - (micro-)services 
  */
 function makeAdapters(ports, adapters, services) {
-  if (!ports || !adapters || !services) {
+  if (!ports || !adapters) {
     return;
   }
   return Object.keys(ports).map(port => {
     try {
-      if (services[ports[port].service] && adapters[port]) {
+      if (adapters[port] && !port.disabled) {
         return {
-          [port]: adapters[port](
-            services[ports[port].service]
-          )
+          [port]: adapters[port](services[ports[port].service])
         }
       }
     } catch (e) {
