@@ -15,9 +15,9 @@
  */
 
 /**
- * @type {Map<any,Map<string,*>>}
+ * @type {WeakMap<any,WeakMap<string,*>>}
  */
-const subscriptions = new Map();
+const subscriptions = new WeakMap();
 
 /**
  * @typedef {{
@@ -87,7 +87,9 @@ const Subscription = function ({
  * @type {adapterFactory}
  */
 export function listen(service) {
-  /**@param {adapterArgs} options */
+  /**
+   * @param {adapterArgs} options 
+   */
   return async function (options) {
     const subscription = Subscription(options);
 
@@ -102,7 +104,7 @@ export function listen(service) {
       return;
     }
 
-    subscriptions.set(topic, new Map().set(id, subscription));
+    subscriptions.set(topic, new WeakMap().set(id, subscription));
 
     service.listen(topic, async function ({ topic, message }) {
       subscriptions.get(topic).forEach(function (subscription) {

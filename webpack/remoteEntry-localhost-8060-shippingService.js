@@ -31725,10 +31725,10 @@ var moduleMap = {
 		return __webpack_require__.e("src_services-mock_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services-mock/publish-event */ "./src/services-mock/publish-event.js")));
 	},
 	"./models": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_express_index_js"), __webpack_require__.e("src_adapters_index_js-node_modules_express_lib_sync_recursive"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
 	"./adapters": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_express_index_js"), __webpack_require__.e("src_adapters_index_js-node_modules_express_lib_sync_recursive")]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./orderService": () => {
 		return Promise.all([__webpack_require__.e("vendors-node_modules_express_index_js"), __webpack_require__.e("src_services_order-service_js-node_modules_express_lib_sync_recursive")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
@@ -32304,7 +32304,7 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 		// no consumes in initial chunks
 /******/ 		var chunkMapping = {
-/******/ 			"src_adapters_index_js-node_modules_express_lib_sync_recursive": [
+/******/ 			"src_adapters_index_js": [
 /******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
 /******/ 			],
 /******/ 			"src_services_order-service_js-node_modules_express_lib_sync_recursive": [
