@@ -9,6 +9,7 @@ import makePorts from './make-ports';
 import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
+import ObserverFactory from '../lib/observer';
 
 /**
  * @namespace
@@ -39,6 +40,8 @@ const Model = (() => {
     ...withTimestamp('deleteTime')(model)
   })
 
+  const observer = ObserverFactory.getInstance();
+
   /**
    * Call factory with user input, generate port functions 
    * and compose functional mixins to create model.
@@ -62,7 +65,12 @@ const Model = (() => {
     factory(...args)
   ).then(model => ({
     // Create ports for domain I/O 
-    ...makePorts.call(model, ports, dependencies),
+    ...makePorts.call(
+      model,
+      ports,
+      dependencies,
+      observer
+    ),
     // Optional mixins
     ...compose(...mixins)(model),
     // Immutable props...

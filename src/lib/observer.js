@@ -53,7 +53,7 @@ class ObserverImpl extends Observer {
    * 
    */
   on(eventName, handler) {
-    if (eventName && typeof handler !== 'function') {
+    if (!eventName || typeof handler !== 'function') {
       throw new Error('eventName or handler invalid');
     }
     if (this._handlers.has(eventName)) {
@@ -69,7 +69,7 @@ class ObserverImpl extends Observer {
   async notify(eventName, eventData) {
     if (this._handlers.has(eventName)) {
       await Promise.all(this._handlers.get(eventName).map(
-        async handler => await handler(eventData)
+        handler => handler(eventData)
       ));
       if (eventName !== '*') {
         await this.notify('*', eventData);
@@ -87,7 +87,7 @@ const ObserverFactory = (() => {
   let instance;
 
   function createInstance() {
-    return new ObserverImpl(new Map());
+    return new ObserverImpl(new WeakMap());
   }
 
   return Object.freeze({

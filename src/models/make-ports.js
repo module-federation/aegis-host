@@ -1,5 +1,7 @@
 'use strict'
 
+import Event from './event';
+
 /**
  * Generate functions to handle I/O between
  * the domain and application layers. Each port
@@ -10,8 +12,9 @@
  * 
  * @param {object} ports - object containing domain interfaces 
  * @param {object} adapters - object containing application adapters 
+ * @param {import('../lib/observer').Observer} observer
  */
-export default function makePorts(ports, adapters) {
+export default function makePorts(ports, adapters, observer) {
   if (!ports || !adapters) {
     console.warn('no ports or adapters configured')
     return;
@@ -20,18 +23,23 @@ export default function makePorts(ports, adapters) {
     const disabled = ports[port].disabled || !adapters[port];
 
     if (disabled) {
-      console.warn(
-        'warning: port disabled or adapter missing: %s',
-        port
-      );
+      console.warn('warning: port disabled or adapter missing: %s', port);
+    } else {
+      // listen for the triggering event to invoke this port
+      observer.on(, function (model) {
+        console.log('handling event...', port, model);
+        // Invoke this port and pass a callack if one is specified
+        model[port](ports[port].callback);
+      });
     }
+
     return {
 
       // The port function
       async [port](...args) {
         const self = this;
 
-        // Return a promise for the adapter or domain to resolve
+        // Return a promise 
         return new Promise(async function (resolve, reject) {
 
           // If the port is disabled, resolve and return
@@ -40,13 +48,12 @@ export default function makePorts(ports, adapters) {
             return;
           }
 
-          // Set an appropriate timeout for the interface 
+          // Set an appropriate timeout for the port 
           const timeout = ports[port].timeout || 60000;
 
           let timerId;
           if (timeout > 0) {
             timerId = setTimeout(function () {
-              resolve(self);
               console.error('port operation timed out: %s', port);
 
               // Call the port's timeout handler if one is specified
@@ -61,31 +68,16 @@ export default function makePorts(ports, adapters) {
           }
 
           try {
-            // If true, the adapter resolves, otherwise domain callback does
-            const resolvePromise = ports[port].resolvePromise;
-            const delegateCallback = ports[port].delegateCallback;
+            // Don't block the caller while we wait
+            resolve(self);
 
-            // Call the adapter and pass it`resolve`
-            // so it can decide when we are done.
-            const promise = adapters[port]({
-              delegateCallback,
-              resolvePromise,
-              model: self,
-              resolve: () => console.log('resolve'),
-              reject,
-              args
-            });
-
-            if (resolvePromise) {
-              console.log('resolving...', port);
-              resolve(self);
-            } else {
-              console.log('awaiting...', port);
-              await promise;
-              resolve(self);
-            }
+            // Call the adapter and wait
+            await adapters[port]({ model: self, args });
 
             clearTimeout(timerId);
+
+            // Signal the next task to run 
+            observer.notify(ports[port].producesEvent, self);
 
           } catch (error) {
             reject(error);
