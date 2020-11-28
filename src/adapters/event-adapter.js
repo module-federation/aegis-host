@@ -94,14 +94,12 @@ export function listen(service) {
     const subscription = Subscription(options);
 
     const {
-      resolve,
       args: [{ topic, id }],
     } = options;
 
     if (subscriptions.has(topic)) {
       subscriptions.get(topic).set(id, subscription);
-      resolve(subscription);
-      return;
+      return subscription;
     }
 
     subscriptions.set(topic, new WeakMap().set(id, subscription));
@@ -111,7 +109,7 @@ export function listen(service) {
         subscription.filter(message);
       });
     });
-    resolve(subscription);
+    return subscription;
   };
 }
 

@@ -48,8 +48,8 @@ describe('Model', function () {
         return (...b) => ({ a: 'a', b });
       }
       const adapters = {
-        async port({ model: ABC, resolve }) {
-          return resolve(ABC);
+        async port({ model: ABC }) {
+          return ABC;
         }
       }
       const model = await Model.create({
