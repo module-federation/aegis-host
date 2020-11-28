@@ -1,7 +1,5 @@
 'use strict'
 
-import Event from './event';
-
 /**
  * Generate functions to handle I/O between
  * the domain and application layers. Each port
@@ -25,12 +23,18 @@ export default function makePorts(ports, adapters, observer) {
     if (disabled) {
       console.warn('warning: port disabled or adapter missing: %s', port);
     } else {
-      // listen for the triggering event to invoke this port
-      observer.on(, function (model) {
-        console.log('handling event...', port, model);
-        // Invoke this port and pass a callack if one is specified
-        model[port](ports[port].callback);
-      });
+      const eventName = ports[port].consumesEvent;
+      const callback = ports[port].callback;
+
+      if (eventName) {
+        // listen for the triggering event to invoke this port
+        observer.on(eventName, async function (model) {
+          console.log('handling event...', eventName);
+
+          // Invoke this port and pass a callack if one is specified
+          await model[port](callback);
+        });
+      }
     }
 
     return {

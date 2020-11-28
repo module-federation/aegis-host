@@ -1,13 +1,13 @@
 'use strict'
 
 export function save(service) {
-  return async function ({ model, resolve }) {
-    service.save(model).then(model => resolve(model));
+  return async function ({ model }) {
+    return service.save(model);
   }
 }
 
 export function find(service) {
-  return async function ({ model, resolve }) {
-    service.find(model).then(model => resolve(model));
+  return async function ({ model }) {
+    return service.find(model);
   }
 }

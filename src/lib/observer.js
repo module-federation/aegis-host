@@ -87,7 +87,7 @@ const ObserverFactory = (() => {
   let instance;
 
   function createInstance() {
-    return new ObserverImpl(new WeakMap());
+    return new ObserverImpl(new Map());
   }
 
   return Object.freeze({
