@@ -1,14 +1,15 @@
+'use strict'
+
 import {
   withId,
   withTimestamp,
   withSymbolsInJSON
 } from './mixins';
+import makePorts from './make-ports';
 import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
-import {
-  Module
-} from 'webpack';
+import ObserverFactory from '../lib/observer';
 
 /**
  * @namespace
@@ -39,51 +40,7 @@ const Model = (() => {
     ...withTimestamp('deleteTime')(model)
   })
 
-  /**
-   * Generate functions to handle I/O between
-   * the domain and application layers. Each port
-   * is assigned an adapter, which either invokes
-   * the port (inbound) or is invoked by it (outbound).
-   * @param {Module} ports - the domain interfaces 
-   * @param {Module} adapters - the application adapters 
-   */
-  function makePorts(ports, adapters) {
-    if (!ports || !adapters) {
-      return;
-    }
-    return Object.keys(ports).map(function (port) {
-      const disabled = ports[port].disabled || !adapters[port];
-      if (disabled) {
-        console.warn(
-          'warning: port disabled or adapter missing: %s',
-          port
-        );
-      }
-      return {
-        async [port](...args) {
-          const self = this;
-          return new Promise(async function (resolve, reject) {
-            if (disabled) {
-              resolve(self);
-              return;
-            }
-            try {
-              return await adapters[port]({
-                model: self,
-                resolve,
-                args
-              });
-            } catch (error) {
-              reject(error);
-            }
-          });
-        }
-      }
-    }).reduce((p, c) => ({
-      ...c,
-      ...p
-    }));
-  }
+  const observer = ObserverFactory.getInstance();
 
   /**
    * Call factory with user input, generate port functions 
@@ -108,7 +65,12 @@ const Model = (() => {
     factory(...args)
   ).then(model => ({
     // Create ports for domain I/O 
-    ...makePorts.call(model, ports, dependencies),
+    ...makePorts.call(
+      model,
+      ports,
+      dependencies,
+      observer
+    ),
     // Optional mixins
     ...compose(...mixins)(model),
     // Immutable props...

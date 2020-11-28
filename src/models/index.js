@@ -42,7 +42,7 @@ import {
  *    disabled?: boolean
  *    adapter?: string
  *  }
- * }} port
+ * }} port - interface that controls I/O between the application and domain layers
  * 
  * @typedef {Object} ModelSpecification Specify model data and behavior 
  * @property {string} modelName name of model (case-insenstive)
@@ -52,7 +52,7 @@ import {
  * @property {Array<import("./mixins").mixinFunction>} [mixins] functional mixins
  * @property {onUpdate} [onUpdate] function called to handle update requests
  * @property {onDelete} [onDelete] function called before deletion
- * @property {port[]} [ports] input/output ports for the domain
+ * @property {port} [ports] input/output ports for the domain
  * @property {Array<function({
  *  eventName:string,
  *  eventType:string,
@@ -98,9 +98,9 @@ const deleteEvent = (model) => ({
  * @param {port} ports - domain interfaces
  * @param {{[x:string]:function(*):function(*):any}} adapters 
  * - service adapters 
- * @param {*} services - (micro-)services 
+ * @param {*} [services] - (micro-)services 
  */
-function makeAdapters(ports, adapters, services) {
+function makeAdapters(ports, adapters, services = {}) {
   if (!ports || !adapters) {
     return;
   }
