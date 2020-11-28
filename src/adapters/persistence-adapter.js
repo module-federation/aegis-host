@@ -2,12 +2,24 @@
 
 export function save(service) {
   return async function ({ model }) {
-    return service.save(model);
+    try {
+      return await service.save(model);
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
+    }
+
   }
 }
 
 export function find(service) {
   return async function ({ model }) {
-    return service.find(model);
+    try {
+      const updated = await service.find(model);
+      return updated;
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
+    }
   }
 }

@@ -72,16 +72,16 @@ export default function makePorts(ports, adapters, observer) {
           }
 
           try {
-            // Don't block the caller while we wait
-            resolve(self);
-
             // Call the adapter and wait
-            await adapters[port]({ model: self, args });
+            const model = await adapters[port]({ model: self, args });
 
             clearTimeout(timerId);
 
+            // Block the caller while we wait
+            resolve(model);
+
             // Signal the next task to run 
-            observer.notify(ports[port].producesEvent, self);
+            observer.notify(ports[port].producesEvent, model);
 
           } catch (error) {
             reject(error);
