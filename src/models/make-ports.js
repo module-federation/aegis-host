@@ -5,7 +5,11 @@
  * the domain and application layers. Each port
  * is assigned an adapter, which either invokes
  * the port (inbound) or is invoked by it (outbound).
- * Ports can be instrumented for exceptions and timeouts.
+ * Ports can be instrumented for exceptions and timeouts. 
+ * They can also be piped together in a flow control, by 
+ * specifying the output event of one port as the input or 
+ * triggering event of another.
+ * 
  * See the `ModelSpecification` for port configuration options.
  * 
  * @param {object} ports - object containing domain interfaces 
@@ -75,10 +79,11 @@ export default function makePorts(ports, adapters, observer) {
             // Call the adapter and wait
             const model = await adapters[port]({ model: self, args });
 
-            clearTimeout(timerId);
-
-            // Block the caller while we wait
+            // Caller was blocked while we waited
             resolve(model);
+
+            // Stop the timer
+            clearTimeout(timerId);
 
             // Signal the next task to run 
             observer.notify(ports[port].producesEvent, model);
