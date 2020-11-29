@@ -3,9 +3,10 @@
 import {
   withId,
   withTimestamp,
-  withSymbolsInJSON
+  withSymbolsInJSON,
 } from './mixins';
 import makePorts from './make-ports';
+import compensate from './compensate';
 import asyncPipe from '../lib/async-pipe';
 import compose from '../lib/compose';
 import uuid from '../lib/uuid';
@@ -22,6 +23,7 @@ const Model = (() => {
   const CREATETIME = Symbol('createTime');
   const ONUPDATE = Symbol('onUpdate');
   const ONDELETE = Symbol('onDelete');
+  const PORTFLOW = Symbol('portFlow');
 
   const keyMap = {
     id: ID,
@@ -64,13 +66,17 @@ const Model = (() => {
     // Call factory
     factory(...args)
   ).then(model => ({
-    // Create ports for domain I/O 
+    // Trace port flow
+    [PORTFLOW]: [],
+    // Create ports for domain I/O
     ...makePorts.call(
       model,
       ports,
       dependencies,
       observer
     ),
+    // Undo logic
+    ...compensate.call(model, ports),
     // Optional mixins
     ...compose(...mixins)(model),
     // Immutable props...
@@ -154,6 +160,11 @@ const Model = (() => {
      * @returns {string} model's name
      */
     getName: (model) => model[MODELNAME],
+    
+    /**
+     * 
+     */
+    getPortFlow: (model) => model[PORTFLOW],
   }
 })();
 

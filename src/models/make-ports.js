@@ -1,12 +1,14 @@
 'use strict'
 
+import Model from './model';
+
 /**
  * Generate functions to handle I/O between
  * the domain and application layers. Each port
  * is assigned an adapter, which either invokes
  * the port (inbound) or is invoked by it (outbound).
  * Ports can be instrumented for exceptions and timeouts. 
- * They can also be piped together in a flow control, by 
+ * They can also be piped together in a control flow, by 
  * specifying the output event of one port as the input or 
  * triggering event of another.
  * 
@@ -21,6 +23,7 @@ export default function makePorts(ports, adapters, observer) {
     console.warn('no ports or adapters configured')
     return;
   }
+
   return Object.keys(ports).map(function (port) {
     const disabled = ports[port].disabled || !adapters[port];
 
@@ -77,17 +80,20 @@ export default function makePorts(ports, adapters, observer) {
 
           try {
             // Call the adapter and wait
-            const model = await adapters[port]({ model: self, args });
+            const model = await adapters[port]({ model: self, port, args });
 
             // Caller was blocked while we waited
             resolve(model);
+
+            Model.getPortFlow(self).push(port);
 
             // Stop the timer
             clearTimeout(timerId);
 
             // Signal the next task to run 
-            observer.notify(ports[port].producesEvent, model);
-
+            if (self.orderStatus !== 'COMPENSATE') {
+              observer.notify(ports[port].producesEvent, model);
+            }
           } catch (error) {
             reject(error);
             console.error(
