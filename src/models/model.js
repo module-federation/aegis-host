@@ -66,7 +66,7 @@ const Model = (() => {
     // Call factory
     factory(...args)
   ).then(model => ({
-    // Trace port flow
+    // Track port calls
     [PORTFLOW]: [],
     // Create ports for domain I/O
     ...makePorts.call(
@@ -160,9 +160,9 @@ const Model = (() => {
      * @returns {string} model's name
      */
     getName: (model) => model[MODELNAME],
-    
+
     /**
-     * 
+     * History of port invocation
      */
     getPortFlow: (model) => model[PORTFLOW],
   }

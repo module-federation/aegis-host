@@ -3,13 +3,15 @@ import Model from "./model";
 export default function compensate(ports) {
   return {
     async compensate() {
-      this.update({ orderStatus: 'COMPENSATE' });
-      let port = Model.getPortFlow(this).pop();
+      const model = { ...this, undo: true };
+      model.save();
+
+      let port = Model.getPortFlow(model).pop();
       while (port) {
         if (ports[port].undo) {
-          await ports[port].undo(this);
+          await ports[port].undo(model);
         }
-        port = Model.getPortFlow(this).pop();
+        port = Model.getPortFlow(model).pop();
       }
     }
   }

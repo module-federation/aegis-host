@@ -80,18 +80,19 @@ export default function makePorts(ports, adapters, observer) {
 
           try {
             // Call the adapter and wait
-            const model = await adapters[port]({ model: self, port, args });
+            const model = await adapters[port]({ model: self, args });
 
             // Caller was blocked while we waited
             resolve(model);
 
+            // Record each invocation for undo
             Model.getPortFlow(self).push(port);
 
             // Stop the timer
             clearTimeout(timerId);
 
-            // Signal the next task to run 
-            if (self.orderStatus !== 'COMPENSATE') {
+            // Signal the next task to run, unless undo is running 
+            if (!self.undo) {
               observer.notify(ports[port].producesEvent, model);
             }
           } catch (error) {
