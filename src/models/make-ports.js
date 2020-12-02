@@ -108,7 +108,8 @@ export default function makePorts(ports, adapters, observer) {
             if (errorCallback) {
               errorCallback({
                 port,
-                model: self
+                model: self,
+                error: error.message
               });
             }
             throw new Error(error);
