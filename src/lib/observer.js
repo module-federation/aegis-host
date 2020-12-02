@@ -24,7 +24,7 @@ export class Observer {
    * @param {String | RegExp} eventName   
    * @param {eventHandler} handler 
    */
-  on(eventName, handler) {
+  on(eventName, handler, allowMultiple = true) {
     throw new Error('unimplemented abstract method');
   }
   /**
@@ -52,12 +52,14 @@ class ObserverImpl extends Observer {
    * @override
    * 
    */
-  on(eventName, handler) {
+  on(eventName, handler, allowMultiple = true) {
     if (!eventName || typeof handler !== 'function') {
       throw new Error('eventName or handler invalid');
     }
     if (this._handlers.has(eventName)) {
-      this._handlers.get(eventName).push(handler);
+      if (allowMultiple) {
+        this._handlers.get(eventName).push(handler);
+      }
     } else {
       this._handlers.set(eventName, [handler]);
     }

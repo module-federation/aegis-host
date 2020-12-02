@@ -1,5 +1,6 @@
 'use strict'
 
+import uuid from '../lib/uuid';
 import Model from './model';
 
 /**
@@ -40,7 +41,7 @@ export default function makePorts(ports, adapters, observer) {
 
           // Invoke this port and pass a callack if one is specified
           await model[port](callback);
-        });
+        }, false);
       }
     }
 
