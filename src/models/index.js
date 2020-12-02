@@ -26,6 +26,10 @@ import {
  * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
  * @property {function(any):string} getModelId
  * 
+ * 
+ * @typedef {string} service - name of the service object to inject in adapter
+ * @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds
+ * 
  * @callback onUpdate
  * @param {Model} model
  * @param {Object} changes
@@ -37,12 +41,18 @@ import {
  * 
  * @typedef {{
  *  [x: string]: {
- *    service: string,
+ *    service: service,
+ *    timeout?: timeout,
+ *    consumesEvent?:string,
+ *    producesEvent?:string,
+ *    callback?: function({model: Model})
+ *    errorCallback?: function({model: Model, port: string, error:Error}),
+ *    timeoutCallback?: function({model: Model, port: string}),
  *    type?:'inbound'|'outbound',
  *    disabled?: boolean
  *    adapter?: string
  *  }
- * }} port - interface that controls I/O between the application and domain layers
+ * }} port - input/output ports for the domain
  * 
  * @typedef {Object} ModelSpecification Specify model data and behavior 
  * @property {string} modelName name of model (case-insenstive)
@@ -59,7 +69,7 @@ import {
  *  eventTime:string,
  *  modelName:string,
  *  model:Model
- * }):Promise<void>>} [eventHandlers] callbacks invoked when model events occur 
+ * }):Promise<void>>} [eventHandlers] callbacks invoked when CRUD events occur  
  */
 
 /**

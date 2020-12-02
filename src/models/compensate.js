@@ -1,5 +1,10 @@
 import Model from "./model";
 
+/**
+ * Returns an object with a function that replays the sequence 
+ * of port calls in LIFO order executing their undo functions
+ * @param {import('./index').port} ports 
+ */
 export default function compensate(ports) {
   return {
     async compensate() {

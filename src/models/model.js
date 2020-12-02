@@ -50,6 +50,10 @@ const Model = (() => {
    * @lends Model
    * @namespace
    * @class
+   * @param {{
+   *  args: any[], 
+   *  spec: import('./index').ModelSpecification
+   * }}
    */
   const Model = async ({
     args,
@@ -102,20 +106,7 @@ const Model = (() => {
     /**
      * Create a new model instance
      * @param {{
-     *  spec: {
-     *    factory: function(*):any, 
-     *    modelName: String, 
-     *    onUpdate?: function(Model,*):Model,
-     *    onDelete?: function(Model):Model, 
-     *    mixins?: Array<import('./mixins').mixinFunction>
-     *    ports?: {
-     *      [x: string]: {
-     *        service: string,
-     *        type?:'inbound'|'outbound',
-     *        disabled?: boolean
-     *      }
-     *    }
-     *  }, 
+     *  spec: import('./index').ModelSpecification
      *  args: any[]
      * }} modelInfo 
      * @returns {Promise<Readonly<Model>>}

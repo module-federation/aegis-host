@@ -82,7 +82,7 @@ export default function makePorts(ports, adapters, observer) {
             // Call the adapter and wait
             const model = await adapters[port]({ model: self, args });
 
-            // Caller was blocked while we waited
+            // Unblock the caller
             resolve(model);
 
             // Record each invocation for undo
