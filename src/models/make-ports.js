@@ -1,6 +1,5 @@
 'use strict'
 
-import uuid from '../lib/uuid';
 import Model from './model';
 
 /**
@@ -38,9 +37,12 @@ export default function makePorts(ports, adapters, observer) {
         // listen for the triggering event to invoke this port
         observer.on(eventName, async function (model) {
           console.log('handling event...', eventName);
-
-          // Invoke this port and pass a callack if one is specified
-          await model[port](callback);
+          try {
+            // Invoke this port and pass a callack if one is specified
+            await model[port](callback);
+          } catch (error) {
+            throw new Error(error);
+          }
         }, false);
       }
     }
@@ -49,73 +51,64 @@ export default function makePorts(ports, adapters, observer) {
 
       // The port function
       async [port](...args) {
-        const self = this;
+        const self = this
 
-        // Return a promise 
-        return new Promise(async function (resolve, reject) {
+        // If the port is disabled, return
+        if (disabled) {
+          return;
+        }
 
-          // If the port is disabled, resolve and return
-          if (disabled) {
-            resolve(self);
-            return;
-          }
+        // Set an appropriate timeout for the port 
+        const timeout = ports[port].timeout || 60000;
 
-          // Set an appropriate timeout for the port 
-          const timeout = ports[port].timeout || 60000;
+        let timerId;
+        if (timeout > 0) {
+          timerId = setTimeout(function () {
+            console.error('port operation timed out: %s', port);
 
-          let timerId;
-          if (timeout > 0) {
-            timerId = setTimeout(function () {
-              console.error('port operation timed out: %s', port);
-
-              // Call the port's timeout handler if one is specified
-              const timeoutCallback = ports[port].timeoutCallback
-              if (timeoutCallback) {
-                timeoutCallback({
-                  port,
-                  model: self
-                });
-              }
-            }, timeout);
-          }
-
-          try {
-            // Call the adapter and wait
-            const model = await adapters[port]({ model: self, args });
-
-            // Unblock the caller
-            resolve(model);
-
-            // Record each invocation for undo
-            Model.getPortFlow(self).push(port);
-
-            // Stop the timer
-            clearTimeout(timerId);
-
-            // Signal the next task to run, unless undo is running 
-            if (!self.undo) {
-              observer.notify(ports[port].producesEvent, model);
-            }
-          } catch (error) {
-            reject(error);
-            console.error(
-              'port operation exception %s: %s',
-              port,
-              error.message
-            );
-
-            // Call the port's error handler if one is specified
-            const errorCallback = ports[port].errorCallback;
-            if (errorCallback) {
-              errorCallback({
+            // Call the port's timeout handler if one is specified
+            const timeoutCallback = ports[port].timeoutCallback
+            if (timeoutCallback) {
+              timeoutCallback({
                 port,
-                model: self,
-                error: error.message
+                model: self
               });
             }
-            throw new Error(error);
+          }, timeout);
+        }
+
+        try {
+          // Call the adapter and wait
+          const model = await adapters[port]({ model: self, args });
+
+          // Record each invocation for undo
+          Model.getPortFlow(self).push(port);
+
+          // Stop the timer
+          clearTimeout(timerId);
+
+          // Signal the next task to run, unless undo is running 
+          if (!self.undo) {
+            observer.notify(ports[port].producesEvent, model);
           }
-        });
+        } catch (error) {
+          console.error(
+            'port operation exception %s: %s',
+            port,
+            error.message
+          );
+
+          // Call the port's error handler if one is specified
+          const errorCallback = ports[port].errorCallback;
+          if (errorCallback) {
+            errorCallback({
+              port,
+              model: self,
+              error: error.message
+            });
+          }
+          throw new Error(error);
+        }
       }
     }
   }).reduce((p, c) => ({

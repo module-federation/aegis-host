@@ -72,7 +72,7 @@ class ObserverImpl extends Observer {
     if (this._handlers.has(eventName)) {
       await Promise.all(this._handlers.get(eventName).map(
         handler => handler(eventData)
-      ));
+      )).catch(reason => { throw new Error(reason) });
       if (eventName !== '*') {
         await this.notify('*', eventData);
       }
