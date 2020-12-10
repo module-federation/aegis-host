@@ -15,7 +15,7 @@ describe('Model', function () {
         },
         args: [{ c: 'c' }]
       });
-      assert.ok(model)
+      assert.ok(model);
     });
   });
   describe('#injection()', function () {
@@ -36,42 +36,41 @@ describe('Model', function () {
         spec: {
           modelName: 'ABC',
           factory: make(dependencies),
+          dependencies
         },
         args: [{ c: 'c' }]
       });
       assert.strictEqual(model, model.injection());
     });
   });
-  // describe('#port()', function () {
-  //   it('should generate port and attach to adapter', async function () {
-  //     const adapters = {
-  //       async port({ model: ABC }) {
-  //         return ABC;
-  //       }
-  //     }
-      
-  //     function make() {
-  //       return (...b) => ({ a: 'a', b });
-  //     }
-      
-  //     const model = await Model.create({
-  //       spec: {
-  //         modelName: 'ABC',
-  //         factory: make(),
-  //         ports: {
-  //           port: {
-  //             type: 'outbound'
-  //           }
-  //         },
-  //         dependencies: adapters
-  //       },
-  //       args: [{ c: 'c' }]
-  //     });
-  //     model.port
-  //     const p = await model.port();
-  //     assert.strictEqual(model, p);
-  //   });
-  // });
+  describe('#port1()', function () {
+    it('should generate port and attach to adapter', async function () {
+      const adapters = {
+         async port1({ model }) {
+           console.log(model);
+        }
+      }
+
+      function make() {
+        return (...b) => ({ a: 'a', b });
+      }
+
+      const model = await Model.create({
+        spec: {
+          modelName: 'ABC',
+          factory: make(),
+          ports: {
+            port1: {
+              type: 'outbound'
+            }
+          },
+          dependencies: {...adapters}
+        },
+        args: [{ c: 'c' }]
+      });
+      assert.ok(model.port1());
+    });
+  });
   describe('#getName()', function () {
     it('should return model name', async function () {
       const model = await Model.create({

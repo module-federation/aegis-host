@@ -8,7 +8,7 @@ import Model from './model';
  * is assigned an adapter, which either invokes
  * the port (inbound) or is invoked by it (outbound).
  * Ports can be instrumented for exceptions and timeouts. 
- * They can also be piped together in a control flow, by 
+ * They can also be piped together in a control flow by 
  * specifying the output event of one port as the input or 
  * triggering event of another.
  * 
