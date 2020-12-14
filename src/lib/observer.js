@@ -1,10 +1,11 @@
 /**
  * @typedef {import('../models/event').Event} Event
+ * @typedef {import('../models').Model} Model
  */
 
 /**
  * @callback eventHandler
- * @param {Event} event
+ * @param {Event | Model | *} eventData
  */
 
 /**
@@ -12,8 +13,8 @@
  */
 export class Observer {
   /**
-   * 
-   * @param {Map<string, eventHandler[]>} eventHandlers 
+   *
+   * @param {Map<string, eventHandler[]>} eventHandlers
    */
   constructor(eventHandlers) {
     this._handlers = eventHandlers;
@@ -21,16 +22,17 @@ export class Observer {
 
   /**
    * Register callback `handler` to fire on event `eventName`
-   * @param {String | RegExp} eventName   
-   * @param {eventHandler} handler 
+   * @param {String | RegExp} eventName
+   * @param {eventHandler} handler
+   * @param {boolean} [allowMultiple] - true by default; if false, event handled only once
    */
   on(eventName, handler, allowMultiple = true) {
     throw new Error('unimplemented abstract method');
   }
   /**
-   *  
-   * @param {String} eventName 
-   * @param {Event} eventData 
+   * Fire event `eventName` and pass `eventData` to listeners.
+   * @param {String} eventName
+   * @param {Event} eventData
    */
   async notify(eventName, eventData) {
     throw new Error('unimplemented abstract method');
@@ -38,11 +40,12 @@ export class Observer {
 }
 
 /**
+ * @type {Observer}
  * @extends Observer
  */
 class ObserverImpl extends Observer {
   /**
-   * @override 
+   * @override
    */
   constructor(eventHandlers) {
     super(eventHandlers);
@@ -50,7 +53,7 @@ class ObserverImpl extends Observer {
 
   /**
    * @override
-   * 
+   *
    */
   on(eventName, handler, allowMultiple = true) {
     if (!eventName || typeof handler !== 'function') {
@@ -70,9 +73,11 @@ class ObserverImpl extends Observer {
    */
   async notify(eventName, eventData) {
     if (this._handlers.has(eventName)) {
-      await Promise.all(this._handlers.get(eventName).map(
-        handler => handler(eventData)
-      )).catch(reason => { throw new Error(reason) });
+      await Promise.all(
+        this._handlers.get(eventName).map((handler) => handler(eventData))
+      ).catch((reason) => {
+        throw new Error(reason);
+      });
       if (eventName !== '*') {
         await this.notify('*', eventData);
       }
@@ -101,9 +106,8 @@ const ObserverFactory = (() => {
         instance = createInstance();
       }
       return instance;
-    }
+    },
   });
-
 })();
 
 export default ObserverFactory;

@@ -1,10 +1,6 @@
-'use strict'
+'use strict';
 
-import {
-  withId,
-  withTimestamp,
-  withSymbolsInJSON,
-} from './mixins';
+import { withId, withTimestamp, withSymbolsInJSON } from './mixins';
 import makePorts from './make-ports';
 import compensate from './compensate';
 import asyncPipe from '../lib/async-pipe';
@@ -16,7 +12,6 @@ import ObserverFactory from '../lib/observer';
  * @namespace
  */
 const Model = (() => {
-
   // Render immutable w/ local symbols
   const ID = Symbol('id');
   const MODELNAME = Symbol('modelName');
@@ -30,28 +25,28 @@ const Model = (() => {
     modelName: MODELNAME,
     createTime: CREATETIME,
     onUpdate: ONUPDATE,
-    onDelete: ONDELETE
-  }
+    onDelete: ONDELETE,
+  };
 
   const defUpdate = (model, changes) => ({
     ...model,
-    ...changes
-  })
+    ...changes,
+  });
 
   const defDelete = (model) => ({
-    ...withTimestamp('deleteTime')(model)
-  })
+    ...withTimestamp('deleteTime')(model),
+  });
 
   const observer = ObserverFactory.getInstance();
 
   /**
-   * Call factory with user input, generate port functions 
+   * Call factory with user input, generate port functions
    * and compose functional mixins to create model.
    * @lends Model
    * @namespace
    * @class
    * @param {{
-   *  args: any[], 
+   *  args: any[],
    *  spec: import('./index').ModelSpecification
    * }}
    */
@@ -65,33 +60,29 @@ const Model = (() => {
       dependencies,
       onUpdate = defUpdate,
       onDelete = defDelete,
-    }
-  }) => Promise.resolve(
-    // Call factory
-    factory(...args)
-  ).then(model => ({
-    // Track port calls
-    [PORTFLOW]: [],
-    // Create ports for domain I/O
-    ...makePorts.call(
-      model,
-      ports,
-      dependencies,
-      observer
-    ),
-    // Undo logic
-    ...compensate.call(model, ports),
-    // Optional mixins
-    ...compose(...mixins)(model),
-    // Immutable props...
-    [ONUPDATE](changes) {
-      return onUpdate(this, changes);
     },
-    [ONDELETE]() {
-      return onDelete(this);
-    },
-    [MODELNAME]: modelName
-  }));
+  }) =>
+    Promise.resolve(
+      // Call factory
+      factory(...args)
+    ).then((model) => ({
+      // Track port calls
+      [PORTFLOW]: [],
+      // Create ports for domain I/O
+      ...makePorts.call(model, ports, dependencies, observer),
+      // Undo logic
+      ...compensate.call(model, ports),
+      // Optional mixins
+      ...compose(...mixins)(model),
+      // Immutable props...
+      [ONUPDATE](changes) {
+        return onUpdate(this, changes);
+      },
+      [ONDELETE]() {
+        return onDelete(this);
+      },
+      [MODELNAME]: modelName,
+    }));
 
   // Add common behavior & data
   const makeModel = asyncPipe(
@@ -108,23 +99,23 @@ const Model = (() => {
      * @param {{
      *  spec: import('./index').ModelSpecification
      *  args: any[]
-     * }} modelInfo 
+     * }} modelInfo
      * @returns {Promise<Readonly<Model>>}
      */
     create: async (modelInfo) => makeModel(modelInfo),
 
     /**
-     * Process model update request. 
+     * Process model update request.
      * (Invokes provided `onUpdate` callback.)
      * @param {Model} model - model instance to update
      * @param {Object} changes - Object containing changes
      * @returns {Model} updated model
-     * 
+     *
      */
     update: (model, changes) => model[ONUPDATE](changes),
 
     /**
-     * Process model delete request. 
+     * Process model delete request.
      * (Invokes provided `onDelete` callback.)
      * @param {Model} model
      * @returns {Model}
@@ -133,14 +124,14 @@ const Model = (() => {
 
     /**
      * Get private symbol for `key`
-     * @param {string} key 
+     * @param {string} key
      * @returns {Symbol} unique symbol
      */
     getKey: (key) => keyMap[key],
 
     /**
      * Get model ID
-     * @param {Model} model 
+     * @param {Model} model
      * @returns {string} model's ID
      */
     getId: (model) => model[ID],
@@ -156,7 +147,7 @@ const Model = (() => {
      * History of port invocation
      */
     getPortFlow: (model) => model[PORTFLOW],
-  }
+  };
 })();
 
 export default Model;

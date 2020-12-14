@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /**
  * @callback mixinFunction
@@ -8,12 +8,12 @@
 
 /**
  * @callback functionalMixinFactory
- * @param {*} mixinFunctionParams params for mixin function 
+ * @param {*} mixinFunctionParams params for mixin function
  * @returns {mixinFunction}
  */
 
 /**
- * 
+ *
  */
 export const utc = () => new Date().toUTCString();
 
@@ -22,8 +22,8 @@ export const utc = () => new Date().toUTCString();
  * @param {Function} fnCreateId function that returns unique id
  */
 export const withId = (propName, fnCreateId) => {
-  return (o) => ({ ...o, [propName]: fnCreateId() })
-}
+  return (o) => ({ ...o, [propName]: fnCreateId() });
+};
 
 /**
  * Add a timestamp
@@ -31,36 +31,26 @@ export const withId = (propName, fnCreateId) => {
  * @param {Function} [fnTimestamp] default is UTC
  */
 export const withTimestamp = (propName, fnTimestamp = utc) => {
-  return (o) => ({ ...o, [propName]: fnTimestamp() })
-}
-
+  return (o) => ({ ...o, [propName]: fnTimestamp() });
+};
 
 /**
- * Convert keys from symbols to strings when 
+ * Convert keys from symbols to strings when
  * the object is serialized so the properties
- * can be seen in JSON output   
- * @param {{key: string, value: Symbol}} keyMap 
+ * can be seen in JSON output
+ * @param {{key: string, value: Symbol}} keyMap
  */
 export const withSymbolsInJSON = (keyMap) => (o) => {
   return {
     ...o,
     toJSON() {
       const symbols = Object.keys(keyMap)
-        .map(k => ({ [k]: this[keyMap[k]] }))
-        .reduce((p, c) => ({ ...c, ...p }))
+        .map((k) => ({ [k]: this[keyMap[k]] }))
+        .reduce((p, c) => ({ ...c, ...p }));
       return {
         ...this,
-        ...symbols
-      }
-    }
-  }
-}
-
-
-
-
-
-
-
-
-
+        ...symbols,
+      };
+    },
+  };
+};

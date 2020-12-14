@@ -1,10 +1,10 @@
-'use strict'
+'use strict';
 
 import Model from './model';
 import Event from './event';
 
 /**
- * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType 
+ * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType
  */
 
 /**
@@ -18,7 +18,7 @@ import Event from './event';
  */
 
 /**
- * @typedef {{ 
+ * @typedef {{
  *  modelName: string,
  *  endpoint: string,
  *  factory: function(*):function(*):any,
@@ -84,7 +84,7 @@ const modelFactories = new Map();
 const eventFactories = {
   [EventTypes.CREATE]: new Map(),
   [EventTypes.UPDATE]: new Map(),
-  [EventTypes.DELETE]: new Map()
+  [EventTypes.DELETE]: new Map(),
 };
 
 /**
@@ -129,7 +129,7 @@ const ModelFactory = {
     if (spec) {
       return Model.create({
         spec,
-        args
+        args,
       });
     }
     throw new Error('unregistered model');
@@ -166,7 +166,7 @@ const ModelFactory = {
       if (v.isRemote) {
         models.push({
           modelName: k,
-          ...v
+          ...v,
         });
       }
     }
@@ -203,12 +203,12 @@ const ModelFactory = {
   },
 
   /**
-   * Get `eventName` value 
+   * Get `eventName` value
    */
   getEventName: createEventName,
 
-  EventTypes
-}
+  EventTypes,
+};
 
 Object.freeze(modelFactories);
 Object.freeze(eventFactories);
