@@ -1,23 +1,21 @@
-
 /**
  * Abstraction
  */
 export default class DataSource {
-
-  constructor(dataSource) {
+  constructor({ dataSource }) {
     this._dataSource = dataSource;
   }
   /**
    * Upsert model instance
-   * @param {*} id 
-   * @param {*} data 
+   * @param {*} id
+   * @param {*} data
    */
   async save(id, data) {
     throw new Error('abstract method not implemented');
   }
 
   /**
-   * Find model instance by ID 
+   * Find model instance by ID
    * @param {*} id record id
    * @returns {Promise<any>} record
    */
@@ -36,5 +34,4 @@ export default class DataSource {
   async delete(id) {
     throw new Error('abstract method not implemented');
   }
-
 }

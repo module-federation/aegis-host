@@ -1,26 +1,30 @@
-'use strict'
+'use strict';
 
 import log from '../lib/logger';
 
 /**
  * @typedef {Object} ModelParam
- * @property {String} modelName 
+ * @property {String} modelName
  * @property {import('../models').ModelFactory} models
- * @property {import('../datasources/datasource').default} repository 
+ * @property {import('../datasources/datasource').default} repository
  * @property {import('../lib/observer').Observer} observer
  * @property {...Function} handlers
  */
 
 /**
- * 
- * @param {ModelParam} param0 
+ *
+ * @param {ModelParam} param0
  */
 export default function removeModelFactory({
-  modelName, models, repository, observer, handlers = []
+  modelName,
+  models,
+  repository,
+  observer,
+  handlers = [],
 } = {}) {
   const eventType = models.EventTypes.DELETE;
   const eventName = models.getEventName(eventType, modelName);
-  handlers.forEach(handler => observer.on(eventName, handler));
+  handlers.forEach((handler) => observer.on(eventName, handler));
 
   return async function removeModel(id) {
     const model = await repository.find(id);
@@ -29,18 +33,16 @@ export default function removeModelFactory({
     }
 
     const deleted = models.deleteModel(model);
-    const event = await models.createEvent(
-      eventType, modelName, deleted
-    );
+    const event = await models.createEvent(eventType, modelName, deleted);
 
     await Promise.all([
       repository.delete(id),
-      observer.notify(event.eventName, event)
+      observer.notify(event.eventName, event),
     ]).catch(async (error) => {
       await repository.save(id, model);
       throw new Error(error);
     });
 
     return model;
-  }
+  };
 }

@@ -2164,45 +2164,17 @@ module.exports = {
   !*** ./node_modules/axios-proxy-fix/package.json ***!
   \***************************************************/
 /*! default exports */
-/*! export _from [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _id [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _inBundle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _integrity [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _location [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _phantomChildren [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   exports [not provided] [no usage info] */
-/*! export _requested [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export escapedName [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export fetchSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export raw [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export rawSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export registry [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export saveSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export _requiredBy [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export _resolved [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _shasum [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _spec [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _where [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export author [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
 /*! export browser [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export ./lib/adapters/http.js [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
 /*! export bugs [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
-/*! export bundleDependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export dependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export follow-redirects [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export is-buffer [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
-/*! export deprecated [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export description [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export coveralls [provided] [no usage info] [missing usage info prevents renaming] */
@@ -2272,7 +2244,7 @@ module.exports = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"_from\":\"axios-proxy-fix@^0.16.3\",\"_id\":\"axios-proxy-fix@0.16.3\",\"_inBundle\":false,\"_integrity\":\"sha512-dLRTjqYW7A9kuqh3aiFjvQrBSQipVwsHFV401MdQb2JhQS9rAobAMhME2GxZXNXDblWRGCVfW/LdoHUXrPFBRg==\",\"_location\":\"/axios-proxy-fix\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"range\",\"registry\":true,\"raw\":\"axios-proxy-fix@^0.16.3\",\"name\":\"axios-proxy-fix\",\"escapedName\":\"axios-proxy-fix\",\"rawSpec\":\"^0.16.3\",\"saveSpec\":null,\"fetchSpec\":\"^0.16.3\"},\"_requiredBy\":[\"/smartystreets-javascript-sdk\"],\"_resolved\":\"https://registry.npmjs.org/axios-proxy-fix/-/axios-proxy-fix-0.16.3.tgz\",\"_shasum\":\"6a015d9fd14c16bc613f713980745bfb71a82666\",\"_spec\":\"axios-proxy-fix@^0.16.3\",\"_where\":\"/Users/tmidboeus.ibm.com/federated-monolith-services/node_modules/smartystreets-javascript-sdk\",\"author\":{\"name\":\"Moe Jangda\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"bugs\":{\"url\":\"https://github.com/mistermoe/axios/issues\"},\"bundleDependencies\":false,\"dependencies\":{\"follow-redirects\":\"^1.2.3\",\"is-buffer\":\"^1.1.5\"},\"deprecated\":false,\"description\":\"Promise based HTTP client for the browser and node.js\",\"devDependencies\":{\"coveralls\":\"^2.11.9\",\"es6-promise\":\"^4.0.5\",\"grunt\":\"^1.0.1\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.0.0\",\"grunt-contrib-nodeunit\":\"^1.0.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^19.0.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-ts\":\"^6.0.0-beta.3\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.0.0\",\"karma-coverage\":\"^1.0.0\",\"karma-firefox-launcher\":\"^1.0.0\",\"karma-jasmine\":\"^1.0.2\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-phantomjs-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.1.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"phantomjs-prebuilt\":\"^2.1.7\",\"sinon\":\"^1.17.4\",\"typescript\":\"^2.0.3\",\"url-search-params\":\"^0.6.1\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"homepage\":\"https://github.com/mistermoe/axios\",\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"license\":\"MIT\",\"main\":\"index.js\",\"name\":\"axios-proxy-fix\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/mistermoe/axios.git\"},\"scripts\":{\"build\":\"NODE_ENV=production grunt build\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"examples\":\"node ./examples/server.js\",\"postversion\":\"git push && git push --tags\",\"start\":\"node ./sandbox/server.js\",\"test\":\"grunt test\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\"},\"typings\":\"./index.d.ts\",\"version\":\"0.16.3\"}");
+module.exports = JSON.parse("{\"name\":\"axios-proxy-fix\",\"version\":\"0.16.3\",\"description\":\"Promise based HTTP client for the browser and node.js\",\"main\":\"index.js\",\"scripts\":{\"test\":\"grunt test\",\"start\":\"node ./sandbox/server.js\",\"build\":\"NODE_ENV=production grunt build\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\",\"postversion\":\"git push && git push --tags\",\"examples\":\"node ./examples/server.js\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/mistermoe/axios.git\"},\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"author\":\"Moe Jangda\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/mistermoe/axios/issues\"},\"homepage\":\"https://github.com/mistermoe/axios\",\"devDependencies\":{\"coveralls\":\"^2.11.9\",\"es6-promise\":\"^4.0.5\",\"grunt\":\"^1.0.1\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.0.0\",\"grunt-contrib-nodeunit\":\"^1.0.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^19.0.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-ts\":\"^6.0.0-beta.3\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.0.0\",\"karma-coverage\":\"^1.0.0\",\"karma-firefox-launcher\":\"^1.0.0\",\"karma-jasmine\":\"^1.0.2\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-phantomjs-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.1.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"phantomjs-prebuilt\":\"^2.1.7\",\"sinon\":\"^1.17.4\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\",\"url-search-params\":\"^0.6.1\",\"typescript\":\"^2.0.3\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"typings\":\"./index.d.ts\",\"dependencies\":{\"follow-redirects\":\"^1.2.3\",\"is-buffer\":\"^1.1.5\"}}");
 
 /***/ }),
 
@@ -4758,41 +4730,13 @@ module.exports = {
   !*** ./node_modules/axios/package.json ***!
   \*****************************************/
 /*! default exports */
-/*! export _from [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _id [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _inBundle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _integrity [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _location [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _phantomChildren [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   exports [not provided] [no usage info] */
-/*! export _requested [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export escapedName [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export fetchSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export raw [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export rawSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export registry [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export saveSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export _requiredBy [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export _resolved [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _shasum [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _spec [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _where [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export author [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
 /*! export browser [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export ./lib/adapters/http.js [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
 /*! export bugs [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
-/*! export bundleDependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export bundlesize [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
 /*!     export path [provided] [no usage info] [missing usage info prevents renaming] */
@@ -4802,7 +4746,6 @@ module.exports = {
 /*! export dependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export follow-redirects [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
-/*! export deprecated [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export description [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export bundlesize [provided] [no usage info] [missing usage info prevents renaming] */
@@ -4876,7 +4819,7 @@ module.exports = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"_from\":\"axios\",\"_id\":\"axios@0.20.0\",\"_inBundle\":false,\"_integrity\":\"sha512-ANA4rr2BDcmmAQLOKft2fufrtuvlqR+cXNNinUmvfeSNCOF98PZL+7M/v1zIdGo7OLjEA9J2gXJL+j4zGsl0bA==\",\"_location\":\"/axios\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"tag\",\"registry\":true,\"raw\":\"axios\",\"name\":\"axios\",\"escapedName\":\"axios\",\"rawSpec\":\"\",\"saveSpec\":null,\"fetchSpec\":\"latest\"},\"_requiredBy\":[\"#USER\",\"/\"],\"_resolved\":\"https://registry.npmjs.org/axios/-/axios-0.20.0.tgz\",\"_shasum\":\"057ba30f04884694993a8cd07fa394cff11c50bd\",\"_spec\":\"axios\",\"_where\":\"/Users/tmidboeus.ibm.com/federated-monolith-services\",\"author\":{\"name\":\"Matt Zabriskie\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"bundleDependencies\":false,\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}],\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"deprecated\":false,\"description\":\"Promise based HTTP client for the browser and node.js\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"homepage\":\"https://github.com/axios/axios\",\"jsdelivr\":\"dist/axios.min.js\",\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"license\":\"MIT\",\"main\":\"index.js\",\"name\":\"axios\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/axios/axios.git\"},\"scripts\":{\"build\":\"NODE_ENV=production grunt build\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"examples\":\"node ./examples/server.js\",\"fix\":\"eslint --fix lib/**/*.js\",\"postversion\":\"git push && git push --tags\",\"preversion\":\"npm test\",\"start\":\"node ./sandbox/server.js\",\"test\":\"grunt test && bundlesize\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\"},\"typings\":\"./index.d.ts\",\"unpkg\":\"dist/axios.min.js\",\"version\":\"0.20.0\"}");
+module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.20.0\",\"description\":\"Promise based HTTP client for the browser and node.js\",\"main\":\"index.js\",\"scripts\":{\"test\":\"grunt test && bundlesize\",\"start\":\"node ./sandbox/server.js\",\"build\":\"NODE_ENV=production grunt build\",\"preversion\":\"npm test\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\",\"postversion\":\"git push && git push --tags\",\"examples\":\"node ./examples/server.js\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"fix\":\"eslint --fix lib/**/*.js\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/axios/axios.git\"},\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"author\":\"Matt Zabriskie\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"homepage\":\"https://github.com/axios/axios\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"jsdelivr\":\"dist/axios.min.js\",\"unpkg\":\"dist/axios.min.js\",\"typings\":\"./index.d.ts\",\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}]}");
 
 /***/ }),
 
@@ -29505,46 +29448,12 @@ module.exports = {
   !*** ./node_modules/smartystreets-javascript-sdk/package.json ***!
   \****************************************************************/
 /*! default exports */
-/*! export _from [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _id [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _inBundle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _integrity [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _location [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _phantomChildren [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   exports [not provided] [no usage info] */
-/*! export _requested [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export escapedName [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export fetchSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export raw [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export rawSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export registry [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export saveSpec [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export _requiredBy [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export _resolved [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _shasum [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _spec [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export _where [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export author [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export email [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export bugs [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export bundleDependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export dependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export axios-proxy-fix [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export axios-retry [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export promise [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
-/*! export deprecated [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export description [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export aws-sdk [provided] [no usage info] [missing usage info prevents renaming] */
@@ -29559,7 +29468,6 @@ module.exports = {
 /*!   export tinyify [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export zlib [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
-/*! export homepage [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export keywords [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
@@ -29594,7 +29502,7 @@ module.exports = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"_from\":\"smartystreets-javascript-sdk\",\"_id\":\"smartystreets-javascript-sdk@1.6.0\",\"_inBundle\":false,\"_integrity\":\"sha512-mNuduv9D4YjnxqG1NPobFTM8sHkn6nBpqusqpnUF2bQHsuqulXpp1FJiMdX7xlXNKv15niEaOakO7ajm5lgMIQ==\",\"_location\":\"/smartystreets-javascript-sdk\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"tag\",\"registry\":true,\"raw\":\"smartystreets-javascript-sdk\",\"name\":\"smartystreets-javascript-sdk\",\"escapedName\":\"smartystreets-javascript-sdk\",\"rawSpec\":\"\",\"saveSpec\":null,\"fetchSpec\":\"latest\"},\"_requiredBy\":[\"#USER\",\"/\"],\"_resolved\":\"https://registry.npmjs.org/smartystreets-javascript-sdk/-/smartystreets-javascript-sdk-1.6.0.tgz\",\"_shasum\":\"c3ff00f32747e93ab28dc20279f5a9c770fd462c\",\"_spec\":\"smartystreets-javascript-sdk\",\"_where\":\"/Users/tmidboeus.ibm.com/federated-monolith-services\",\"author\":{\"name\":\"SmartyStreets SDK Team\",\"email\":\"support@smartystreets.com\",\"url\":\"https://www.smartystreets.com\"},\"bugs\":{\"url\":\"https://github.com/smartystreets/smartystreets-javascript-sdk/issues\"},\"bundleDependencies\":false,\"dependencies\":{\"axios-proxy-fix\":\"^0.16.3\",\"axios-retry\":\"^3.0.1\",\"promise\":\"^8.0.1\"},\"deprecated\":false,\"description\":\"Quick and easy SmartyStreets address validation.\",\"devDependencies\":{\"aws-sdk\":\"^2.412.0\",\"babel-core\":\"^6.26.0\",\"babel-preset-env\":\"^1.6.1\",\"babelify\":\"^8.0.0\",\"browserify\":\"^16.2.3\",\"chai\":\"^4.1.2\",\"chai-as-promised\":\"^7.1.1\",\"mocha\":\"^8.0.1\",\"s3-upload-stream\":\"^1.0.7\",\"tinyify\":\"^2.5.2\",\"zlib\":\"^1.0.5\"},\"homepage\":\"https://github.com/smartystreets/smartystreets-javascript-sdk#readme\",\"keywords\":[\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"license\":\"Apache-2.0\",\"main\":\"index.js\",\"name\":\"smartystreets-javascript-sdk\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/smartystreets/smartystreets-javascript-sdk.git\"},\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"version\":\"1.6.0\"}");
+module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"version\":\"1.6.0\",\"description\":\"Quick and easy SmartyStreets address validation.\",\"keywords\":[\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"main\":\"index.js\",\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"author\":\"SmartyStreets SDK Team <support@smartystreets.com> (https://www.smartystreets.com)\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"github:smartystreets/smartystreets-javascript-sdk\"},\"devDependencies\":{\"aws-sdk\":\"^2.412.0\",\"babel-core\":\"^6.26.0\",\"babel-preset-env\":\"^1.6.1\",\"babelify\":\"^8.0.0\",\"browserify\":\"^16.2.3\",\"chai\":\"^4.1.2\",\"chai-as-promised\":\"^7.1.1\",\"mocha\":\"^8.0.1\",\"s3-upload-stream\":\"^1.0.7\",\"tinyify\":\"^2.5.2\",\"zlib\":\"^1.0.5\"},\"dependencies\":{\"axios-proxy-fix\":\"^0.16.3\",\"axios-retry\":\"^3.0.1\",\"promise\":\"^8.0.1\"}}");
 
 /***/ }),
 

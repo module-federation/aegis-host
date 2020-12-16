@@ -1,26 +1,30 @@
-'use strict'
+'use strict';
 
 import log from '../lib/logger';
 
 /**
  * @typedef {Object} ModelParam
- * @property {String} modelName 
+ * @property {String} modelName
  * @property {import('../models').ModelFactory} models
- * @property {import('../datasources/datasource').default} repository 
+ * @property {import('../datasources/datasource').default} repository
  * @property {import('../lib/observer').Observer} observer
  * @property {Function[]} handlers
  */
 
 /**
- * 
- * @param {ModelParam} param0 
+ *
+ * @param {ModelParam} param0
  */
 export default function editModelFactory({
-  modelName, models, repository, observer, handlers = []
+  modelName,
+  models,
+  repository,
+  observer,
+  handlers = [],
 } = {}) {
   const eventType = models.EventTypes.UPDATE;
   const eventName = models.getEventName(eventType, modelName);
-  handlers.forEach(handler => observer.on(eventName, handler));
+  handlers.forEach((handler) => observer.on(eventName, handler));
 
   return async function editModel(id, changes) {
     const model = await repository.find(id);
@@ -29,9 +33,10 @@ export default function editModelFactory({
     }
 
     const updated = models.updateModel(model, changes);
-    const event = await models.createEvent(
-      eventType, modelName, { updated, changes }
-    );
+    const event = await models.createEvent(eventType, modelName, {
+      updated,
+      changes,
+    });
 
     try {
       await repository.save(id, updated);
@@ -42,5 +47,5 @@ export default function editModelFactory({
     }
 
     return updated;
-  }
+  };
 }

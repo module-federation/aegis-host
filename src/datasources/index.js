@@ -1,4 +1,6 @@
-import DataSourceImpl from './datasource-impl'
+import * as adapters from './adapters';
+
+const adapter = process.env.DATASOURCE_ADAPTER || 'DataSourceDisk';
 
 const DataSourceFactory = (() => {
   let dataSources;
@@ -10,7 +12,7 @@ const DataSourceFactory = (() => {
     if (dataSources.has(name)) {
       return dataSources.get(name);
     }
-    const newDs = new DataSourceImpl(new Map());
+    const newDs = new adapters[adapter]({ name, dataSource: new Map() });
     dataSources.set(name, newDs);
     return newDs;
   }
@@ -20,7 +22,7 @@ const DataSourceFactory = (() => {
      * Get `DataSource` singleton
      * @returns {import('./datasource').default} DataSource singleton
      */
-    getDataSource
+    getDataSource,
   });
 })();
 
