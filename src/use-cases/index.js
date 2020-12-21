@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 import addModelFactory from './add-model';
 import editModelFactory from './edit-model';
@@ -18,15 +18,15 @@ function buildOptions(model) {
     models: ModelFactory,
     repository: DataSourceFactory.getDataSource(model.modelName),
     observer: ObserverFactory.getInstance(),
-    handlers: model.eventHandlers
-  }
+    handlers: model.eventHandlers,
+  };
 }
 
 function make(factory) {
   const models = ModelFactory.getRemoteModels();
-  return models.map(model => ({
+  return models.map((model) => ({
     endpoint: model.endpoint,
-    fn: factory(buildOptions(model))
+    fn: factory(buildOptions(model)),
   }));
 }
 
@@ -36,5 +36,3 @@ export const listModels = () => make(listModelsFactory);
 export const findModels = () => make(findModelFactory);
 export const removeModels = () => make(removeModelFactory);
 export const getModelId = (model) => ModelFactory.getModelId(model);
-
-

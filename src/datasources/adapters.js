@@ -1,12 +1,12 @@
-import DataSource from './datasource';
 import fs from 'fs';
 import path from 'path';
-import Model from 'Model';
+import DataSource from './datasource';
+import { serialize, deserialize } from '../lib/serializer';
 
 /**
  * Temporary in-memory storage
  */
-export class DataSourceMem extends DataSource {
+export class DataSourceMemory extends DataSource {
   constructor({ dataSource }) {
     super({ dataSource });
   }
@@ -15,66 +15,80 @@ export class DataSourceMem extends DataSource {
    * @override
    */
   async save(id, data) {
-    this._dataSource.set(id, data);
+    this.dataSource.set(id, data);
   }
 
   /**
    * @override
    */
   async find(id) {
-    return this._dataSource.get(id);
+    return this.dataSource.get(id);
   }
 
   /**
    * @override
    */
   async list() {
-    return [...this._dataSource.values()];
+    return [...this.dataSource.values()];
   }
 
   /**
    * @override
    */
   async delete(id) {
-    this._dataSource.delete(id);
+    this.dataSource.delete(id);
   }
 }
 
 /**
- * Persist data on disk
+ * Persistent storage on filesystem
  */
-export class DataSourceDisk extends DataSourceMem {
-  constructor({ dataSource, name }) {
+export class DataSourceFile extends DataSourceMemory {
+  constructor({
+    dataSource,
+    directory = __dirname,
+    replacer = (key, value) => value,
+    reviver = (key, value) => value,
+    name,
+  }) {
     super({ dataSource });
-    this._name = name;
-    this._dataSource = this.deserialize();
+    this.replacer = this.replace(replacer);
+    this.reviver = this.revive(reviver);
+    this.file = path.resolve(directory, name.concat('.json'));
+    // this.dataSource = this.readFile();
   }
 
-  serialize() {
-    const dataStr = JSON.stringify(Array.from(this._dataSource.entries()));
-    fs.writeFileSync(this._name.concat('.json'), dataStr);
+  replace(callback) {
+    return function (key, value) {
+      if (value) {
+        const serialized = serialize(key, value);
+        return callback('', serialized.value);
+      }
+    };
+  }
+
+  revive(callback) {
+    return function (key, value) {
+      const deserialized = deserialize(key, value);
+      return callback('', deserialized.value);
+    };
+  }
+
+  writeFile() {
+    const dataStr = JSON.stringify([...this.dataSource], this.replacer);
+    console.log(dataStr);
+    fs.writeFileSync(this.file, dataStr);
   }
 
   /**
    *
    */
-  deserialize() {
-    const file = path.resolve(__dirname, this._name.concat('.json'));
-    if (fs.existsSync(file)) {
-      const data = fs.readFileSync(file, {
-        BufferEncoding: 'utf-8',
-        flag: 'r',
-      });
-      if (data) {
-        const models = JSON.parse(data);
-        await models.forEach((model) =>
-         Model.create({ name: this._name, args: model });
+  readFile() {
+    if (fs.existsSync(this.file)) {
+      const models = fs.readFileSync(this.file, 'utf-8');
+      if (models) {
+        return new Map(JSON.parse(models, this.reviver));
       }
-
-      if (modelData) {
-        return new Map(modelData);
-      }
-      console.warn('no models found');
     }
     return new Map();
   }
@@ -85,7 +99,7 @@ export class DataSourceDisk extends DataSourceMem {
    */
   async delete(id) {
     await super.delete(id);
-    this.serialize();
+    this.writeFile();
   }
 
   /**
@@ -95,8 +109,7 @@ export class DataSourceDisk extends DataSourceMem {
    */
   async save(id, data) {
     const ds = await super.save(id, data);
-    this.serialize();
+    this.writeFile();
     return ds;
   }
 }
-we;

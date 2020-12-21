@@ -3,7 +3,7 @@
  */
 export default class DataSource {
   constructor({ dataSource }) {
-    this._dataSource = dataSource;
+    this.dataSource = dataSource;
   }
   /**
    * Upsert model instance

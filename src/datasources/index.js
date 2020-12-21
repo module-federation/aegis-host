@@ -1,6 +1,6 @@
 import * as adapters from './adapters';
 
-const adapter = process.env.DATASOURCE_ADAPTER || 'DataSourceDisk';
+const adapter = process.env.DATASOURCE_ADAPTER || 'DataSourceFile';
 
 const DataSourceFactory = (() => {
   let dataSources;

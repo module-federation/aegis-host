@@ -31,7 +31,7 @@ export const withId = (propName, fnCreateId) => {
  * @param {Function} [fnTimestamp] default is UTC
  */
 export const withTimestamp = (propName, fnTimestamp = utc) => {
-  return (o) => ({ ...o, [propName]: fnTimestamp() });
+  return (o) => ({ [propName]: fnTimestamp(), ...o });
 };
 
 /**
@@ -52,5 +52,30 @@ export const withSymbolsInJSON = (keyMap) => (o) => {
         ...symbols,
       };
     },
+  };
+};
+
+/**
+ * Convert keys from symbols to strings when
+ * the object is serialized so the properties
+ * can be seen in JSON output
+ * @param {{key: string, value: Symbol}} keyMap
+ */
+export const serialize = (closures) => (o) => {
+  return {
+    ...o,
+    serialize() {
+      const props = Object.keys(this).filter(
+        (k) => typeof this[k] === 'symbol'
+      );
+      const symbols = props
+        .map((k) => ({ [`Symbol(${k.toString()})`]: this[k] }))
+        .reduce((p, c) => ({ ...c, ...p }));
+      return {
+        ...this,
+        ...symbols,
+      };
+    },
+    deserialize() {},
   };
 };
