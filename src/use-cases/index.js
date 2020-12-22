@@ -9,6 +9,7 @@ import handleEvents from './handle-events';
 import DataSourceFactory from '../datasources';
 import ObserverFactory from '../lib/observer';
 import ModelFactory from '../models';
+import hydrate from './hydrate-models';
 
 handleEvents(ObserverFactory.getInstance());
 
@@ -16,7 +17,7 @@ function buildOptions(model) {
   return {
     modelName: model.modelName,
     models: ModelFactory,
-    repository: DataSourceFactory.getDataSource(model.modelName),
+    repository: DataSourceFactory.getDataSource(model.modelName, hydrate),
     observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers,
   };

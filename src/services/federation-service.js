@@ -3,7 +3,7 @@
 import remoteEntries from '../../webpack/remote-entries';
 
 /**
- * @returns {import('../models').ModelSpecification[]}
+ * @returns {Promise<import('../models').ModelSpecification[]>}
  */
 export async function importRemoteModels() {
   const importStartTime = Date.now();
@@ -67,7 +67,7 @@ export async function importRemoteAdapters() {
   }
 
   console.log(
-    '\n%dms to import remote services\n',
+    '\n%dms to import remote adapters\n',
     Date.now() - importStartTime
   );
 

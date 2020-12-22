@@ -109,11 +109,11 @@ const ModelFactory = {
    * @param {Function} factory factory function
    */
   registerEvent: (eventType, modelName, factory) => {
-    modelName = checkModelName(modelName);
-    eventType = checkEventType(eventType);
+    const name = checkModelName(modelName);
+    const type = checkEventType(eventType);
 
     if (typeof factory === 'function') {
-      eventFactories[eventType].set(modelName, factory);
+      eventFactories[type].set(name, factory);
     }
   },
 
@@ -127,10 +127,7 @@ const ModelFactory = {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
     if (spec) {
-      return Model.create({
-        spec,
-        args,
-      });
+      return Model.create({ spec, args });
     }
     throw new Error('unregistered model');
   },
@@ -143,16 +140,11 @@ const ModelFactory = {
    * @returns {Promise<Readonly<Event>>} the event instance
    */
   createEvent: async (eventType, modelName, args) => {
-    modelName = checkModelName(modelName);
-    eventType = checkEventType(eventType);
-
-    if (eventFactories[eventType].has(modelName)) {
-      return Event.create({
-        args,
-        eventType,
-        modelName,
-        factory: eventFactories[eventType].get(modelName),
-      });
+    const name = checkModelName(modelName);
+    const type = checkEventType(eventType);
+    const factory = eventFactories[type].get(name);
+    if (factory) {
+      return Event.create({ args, factory, eventType: type, modelName: name });
     }
     throw new Error('unregistered model event');
   },

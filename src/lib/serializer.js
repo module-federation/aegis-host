@@ -1,38 +1,41 @@
 'use strict';
 
-const objectTypes = {
-  Map: (key, value) => [...value],
+const objectTypeMap = {
+  test: (key, value) => value instanceof Map,
+  serialize: (key, value) => [...value],
 };
 
+const objectTypes = [objectTypeMap];
+
 function serializeObject(key, value) {
-  const objType = {}.toString.call(value);
-  console.log({ func: serializeObject.name, key, objType });
-  if (objectTypes[objType]) {
-    console.log({ func: serializeObject.name, desc: 'execute' });
-    return objectTypes[objType](key, value);
+  const type = objectTypes.find((type) => type.test(key, value));
+  if (type) {
+    return type.serialize(key, value);
   }
   return value;
 }
 
 const replaceTypes = {
-  function: (key, value) => value.toString(),
+  //function: (key, value) => value.toString(),
   object: (key, value) => serializeObject(key, value),
 };
 
 export function serialize(key, value) {
-  console.log({ func: serialize.name, key, value, typeof: typeof value });
-  if (replaceTypes[typeof value]) {
-    const replaceValue = replaceTypes[typeof value](key, value);
-    console.log('replaceValue', replaceValue);
-    return replaceValue;
+  //console.log({ func: serialize.name, key, typeof: typeof value, value });
+  const replace = replaceTypes[typeof value];
+  if (replace) {
+    return replace(key, value);
   }
   return value;
 }
 
 export function deserialize(key, value) {
-  console.log({ func: deserialize.name, key, value });
+  //console.log({ func: deserialize.name, key, value, value: typeof value });
   if (typeof key === 'string' && key.indexOf('function ') === 0) {
     return eval(`(${value})`);
+  }
+  if (typeof key === 'object' && key.indexof('Map') === 0) {
+    return new Map(value);
   }
   return value;
 }

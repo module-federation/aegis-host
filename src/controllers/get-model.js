@@ -4,36 +4,36 @@ export default function getModelFactory(listModels) {
   return async function getModel(httpRequest) {
     log({ function: 'getModel' });
     try {
-      const { source = {} } = httpRequest.body
-      source.ip = httpRequest.ip
-      source.browser = httpRequest.headers['User-Agent']
+      const { source = {} } = httpRequest.body;
+      source.ip = httpRequest.ip;
+      source.browser = httpRequest.headers['User-Agent'];
       if (httpRequest.headers['Referer']) {
-        source.referrer = httpRequest.headers['Referer']
+        source.referrer = httpRequest.headers['Referer'];
       }
       log(source);
 
       const models = await listModels();
-      // log({ function: listModels.name, ...models });
+      log({ function: listModels.name, ...models });
 
       return {
         headers: {
           'Content-Type': 'application/json',
         },
         statusCode: 200,
-        body: { models }
-      }
+        body: { models },
+      };
     } catch (e) {
       log(e);
 
       return {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         statusCode: 400,
         body: {
-          error: e.message
-        }
-      }
+          error: e.message,
+        },
+      };
     }
-  }
+  };
 }

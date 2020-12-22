@@ -26,6 +26,7 @@ const Model = (() => {
     createTime: CREATETIME,
     onUpdate: ONUPDATE,
     onDelete: ONDELETE,
+    portFlow: PORTFLOW,
   };
 
   const defUpdate = (model, changes) => ({

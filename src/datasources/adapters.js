@@ -49,45 +49,46 @@ export class DataSourceFile extends DataSourceMemory {
     directory = __dirname,
     replacer = (key, value) => value,
     reviver = (key, value) => value,
+    hydrate = (value) => value,
     name,
   }) {
     super({ dataSource });
     this.replacer = this.replace(replacer);
     this.reviver = this.revive(reviver);
     this.file = path.resolve(directory, name.concat('.json'));
-    // this.dataSource = this.readFile();
+    this.dataSource = this.readFile(hydrate);
   }
 
   replace(callback) {
     return function (key, value) {
       if (value) {
-        const serialized = serialize(key, value);
-        return callback('', serialized.value);
+        const serializedValue = serialize(key, value);
+        return callback(key, serializedValue);
       }
     };
   }
 
   revive(callback) {
     return function (key, value) {
-      const deserialized = deserialize(key, value);
-      return callback('', deserialized.value);
+      const deserializedValue = deserialize(key, value);
+      return callback(key, deserializedValue);
     };
   }
 
   writeFile() {
     const dataStr = JSON.stringify([...this.dataSource], this.replacer);
-    console.log(dataStr);
-    fs.writeFileSync(this.file, dataStr);
+    fs.writeFile(this.file, dataStr, (err) => console.error(err));
   }
 
   /**
    *
    */
-  readFile() {
+  readFile(hydrate) {
+    console.log(hydrate.name);
     if (fs.existsSync(this.file)) {
       const models = fs.readFileSync(this.file, 'utf-8');
       if (models) {
-        return new Map(JSON.parse(models, this.reviver));
+        return hydrate(new Map(JSON.parse(models, this.reviver)));
       }
     }
     return new Map();
