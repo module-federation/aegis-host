@@ -2,7 +2,7 @@
 
 import * as adapters from './adapters';
 
-const adapter = process.env.DATASOURCE_ADAPTER || 'DataSourceFile';
+const adapter = process.env.DATASOURCE_ADAPTER || 'DataSourceMemory';
 
 const DataSourceFactory = (() => {
   let dataSources;
