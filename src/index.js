@@ -1,6 +1,4 @@
 // import('./bootstrap');
-import Server from './server';
+import Server from "./server";
 
 Server.start();
-
-

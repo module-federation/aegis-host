@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import DataSource from './datasource';
-import { serialize, deserialize } from '../lib/serializer';
+import fs from "fs";
+import path from "path";
+import DataSource from "./datasource";
+import Serializer from "../lib/serializer";
 
 /**
  * Temporary in-memory storage
@@ -44,39 +44,45 @@ export class DataSourceMemory extends DataSource {
  * Persistent storage on filesystem
  */
 export class DataSourceFile extends DataSourceMemory {
+  /**
+   *
+   * @param {{
+   *  dataSource:Map<string,import('../models').Model>
+   *  serializers:import('../models/index').serializer
+   *  directory:string
+   *  hydrate:function(*):import('../models').Model,
+   *  name:string
+   * }} param0
+   */
   constructor({
     dataSource,
+    serializers = [],
     directory = __dirname,
-    replacer = (key, value) => value,
-    reviver = (key, value) => value,
     hydrate = (value) => value,
     name,
   }) {
     super({ dataSource });
-    this.replacer = this.replace(replacer);
-    this.reviver = this.revive(reviver);
-    this.file = path.resolve(directory, name.concat('.json'));
+    this.file = path.resolve(directory, name.concat(".json"));
+    if (serializers.length > 0) {
+      Serializer.addSerializer(serializers);
+    }
     this.dataSource = this.readFile(hydrate);
   }
 
-  replace(callback) {
-    return function (key, value) {
-      if (value) {
-        const serializedValue = serialize(key, value);
-        return callback(key, serializedValue);
-      }
-    };
+  replace(key, value) {
+    if (value) {
+      return Serializer.serialize(key, value);
+    }
   }
 
-  revive(callback) {
-    return function (key, value) {
-      const deserializedValue = deserialize(key, value);
-      return callback(key, deserializedValue);
-    };
+  revive(key, value) {
+    if (value) {
+      return Serializer.deserialize(key, value);
+    }
   }
 
   writeFile() {
-    const dataStr = JSON.stringify([...this.dataSource], this.replacer);
+    const dataStr = JSON.stringify([...this.dataSource], this.replace);
     fs.writeFile(this.file, dataStr, (err) => console.error(err));
   }
 
@@ -84,11 +90,10 @@ export class DataSourceFile extends DataSourceMemory {
    *
    */
   readFile(hydrate) {
-    console.log(hydrate.name);
     if (fs.existsSync(this.file)) {
-      const models = fs.readFileSync(this.file, 'utf-8');
+      const models = fs.readFileSync(this.file, "utf-8");
       if (models) {
-        return hydrate(new Map(JSON.parse(models, this.reviver)));
+        return hydrate(new Map(JSON.parse(models, this.revive)));
       }
     }
     return new Map();

@@ -13,11 +13,19 @@ import hydrate from './hydrate-models';
 
 handleEvents(ObserverFactory.getInstance());
 
+/**
+ *
+ * @param {import('../models').ModelSpecification} model
+ */
 function buildOptions(model) {
   return {
     modelName: model.modelName,
     models: ModelFactory,
-    repository: DataSourceFactory.getDataSource(model.modelName, hydrate),
+    repository: DataSourceFactory.getDataSource(
+      model.modelName,
+      model.serializers,
+      hydrate
+    ),
     observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers,
   };

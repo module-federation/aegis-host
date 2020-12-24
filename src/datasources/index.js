@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * @typedef {import('../models').Model} Model
+ */
+
 import * as adapters from './adapters';
 
 const adapter = process.env.DATASOURCE_ADAPTER || 'DataSourceMemory';
@@ -8,11 +12,14 @@ const DataSourceFactory = (() => {
   let dataSources;
 
   /**
-   * Get the datasource for each model
+   * Get the datasource for each model. Optionally inject logic 
+   * for custom de/serialization and unmarshaling deserialized models
+
    * @param {string} name - model name
-   * @param {function(Map<string,import('../models').Model):Map<string, import('../models').Model} [hydrate] - unmarshal serialized objects
+   * @param {import('../models/index').serializer[]} [serializers] - callbacks invoked during de/serialization
+   * @param {function(Map<string,Model>):Map<string,Model} [hydrate] - unmarshalling deserialized objects
    */
-  function getDataSource(name, hydrate = (o) => o) {
+  function getDataSource(name, serializers = {}, hydrate = (v) => v) {
     if (!dataSources) {
       dataSources = new Map();
     }
@@ -22,6 +29,7 @@ const DataSourceFactory = (() => {
     const newDs = new adapters[adapter]({
       name,
       dataSource: new Map(),
+      serializers,
       hydrate,
     });
     dataSources.set(name, newDs);
