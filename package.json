@@ -6,6 +6,9 @@
   "installConfig": {
     "pnp": false
   },
+  "repository": {
+    "url": "https://github.com/tysonrm/composable-microservices"
+  },
   "scripts": {
     "build": "npm run clean && webpack --config webpack.config.js",
     "start": "node -r dotenv/config dist/main.js",
@@ -37,5 +40,4 @@
     "webpack": "^5.4.0",
     "webpack-cli": "^3.3.12"
   }
-} 
-
+}

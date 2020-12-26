@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * In a hex arch, ports and adapters control I/O between

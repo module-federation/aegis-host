@@ -62,7 +62,7 @@ import {
  *  on: "serialize" | "deserialize",
  *  key: string | "*" | RegExp | function(key,value):boolean
  *  type: (function(key,value):boolean) | "string" | "object" | "number" | "function" | "any" | RegExp
- *  value(key, value):value
+ *  value: function(key, value):any
  * }} serializer
  *
  * @typedef {Object} ModelSpecification Specify model data and behavior

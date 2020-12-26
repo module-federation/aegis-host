@@ -1,7 +1,5 @@
 "use strict";
 
-import compose from "./compose";
-
 /**
  * @typedef {import('../models/index').serializer} serializerType
  */
@@ -31,8 +29,8 @@ export const replaceFunction = {
  */
 export const reviveFunction = {
   on: "deserialize",
-  key: "*",
-  type: "function",
+  key: "function",
+  type: "string",
   value: (key, value) => eval(`(${value})`),
 };
 
@@ -47,6 +45,10 @@ const serializers = {
   deserialize: [],
 };
 
+/**
+ *
+ * @param {serializerType} s
+ */
 function checkTypes(s) {
   return (
     ["serialize", "deserialize"].includes(s.on) &&
@@ -59,6 +61,10 @@ function checkTypes(s) {
   );
 }
 
+/**
+ *
+ * @param {serializerType} serializer
+ */
 function checkRequiredProps(serializer) {
   const requiredProps = ["on", "key", "type", "value"];
   const missing = requiredProps.filter((key) => !serializer[key]);
@@ -67,28 +73,64 @@ function checkRequiredProps(serializer) {
   }
 }
 
+/**
+ *
+ * @param {serializerType[]} serializers
+ * @returns {serializerType[]}
+ */
 function validateSerializer(serializers) {
-  const _serializers = Array.isArray(serializers) ? serializers : [serializers];
-  _serializers.every((s) => checkRequiredProps(s));
+  const newSerializers = Array.isArray(serializers)
+    ? serializers
+    : [serializers];
+  newSerializers.every((s) => checkRequiredProps(s));
 
-  if (!_serializers.every((s) => checkTypes(s))) {
+  if (!newSerializers.every((s) => checkTypes(s))) {
     throw new Error("invalid serializer, check property types");
   }
-  return _serializers;
+  return newSerializers;
 }
 
 const keyApplies = {
+  /**
+   * @param {serializerType} s
+   * @returns {boolean}
+   */
   object: (s, k, v) => s.key.test(k),
+  /**
+   * @param {serializerType} s
+   */
   string: (s, k, v) => s.key === k || s.key === "*",
+  /**
+   * @param {serializerType} s
+   * @returns {boolean}
+   */
   function: (s, k, v) => s.key(k, v),
 };
 
 const typeApplies = {
+  /**
+   * @param {serializerType} s
+   * @returns {boolean}
+   */
   object: (s, k, v) => s.type.test(k),
+  /**
+   * @param {serializerType} s
+   */
   string: (s, k, v) => s.type === typeof v,
+  /**
+   * @param {serializerType} s
+   * @returns {boolean}
+   */
   function: (s, k, v) => s.type(k, v),
 };
 
+/**
+ *
+ * @param {serializerType} serializer
+ * @param {*} key
+ * @param {*} value
+ * @returns {boolean}
+ */
 function applies(serializer, key, value) {
   return (
     typeApplies[typeof serializer.type](serializer, key, value) &&
@@ -105,6 +147,10 @@ function findSerializer(key, value) {
 }
 
 const Serializer = {
+  /**
+   *
+   * @param {serializerType | serializerType[]} s
+   */
   addSerializer(s) {
     const newSerializers = validateSerializer(s);
     newSerializers.forEach((s) => serializers[s.on].push(s));
@@ -114,7 +160,6 @@ const Serializer = {
   serialize(key, value) {
     const serializer = findSerializer(key, value);
     if (serializer) {
-      console.log(serializer);
       return serializer.value(key, value);
     }
     return value;
@@ -123,7 +168,6 @@ const Serializer = {
   deserialize(key, value) {
     const deserializer = findDeserializer(key, value);
     if (deserializer) {
-      console.log(deserializer);
       return deserializer.value(key, value);
     }
     return value;

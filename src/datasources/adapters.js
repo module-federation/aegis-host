@@ -48,7 +48,7 @@ export class DataSourceFile extends DataSourceMemory {
    *
    * @param {{
    *  dataSource:Map<string,import('../models').Model>
-   *  serializers:import('../models/index').serializer
+   *  serializers:import('../models/index').serializer[]
    *  directory:string
    *  hydrate:function(*):import('../models').Model,
    *  name:string
@@ -81,9 +81,13 @@ export class DataSourceFile extends DataSourceMemory {
     }
   }
 
-  writeFile() {
+  writeFile(async = true) {
     const dataStr = JSON.stringify([...this.dataSource], this.replace);
-    fs.writeFile(this.file, dataStr, (err) => console.error(err));
+    if (async) {
+      fs.writeFile(this.file, dataStr, (err) => console.error(err));
+    } else {
+      fs.writeFileSync(this.file, dataStr);
+    }
   }
 
   /**
@@ -117,5 +121,9 @@ export class DataSourceFile extends DataSourceMemory {
     const ds = await super.save(id, data);
     this.writeFile();
     return ds;
+  }
+
+  close() {
+    this.writeFile(false);
   }
 }

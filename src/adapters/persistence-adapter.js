@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 export function save(service) {
   return async function ({ model }) {
@@ -8,8 +8,7 @@ export function save(service) {
       console.error(error);
       throw new Error(error);
     }
-
-  }
+  };
 }
 
 export function find(service) {
@@ -21,5 +20,16 @@ export function find(service) {
       console.error(error);
       throw new Error(error);
     }
-  }
+  };
+}
+
+export function close(service) {
+  return function () {
+    try {
+      service.close();
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
+    }
+  };
 }

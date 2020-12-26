@@ -31647,6 +31647,9 @@ var moduleMap = {
 	"./paymentService": () => {
 		return __webpack_require__.e("src_services_payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/payment-service */ "./src/services/payment-service.js")));
 	},
+	"./shippingService": () => {
+		return __webpack_require__.e("src_services_shipping-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/shipping-service */ "./src/services/shipping-service.js")));
+	},
 	"./addressService": () => {
 		return __webpack_require__.e("src_services_address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/address-service */ "./src/services/address-service.js")));
 	}

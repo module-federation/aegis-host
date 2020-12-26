@@ -11,7 +11,7 @@ export default class DataSource {
    * @param {*} data
    */
   async save(id, data) {
-    throw new Error('abstract method not implemented');
+    throw new Error("abstract method not implemented");
   }
 
   /**
@@ -20,7 +20,7 @@ export default class DataSource {
    * @returns {Promise<any>} record
    */
   async find(id) {
-    throw new Error('abstract method not implemented');
+    throw new Error("abstract method not implemented");
   }
 
   /**
@@ -28,10 +28,12 @@ export default class DataSource {
    * @returns {Promise<any[]>}
    */
   async list() {
-    throw new Error('abstract method not implemented');
+    throw new Error("abstract method not implemented");
   }
 
   async delete(id) {
-    throw new Error('abstract method not implemented');
+    throw new Error("abstract method not implemented");
   }
+
+  close() {}
 }

@@ -1,7 +1,7 @@
-'use strict'
+"use strict";
 
-import express from 'express';
-import bodyParser from 'body-parser';
+import express from "express";
+import bodyParser from "body-parser";
 
 import {
   postModels,
@@ -9,27 +9,27 @@ import {
   getModels,
   getModelsById,
   deleteModels,
-} from './controllers';
+} from "./controllers";
 
-import { initRemotes } from './models';
-import { Persistence } from './services/persistence-service';
-import { save, find } from './adapters/persistence-adapter';
-import adapter from './adapters/http-adapter';
-import initMiddleware from './middleware';
-import log from './lib/logger';
+import { initRemotes } from "./models";
+import { Persistence } from "./services/persistence-service";
+import { save, find, close } from "./adapters/persistence-adapter";
+import adapter from "./adapters/http-adapter";
+import initMiddleware from "./middleware";
+import log from "./lib/logger";
 
 const Server = (() => {
   const app = express();
-  const API_ROOT = '/api';
+  const API_ROOT = "/api";
   const PORT = 8070;
   const ENDPOINT = (e) => `${API_ROOT}/${e}`;
   const ENDPOINTID = (e) => `${API_ROOT}/${e}/:id`;
 
   app.use(bodyParser.json());
-  app.use(express.static('public'));
+  app.use(express.static("public"));
 
   function make(path, app, method, controllers) {
-    controllers().forEach(ctlr => {
+    controllers().forEach((ctlr) => {
       log(ctlr);
       app[method](path(ctlr.endpoint), adapter(ctlr.fn));
     });
@@ -40,27 +40,23 @@ const Server = (() => {
     const overrides = { save, find, Persistence };
 
     initRemotes(overrides).then(() => {
-      log('\n%dms to import & register models\n',
-        Date.now() - importStartTime);
+      log("\n%dms to import & register models\n", Date.now() - importStartTime);
 
       const makeEPStartTime = Date.now();
 
-      make(ENDPOINT, app, 'post', postModels);
-      make(ENDPOINT, app, 'get', getModels);
-      make(ENDPOINTID, app, 'patch', patchModels);
-      make(ENDPOINTID, app, 'get', getModelsById);
-      make(ENDPOINTID, app, 'delete', deleteModels);
+      make(ENDPOINT, app, "post", postModels);
+      make(ENDPOINT, app, "get", getModels);
+      make(ENDPOINTID, app, "patch", patchModels);
+      make(ENDPOINTID, app, "get", getModelsById);
+      make(ENDPOINTID, app, "delete", deleteModels);
 
-      log('\n%dms to create endpoints\n',
-        Date.now() - makeEPStartTime);
+      log("\n%dms to create endpoints\n", Date.now() - makeEPStartTime);
 
-      app.listen(
-        PORT,
-        () => {
-          console.log(`Server listening on http://localhost:${PORT}`);
-        }
-      );
+      app.listen(PORT, function () {
+        console.log(`Server listening on http://localhost:${PORT}`);
+      });
 
+      process.on("SIGTERM", () => close());
     });
   }
 
@@ -69,9 +65,8 @@ const Server = (() => {
   }
 
   return {
-    start
-  }
-
+    start,
+  };
 })();
 
 export default Server;

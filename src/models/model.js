@@ -1,27 +1,29 @@
-'use strict';
+"use strict";
 
-import { withId, withTimestamp, withSymbolsInJSON } from './mixins';
-import makePorts from './make-ports';
-import compensate from './compensate';
-import asyncPipe from '../lib/async-pipe';
-import compose from '../lib/compose';
-import uuid from '../lib/uuid';
-import ObserverFactory from '../lib/observer';
+import { withId, withTimestamp, withSymbolsInJSON } from "./mixins";
+import makePorts from "./make-ports";
+import compensate from "./compensate";
+import asyncPipe from "../lib/async-pipe";
+import compose from "../lib/compose";
+import uuid from "../lib/uuid";
+import ObserverFactory from "../lib/observer";
 
 /**
  * @namespace
  */
 const Model = (() => {
   // Render immutable w/ local symbols
-  const ID = Symbol('id');
-  const MODELNAME = Symbol('modelName');
-  const CREATETIME = Symbol('createTime');
-  const ONUPDATE = Symbol('onUpdate');
-  const ONDELETE = Symbol('onDelete');
-  const PORTFLOW = Symbol('portFlow');
+  const ID = Symbol("id");
+  const ONLOAD = Symbol("onLoad");
+  const MODELNAME = Symbol("modelName");
+  const CREATETIME = Symbol("createTime");
+  const ONUPDATE = Symbol("onUpdate");
+  const ONDELETE = Symbol("onDelete");
+  const PORTFLOW = Symbol("portFlow");
 
   const keyMap = {
     id: ID,
+    onLoad: ONLOAD,
     modelName: MODELNAME,
     createTime: CREATETIME,
     onUpdate: ONUPDATE,
@@ -35,8 +37,10 @@ const Model = (() => {
   });
 
   const defDelete = (model) => ({
-    ...withTimestamp('deleteTime')(model),
+    ...withTimestamp("deleteTime")(model),
   });
+
+  const defLoad = (savedData) => savedData;
 
   const observer = ObserverFactory.getInstance();
 
@@ -59,6 +63,7 @@ const Model = (() => {
       modelName,
       mixins = [],
       dependencies,
+      onLoad = defLoad,
       onUpdate = defUpdate,
       onDelete = defDelete,
     },
@@ -81,6 +86,9 @@ const Model = (() => {
       },
       [ONDELETE]() {
         return onDelete(this);
+      },
+      [ONLOAD](savedModel) {
+        return onLoad(savedModel);
       },
       [MODELNAME]: modelName,
     }));
@@ -122,6 +130,11 @@ const Model = (() => {
      * @returns {Model}
      */
     delete: (model) => model[ONDELETE](),
+
+    /**
+     * Invoked when loading saved models
+     */
+    load: (savedData) => model[ONLOAD](savedData),
 
     /**
      * Get private symbol for `key`
