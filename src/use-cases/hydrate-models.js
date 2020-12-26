@@ -1,29 +1,24 @@
 "use strict";
 
-import { Observer } from "../lib/observer";
 import ModelFactory from "../models";
 import Model from "../models/model";
 
 /**
- * Unmarshal deserialized models.
- * @param {*} savedModels
+ * Called by datasource or other I/O module to unmarshal deserialized models.
+ *
+ * @param {import('../models').Model} savedModels
  */
-export default function hydrate(savedModels, observer) {
+export default function hydrate(savedModels) {
   const hydratedModels = new Map();
+
+  // Create new models and merge them with the saved copies.
   savedModels.forEach(function (savedModel, modelId) {
-    // let writable = {};
-    // for (let [v, k] of Object.entries(savedModel)) {
-    //   Object.defineProperty(writable, v, {
-    //     writable: true,
-    //     enumerable: true,
-    //     configurable: true,
-    //   });
-    // }
     ModelFactory.createModel(savedModel.modelName, savedModel).then(function (
       newModel
     ) {
       hydratedModels.set(
         modelId,
+        // Handle any special serialization requirements
         newModel[Model.getKey("onLoad")]({
           ...newModel,
           ...savedModel,
@@ -33,9 +28,6 @@ export default function hydrate(savedModels, observer) {
         })
       );
     });
-    // .then(function (model) {
-    //   Observer.notify("deserialize".concat(savedModel.modelName), model);
-    // });
   });
   return hydratedModels;
 }

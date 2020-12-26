@@ -40,7 +40,7 @@ const Model = (() => {
     ...withTimestamp("deleteTime")(model),
   });
 
-  const defLoad = (savedData) => savedData;
+  const defLoad = (savedModel) => savedModel;
 
   const observer = ObserverFactory.getInstance();
 
@@ -134,7 +134,7 @@ const Model = (() => {
     /**
      * Invoked when loading saved models
      */
-    load: (savedData) => model[ONLOAD](savedData),
+    load: (model, savedData) => model[ONLOAD](savedData),
 
     /**
      * Get private symbol for `key`
