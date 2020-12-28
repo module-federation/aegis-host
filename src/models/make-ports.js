@@ -41,6 +41,7 @@ export default function makePorts(ports, adapters, observer) {
             async function (model) {
               console.log("handling event...", eventName);
               try {
+                console.log({ func: makePorts.name, eventName, port, model });
                 // Invoke this port and pass a callack if one is specified
                 await model[port](callback);
               } catch (error) {
@@ -93,7 +94,8 @@ export default function makePorts(ports, adapters, observer) {
 
             // Signal the next task to run, unless undo is running
             if (!self.undo) {
-              await observer.notify(ports[port].producesEvent, model);
+              const m = model || self;
+              await observer.notify(ports[port].producesEvent, m);
             }
           } catch (error) {
             console.error(
