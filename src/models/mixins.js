@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * @callback mixinFunction
@@ -37,10 +37,22 @@ export const withTimestamp = (propName, fnTimestamp = utc) => {
 /**
  * Convert keys from symbols to strings when
  * the object is serialized so the properties
- * can be seen in JSON output
+ * can be seen in JSON output. When `deserialize`
+ * is true, convert them back to symbols.
  * @param {{key: string, value: Symbol}} keyMap
  */
-export const withSymbolsInJSON = (keyMap) => (o) => {
+export const withSymbolsInJSON = (keyMap, deserialize = false) => (o) => {
+  function fromJSON() {
+    if (deserialize) {
+      return Object.keys(keyMap)
+        .map((k) => (o[k] ? { [keyMap[k]]: o[k] } : {}))
+        .reduce((p, c) => ({ ...c, ...p }));
+    }
+    return {};
+  }
+
+  console.log({fromJSON});
+
   return {
     ...o,
     toJSON() {
@@ -52,5 +64,6 @@ export const withSymbolsInJSON = (keyMap) => (o) => {
         ...symbols,
       };
     },
+    ...fromJSON(),
   };
 };

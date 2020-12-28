@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-import Model from './model';
+import Model from "./model";
 
 /**
  * Generate functions to handle I/O between
@@ -20,7 +20,7 @@ import Model from './model';
  */
 export default function makePorts(ports, adapters, observer) {
   if (!ports || !adapters) {
-    console.warn('no ports or adapters configured');
+    console.warn("no ports or adapters configured");
     return;
   }
 
@@ -29,7 +29,7 @@ export default function makePorts(ports, adapters, observer) {
       const disabled = ports[port].disabled || !adapters[port];
 
       if (disabled) {
-        console.warn('warning: port disabled or adapter missing: %s', port);
+        console.warn("warning: port disabled or adapter missing: %s", port);
       } else {
         const eventName = ports[port].consumesEvent;
         const callback = ports[port].callback;
@@ -39,7 +39,7 @@ export default function makePorts(ports, adapters, observer) {
           observer.on(
             eventName,
             async function (model) {
-              console.log('handling event...', eventName);
+              console.log("handling event...", eventName);
               try {
                 // Invoke this port and pass a callack if one is specified
                 await model[port](callback);
@@ -68,7 +68,7 @@ export default function makePorts(ports, adapters, observer) {
           let timerId;
           if (timeout > 0) {
             timerId = setTimeout(function () {
-              console.error('port operation timed out: %s', port);
+              console.error("port operation timed out: %s", port);
 
               // Call the port's timeout handler if one is specified
               const timeoutCallback = ports[port].timeoutCallback;
@@ -93,11 +93,11 @@ export default function makePorts(ports, adapters, observer) {
 
             // Signal the next task to run, unless undo is running
             if (!self.undo) {
-              observer.notify(ports[port].producesEvent, model);
+              await observer.notify(ports[port].producesEvent, model);
             }
           } catch (error) {
             console.error(
-              'port operation exception %s: %s',
+              "port operation exception %s: %s",
               port,
               error.message
             );

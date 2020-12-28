@@ -1,15 +1,15 @@
-import log from '../lib/logger';
+import log from "../lib/logger";
 
 export default function deleteModelFactory(removeModel, getModelId, hash) {
   return async function deleteModel(httpRequest) {
     try {
-      const { source = {}, ...modelInfo } = httpRequest.body
-      log({ function: 'patchModel', ...modelInfo });
+      const { source = {}, ...modelInfo } = httpRequest.body;
+      log({ function: "patchModel", ...modelInfo });
 
-      source.ip = httpRequest.ip
-      source.browser = httpRequest.headers['User-Agent']
-      if (httpRequest.headers['Referer']) {
-        source.referrer = httpRequest.headers['Referer']
+      source.ip = httpRequest.ip;
+      source.browser = httpRequest.headers["User-Agent"];
+      if (httpRequest.headers["Referer"]) {
+        source.referrer = httpRequest.headers["Referer"];
       }
       log(source);
       const id = httpRequest.params.id;
@@ -19,25 +19,34 @@ export default function deleteModelFactory(removeModel, getModelId, hash) {
 
       return {
         headers: {
-          'Content-Type': 'application/json',
-          'Last-Modified': new Date().toUTCString(),
-          'ETag': hash(JSON.stringify(model))
+          "Content-Type": "application/json",
+          "Last-Modified": new Date().toUTCString(),
+          ETag: hash(JSON.stringify(model)),
         },
         statusCode: 201,
-        body: { modelId: getModelId(model) }
-      }
+        body: { modelId: getModelId(model) },
+      };
     } catch (e) {
       log(e);
 
+      if (e.message === "no such id") {
+        return {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          statusCode: 404,
+        };
+      }
+
       return {
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         statusCode: 400,
         body: {
-          error: e.message
-        }
-      }
+          error: e.message,
+        },
+      };
     }
-  }
+  };
 }

@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-import remoteEntries from '../../webpack/remote-entries';
+import remoteEntries from "../../webpack/remote-entries";
 
 /**
  * @returns {Promise<import('../models').ModelSpecification[]>}
@@ -10,13 +10,13 @@ export async function importRemoteModels() {
 
   let remoteModels = [];
   for (const entry of remoteEntries) {
-    if (entry.type === 'model') {
+    if (entry.type === "model") {
       const models = await entry.importRemote();
       remoteModels.push(models);
     }
   }
 
-  console.log('\n%dms to import remote models\n', Date.now() - importStartTime);
+  console.log("\n%dms to import remote models\n", Date.now() - importStartTime);
 
   return remoteModels
     .map((m) => ({
@@ -36,14 +36,14 @@ export async function importRemoteServices() {
 
   let services = [];
   for (const entry of remoteEntries) {
-    if (entry.type === 'service') {
+    if (entry.type === "service") {
       const service = await entry.importRemote();
       services.push(service);
     }
   }
 
   console.log(
-    '\n%dms to import remote services\n',
+    "\n%dms to import remote services\n",
     Date.now() - importStartTime
   );
 
@@ -60,14 +60,14 @@ export async function importRemoteAdapters() {
 
   let adapters = [];
   for (const entry of remoteEntries) {
-    if (entry.type === 'adapter') {
+    if (entry.type === "adapter") {
       const adapter = await entry.importRemote();
       adapters.push(adapter);
     }
   }
 
   console.log(
-    '\n%dms to import remote adapters\n',
+    "\n%dms to import remote adapters\n",
     Date.now() - importStartTime
   );
 

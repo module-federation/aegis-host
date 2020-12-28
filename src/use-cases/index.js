@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-import addModelFactory from './add-model';
-import editModelFactory from './edit-model';
-import listModelsFactory from './list-models';
-import findModelFactory from './find-model';
-import removeModelFactory from './remove-model';
-import handleEvents from './handle-events';
-import DataSourceFactory from '../datasources';
-import ObserverFactory from '../lib/observer';
-import ModelFactory from '../models';
-import hydrate from './hydrate-models';
+import addModelFactory from "./add-model";
+import editModelFactory from "./edit-model";
+import listModelsFactory from "./list-models";
+import findModelFactory from "./find-model";
+import removeModelFactory from "./remove-model";
+import handleEvents from "./handle-events";
+import DataSourceFactory from "../datasources";
+import ObserverFactory from "../lib/observer";
+import ModelFactory from "../models";
+import loadModels from "./load-models";
 
 handleEvents(ObserverFactory.getInstance());
 
@@ -24,7 +24,7 @@ function buildOptions(model) {
     repository: DataSourceFactory.getDataSource(
       model.modelName,
       model.serializers,
-      hydrate
+      loadModels
     ),
     observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers,

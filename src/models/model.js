@@ -7,6 +7,7 @@ import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
 import uuid from "../lib/uuid";
 import ObserverFactory from "../lib/observer";
+import pipe from "../lib/pipe";
 
 /**
  * @namespace
@@ -14,7 +15,6 @@ import ObserverFactory from "../lib/observer";
 const Model = (() => {
   // Render immutable w/ local symbols
   const ID = Symbol("id");
-  const ONLOAD = Symbol("onLoad");
   const MODELNAME = Symbol("modelName");
   const CREATETIME = Symbol("createTime");
   const ONUPDATE = Symbol("onUpdate");
@@ -23,7 +23,6 @@ const Model = (() => {
 
   const keyMap = {
     id: ID,
-    onLoad: ONLOAD,
     modelName: MODELNAME,
     createTime: CREATETIME,
     onUpdate: ONUPDATE,
@@ -40,9 +39,39 @@ const Model = (() => {
     ...withTimestamp("deleteTime")(model),
   });
 
-  const defLoad = (savedModel) => savedModel;
-
   const observer = ObserverFactory.getInstance();
+
+  function normalize({
+    model,
+    spec: {
+      ports,
+      modelName,
+      mixins = [],
+      dependencies,
+      onUpdate = defUpdate,
+      onDelete = defDelete,
+    },
+  }) {
+    return {
+      ...model,
+      // Track port calls
+      [PORTFLOW]: [],
+      // Create ports for domain I/O
+      ...makePorts.call(model, ports, dependencies, observer),
+      // Undo logic
+      compensate: compensate.call(model, ports),
+      // Optional mixins
+      ...compose(...mixins)(model),
+      // Immutable props...
+      [ONUPDATE](changes) {
+        return onUpdate(this, changes);
+      },
+      [ONDELETE]() {
+        return onDelete(this);
+      },
+      [MODELNAME]: modelName,
+    };
+  }
 
   /**
    * Call factory with user input, generate port functions
@@ -55,43 +84,11 @@ const Model = (() => {
    *  spec: import('./index').ModelSpecification
    * }}
    */
-  const Model = async ({
-    args,
-    spec: {
-      ports,
-      factory,
-      modelName,
-      mixins = [],
-      dependencies,
-      onLoad = defLoad,
-      onUpdate = defUpdate,
-      onDelete = defDelete,
-    },
-  }) =>
+  const Model = async (modelInfo) =>
     Promise.resolve(
       // Call factory
-      factory(...args)
-    ).then((model) => ({
-      // Track port calls
-      [PORTFLOW]: [],
-      // Create ports for domain I/O
-      ...makePorts.call(model, ports, dependencies, observer),
-      // Undo logic
-      ...compensate.call(model, ports),
-      // Optional mixins
-      ...compose(...mixins)(model),
-      // Immutable props...
-      [ONUPDATE](changes) {
-        return onUpdate(this, changes);
-      },
-      [ONDELETE]() {
-        return onDelete(this);
-      },
-      [ONLOAD](savedModel) {
-        return onLoad(savedModel);
-      },
-      [MODELNAME]: modelName,
-    }));
+      modelInfo.spec.factory(...modelInfo.args)
+    ).then((model) => normalize({ model, spec: modelInfo.spec }));
 
   // Add common behavior & data
   const makeModel = asyncPipe(
@@ -99,6 +96,12 @@ const Model = (() => {
     withTimestamp(CREATETIME),
     withId(ID, uuid),
     withSymbolsInJSON(keyMap),
+    Object.freeze
+  );
+
+  const loadModel = pipe(
+    normalize,
+    withSymbolsInJSON(keyMap, true),
     Object.freeze
   );
 
@@ -114,6 +117,18 @@ const Model = (() => {
     create: async (modelInfo) => makeModel(modelInfo),
 
     /**
+     * Invoked when loading saved models
+     * @param {Model} savedModel deserialized model
+     * @param {import('../models').ModelSpecification} spec
+     */
+    load: function (modelInfo) {
+      return loadModel({
+        model: { ...modelInfo.model, isLoading: true },
+        spec: { ...modelInfo.spec },
+      });
+    },
+
+    /**
      * Process model update request.
      * (Invokes provided `onUpdate` callback.)
      * @param {Model} model - model instance to update
@@ -121,7 +136,11 @@ const Model = (() => {
      * @returns {Model} updated model
      *
      */
-    update: (model, changes) => model[ONUPDATE](changes),
+    update: function (model, changes) {
+      const updates = { ...changes, isLoading: false };
+      console.log({ updates, model });
+      return model[ONUPDATE](updates);
+    },
 
     /**
      * Process model delete request.
@@ -130,11 +149,6 @@ const Model = (() => {
      * @returns {Model}
      */
     delete: (model) => model[ONDELETE](),
-
-    /**
-     * Invoked when loading saved models
-     */
-    load: (model, savedData) => model[ONLOAD](savedData),
 
     /**
      * Get private symbol for `key`

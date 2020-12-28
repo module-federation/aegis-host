@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import Model from './model';
-import Event from './event';
+import Model from "./model";
+import Event from "./event";
 
 /**
  * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType
@@ -42,19 +42,19 @@ import Event from './event';
  * @enum {EventType}
  */
 const EventTypes = {
-  CREATE: 'CREATE',
-  UPDATE: 'UPDATE',
-  DELETE: 'DELETE',
+  CREATE: "CREATE",
+  UPDATE: "UPDATE",
+  DELETE: "DELETE",
 };
 
 /**
  * @param {String} modelName
  */
 function checkModelName(modelName) {
-  if (typeof modelName === 'string') {
+  if (typeof modelName === "string") {
     return modelName.toUpperCase();
   }
-  throw new Error('modelName missing or invalid');
+  throw new Error("modelName missing or invalid");
 }
 
 /**
@@ -62,13 +62,13 @@ function checkModelName(modelName) {
  * @param {EventType} eventType
  */
 function checkEventType(eventType) {
-  if (typeof eventType === 'string') {
+  if (typeof eventType === "string") {
     const upper = eventType.toUpperCase();
     if (Object.values(EventTypes).includes(upper)) {
       return upper;
     }
   }
-  throw new Error('eventType missing or invalid');
+  throw new Error("eventType missing or invalid");
 }
 
 /**
@@ -112,7 +112,7 @@ const ModelFactory = {
     const name = checkModelName(modelName);
     const type = checkEventType(eventType);
 
-    if (typeof factory === 'function') {
+    if (typeof factory === "function") {
       eventFactories[type].set(name, factory);
     }
   },
@@ -129,7 +129,16 @@ const ModelFactory = {
     if (spec) {
       return Model.create({ spec, args });
     }
-    throw new Error('unregistered model');
+    throw new Error("unregistered model");
+  },
+
+  loadModel: (model, modelName) => {
+    const name = checkModelName(modelName);
+    const spec = modelFactories.get(name);
+    if (spec) {
+      return Model.load({ model, spec });
+    }
+    throw new Error("unregistered model");
   },
 
   /**
@@ -146,7 +155,7 @@ const ModelFactory = {
     if (factory) {
       return Event.create({ args, factory, eventType: type, modelName: name });
     }
-    throw new Error('unregistered model event');
+    throw new Error("unregistered model event");
   },
 
   /**
@@ -171,21 +180,15 @@ const ModelFactory = {
    * @param {*} changes - object with updated properties
    * @returns {Model} updated model
    */
-  updateModel: (model, changes) => {
-    return Model.update(model, changes);
-  },
+  updateModel: (model, changes) => Model.update(model, changes),
 
-  deleteModel: (model) => {
-    return Model.delete(model);
-  },
+  deleteModel: (model) => Model.delete(model),
 
   /**
    * Get ID of model
    * @param {Model} model
    */
-  getModelId: (model) => {
-    return Model.getId(model);
-  },
+  getModelId: (model) => Model.getId(model),
 
   /**
    * Get model's name

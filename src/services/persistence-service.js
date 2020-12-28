@@ -17,6 +17,21 @@ export const Persistence = {
     );
   },
 
+  findModel(model) {
+    const current = this.find(model);
+    if (current) {
+      return current;
+    }
+    return model;
+  },
+
+  async update(model, changes) {
+    const current = await this.findModel(model);
+    const updated = Model.update(current, changes);
+    await this.save(updated);
+    return updated;
+  },
+
   close() {
     DataSource.close();
   },

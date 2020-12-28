@@ -13,7 +13,7 @@ import {
 
 import { initRemotes } from "./models";
 import { Persistence } from "./services/persistence-service";
-import { save, find, close } from "./adapters/persistence-adapter";
+import { save, find, update, close } from "./adapters/persistence-adapter";
 import adapter from "./adapters/http-adapter";
 import initMiddleware from "./middleware";
 import log from "./lib/logger";
@@ -37,7 +37,7 @@ const Server = (() => {
 
   function run() {
     const importStartTime = Date.now();
-    const overrides = { save, find, Persistence };
+    const overrides = { save, find, update, Persistence };
 
     initRemotes(overrides).then(() => {
       log("\n%dms to import & register models\n", Date.now() - importStartTime);

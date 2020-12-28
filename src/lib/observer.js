@@ -27,7 +27,7 @@ export class Observer {
    * @param {boolean} [allowMultiple] - true by default; if false, event handled only once
    */
   on(eventName, handler, allowMultiple = true) {
-    throw new Error('unimplemented abstract method');
+    throw new Error("unimplemented abstract method");
   }
   /**
    * Fire event `eventName` and pass `eventData` to listeners.
@@ -35,7 +35,7 @@ export class Observer {
    * @param {Event} eventData
    */
   async notify(eventName, eventData) {
-    throw new Error('unimplemented abstract method');
+    throw new Error("unimplemented abstract method");
   }
 }
 
@@ -56,8 +56,8 @@ class ObserverImpl extends Observer {
    *
    */
   on(eventName, handler, allowMultiple = true) {
-    if (!eventName || typeof handler !== 'function') {
-      throw new Error('eventName or handler invalid');
+    if (!eventName || typeof handler !== "function") {
+      throw new Error("eventName or handler invalid");
     }
     if (this._handlers.has(eventName)) {
       if (allowMultiple) {
@@ -74,15 +74,17 @@ class ObserverImpl extends Observer {
   async notify(eventName, eventData) {
     if (this._handlers.has(eventName)) {
       await Promise.all(
-        this._handlers.get(eventName).map((handler) => handler(eventData))
+        this._handlers
+          .get(eventName)
+          .map(async (handler) => await handler(eventData))
       ).catch((reason) => {
         throw new Error(reason);
       });
-      if (eventName !== '*') {
-        await this.notify('*', eventData);
+      if (eventName !== "*") {
+        await this.notify("*", eventData);
       }
-    } else if (eventName !== '*') {
-      await this.notify('*', eventData);
+    } else if (eventName !== "*") {
+      await this.notify("*", eventData);
     }
   }
 }
