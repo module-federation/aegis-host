@@ -2,11 +2,11 @@
 
 import Model from "./model";
 
-/** 
+/**
  * Set an appropriate timeout interval and action for the port.
- * @param {*} port 
- * @param {*} ports 
- * @param {*} model 
+ * @param {*} port
+ * @param {*} ports
+ * @param {*} model
  */
 function setPortTimeout(port, ports, model) {
   // Set an appropriate timeout for the port
@@ -15,7 +15,7 @@ function setPortTimeout(port, ports, model) {
   if (timeout === 0) {
     return 0;
   }
-` `
+  ` `;
   const timerId = setTimeout(function () {
     console.error("port operation timed out: %s", port);
 
@@ -32,11 +32,10 @@ function setPortTimeout(port, ports, model) {
   return timerId;
 }
 
-
 /**
- * Register an event handler to invoke the port.  
+ * Register an event handler to invoke the port.
  */
-function handlePortEvents(port, ports, observer) {
+function setPortEvent(port, ports, observer) {
   const eventName = ports[port].consumesEvent;
   const callback = ports[port].callback;
 
@@ -58,7 +57,7 @@ function handlePortEvents(port, ports, observer) {
 }
 
 /**
- * 
+ *
  */
 function handleError(port, ports, error) {
   console.error("port operation exception %s: %s", port, error.message);
@@ -104,7 +103,7 @@ export default function makePorts(ports, adapters, observer) {
       if (disabled) {
         console.warn("warning: port disabled or adapter missing: %s", port);
       } else {
-        handlePortEvents(port, ports, observer);
+        setPortEvent(port, ports, observer);
       }
 
       return {
