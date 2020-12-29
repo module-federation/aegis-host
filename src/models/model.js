@@ -41,7 +41,7 @@ const Model = (() => {
 
   const observer = ObserverFactory.getInstance();
 
-  function normalize({
+  function enrich({
     model,
     spec: {
       ports,
@@ -88,7 +88,7 @@ const Model = (() => {
     Promise.resolve(
       // Call factory
       modelInfo.spec.factory(...modelInfo.args)
-    ).then((model) => normalize({ model, spec: modelInfo.spec }));
+    ).then((model) => enrich({ model, spec: modelInfo.spec }));
 
   // Add common behavior & data
   const makeModel = asyncPipe(
@@ -100,7 +100,7 @@ const Model = (() => {
   );
 
   const loadModel = pipe(
-    normalize,
+    enrich,
     withSymbolsInJSON(keyMap, true),
     Object.freeze
   );

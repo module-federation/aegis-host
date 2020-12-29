@@ -51,7 +51,7 @@ export const withSymbolsInJSON = (keyMap, deserialize = false) => (o) => {
     return {};
   }
 
-  console.log({fromJSON});
+  console.log(fromJSON());
 
   return {
     ...o,
