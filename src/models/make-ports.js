@@ -3,7 +3,7 @@
 import Model from "./model";
 
 /**
- * Set an appropriate timeout interval and action for the port.
+ * Set an appropriate timeout interval and handler for the port.
  * @param {*} port
  * @param {*} ports
  * @param {*} model
@@ -15,7 +15,7 @@ function setPortTimeout(port, ports, model) {
   if (timeout === 0) {
     return 0;
   }
-  ` `;
+
   const timerId = setTimeout(function () {
     console.error("port operation timed out: %s", port);
 
@@ -33,7 +33,7 @@ function setPortTimeout(port, ports, model) {
 }
 
 /**
- * Register an event handler to invoke the port.
+ * Register an event handler that invokes the `port`.
  */
 function setPortEvent(port, ports, observer) {
   const eventName = ports[port].consumesEvent;

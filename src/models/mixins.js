@@ -43,15 +43,11 @@ export const withTimestamp = (propName, fnTimestamp = utc) => {
  */
 export const withSymbolsInJSON = (keyMap, deserialize = false) => (o) => {
   function fromJSON() {
-    if (deserialize) {
-      return Object.keys(keyMap)
-        .map((k) => (o[k] ? { [keyMap[k]]: o[k] } : {}))
-        .reduce((p, c) => ({ ...c, ...p }));
-    }
-    return {};
+    if (!deserialize) return {};
+    return Object.keys(keyMap)
+      .map((k) => (o[k] ? { [keyMap[k]]: o[k] } : {}))
+      .reduce((p, c) => ({ ...c, ...p }));
   }
-
-  console.log(fromJSON());
 
   return {
     ...o,

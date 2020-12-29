@@ -182,6 +182,10 @@ const ModelFactory = {
    */
   updateModel: (model, changes) => Model.update(model, changes),
 
+  /**
+   *
+   * @param {*} model
+   */
   deleteModel: (model) => Model.delete(model),
 
   /**
@@ -193,9 +197,7 @@ const ModelFactory = {
   /**
    * Get model's name
    */
-  getModelName: (model) => {
-    return Model.getName(model);
-  },
+  getModelName: (model) => Model.getName(model),
 
   /**
    * Get `eventName` value
