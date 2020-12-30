@@ -138,7 +138,6 @@ const Model = (() => {
      */
     update: function (model, changes) {
       const updates = { ...changes, isLoading: false };
-      console.log({ updates, model });
       return model[ONUPDATE](updates);
     },
 

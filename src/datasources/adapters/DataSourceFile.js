@@ -1,44 +1,7 @@
 import fs from "fs";
 import path from "path";
-import DataSource from "./datasource";
-import Serializer from "../lib/serializer";
-
-/**
- * Temporary in-memory storage
- */
-export class DataSourceMemory extends DataSource {
-  constructor({ dataSource }) {
-    super({ dataSource });
-  }
-
-  /**
-   * @override
-   */
-  async save(id, data) {
-    this.dataSource.set(id, data);
-  }
-
-  /**
-   * @override
-   */
-  async find(id) {
-    return this.dataSource.get(id);
-  }
-
-  /**
-   * @override
-   */
-  async list() {
-    return [...this.dataSource.values()];
-  }
-
-  /**
-   * @override
-   */
-  async delete(id) {
-    this.dataSource.delete(id);
-  }
-}
+import { DataSourceMemory } from "./DataSourceMemory";
+import Serializer from "../../lib/serializer";
 
 /**
  * Persistent storage on filesystem

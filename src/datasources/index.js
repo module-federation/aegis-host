@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
 /**
  * @typedef {import('../models').Model} Model
  */
 
-import * as adapters from './adapters';
-
-const adapter = process.env.DATASOURCE_ADAPTER || 'DataSourceMemory';
+import * as adapters from "./adapters";
+console.log(adapters);
+const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
 
 const DataSourceFactory = (() => {
   let dataSources;
