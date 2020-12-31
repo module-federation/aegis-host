@@ -1,8 +1,5 @@
 "use strict";
 
-import e from "express";
-import Model from "../models/model";
-
 export function save(service) {
   return async function ({ model }) {
     try {

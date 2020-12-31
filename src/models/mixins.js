@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * @callback mixinFunction
+ * @callback functionalMixin
  * @param {Object} o - Object to compose
  * @returns {Object} - Composed object
  */
@@ -9,7 +9,7 @@
 /**
  * @callback functionalMixinFactory
  * @param {*} mixinFunctionParams params for mixin function
- * @returns {mixinFunction}
+ * @returns {functionalMixin}
  */
 
 /**

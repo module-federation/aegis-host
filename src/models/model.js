@@ -1,6 +1,10 @@
 "use strict";
 
-import { withId, withTimestamp, withSymbolsInJSON } from "./mixins";
+import {
+  withId,
+  withTimestamp,
+  withSymbolsInJSON
+} from "./mixins";
 import makePorts from "./make-ports";
 import compensate from "./compensate";
 import asyncPipe from "../lib/async-pipe";
@@ -41,7 +45,7 @@ const Model = (() => {
 
   const observer = ObserverFactory.getInstance();
 
-  function enrich({
+  function make({
     model,
     spec: {
       ports,
@@ -58,7 +62,7 @@ const Model = (() => {
       [PORTFLOW]: [],
       // Create ports for domain I/O
       ...makePorts.call(model, ports, dependencies, observer),
-      // Undo logic
+      // Orchestration undo logic
       compensate: compensate.call(model, ports),
       // Optional mixins
       ...compose(...mixins)(model),
@@ -82,13 +86,16 @@ const Model = (() => {
    * @param {{
    *  args: any[],
    *  spec: import('./index').ModelSpecification
-   * }}
+   * }} modelInfo
    */
   const Model = async (modelInfo) =>
     Promise.resolve(
       // Call factory
       modelInfo.spec.factory(...modelInfo.args)
-    ).then((model) => enrich({ model, spec: modelInfo.spec }));
+    ).then((model) => make({
+      model,
+      spec: modelInfo.spec
+    }));
 
   // Add common behavior & data
   const makeModel = asyncPipe(
@@ -100,7 +107,7 @@ const Model = (() => {
   );
 
   const loadModel = pipe(
-    enrich,
+    make,
     withSymbolsInJSON(keyMap, true),
     Object.freeze
   );
@@ -123,21 +130,29 @@ const Model = (() => {
      */
     load: function (modelInfo) {
       return loadModel({
-        model: { ...modelInfo.model, isLoading: true },
-        spec: { ...modelInfo.spec },
+        model: {
+          ...modelInfo.model,
+          isLoading: true
+        },
+        spec: {
+          ...modelInfo.spec
+        },
       });
     },
 
     /**
      * Process model update request.
-     * (Invokes provided `onUpdate` callback.)
+     * (Invokes user-provided `onUpdate` callback.)
      * @param {Model} model - model instance to update
      * @param {Object} changes - Object containing changes
      * @returns {Model} updated model
      *
      */
     update: function (model, changes) {
-      const updates = { ...changes, isLoading: false };
+      const updates = {
+        ...changes,
+        isLoading: false
+      };
       return model[ONUPDATE](updates);
     },
 

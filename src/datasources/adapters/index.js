@@ -1,2 +1,2 @@
-export * from "./DataSourceMemory";
-export * from "./DataSourceFile";
+export * from "./datasource-memory";
+export * from "./datasource-file";

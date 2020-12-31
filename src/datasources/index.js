@@ -5,7 +5,7 @@
  */
 
 import * as adapters from "./adapters";
-console.log(adapters);
+
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
 
 const DataSourceFactory = (() => {
@@ -19,7 +19,7 @@ const DataSourceFactory = (() => {
    * @param {import('../models/index').serializer[]} [serializers] - callbacks invoked during de/serialization
    * @param {function(Map<string,Model>):Map<string,Model} [hydrate] - unmarshalling deserialized objects
    */
-  function getDataSource(name, serializers = {}, hydrate = (v) => v) {
+  function getDataSource(name, serializers = {}, loadModels = (v) => v) {
     if (!dataSources) {
       dataSources = new Map();
     }
@@ -30,7 +30,7 @@ const DataSourceFactory = (() => {
       name,
       dataSource: new Map(),
       serializers,
-      hydrate,
+      loadModels,
     });
     dataSources.set(name, newDs);
     return newDs;

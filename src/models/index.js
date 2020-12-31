@@ -9,16 +9,19 @@ import {
 } from "../services/federation-service";
 
 /**
- * @typedef {Object} Model
- * @property {Symbol} id
- * @property {Symbol} modelName
- * @property {Symbol} createTime
- * @property {Symbol} onUpdate
- * @property {Symbol} onDelete
+ * @typedef {Object} Model Every imported domain object created by the framework 
+ * is a `Model`, which allows it to be extended and controlled through configuration. 
+ * Note that the framework does not use inheritance. All objects are immutable; 
+ * all extensions are applied to copies of the original.
+ * @property {string} id
+ * @property {string} modelName
+ * @property {string} createTime
+ * @property {string} onUpdate
+ * @property {string} onDelete
  *
  * @typedef {import('../models/event').Event} Event
  *
- * @typedef {Object} ModelFactory
+ * @typedef {Object} ModelFactory Creates new model instances.
  * @property {function(string,*):Promise<Readonly<Model>>} createModel
  * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
  * @property {function(Model,object):Model} updateModel
@@ -26,6 +29,8 @@ import {
  * @property {function(string,string):string} getEventName
  * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
  * @property {function(any):string} getModelId
+ * @property {function(Model):string[]} getPortFlow 
+ * @property {function(Map<string,Model>):Map<string,Model>} loadModels
  *
  * @typedef {string} service - name of the service object to inject in adapter
  * @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds
@@ -64,23 +69,25 @@ import {
  *  type: (function(key,value):boolean) | "string" | "object" | "number" | "function" | "any" | RegExp
  *  value: function(key, value):any
  * }} serializer
- *
- * @typedef {Object} ModelSpecification Specify model data and behavior
- * @property {string} modelName name of model (case-insenstive)
- * @property {string} endpoint URI reference (e.g. plural of `modelName`)
- * @property {function(...args): any} factory factory function that creates model
- * @property {object} dependencies injected into the model for inverted control
- * @property {Array<import("./mixins").mixinFunction>} [mixins] functional mixins
- * @property {onUpdate} [onUpdate] function called to handle update requests
- * @property {onDelete} [onDelete] function called before deletion
- * @property {ports} [ports] input/output ports for the domain
- * @property {Array<function({
+ * 
+ * @typedef {Array<function({
  *  eventName:string,
  *  eventType:string,
  *  eventTime:string,
  *  modelName:string,
  *  model:Model
- * }):Promise<void>>} [eventHandlers] callbacks invoked when CRUD events occur
+ * }):Promise<void>>} eventHandler
+ *
+ * @typedef {Object} ModelSpecification Specify model data and behavior
+ * @property {string} modelName name of model (case-insenstive)
+ * @property {string} endpoint URI reference (e.g. plural of `modelName`)
+ * @property {function(...args): any} factory factory function that creates model
+ * @property {object} [dependencies] injected into the model for inverted control
+ * @property {Array<import("./mixins").functionalMixin>} [mixins] functional mixins
+ * @property {onUpdate} [onUpdate] function called to handle update requests
+ * @property {onDelete} [onDelete] function called before deletion
+ * @property {ports} [ports] input/output ports for the domain
+ * @property {eventHandler[]} [eventHandlers] callbacks invoked (after save) when CRUD write events occur
  * @property {serializer[]} serializers callbacks invoked to de/serialzed the model
  */
 
@@ -95,7 +102,10 @@ const createEvent = (model) => ({
 /**
  * @param {{updated:Model,changes:Object}} param0
  */
-const updateEvent = ({ updated, changes }) => ({
+const updateEvent = ({
+  updated,
+  changes
+}) => ({
   model: updated,
   changes: {
     ...changes,
@@ -175,16 +185,13 @@ export async function initRemotes(overrides) {
     overrides,
   });
 
-  await initModels(
-    {
-      ...services,
-      ...overrides,
-    },
-    {
-      ...adapters,
-      ...overrides,
-    }
-  );
+  await initModels({
+    ...services,
+    ...overrides,
+  }, {
+    ...adapters,
+    ...overrides,
+  });
 }
 
 export default ModelFactory;

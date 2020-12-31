@@ -34,6 +34,8 @@ function setPortTimeout(port, ports, model) {
 
 /**
  * Register an event handler that invokes the `port`.
+ * @returns {boolean} whether or not to record this port 
+ * for compensation and restart
  */
 function setPortEvent(port, ports, observer) {
   const eventName = ports[port].consumesEvent;
@@ -53,7 +55,9 @@ function setPortEvent(port, ports, observer) {
       },
       false
     );
-  }
+    return true;
+  } 
+  return false;
 }
 
 /**
@@ -99,11 +103,12 @@ export default function makePorts(ports, adapters, observer) {
   return Object.keys(ports)
     .map(function (port) {
       const disabled = ports[port].disabled || !adapters[port];
+      let recordPort = false;
 
       if (disabled) {
         console.warn("warning: port disabled or adapter missing: %s", port);
       } else {
-        setPortEvent(port, ports, observer);
+        recordPort = setPortEvent(port, ports, observer);
       }
 
       return {
@@ -111,8 +116,8 @@ export default function makePorts(ports, adapters, observer) {
         async [port](...args) {
           const self = this;
 
-          // If the port is disabled, return
-          if (disabled) {
+          // If the port is disabled or we've already invoked it, ret urn
+          if (disabled || Model.getPortFlow(self).includes(port)) {
             return;
           }
 
@@ -125,11 +130,13 @@ export default function makePorts(ports, adapters, observer) {
             // Stop the timer
             clearTimeout(timerId);
 
-            // Record each invocation for undo
-            Model.getPortFlow(self).push(port);
+            // Record invocations for undo
+            if (recordPort) {
+              Model.getPortFlow(self).push(port);
+            }
 
             // Signal the next task to run, unless undo is running
-            if (!self.undo) {
+            if (!self.undo && recordPort) {
               const m = model || self;
               await observer.notify(ports[port].producesEvent, m);
             }

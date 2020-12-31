@@ -2,12 +2,11 @@
 
 import Model from "./model";
 import Event from "./event";
+import ObserverFactory, { Observer } from "../lib/observer";
 
 /**
  * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType
- */
-
-/**
+ * 
  * @typedef {{
  *  id:string,
  *  createTime:string,
@@ -15,26 +14,8 @@ import Event from "./event";
  *  onUpdate:function(Model,*):Model,
  *  onDelete:function(Model):Model
  * }} Model
- */
-
-/**
- * @typedef {{
- *  modelName: string,
- *  endpoint: string,
- *  factory: function(*):function(*):any,
- *  dependencies: any,
- *  onUpdate?: function(Model,*): Model,
- *  onDelete?: function(Model): Model,
- *  eventHandlers?: Array<function({
- *    eventName:string,
- *    eventType:string,
- *    eventTime:string,
- *    modelName:string,
- *    model:Model
- *  }):Promise<void>>
- *  mixins?: Array<import('./mixins').mixinFunction>,
- *  isRemote?: boolean
- * }} ModelSpecification
+ * 
+ * @typedef {import('./index').ModelSpecification} ModelSpecification
  */
 
 /**
@@ -127,7 +108,10 @@ const ModelFactory = {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
     if (spec) {
-      return Model.create({ spec, args });
+      return Model.create({
+        spec,
+        args
+      });
     }
     throw new Error("unregistered model");
   },
@@ -136,7 +120,10 @@ const ModelFactory = {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
     if (spec) {
-      return Model.load({ model, spec });
+      return Model.load({
+        model,
+        spec
+      });
     }
     throw new Error("unregistered model");
   },
@@ -153,7 +140,12 @@ const ModelFactory = {
     const type = checkEventType(eventType);
     const factory = eventFactories[type].get(name);
     if (factory) {
-      return Event.create({ args, factory, eventType: type, modelName: name });
+      return Event.create({
+        args,
+        factory,
+        eventType: type,
+        modelName: name
+      });
     }
     throw new Error("unregistered model event");
   },
@@ -173,6 +165,12 @@ const ModelFactory = {
     }
     return models;
   },
+
+  /**
+   * History of port invocation
+   * @param {Model} model 
+   */
+  getPortFlow: (model) => Model.getPortFlow(model),
 
   /**
    *

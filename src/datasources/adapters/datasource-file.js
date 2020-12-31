@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { DataSourceMemory } from "./DataSourceMemory";
+import { DataSourceMemory } from "./datasource-memory";
 import Serializer from "../../lib/serializer";
 
 /**
@@ -13,7 +13,7 @@ export class DataSourceFile extends DataSourceMemory {
    *  dataSource:Map<string,import('../models').Model>
    *  serializers:import('../models/index').serializer[]
    *  directory:string
-   *  hydrate:function(*):import('../models').Model,
+   *  loadModels:function(*):import('../models').Model,
    *  name:string
    * }} param0
    */
@@ -21,15 +21,17 @@ export class DataSourceFile extends DataSourceMemory {
     dataSource,
     serializers = [],
     directory = __dirname,
-    hydrate = (value) => value,
+    loadModels = (value) => value,
     name,
   }) {
-    super({ dataSource });
+    super({
+      dataSource
+    });
     this.file = path.resolve(directory, name.concat(".json"));
     if (serializers.length > 0) {
       Serializer.addSerializer(serializers);
     }
-    this.dataSource = this.readFile(hydrate);
+    this.dataSource = this.readFile(loadModels);
   }
 
   replace(key, value) {
@@ -56,11 +58,11 @@ export class DataSourceFile extends DataSourceMemory {
   /**
    *
    */
-  readFile(hydrate) {
+  readFile(loadModels) {
     if (fs.existsSync(this.file)) {
       const models = fs.readFileSync(this.file, "utf-8");
       if (models) {
-        return hydrate(new Map(JSON.parse(models, this.revive)));
+        return loadModels(new Map(JSON.parse(models, this.revive)));
       }
     }
     return new Map();
