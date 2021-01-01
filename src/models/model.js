@@ -3,7 +3,8 @@
 import {
   withId,
   withTimestamp,
-  withSymbolsInJSON
+  withSymbolsInJSON,
+  withObserver
 } from "./mixins";
 import makePorts from "./make-ports";
 import compensate from "./compensate";
@@ -103,12 +104,14 @@ const Model = (() => {
     withTimestamp(CREATETIME),
     withId(ID, uuid),
     withSymbolsInJSON(keyMap),
+    withObserver(observer),
     Object.freeze
   );
 
   const loadModel = pipe(
     make,
     withSymbolsInJSON(keyMap, true),
+    withObserver(observer),
     Object.freeze
   );
 

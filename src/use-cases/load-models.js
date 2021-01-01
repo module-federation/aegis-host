@@ -6,19 +6,15 @@
  *  models:import('../models').ModelFactory,
  *  model:Model,
  *  specs:import('../models/model-factory').ModelSpecification[],
- *  observer:Observer
  * }}
  */
-function resumeWorkflow({ models, model, specs, observer }) {
+async function resumeWorkflow({ models, model, specs }) {
   const spec = specs.find((s) => s.modelName === model.modelName);
+  const portFlow = models.getPortFlow(model);
 
-  if (spec) {
-    const flow = models.getPortFlow(model);
-    const nextPort = spec.ports[flow[flow.length - 1]].producesEvent;
-
-    if (flow?.length > 0) {
-      setTimeout(() => observer.notify(nextPort, model), 30000);
-    }
+  if (portFlow?.length > 0) {
+    const nextPort = spec.ports[portFlow[portFlow.length - 1]].producesEvent;
+    model.emit(nextPort, model);
   }
 }
 
@@ -27,21 +23,20 @@ function resumeWorkflow({ models, model, specs, observer }) {
  * @typedef {import('../models').Model} Model
  * @param {import('../models').ModelFactory} models
  * @param {import('../lib/observer').Observer} observer
- * @returns {function(Model):Map<string,Model>}
+ * @returns {function(Map<Model>):Map<string,Model>}
  */
-export default function (models, observer) {
+export default function (models) {
   return function loadModels(savedModels) {
     const hydratedModels = new Map();
-    const specs = models.getRemoteModels();
+    const modelSpec = models.getRemoteModels();
 
-    savedModels.forEach(function (savedModel, modelId) {
-      const model = models.loadModel(savedModel, savedModel.modelName);
-      if (!model) {
-        console.error("failed to load model: %s", modelId);
-      }
-      resumeWorkflow({ models, model, specs, observer });
-      hydratedModels.set(modelId, model);
-    });
+    Promise.all(
+      [...savedModels].map(async function ([modelId, savedModel]) {
+        const model = models.loadModel(savedModel, savedModel.modelName);
+        hydratedModels.set(modelId, model);
+        await resumeWorkflow({ models, model, specs: modelSpec });
+      })
+    ).then();
 
     return hydratedModels;
   };

@@ -2,7 +2,6 @@
 
 import Model from "./model";
 import Event from "./event";
-import ObserverFactory, { Observer } from "../lib/observer";
 
 /**
  * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType

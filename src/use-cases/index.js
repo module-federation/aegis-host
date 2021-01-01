@@ -18,16 +18,15 @@ handleEvents(ObserverFactory.getInstance());
  * @param {import('../models').ModelSpecification} model
  */
 function buildOptions(model) {
-  const observer = ObserverFactory.getInstance();
   return {
     modelName: model.modelName,
     models: ModelFactory,
-    observer: observer,
+    observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers,
     repository: DataSourceFactory.getDataSource(
       model.modelName,
       model.serializers,
-      loadModels(ModelFactory, observer)
+      loadModels(ModelFactory)
     )
   };
 }

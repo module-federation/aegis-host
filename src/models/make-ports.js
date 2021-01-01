@@ -8,7 +8,7 @@ import Model from "./model";
  * @param {*} ports
  * @param {*} model
  */
-function setPortTimeout(port, ports, model) {
+function setPortTimeout(port, ports) {
   // Set an appropriate timeout for the port
   const timeout = ports[port].timeout || 60000;
 
@@ -24,7 +24,7 @@ function setPortTimeout(port, ports, model) {
     if (timeoutCallback) {
       timeoutCallback({
         port,
-        model,
+        model: this,
       });
     }
   }, timeout);
@@ -34,7 +34,7 @@ function setPortTimeout(port, ports, model) {
 
 /**
  * Register an event handler that invokes the `port`.
- * @returns {boolean} whether or not to record this port 
+ * @returns {boolean} whether or not to record this port
  * for compensation and restart
  */
 function setPortEvent(port, ports, observer) {
@@ -56,7 +56,7 @@ function setPortEvent(port, ports, observer) {
       false
     );
     return true;
-  } 
+  }
   return false;
 }
 
@@ -71,7 +71,7 @@ function handleError(port, ports, error) {
   if (errorCallback) {
     errorCallback({
       port,
-      model: self,
+      model: this,
       error: error.message,
     });
   }
@@ -114,34 +114,31 @@ export default function makePorts(ports, adapters, observer) {
       return {
         // The port function
         async [port](...args) {
-          const self = this;
-
-          // If the port is disabled or we've already invoked it, ret urn
-          if (disabled || Model.getPortFlow(self).includes(port)) {
+          // If the port is disabled or we've already invoked it, return
+          if (disabled || Model.getPortFlow(this).includes(port)) {
             return;
           }
 
-          const timerId = setPortTimeout(port, ports, self);
+          const timerId = setPortTimeout.call(this, port, ports);
 
           try {
             // Call the adapter and wait
-            const model = await adapters[port]({ model: self, args });
+            const model = (await adapters[port]({ model: this, args })) || this;
 
             // Stop the timer
             clearTimeout(timerId);
 
             // Record invocations for undo
             if (recordPort) {
-              Model.getPortFlow(self).push(port);
+              Model.getPortFlow(model).push(port);
             }
 
             // Signal the next task to run, unless undo is running
-            if (!self.undo && recordPort) {
-              const m = model || self;
-              await observer.notify(ports[port].producesEvent, m);
+            if (!model.undo && recordPort) {
+              await observer.notify(ports[port].producesEvent, model);
             }
           } catch (error) {
-            handleError(error);
+            handleError.call(this, port, ports, error);
           }
         },
       };

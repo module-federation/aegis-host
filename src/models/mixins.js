@@ -63,3 +63,21 @@ export const withSymbolsInJSON = (keyMap, deserialize = false) => (o) => {
     ...fromJSON(),
   };
 };
+
+/**
+ * Emit and listen for application and domain events
+ * @param {import('../lib/observer').Observer} observer 
+ */
+export const withObserver = (observer) => (o) => {
+  return {
+    ...o,
+    emit(eventName, eventData) {
+      console.log({desc:"notify>>>>>>>>>>",eventName, eventData});
+      observer.notify(eventName, eventData);
+    },
+    subscribe(eventName, callback) {
+      console.log({desc:"on>>>>>>>>>>",eventName, callback: callback.toString()});
+      observer.on(eventName, callback);
+    }
+  };
+};
