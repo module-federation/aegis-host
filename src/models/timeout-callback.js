@@ -1,9 +1,6 @@
 "use strict";
 
 import Model from "./model";
-import sleep from "../lib/sleep";
-
-//const calculateSleep = (s) => 3 * Math.pow(s, 3);
 
 /**
  * Default timeout handler: 
@@ -19,11 +16,8 @@ import sleep from "../lib/sleep";
 export default async function timeoutCallback({ portName, portConf, model }) {
   console.warn("timeout handler called:", portName);
   const FIFTEEN_MINUTES = 15 * 60 * 1000;
-  const SIXTY_SECONDS = 60 * 1000;
   const eventData = { portName, model };
 
-  const retryInterval = portConf.retryInterval || SIXTY_SECONDS;
-  await sleep(retryInterval);
   console.warn("retrying port function:", portName);
   model.emit("retryPort", model);
 

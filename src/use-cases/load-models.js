@@ -12,17 +12,20 @@ import Serializer from "../lib/serializer";
  *  ports:import('../models/  odelSpecification[],
  * }}
  */
-async function resumeWorkflow(list, getWorkflowStatus, ports) {
-  if (list?.length > 0) {
-    await Promise.all(
-      list.map(async function (model) {
-        const status = getWorkflowStatus(model);
-        if (status?.length > 0) {
-          const nextPort = ports[status[status.length - 1]].producesEvent;
-          await model.emit(nextPort, model);
-        }
-      })
-    );
+function resumeWorkflow(getPortFlow, ports) {
+  return async function (list) {
+    if (list?.length > 0) {
+      await Promise.all(
+        list.map(async function (model) {
+          const flow = getPortFlow(model);
+          if (flow?.length > 0) {
+            const lastPort = flow.length - 1;
+            const nextPort = ports[flow[lastPort]].producesEvent;
+            await model.emit(nextPort, model);
+          }
+        })
+      );
+    }
   }
 }
 
@@ -35,6 +38,10 @@ function hydrateModels(loadModel, observer, repository) {
       })
     );
   };
+}
+
+function handleError(e) {
+  console.error(e);
 }
 
 /**
@@ -64,7 +71,7 @@ export default function ({ models, observer, repository, modelName }) {
 
     repository
       .list()
-      .then((list) => resumeWorkflow(list, models.getPortFlow, spec.ports))
-      .catch((e) => console.error(e));
+      .then(resumeWorkflow(models.getPortFlow, spec.ports))
+      .catch(handleError);
   };
 }

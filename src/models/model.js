@@ -68,7 +68,6 @@ const Model = (() => {
     },
   }) {
     return {
-      ...model,
       // Optional mixins
       ...compose(...mixins)(model),
       // Create ports for domain I/O
@@ -95,7 +94,10 @@ const Model = (() => {
        */
       async update(changes) {
         const model = this[ONUPDATE](changes);
-        const update = await datasource.save(model[ID], model);
+        const update = await datasource.save(model[ID], {
+          ...model, 
+          [UPDATETIME]: new Date().getTime()
+        });
         return update;
       },
       /**
@@ -103,8 +105,8 @@ const Model = (() => {
        * @param {*} eventName
        * @param {*} callback
        */
-      addListener(eventName, callback) {
-        observer.on(eventName, callback);
+      addListener(eventName, callback, multi) {
+        observer.on(eventName, callback, multi);
       },
       /**
        * Emit domain events.

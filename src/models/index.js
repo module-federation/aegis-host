@@ -20,7 +20,7 @@ import {
  * @property {string} onUpdate
  * @property {string} onDelete
  * @property {function():Promise<Model>} update user code calls this to update the model
- * @property {function(eventName,function(eventName,Model):void)} subscribe listen for domain events
+ * @property {function(eventName,function(eventName,Model):void)} addListener listen for domain events
  * @property {function(eventName,Model):Promise<void>} emit emit domain event 
  *
  * @typedef {import('../models/event').Event} Event

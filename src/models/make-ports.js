@@ -85,6 +85,13 @@ function handleError({ portName, portConf, model, error }) {
   }
 }
 
+function clearTimeoutHandler(model, portConf) {
+  const FIFTEEN_MINUTES = 15 * 60 * 60 * 1000;
+  const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
+  const lastUpdate = model[Model.getKey("updateTime")];
+  return new Date().getTime() - lastUpdate > retryTimeout;
+}
+
 /**
  * Generate functions to handle I/O between
  * the domain and application layers. Each port
@@ -150,12 +157,16 @@ export default function makePorts(ports, adapters, observer) {
           } catch (error) {
             console.error(error);
             
-            handleError({
-              model: this,
-              error,
-              portName,
-              portConf,
-            });
+            if (clearTimeoutHandler(this, portConf)) {
+              clearTimeout(timerId); 
+
+              handleError({
+                model: this,
+                error,
+                portName,
+                portConf,
+              });
+            }
           }
         },
       };

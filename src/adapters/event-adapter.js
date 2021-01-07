@@ -1,6 +1,39 @@
-'use strict';
+"use strict";
+
+import { Event } from "../services/event-service";
+/**
+ * @typedef {import('../models').Model} Model
+ * @typedef {string} serviceName
+ *
+ * @typedef {Object} EventMessage
+ * @property {serviceName} eventSource
+ * @property {serviceName|"broadcast"} eventTarget
+ * @property {"command"|"commandResponse"|"notification"|"import"} eventType
+ * @property {string} eventName
+ * @property {string} eventTime
+ * @property {string} eventUuid
+ * @property {NotificationEvent|ImportEvent|CommandEvent} eventData
+ *
+ * @typedef {object} ImportEvent
+ * @property {"service"|"model"|"adapter"} type
+ * @property {string} url
+ * @property {string} path
+ * @property {string} importRemote
+ *
+ * @typedef {object} NotificationEvent
+ * @property {string|} message
+ * @property {"utf8"|Uint32Array} encoding
+ * *
+ * @typedef {Object} CommandEvent
+ * @property {string} commandName
+ * @property {string} commandResp
+ * @property {*} commandArgs
+ */
 
 /**
+ * @typedef {{
+ *  getModel:import('../models').Model,
+ * }} Subscription
  * @typedef {string|RegExp} topic
  * @callback eventHandler
  * @param {string} eventData
@@ -15,26 +48,32 @@
  */
 
 /**
- * @type {WeakMap<any,WeakMap<string,*>>}
+ * @type {Map<any,Map<string,*>>}
  */
-const subscriptions = new WeakMap();
+const subscriptions = new Map();
+
+function applyFilter(message) {
+  return function (filter) {
+    const regex = new RegExp(filter);
+    const result = regex.test(message);
+    console.log({ func: applyFilter.name, filter, result, message });
+    return result;
+  };
+}
 
 /**
- * @typedef {{
- * model:import('../models').Model;
- * args:[{
+ * @typedef {string} message
+ * @typedef {string|RegExp} topic
+ * @param {{
  *  id:string,
  *  callback:function(message,Subscription),
  *  topic:topic,
  *  filter:string|RegExp,
- *  once:boolean
- * }]}} adapterArgs
- * @param {adapterArgs} param
+ *  once:boolean,
+ *  model:object
+ * }} options
  */
-const Subscription = function ({
-  model,
-  args: [{ callback, id, topic, filter, once }]
-}) {
+const Subscription = function ({ id, callback, topic, filters, once, model }) {
   return {
     /**
      * unsubscribe from topic
@@ -56,26 +95,22 @@ const Subscription = function ({
     },
 
     /**
-     * Filter message and invoke callback on match
+     * Filter message and invoke callback
      * @param {string} message
      */
     async filter(message) {
       if (filters) {
-        if (filters.every(f => new RegExp(f).test(message))) {
+        if (filters.every(applyFilter(message))) {
           if (once) {
             this.unsubscribe();
           }
-          callback({
-            message,
-            subscription: this,
-          });                       
+          callback({ message, subscription: this });
+          return;
         }
+        console.log("filters didn't match: keep listening", message);
         return;
       }
-      callback({
-        message,
-        subscription: this,
-      });
+      callback({ message, subscription: this });
     },
   };
 };
@@ -84,29 +119,36 @@ const Subscription = function ({
  *
  * @type {adapterFactory}
  */
-export function listen(service) {
-  /**
-   * @param {adapterArgs} options 
-   */
-  return async function (options) {
-    const subscription = Subscription(options);
-
-    const {
-      args: [{ topic, id }],
-    } = options;
+export function listen(service = Event) {
+  return async function ({
+    model,
+    args: [{ topic, callback, filters, once, id }],
+  }) {
+    const subscription = Subscription({
+      id,
+      topic,
+      callback,
+      filters,
+      once,
+      model,
+    });
 
     if (subscriptions.has(topic)) {
       subscriptions.get(topic).set(id, subscription);
       return subscription;
     }
 
-    subscriptions.set(topic, new WeakMap().set(id, subscription));
+    subscriptions.set(topic, new Map().set(id, subscription));
 
-    service.listen(topic, async function ({ topic, message }) {
-      subscriptions.get(topic).forEach(function (subscription) {
-        subscription.filter(message);
+    if (!service.listening) {
+      service.listen(/Channel/, async function ({ topic, message }) {
+        if (subscriptions.has(topic)) {
+          subscriptions.get(topic).forEach(async (subscription) => {
+            await subscription.filter(message);
+          });
+        }
       });
-    });
+    }
     return subscription;
   };
 }
@@ -115,8 +157,10 @@ export function listen(service) {
  * @type {adapterFactory}
  * @returns {function(topic, eventData)}
  */
-export async function notify(service) {
-  return async function ({ topic, message }) {
-    service.notify(topic, message);
+export function notify(service = Event) {
+  return async function ({ model, args: [topic, message] }) {
+    console.log("sending...", { topic, message: JSON.parse(message) });
+    await service.notify(topic, message);
+    return model;
   };
 }

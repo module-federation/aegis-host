@@ -31,12 +31,17 @@ const DataSourceFactory = (() => {
     return newDs;
   }
 
+  function close() {
+    dataSources.forEach(ds => ds.close());
+  }
+
   return Object.freeze({
     /**
      * Get `DataSource` singleton
      * @returns {import('./datasource').default} DataSource singleton
      */
     getDataSource,
+    close
   });
 })();
 
