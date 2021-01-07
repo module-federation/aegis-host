@@ -152,9 +152,10 @@ const Serializer = {
    * @param {serializerType | serializerType[]} s
    */
   addSerializer(s) {
+    if (!s) return null;
     const newSerializers = validateSerializer(s);
     newSerializers.forEach((s) => serializers[s.on].push(s));
-    console.log("serializers ", serializers);
+    return this;
   },
 
   serialize(key, value) {

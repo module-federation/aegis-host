@@ -2,6 +2,7 @@
 
 import Model from "./model";
 import timeoutCallback from "./timeout-callback";
+import errorCallback from "./error-callback";
 
 /**
  * Set an appropriate timeout interval and handler for the port.
@@ -25,6 +26,7 @@ function setPortTimeout({ portName, portConf, model }) {
     // Call the port's timeout handler if one is specified
     const handler = portConf.timeoutCallback || timeoutCallback;
     if (handler) {
+
       handler({
         model,
         portName,
@@ -65,16 +67,16 @@ function setPortEvent(portName, portConf, observer) {
 /**
  *
  */
-function handleError({ result, portName, portConf, model }) {
-  console.error("port operation exception %s: %s", portName, result.error);
+function handleError({ portName, portConf, model, error }) {
+  console.error("port operation exception %s: %s", portName, error);
 
   // Call the port's error handler if one is specified
-  const errorCallback = portConf.errorCallback;
+  const handler = portConf.errorCallback || errorCallback;
 
-  if (errorCallback) {
+  if (handler) {
     console.error("invoking error callback");
     
-    errorCallback({
+    handler({
       model,
       error,
       portName,
@@ -121,19 +123,17 @@ export default function makePorts(ports, adapters, observer) {
       return {
         // The port function
         async [port](...args) {
-          // If the port is disabled or we've already invoked it, return
+          // If the port is disabled, return
           if (disabled) {
             return;
           }
 
           // Handle port timeouts
-          const timerId = setPortTimeout({ port, portConf, model: this });
+          const timerId = setPortTimeout({ portName, portConf, model: this });
 
           try {
             // Call the adapter and wait
             const model = await adapters[port]({ model: this, args });
-
-            console.log({port,model});
 
             // Stop the timer
             clearTimeout(timerId);

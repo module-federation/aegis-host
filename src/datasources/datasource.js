@@ -35,6 +35,10 @@ export default class DataSource {
     throw new Error("abstract method not implemented");
   }
 
+  /**
+   * 
+   * @param {*} options 
+   */
   load(options) {} 
 
   close() {}

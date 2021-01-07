@@ -8,15 +8,15 @@ import Model from "./model";
  */
 export default function compensate(ports) {
   const self = this;
-  return async function compensateAsync() {
+  return async function undo() {
     const model = { ...self, undo: true };
-    await model.save();
-    let port = Model.getPortFlow(model).pop();
+    const updated = await model.update();
+    let port = Model.getPortFlow(updated).pop();
     while (port) {
       if (ports[port].undo) {
-        await ports[port].undo(model);
+        await ports[port].undo(updated);
       }
-      port = Model.getPortFlow(model).pop();
+      port = Model.getPortFlow(updated).pop();
     }
   };
 }

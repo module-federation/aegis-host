@@ -1,42 +1,36 @@
 import fs from "fs";
 import path from "path";
 import { DataSourceMemory } from "./datasource-memory";
-import Serializer from "../../lib/serializer";
 
 /**
  * Persistent storage on filesystem
  */
 export class DataSourceFile extends DataSourceMemory {
   /**
-   *
-   * @param {{
-   *  dataSource:Map<string,import('../models').Model>
-   *  serializers:import('../models/index').serializer[]
-   *  directory:string
-   *  loadModels:function(*):import('../models').Model,
-   *  name:string
-   * }} param0
+   * @param {import('../datasource').default}
    */
   constructor(dataSource) {
     super(dataSource);
   }
 
-  load({ hydrate, fileName, directory = __dirname, serializers = [] }) {
+  load({ hydrate, fileName, directory = __dirname, serializer }) {
     this.file = path.resolve(directory, fileName.concat(".json"));
-    Serializer.addSerializer(serializers);
+    this.serializer = serializer;
     this.dataSource = this.readFile(hydrate);
   }
 
   replace(key, value) {
-    if (value) {
-      return Serializer.serialize(key, value);
+    if (value && this.serializer) {
+      return this.serializer.serialize(key, value);
     }
+    return value;
   }
 
   revive(key, value) {
-    if (value) {
-      return Serializer.deserialize(key, value);
+    if (value && this.serializer) {
+      return this.serializer.deserialize(key, value);
     }
+    return value;
   }
 
   writeFile(async = true) {
