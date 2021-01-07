@@ -3,7 +3,8 @@
 export function save(service) {
   return async function ({ model }) {
     try {
-      return await service.save(model);
+      const saved = await service.save(model);
+      return saved;
     } catch (error) {
       console.error(error);
       throw new Error(error);
@@ -26,7 +27,8 @@ export function find(service) {
 export function update(service) {
   return async function ({ model, args: [changes] }) {
     try {
-      return await service.update(model, changes);
+      const update = await service.update(model, changes);
+      return update;
     } catch (error) {
       console.error(error);
       throw new Error(error);

@@ -32,10 +32,20 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
+  function updateModelId(modelId) {
+    modelIdText.value = modelId;
+  }
+
   function handleResponse(response) {
     try {
       return [200, 201, 400].includes(response.status)
-        ? response.json().then(data => JSON.stringify(data, null, 2))
+        ? response.json().then(function(data) {
+          if (data.modelId) {
+            updateModelId(data.modelId);
+            getUrl();
+          }
+          return JSON.stringify(data, null, 2);
+        })
         : Promise.reject(new Error([
           response.status,
           response.statusText

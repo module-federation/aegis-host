@@ -68,7 +68,7 @@ function checkTypes(s) {
 function checkRequiredProps(serializer) {
   const requiredProps = ["on", "key", "type", "value"];
   const missing = requiredProps.filter((key) => !serializer[key]);
-  if (missing?.length > 0) {
+  if (missing && missing.length > 0) {
     throw new Error("missing required property: ", missing);
   }
 }

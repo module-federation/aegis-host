@@ -1,43 +1,74 @@
 "use strict";
 
 /**
- * Check `portFlow` history and resume workflow as needed.
+ * Check `portFlow` history and resume any workflow
+ * that was running before we shut down.
+ *
  * @param {{
+ *  rehydratedModels:Map<string,Model>,
  *  models:import('../models').ModelFactory,
- *  model:Model,
  *  specs:import('../models/model-factory').ModelSpecification[],
  * }}
  */
-async function resumeWorkflow({ models, model, specs }) {
-  const spec = specs.find((s) => s.modelName === model.modelName);
-  const portFlow = models.getPortFlow(model);
+async function resumeWorkflow({ list, models, ports }) {
+  console.log(list);
+  await Promise.all(
+    list.map(async function (model) {
+      const flow = models.getPortFlow(model);
 
-  if (portFlow?.length > 0) {
-    const nextPort = spec.ports[portFlow[portFlow.length - 1]].producesEvent;
-    model.emit(nextPort, model);
-  }
+      if (flow?.length > 0) {
+        const nextPort = ports[flow[flow.length - 1]].producesEvent;
+        await model.emit(nextPort, model);
+      }
+    })
+  );
+}
+
+// async function resumeWorkflow({ model, spec, models }) {
+//   const portFlow = models.getPortFlow(model);
+//   if (portFlow?.length > 0) {
+//     const nextPort = spec.ports[portFlow[portFlow.length - 1]].producesEvent;
+//     await model.emit(nextPort, model);
+//   }
+// }
+
+function hydrate(loadModel, observer, repository) {
+  return function (savedModels) {
+    return new Map(
+      [...savedModels].map(function ([k, v]) {
+        const model = loadModel(observer, repository, v, v.modelName);
+        return [k, model];
+      })
+    );
+  };
 }
 
 /**
- * Called by datasource or other I/O module to unmarshal deserialized models.
+ * Factory function returns function called by datasource
+ * or other I/O module to unmarshal deserialized models.
  * @typedef {import('../models').Model} Model
- * @param {import('../models').ModelFactory} models
- * @param {import('../lib/observer').Observer} observer
- * @returns {function(Map<Model>):Map<string,Model>}
+ * @param {{
+ *  models:import('../models').ModelFactory,
+ *  observer:import('../lib/observer').Observer,
+ * }}
+ * @returns {function(Map<string,Model>):Map<string,Model>}
  */
-export default function (models) {
-  return function loadModels(savedModels) {
-    const hydratedModels = new Map();
-    const modelSpec = models.getRemoteModels();
+export default function ({ models, observer, repository, modelName }) {
+  return function loadModels() {
+    const spec = models
+      .getRemoteModels()
+      .find((s) => s.modelName === modelName);
 
-    Promise.all(
-      [...savedModels].map(async function ([modelId, savedModel]) {
-        const model = models.loadModel(savedModel, savedModel.modelName);
-        hydratedModels.set(modelId, model);
-        await resumeWorkflow({ models, model, specs: modelSpec });
-      })
-    ).then();
+    repository.load({
+      hydrate: hydrate(models.loadModel, observer, repository),
+      fileName: modelName,
+      serializers: spec.serializers,
+    });
 
-    return hydratedModels;
+    if (repository.size > 0) {
+      resumeWorkflow(repository.list(), models, spec.ports)
+        .then()
+        .catch((e) => console.error(e));
+    }
   };
 }

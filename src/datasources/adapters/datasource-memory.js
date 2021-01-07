@@ -4,15 +4,15 @@ import DataSource from "../datasource";
  * Temporary in-memory storage
  */
 export class DataSourceMemory extends DataSource {
-  constructor({ dataSource }) {
-    super({ dataSource });
+  constructor(dataSource) {
+    super(dataSource);
   }
 
   /**
    * @override
    */
   async save(id, data) {
-    this.dataSource.set(id, data);
+    return this.dataSource.set(id, data).get(id);
   }
 
   /**

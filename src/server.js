@@ -9,12 +9,13 @@ import {
   getModels,
   getModelsById,
   deleteModels,
+  loadSavedModels
 } from "./controllers";
 
 import { initRemotes } from "./models";
 import { Persistence } from "./services/persistence-service";
-import { save, find, update, close } from "./adapters/persistence-adapter";
-import adapter from "./adapters/http-adapter";
+import { save, find, close } from "./adapters/persistence-adapter";
+import http from "./adapters/http-adapter";
 import initMiddleware from "./middleware";
 import log from "./lib/logger";
 
@@ -31,18 +32,20 @@ const Server = (() => {
   function make(path, app, method, controllers) {
     controllers().forEach((ctlr) => {
       log(ctlr);
-      app[method](path(ctlr.endpoint), adapter(ctlr.fn));
+      app[method](path(ctlr.endpoint), http(ctlr.fn));
     });
   }
 
   function run() {
     const importStartTime = Date.now();
-    const overrides = { save, find, update, Persistence };
+    const overrides = { save, find, Persistence };
 
     initRemotes(overrides).then(() => {
       log("\n%dms to import & register models\n", Date.now() - importStartTime);
 
       const makeEPStartTime = Date.now();
+
+      loadSavedModels();
 
       make(ENDPOINT, app, "post", postModels);
       make(ENDPOINT, app, "get", getModels);

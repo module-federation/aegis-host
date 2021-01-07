@@ -2,7 +2,7 @@
  * Abstraction
  */
 export default class DataSource {
-  constructor({ dataSource }) {
+  constructor(dataSource) {
     this.dataSource = dataSource;
   }
   /**
@@ -34,6 +34,8 @@ export default class DataSource {
   async delete(id) {
     throw new Error("abstract method not implemented");
   }
+
+  load(options) {} 
 
   close() {}
 }

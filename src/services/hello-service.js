@@ -1,7 +1,7 @@
 import log from '../lib/logger';
 
 export default () => async (req, res) => {
-  try {
+  // try {
     // const service1 = (await import('orderService/service1')).default;
     // return service1(body => {
     //   const status = body ? 200 : 500;
@@ -21,9 +21,9 @@ export default () => async (req, res) => {
     //     console.log(Module);
     //     return Module;
 
-  } catch (error) {
-    log(error);
-  }
+  // } catch (error) {
+  //   log(error);
+  // }
 };
 
 

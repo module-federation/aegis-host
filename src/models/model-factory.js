@@ -103,25 +103,40 @@ const ModelFactory = {
    * @param {*} args - input sent in the request
    * @returns {Promise<Readonly<Model>>} the model instance
    */
-  createModel: async (modelName, ...args) => {
+  createModel: async function (observer, datasource, modelName, ...args) {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
+
     if (spec) {
       return Model.create({
-        spec,
-        args
+        args,
+        spec: { 
+          ...spec, 
+          observer,
+          datasource
+        }
       });
     }
     throw new Error("unregistered model");
   },
 
-  loadModel: (model, modelName) => {
+  /**
+   * Unmarshalls deserialized model.
+   * @param {import(".").Model} model 
+   * @param {*} modelName 
+   */
+  loadModel: (observer, datasource, model, modelName) => {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
-    if (spec) {
+
+    if (spec) { 
       return Model.load({
         model,
-        spec
+        spec: {
+          ...spec,
+          observer,
+          datasource,
+        },
       });
     }
     throw new Error("unregistered model");
@@ -138,6 +153,7 @@ const ModelFactory = {
     const name = checkModelName(modelName);
     const type = checkEventType(eventType);
     const factory = eventFactories[type].get(name);
+    
     if (factory) {
       return Event.create({
         args,

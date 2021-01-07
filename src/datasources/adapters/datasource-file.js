@@ -17,21 +17,14 @@ export class DataSourceFile extends DataSourceMemory {
    *  name:string
    * }} param0
    */
-  constructor({
-    dataSource,
-    serializers = [],
-    directory = __dirname,
-    loadModels = (value) => value,
-    name,
-  }) {
-    super({
-      dataSource
-    });
-    this.file = path.resolve(directory, name.concat(".json"));
-    if (serializers.length > 0) {
-      Serializer.addSerializer(serializers);
-    }
-    this.dataSource = this.readFile(loadModels);
+  constructor(dataSource) {
+    super(dataSource);
+  }
+
+  load({ hydrate, fileName, directory = __dirname, serializers = [] }) {
+    this.file = path.resolve(directory, fileName.concat(".json"));
+    Serializer.addSerializer(serializers);
+    this.dataSource = this.readFile(hydrate);
   }
 
   replace(key, value) {
@@ -58,11 +51,11 @@ export class DataSourceFile extends DataSourceMemory {
   /**
    *
    */
-  readFile(loadModels) {
+  readFile(hydrate) {
     if (fs.existsSync(this.file)) {
       const models = fs.readFileSync(this.file, "utf-8");
       if (models) {
-        return loadModels(new Map(JSON.parse(models, this.revive)));
+        return hydrate(new Map(JSON.parse(models, this.revive)));
       }
     }
     return new Map();

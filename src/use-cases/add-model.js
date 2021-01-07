@@ -24,7 +24,7 @@ export default function addModelFactory({
   handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function addModel(input) {
-    const model = await models.createModel(modelName, input);
+    const model = await models.createModel(observer, repository, modelName, input);
     const event = await models.createEvent(eventType, modelName, model);
 
     try {

@@ -9,6 +9,7 @@ import {
 } from "../services/federation-service";
 
 /**
+ * @typedef {string} eventName
  * @typedef {Object} Model Every imported domain object created by the framework 
  * is a `Model`, which allows it to be extended and controlled through configuration. 
  * Note that the framework does not use inheritance. All objects are immutable; 
@@ -18,6 +19,9 @@ import {
  * @property {string} createTime
  * @property {string} onUpdate
  * @property {string} onDelete
+ * @property {function():Promise<Model>} update user code calls this to update the model
+ * @property {function(eventName,function(eventName,Model):void)} subscribe listen for domain events
+ * @property {function(eventName,Model):Promise<void>} emit emit domain event 
  *
  * @typedef {import('../models/event').Event} Event
  *
@@ -30,7 +34,8 @@ import {
  * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
  * @property {function(any):string} getModelId
  * @property {function(Model):string[]} getPortFlow 
- * @property {function(Map<string,Model>):Map<string,Model>} loadModels
+ * @property {function(Model,string):Model} loadModel
+ * @property {function():ModelSpecification[]} getRemoteModels  
  *
  * @typedef {string} service - name of the service object to inject in adapter
  * @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds
@@ -46,7 +51,7 @@ import {
  *
  * @typedef {{
  *  [x: string]: {
- *    service: service,
+ *    service?: service,
  *    timeout?: timeout,
  *    consumesEvent?:string,
  *    producesEvent?:string,
@@ -56,6 +61,7 @@ import {
  *    type?:'inbound'|'outbound',
  *    disabled?: boolean
  *    adapter?: string,
+ *    retries?: number
  *    undo: function(Model, port)
  *  }
  * }} ports - input/output ports for the domain

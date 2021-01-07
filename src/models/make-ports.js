@@ -1,30 +1,34 @@
 "use strict";
 
 import Model from "./model";
+import timeoutCallback from "./timeout-callback";
 
 /**
  * Set an appropriate timeout interval and handler for the port.
- * @param {*} port
- * @param {*} ports
- * @param {*} model
+ * @param {{
+ *  portName: string,
+ *  portConf: import('../models').ports,
+ *  portFunc: function()
+ * }} param0
  */
-function setPortTimeout(port, ports) {
+function setPortTimeout({ portName, portConf, model }) {
   // Set an appropriate timeout for the port
-  const timeout = ports[port].timeout || 60000;
+  const timeout = portConf.timeout || 60000;
 
   if (timeout === 0) {
     return 0;
   }
 
   const timerId = setTimeout(function () {
-    console.error("port operation timed out: %s", port);
+    console.error("port operation timed out: %s", portName);
 
     // Call the port's timeout handler if one is specified
-    const timeoutCallback = ports[port].timeoutCallback;
-    if (timeoutCallback) {
-      timeoutCallback({
-        port,
-        model: this,
+    const handler = portConf.timeoutCallback || timeoutCallback;
+    if (handler) {
+      handler({
+        model,
+        portName,
+        portConf,
       });
     }
   }, timeout);
@@ -34,21 +38,19 @@ function setPortTimeout(port, ports) {
 
 /**
  * Register an event handler that invokes the `port`.
- * @returns {boolean} whether or not to record this port
+ * @param {import('./index').Model} model
+ * @returns {boolean} whether or not to remember this port
  * for compensation and restart
  */
-function setPortEvent(port, ports, observer) {
-  const eventName = ports[port].consumesEvent;
-  const callback = ports[port].callback;
-
-  if (eventName) {
+function setPortEvent(portName, portConf, observer) {
+  if (portConf.consumesEvent) {
     // listen for the triggering event to invoke this port
     observer.on(
-      eventName,
+      portConf.consumesEvent,
       async function (model) {
         try {
           // Invoke this port and pass a callack if one is specified
-          await model[port](callback);
+          await model[portName](portConf.callback);
         } catch (error) {
           throw new Error(error);
         }
@@ -63,19 +65,22 @@ function setPortEvent(port, ports, observer) {
 /**
  *
  */
-function handleError(port, ports, error) {
-  console.error("port operation exception %s: %s", port, error.message);
+function handleError({ result, portName, portConf, model }) {
+  console.error("port operation exception %s: %s", portName, result.error);
 
   // Call the port's error handler if one is specified
-  const errorCallback = ports[port].errorCallback;
+  const errorCallback = portConf.errorCallback;
+
   if (errorCallback) {
+    console.error("invoking error callback");
+    
     errorCallback({
-      port,
-      model: this,
-      error: error.message,
+      model,
+      error,
+      portName,
+      portConf,
     });
   }
-  throw new Error(error);
 }
 
 /**
@@ -90,7 +95,7 @@ function handleError(port, ports, error) {
  *
  * See the `ModelSpecification` for port configuration options.
  *
- * @param {object} ports - object containing domain interfaces
+ * @param {import('./index').ports} ports - object containing domain interfaces
  * @param {object} adapters - object containing application adapters
  * @param {import('../lib/observer').Observer} observer
  */
@@ -102,43 +107,55 @@ export default function makePorts(ports, adapters, observer) {
 
   return Object.keys(ports)
     .map(function (port) {
-      const disabled = ports[port].disabled || !adapters[port];
+      const portName = port;
+      const portConf = ports[port];
+      const disabled = portConf.disabled || !adapters[port];
       let recordPort = false;
 
       if (disabled) {
         console.warn("warning: port disabled or adapter missing: %s", port);
       } else {
-        recordPort = setPortEvent(port, ports, observer);
+        recordPort = setPortEvent(portName, portConf, observer);
       }
 
       return {
         // The port function
         async [port](...args) {
           // If the port is disabled or we've already invoked it, return
-          if (disabled || Model.getPortFlow(this).includes(port)) {
+          if (disabled) {
             return;
           }
 
-          const timerId = setPortTimeout.call(this, port, ports);
+          // Handle port timeouts
+          const timerId = setPortTimeout({ port, portConf, model: this });
 
           try {
             // Call the adapter and wait
-            const model = (await adapters[port]({ model: this, args })) || this;
+            const model = await adapters[port]({ model: this, args });
+
+            console.log({port,model});
 
             // Stop the timer
             clearTimeout(timerId);
 
-            // Record invocations for undo
+            // Remember invocations for undo and restart
             if (recordPort) {
               Model.getPortFlow(model).push(port);
             }
 
             // Signal the next task to run, unless undo is running
             if (!model.undo && recordPort) {
-              await observer.notify(ports[port].producesEvent, model);
+              observer.notify(portConf.producesEvent, model);
             }
           } catch (error) {
-            handleError.call(this, port, ports, error);
+            console.error(error);
+            
+            handleError({
+              model: this,
+              error,
+              portName,
+              portConf,
+            });
           }
         },
       };

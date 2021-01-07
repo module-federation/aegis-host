@@ -60,17 +60,15 @@ const Subscription = function ({
      * @param {string} message
      */
     async filter(message) {
-      if (filter) {
-        const regex = new RegExp(filter);
-
-        if (regex.test(message)) {
+      if (filters) {
+        if (filters.every(f => new RegExp(f).test(message))) {
           if (once) {
             this.unsubscribe();
           }
           callback({
             message,
             subscription: this,
-          });
+          });                       
         }
         return;
       }

@@ -5,11 +5,11 @@ import editModelFactory from "./edit-model";
 import listModelsFactory from "./list-models";
 import findModelFactory from "./find-model";
 import removeModelFactory from "./remove-model";
-import handleEvents from "./handle-events";
+import loadModelsFactory from "./load-models";
 import DataSourceFactory from "../datasources";
 import ObserverFactory from "../lib/observer";
 import ModelFactory from "../models";
-import loadModels from "./load-models";
+import handleEvents from "./handle-events";
 
 handleEvents(ObserverFactory.getInstance());
 
@@ -23,11 +23,7 @@ function buildOptions(model) {
     models: ModelFactory,
     observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers,
-    repository: DataSourceFactory.getDataSource(
-      model.modelName,
-      model.serializers,
-      loadModels(ModelFactory)
-    )
+    repository: DataSourceFactory.getDataSource(model.modelName)
   };
 }
 
@@ -44,4 +40,5 @@ export const editModels = () => make(editModelFactory);
 export const listModels = () => make(listModelsFactory);
 export const findModels = () => make(findModelFactory);
 export const removeModels = () => make(removeModelFactory);
+export const loadModels = () => make(loadModelsFactory);
 export const getModelId = (model) => ModelFactory.getModelId(model);

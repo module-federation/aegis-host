@@ -1,17 +1,18 @@
 "use strict";
 
 import {
-  withId,
   withTimestamp,
-  withSymbolsInJSON,
-  withObserver
+  withSerializers,
+  withDeserializers,
+  fromSymbol,
+  fromTimestamp,
+  toSymbol
 } from "./mixins";
 import makePorts from "./make-ports";
 import compensate from "./compensate";
 import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
 import uuid from "../lib/uuid";
-import ObserverFactory from "../lib/observer";
 import pipe from "../lib/pipe";
 
 /**
@@ -22,6 +23,7 @@ const Model = (() => {
   const ID = Symbol("id");
   const MODELNAME = Symbol("modelName");
   const CREATETIME = Symbol("createTime");
+  const UPDATETIME = Symbol("updateTime");
   const ONUPDATE = Symbol("onUpdate");
   const ONDELETE = Symbol("onDelete");
   const PORTFLOW = Symbol("portFlow");
@@ -30,6 +32,7 @@ const Model = (() => {
     id: ID,
     modelName: MODELNAME,
     createTime: CREATETIME,
+    updateTime: UPDATETIME,
     onUpdate: ONUPDATE,
     onDelete: ONDELETE,
     portFlow: PORTFLOW,
@@ -44,13 +47,20 @@ const Model = (() => {
     ...withTimestamp("deleteTime")(model),
   });
 
-  const observer = ObserverFactory.getInstance();
-
+  /**
+   * 
+   * @param {{
+   *  model:import('./index').Model,
+   *  spec:import('./index').ModelSpecification
+   * }} param0 
+   */
   function make({
     model,
     spec: {
       ports,
+      observer,
       modelName,
+      datasource,
       mixins = [],
       dependencies,
       onUpdate = defUpdate,
@@ -59,22 +69,51 @@ const Model = (() => {
   }) {
     return {
       ...model,
-      // Track port calls
-      [PORTFLOW]: [],
-      // Create ports for domain I/O
-      ...makePorts.call(model, ports, dependencies, observer),
-      // Orchestration undo logic
-      compensate: compensate.call(model, ports),
       // Optional mixins
       ...compose(...mixins)(model),
-      // Immutable props...
+      // Create ports for domain I/O
+      ...makePorts.call(model, ports, dependencies, observer),
+      // Remember port calls
+      [PORTFLOW]: [],
+      // Undo port transaction
+      compensate: compensate.call(model, ports),
+      // name
+      [MODELNAME]: modelName,
+      // uuid
+      [ID]: uuid(),
+      // Call before saving
       [ONUPDATE](changes) {
         return onUpdate(this, changes);
       },
+      // Call before deleting
       [ONDELETE]() {
         return onDelete(this);
       },
-      [MODELNAME]: modelName,
+      /**
+       * User code calls this to persist any updates it makes.
+       * @param {*} changes
+       */
+      async update(changes) {
+        const model = this[ONUPDATE](changes);
+        const update = await datasource.save(model[ID], model);
+        return update;
+      },
+      /**
+       * Listen for domain events.
+       * @param {*} eventName
+       * @param {*} callback
+       */
+      addListener(eventName, callback) {
+        observer.on(eventName, callback);
+      },
+      /**
+       * Emit domain events.
+       * @param {*} eventName
+       * @param {*} eventData
+       */
+      async emit(eventName, eventData) {
+        await observer.notify(eventName, eventData);
+      },
     };
   }
 
@@ -93,25 +132,32 @@ const Model = (() => {
     Promise.resolve(
       // Call factory
       modelInfo.spec.factory(...modelInfo.args)
-    ).then((model) => make({
-      model,
-      spec: modelInfo.spec
-    }));
+    ).then((model) =>
+      make({
+        model,
+        spec: modelInfo.spec,
+      })
+    );
 
   // Add common behavior & data
   const makeModel = asyncPipe(
     Model,
     withTimestamp(CREATETIME),
-    withId(ID, uuid),
-    withSymbolsInJSON(keyMap),
-    withObserver(observer),
+    withSerializers(
+      fromSymbol(keyMap),
+      fromTimestamp(["createTime", "updateTime"])
+    ),
+    withDeserializers(toSymbol(keyMap)),
     Object.freeze
   );
 
   const loadModel = pipe(
     make,
-    withSymbolsInJSON(keyMap, true),
-    withObserver(observer),
+    withSerializers(
+      fromSymbol(keyMap),
+      fromTimestamp(["createTime", "updateTime"])
+    ),
+    withDeserializers(toSymbol(keyMap)),
     Object.freeze
   );
 
@@ -135,10 +181,10 @@ const Model = (() => {
       return loadModel({
         model: {
           ...modelInfo.model,
-          isLoading: true
+          isLoading: true,
         },
         spec: {
-          ...modelInfo.spec
+          ...modelInfo.spec,
         },
       });
     },
@@ -154,7 +200,8 @@ const Model = (() => {
     update: function (model, changes) {
       const updates = {
         ...changes,
-        isLoading: false
+        [UPDATETIME]: new Date().getTime(),
+        isLoading: false,
       };
       return model[ONUPDATE](updates);
     },
