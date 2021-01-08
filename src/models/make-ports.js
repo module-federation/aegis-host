@@ -85,11 +85,17 @@ function handleError({ portName, portConf, model, error }) {
   }
 }
 
-function clearTimeoutHandler(model, portConf) {
+function stopTimer(model, portConf, timerId) {
   const FIFTEEN_MINUTES = 15 * 60 * 60 * 1000;
   const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
   const lastUpdate = model[Model.getKey("updateTime")];
-  return new Date().getTime() - lastUpdate > retryTimeout;
+  const now = new Date().getTime();
+  const stopTimer = now - lastUpdate > retryTimeout;
+  
+  if (stopTimer) {
+    clearTimeout(timerId); 
+  }
+  return stopTimer;
 }
 
 /**
@@ -157,9 +163,7 @@ export default function makePorts(ports, adapters, observer) {
           } catch (error) {
             console.error(error);
             
-            if (clearTimeoutHandler(this, portConf)) {
-              clearTimeout(timerId); 
-
+            if (stopTimer(this, portConf, timerId)) {
               handleError({
                 model: this,
                 error,

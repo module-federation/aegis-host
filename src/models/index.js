@@ -179,7 +179,7 @@ async function initModels(services, adapters) {
 /**
  * Import remote models, services, and adapters.
  *
- * @param {*} overrides - override services or adapters
+ * @param {*} overrides - override or add services and adapters
  */
 export async function initRemotes(overrides) {
   const services = await importRemoteServices();

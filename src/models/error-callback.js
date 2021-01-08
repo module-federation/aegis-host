@@ -1,37 +1,6 @@
 "use strict";
 
-import Model from "./model";
-
-const errorActions = {
-
-  retryAction: async function ({ portConf, portName, model }) {
-    const FIFTEEN_MINUTES = 15 * 60 * 1000;
-    const eventData = { portName, model };
-    const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
-    const lastUpdate = model[Model.getKey("updateTime")];
-
-    if (new Date().getTime() - lastUpdate < retryTimeout) {
-      await model[portName](portConf.callback);
-      model.emit("retryWorked", eventData);
-      return;
-    }
-    model.emit("retryTimedOut", eventData);
-    this.undoAction({ portName, model });
-  },
-
-  undoAction: async function ({ portName, model }) {
-    const eventData = { portName, model };
-    try {
-      model.emit("compensating", eventData);
-      await model.compensate();
-      model.emit("compensateWorked", eventData);
-    } catch (error) {
-      model.emit("compensateFailed", { eventData, error });
-    }
-  },
-
-  abortAction: () => process.abort()
-}
+import errorActions from "./error-actions";
 
 /**
  * Default error handler:
@@ -50,13 +19,12 @@ export default async function errorCallback({ portName, portConf, model, error }
   const EIGHT_MINUTES = 8 * 60 * 60 * 1000;
   const sendEventName = `errorActionReq:${model.modelName}`;
   const recvEventName = `errorActionRsp:${model.modelName}`;
+  const args = { model, portName, portConf, model, error };
 
   const timerId = setTimeout(
-    () => errorActions["undoAction"](args), 
+    () => errorActions.undoAction({ ...args, timerId }), 
     EIGHT_MINUTES
   );
-
-  const args = { model, portName, portConf, model, error, timerId };
 
   model.addListener(recvEventName, function ({ action, args }) {
     clearTimer(args.timerId);
