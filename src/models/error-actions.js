@@ -2,6 +2,8 @@
 
 import Model from "./model";
 
+const RETRY_MINUTES = 15
+
 /**
  * @name errorActions
  */
@@ -12,39 +14,43 @@ const errorActions = {
    *  portName:string,
    *  portConf:import('../models').ports,
    *  model:import('../models').Model
-   * }} param0 
+   * }} param0
    */
   retryAction: async function ({ portConf, portName, model }) {
-    const FIFTEEN_MINUTES = 15 * 60 * 1000;
-    const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
+    const retryMinutes = portConf.retryMinutes || RETRY_MINUTES;
     const lastUpdate = model[Model.getKey("updateTime")];
-    const eventData = { portName, model };
+    const now = new Date().getTime();
+    const totalMinutes = new Date(now - lastUpdate).getMinutes()
 
-    if (new Date().getTime() - lastUpdate < retryTimeout) {
+    console.log({ func: this.retryAction.name, totalMinutes, retryMinutes });
+
+    if (totalMinutes < retryMinutes) {
       await model[portName](portConf.callback);
-      model.emit("retryWorked", eventData);
+      model.emit("retryWorked", { portName, model });
       return;
     }
-    model.emit("retryTimedOut", eventData);
+    model.emit("retryTimedOut", { portName, model });
     await this.undoAction({ portName, model });
   },
 
   /**
    * Backout transactions: execute compensating actions.
-   * @param {*} param0 
+   * @param {*} param0
    */
   undoAction: async function ({ portName, model }) {
     const eventData = { portName, model };
     try {
+      console.log("compensating", eventData);
       model.emit("compensating", eventData);
       await model.compensate();
       model.emit("compensateWorked", eventData);
     } catch (error) {
+      console.error("compensateFailed", { eventData, error });
       model.emit("compensateFailed", { eventData, error });
     }
   },
 
-  abortAction: () => process.abort(),
+  exitAction: () => process.exit(),
 };
 
 export default errorActions;

@@ -4,6 +4,8 @@ import Model from "./model";
 import timeoutCallback from "./timeout-callback";
 import errorCallback from "./error-callback";
 
+const TIMEOUT_SECONDS = 60;
+
 /**
  * Set an appropriate timeout interval and handler for the port.
  * @param {{
@@ -14,7 +16,7 @@ import errorCallback from "./error-callback";
  */
 function setPortTimeout({ portName, portConf, model }) {
   // Set an appropriate timeout for the port
-  const timeout = portConf.timeout || 60000;
+  const timeout = (portConf.timeout || TIMEOUT_SECONDS) * 1000;
 
   if (timeout === 0) {
     return 0;
@@ -90,7 +92,7 @@ function stopTimer(model, portConf, timerId) {
   const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
   const lastUpdate = model[Model.getKey("updateTime")];
   const now = new Date().getTime();
-  const stopTimer = now - lastUpdate > retryTimeout;
+  const stopTimer = lastUpdate - now > retryTimeout;
   
   if (stopTimer) {
     clearTimeout(timerId); 

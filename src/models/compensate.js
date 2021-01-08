@@ -8,9 +8,11 @@ import Model from "./model";
  */
 export default function compensate(ports) {
   const self = this;
+  
   return async function undo() {
     const model = { ...self, undo: true };
     const updated = await model.update();
+
     let port = Model.getPortFlow(updated).pop();
     while (port) {
       if (ports[port].undo) {
