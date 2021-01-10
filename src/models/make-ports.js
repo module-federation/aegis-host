@@ -92,7 +92,7 @@ function stopTimer(model, portConf, timerId) {
   const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
   const lastUpdate = model[Model.getKey("updateTime")];
   const now = new Date().getTime();
-  const totalSeconds = new Date(now - lastUpdate).getMinutes();
+  const totalSeconds = new Date(now - lastUpdate).getSeconds();
   
   if (totalSeconds > retryTimeout) {
     clearTimeout(timerId); 

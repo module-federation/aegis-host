@@ -10,7 +10,7 @@ const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) =>
-    (await ds.list()).filter(v => Model.getId(model) === v[rel.foreignKey]),
+    (await ds.list()).filter(v => Model.getId(model) !== v[rel.foreignKey]),
   /**
    *
    * @param {import("../models").Model} model
