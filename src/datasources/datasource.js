@@ -2,8 +2,9 @@
  * Abstraction
  */
 export default class DataSource {
-  constructor(dataSource) {
+  constructor(dataSource, factory) {
     this.dataSource = dataSource;
+    this.factory = factory;
   }
   /**
    * Upsert model instance
@@ -42,4 +43,8 @@ export default class DataSource {
   load(options) {} 
 
   close() {}
+
+  getFactory() {
+    return this.factory;
+  }
 }

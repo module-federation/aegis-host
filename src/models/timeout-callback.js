@@ -14,8 +14,7 @@ import errorActions from "./error-actions";
  * }} args
  */
 export default async function timeoutCallback(args) {
-  const { model, portName } = args;
+  const { portName } = args;
   console.warn("timeout handler retrying port:", portName);
-  model.emit("retryPort", model);
   errorActions.retryAction(args);
 }

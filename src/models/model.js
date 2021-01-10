@@ -4,16 +4,17 @@ import {
   withTimestamp,
   withSerializers,
   withDeserializers,
-  fromSymbol,
   fromTimestamp,
-  toSymbol
+  fromSymbol,
+  toSymbol,
 } from "./mixins";
 import makePorts from "./make-ports";
+import makeRelations from "./make-relations";
 import compensate from "./compensate";
 import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
-import uuid from "../lib/uuid";
 import pipe from "../lib/pipe";
+import uuid from "../lib/uuid";
 
 /**
  * @namespace
@@ -48,11 +49,11 @@ const Model = (() => {
   });
 
   /**
-   * 
+   *
    * @param {{
    *  model:import('./index').Model,
    *  spec:import('./index').ModelSpecification
-   * }} param0 
+   * }} param0
    */
   function make({
     model,
@@ -63,6 +64,7 @@ const Model = (() => {
       datasource,
       mixins = [],
       dependencies,
+      relations = {},
       onUpdate = defUpdate,
       onDelete = defDelete,
     },
@@ -70,11 +72,13 @@ const Model = (() => {
     return {
       // Optional mixins
       ...compose(...mixins)(model),
+      // Generate functions to fetch related objects
+      ...makeRelations(model, relations, datasource),
       // Create ports for domain I/O
-      ...makePorts.call(model, ports, dependencies, observer),
+      ...makePorts(ports, dependencies, observer),
       // Remember port calls
       [PORTFLOW]: [],
-      // Undo port transaction
+      // Undo port transactions
       compensate: compensate.call(model, ports),
       // name
       [MODELNAME]: modelName,
@@ -95,8 +99,8 @@ const Model = (() => {
       async update(changes) {
         const model = this[ONUPDATE](changes);
         const update = await datasource.save(model[ID], {
-          ...model, 
-          [UPDATETIME]: new Date().getTime()
+          ...model,
+          [UPDATETIME]: new Date().getTime(),
         });
         return update;
       },

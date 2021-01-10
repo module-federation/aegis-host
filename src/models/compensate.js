@@ -1,8 +1,8 @@
 import Model from "./model";
 
 /**
- * Returns a function that steps through the sequence
- * of port calls in LIFO order executing their undo functions
+ * Steps through the sequence of port calls 
+ * in LIFO order executing their undo functions.
  * @param {import('./index').port} ports
  * @returns {function():Promise<void>}
  */

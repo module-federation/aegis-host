@@ -8,6 +8,7 @@
   const clearButton = document.querySelector('#clear');
   const modelText = document.querySelector('#model');
   const modelIdText = document.querySelector('#modelId');
+  const queryText = document.querySelector("#query");
 
   function updateUrl(url) {
     document.getElementById('url').textContent = [
@@ -16,10 +17,19 @@
     ].join('/');
   }
 
-  function getUrl() {
+    function getQuery() {
+      const query = document.getElementById("query").value;
+      console.log(query);
+      if (query) {
+        return `?${query}`;
+      }
+      return "";
+    }
+
+  function getUrl(getQuery = () => "") {
     const model = document.getElementById('model').value;
     const id = document.getElementById('modelId').value;
-    const url = ['api', model, id].join('/');
+    const url = ['api', model, id].join('/') + getQuery();
     updateUrl(url);
     return url;
   }
@@ -80,7 +90,7 @@
   }
 
   getButton.onclick = function () {
-    fetch(getUrl())
+    fetch(getUrl(getQuery))
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {

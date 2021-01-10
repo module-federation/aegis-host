@@ -6,7 +6,8 @@ import remoteEntries from "../../webpack/remote-entries";
  * @returns {Promise<import('../models').ModelSpecification[]>}
  */
 export async function importRemoteModels() {
-  const importStartTime = Date.now();
+  const label = "\ntime to import remote models";
+  console.time(label);
 
   let remoteModels = [];
   for (const entry of remoteEntries) {
@@ -16,7 +17,7 @@ export async function importRemoteModels() {
     }
   }
 
-  console.log("\n%dms to import remote models\n", Date.now() - importStartTime);
+  console.timeEnd(label);
 
   return remoteModels
     .map((m) => ({
@@ -32,7 +33,8 @@ export async function importRemoteModels() {
  * Imports remote service modules.
  */
 export async function importRemoteServices() {
-  const importStartTime = Date.now();
+  const label = "\ntime to import remote services";
+  console.time(label);
 
   let services = [];
   for (const entry of remoteEntries) {
@@ -42,10 +44,7 @@ export async function importRemoteServices() {
     }
   }
 
-  console.log(
-    "\n%dms to import remote services\n",
-    Date.now() - importStartTime
-  );
+  console.timeEnd(label);
 
   if (services.length === 0) return {};
 
@@ -56,7 +55,8 @@ export async function importRemoteServices() {
 }
 
 export async function importRemoteAdapters() {
-  const importStartTime = Date.now();
+  const label = "\ntime to import remote adapters";
+  console.time(label);
 
   let adapters = [];
   for (const entry of remoteEntries) {
@@ -66,10 +66,7 @@ export async function importRemoteAdapters() {
     }
   }
 
-  console.log(
-    "\n%dms to import remote adapters\n",
-    Date.now() - importStartTime
-  );
+  console.timeEnd(label);
 
   if (adapters.length === 0) return {};
 

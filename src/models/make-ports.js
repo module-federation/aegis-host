@@ -88,16 +88,17 @@ function handleError({ portName, portConf, model, error }) {
 }
 
 function stopTimer(model, portConf, timerId) {
-  const FIFTEEN_MINUTES = 15 * 60 * 60 * 1000;
+  const FIFTEEN_MINUTES = 15 * 60 * 60;
   const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
   const lastUpdate = model[Model.getKey("updateTime")];
   const now = new Date().getTime();
-  const stopTimer = lastUpdate - now > retryTimeout;
+  const totalSeconds = new Date(now - lastUpdate).getMinutes();
   
-  if (stopTimer) {
+  if (totalSeconds > retryTimeout) {
     clearTimeout(timerId); 
+    return true;
   }
-  return stopTimer;
+  return false;
 }
 
 /**
@@ -132,6 +133,7 @@ export default function makePorts(ports, adapters, observer) {
       if (disabled) {
         console.warn("warning: port disabled or adapter missing: %s", port);
       } else {
+        // Listen for event that will invoke this port  
         recordPort = setPortEvent(portName, portConf, observer);
       }
 

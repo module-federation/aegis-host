@@ -4,8 +4,8 @@ import DataSource from "../datasource";
  * Temporary in-memory storage
  */
 export class DataSourceMemory extends DataSource {
-  constructor(dataSource) {
-    super(dataSource);
+  constructor(dataSource, factory) {
+    super(dataSource, factory);
   }
 
   /**

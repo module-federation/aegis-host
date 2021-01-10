@@ -20,19 +20,19 @@ export default async function errorCallback({ portName, portConf, model, error }
   const sendEventName = `errorActionReq:${model.modelName}`;
   const recvEventName = `errorActionRsp:${model.modelName}`;
   const args = { model, portName, portConf, model, error };
-
+  
   const timerId = setTimeout(
     () => errorActions.undoAction({ ...args, timerId }), 
     EIGHT_MINUTES
   );
 
   model.addListener(recvEventName, function ({ action, args }) {
-    clearTimer(args.timerId);
     if (errorActions[action]) {
+      clearTimer(args.timerId);
       errorActions[action](args);
       return;
     }
-    model.emit("unknownErrorAction", { model, action });
+    console.log("unknown error action:", action);
   }, false);
   
   model.emit(sendEventName, args);

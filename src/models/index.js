@@ -65,6 +65,14 @@ import {
  *    undo: function(Model, port)
  *  }
  * }} ports - input/output ports for the domain
+ * 
+ * @typedef {{
+ *  [x: string]: {
+ *    modelName:string,
+ *    type:"oneToMany"|"manyToOne",
+ *    foreignKey:any,
+ *  }
+ * }} relations - define related domain entities
  *
  * @typedef {any} value
  * @typedef {any} key
@@ -95,6 +103,7 @@ import {
  * @property {ports} [ports] input/output ports for the domain
  * @property {eventHandler[]} [eventHandlers] callbacks invoked (after save) when CRUD write events occur
  * @property {serializer[]} serializers callbacks invoked to de/serialzed the model
+ * @property {relations} relations
  */
 
 /**

@@ -26,7 +26,7 @@ const DataSourceFactory = (() => {
     if (dataSources.has(name)) {
       return dataSources.get(name);
     }
-    const newDs = new DataSource(new Map());
+    const newDs = new DataSource(new Map(), this);
     dataSources.set(name, newDs);
     return newDs;
   }

@@ -7,13 +7,13 @@ import { DataSourceMemory } from "./datasource-memory";
  */
 export class DataSourceFile extends DataSourceMemory {
   /**
-   * @param {import('../datasource').default}
+   * @param {Set} dataSource
    */
-  constructor(dataSource) {
-    super(dataSource);
+  constructor(dataSource, factory) {
+    super(dataSource, factory);
   }
 
-  load({ hydrate, fileName, directory = __dirname, serializer }) {
+  load({ fileName, hydrate, serializer, directory = __dirname }) {
     this.file = path.resolve(directory, fileName.concat(".json"));
     this.serializer = serializer;
     this.dataSource = this.readFile(hydrate);

@@ -9,7 +9,7 @@ import {
   getModels,
   getModelsById,
   deleteModels,
-  loadSavedModels
+  loadSavedModels,
 } from "./controllers";
 
 import { initRemotes } from "./models";
@@ -17,7 +17,6 @@ import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 import initMiddleware from "./middleware";
-import log from "./lib/logger";
 
 const Server = (() => {
   const app = express();
@@ -31,20 +30,18 @@ const Server = (() => {
 
   function make(path, app, method, controllers) {
     controllers().forEach((ctlr) => {
-      log(ctlr);
+      console.log(ctlr);
       app[method](path(ctlr.endpoint), http(ctlr.fn));
     });
   }
 
   function run() {
-    const importStartTime = Date.now();
+    const label = "\ntotal time to import & register remote modules";
+    console.time(label);
+
     const overrides = { save, find, Persistence };
 
     initRemotes(overrides).then(() => {
-      log("\n%dms to import & register models\n", Date.now() - importStartTime);
-
-      const makeEPStartTime = Date.now();
-
       loadSavedModels();
 
       make(ENDPOINT, app, "post", postModels);
@@ -53,10 +50,10 @@ const Server = (() => {
       make(ENDPOINTID, app, "get", getModelsById);
       make(ENDPOINTID, app, "delete", deleteModels);
 
-      log("\n%dms to create endpoints\n", Date.now() - makeEPStartTime);
+      console.timeEnd(label);
 
       app.listen(PORT, function () {
-        console.log(`Server listening on http://localhost:${PORT}`);
+        console.log(`\nServer listening on http://localhost:${PORT}`);
       });
 
       process.on("SIGTERM", () => close());

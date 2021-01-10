@@ -11,6 +11,7 @@ export default function getModelFactory(listModels) {
         source.referrer = httpRequest.headers['Referer'];
       }
       log(source);
+      console.log(httpRequest.query);
 
       const models = await listModels();
       log({ function: listModels.name, ...models });
