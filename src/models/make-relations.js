@@ -33,11 +33,11 @@ export default function makeRelations (model, relations, dataSource) {
     .map(function (relation) {
       return {
         async [relation] () {
-          const rel = relations[relation];
+          const rel = relations[relation];          
           const ds = dataSource.getFactory().getDataSource(rel.modelName);
 
-          if (!relationType[rel.type]) {
-            console.warn("invalid relation type: ", rel.type);
+          if (!ds || !relationType[rel.type]) {
+            console.warn("invalid relation", rel);
             return;
           }
 

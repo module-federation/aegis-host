@@ -19,7 +19,14 @@ export default async function errorCallback({ portName, portConf, model, error }
   const EIGHT_MINUTES = 8 * 60 * 60 * 1000;
   const sendEventName = `errorActionReq:${model.modelName}`;
   const recvEventName = `errorActionRsp:${model.modelName}`;
-  const args = { model, portName, portConf, model, error };
+  const args = { 
+    model, 
+    portName, 
+    portConf, 
+    model, 
+    error, 
+    recvEventName 
+  };
   
   const timerId = setTimeout(
     () => errorActions.undoAction({ ...args, timerId }), 
