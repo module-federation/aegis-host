@@ -23,7 +23,9 @@ const Server = (() => {
   const API_ROOT = "/api";
   const PORT = 8070;
   const ENDPOINT = (e) => `${API_ROOT}/${e}`;
+  const ENDPOINTCMD = (e) => `${API_ROOT}/${e}/:command`;
   const ENDPOINTID = (e) => `${API_ROOT}/${e}/:id`;
+  const ENDPOINTIDCMD = (e) => `${API_ROOT}/${e}/:id/:command`;
 
   app.use(bodyParser.json());
   app.use(express.static("public"));
@@ -45,8 +47,10 @@ const Server = (() => {
       loadSavedModels();
 
       make(ENDPOINT, app, "post", postModels);
+      make(ENDPOINTCMD, app, "post", postModels);
       make(ENDPOINT, app, "get", getModels);
       make(ENDPOINTID, app, "patch", patchModels);
+      make(ENDPOINTIDCMD, app, "patch", patchModels);
       make(ENDPOINTID, app, "get", getModelsById);
       make(ENDPOINTID, app, "delete", deleteModels);
 

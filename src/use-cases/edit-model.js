@@ -1,7 +1,7 @@
 "use strict";
 
-import executeCommand from './execute-command';
-import invokePort from './invoke-port';
+import executeCommand from "./execute-command";
+import invokePort from "./invoke-port";
 
 /**
  * @typedef {Object} ModelParam
@@ -27,8 +27,9 @@ export default function editModelFactory({
   const eventName = models.getEventName(eventType, modelName);
   handlers.forEach((handler) => observer.on(eventName, handler));
 
-  return async function editModel(id, changes, query) {
+  return async function editModel(id, changes, command) {
     const model = await repository.find(id);
+
     if (!model) {
       throw new Error("no such id");
     }
@@ -47,15 +48,10 @@ export default function editModelFactory({
       throw new Error(error);
     }
 
-    if (query) {
-      const command = await executeCommand(models, updated, query);
-      if (command) {
-        return command;
-      }
-
-      const port = await invokePort(models, updated, query);
-      if (port) {
-        return port;
+    if (command) {
+      const result = await executeCommand(models, updated, command, "write");
+      if (result) {
+        return result;
       }
     }
 

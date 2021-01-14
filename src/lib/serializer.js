@@ -82,12 +82,13 @@ function validateSerializer(serializers) {
   const newSerializers = Array.isArray(serializers)
     ? serializers
     : [serializers];
-  newSerializers.every((s) => checkRequiredProps(s));
+  const enabled = newSerializers.filter((n) => n.enabled);
+  enabled.every((e) => checkRequiredProps(e));
 
-  if (!newSerializers.every((s) => checkTypes(s))) {
+  if (!enabled.every((e) => checkTypes(e))) {
     throw new Error("invalid serializer, check property types");
   }
-  return newSerializers;
+  return enabled;
 }
 
 const keyApplies = {

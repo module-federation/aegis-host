@@ -31639,13 +31639,13 @@ var moduleMap = {
 		return __webpack_require__.e("src_services_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services/publish-event */ "./src/services/publish-event.js")));
 	},
 	"./orderService": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_express_index_js"), __webpack_require__.e("src_services_order-service_js-node_modules_express_lib_sync_recursive")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_express_index_js"), __webpack_require__.e("webpack_sharing_consume_default_axios_axios"), __webpack_require__.e("src_services_order-service_js-node_modules_express_lib_sync_recursive")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
 	},
 	"./eventService": () => {
 		return __webpack_require__.e("src_services_event-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/event-service */ "./src/services/event-service.js")));
 	},
 	"./paymentService": () => {
-		return __webpack_require__.e("src_services_payment-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/payment-service */ "./src/services/payment-service.js")));
+		return Promise.all([__webpack_require__.e("webpack_sharing_consume_default_axios_axios"), __webpack_require__.e("src_services_payment-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/payment-service */ "./src/services/payment-service.js")));
 	},
 	"./shippingService": () => {
 		return __webpack_require__.e("src_services_shipping-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/shipping-service */ "./src/services/shipping-service.js")));
@@ -32212,7 +32212,7 @@ module.exports = require("zlib");
 /******/ 			"src_adapters_index_js": [
 /******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
 /******/ 			],
-/******/ 			"src_services_order-service_js-node_modules_express_lib_sync_recursive": [
+/******/ 			"webpack_sharing_consume_default_axios_axios": [
 /******/ 				"webpack/sharing/consume/default/axios/axios"
 /******/ 			],
 /******/ 			"src_services_event-service_js": [
@@ -32312,7 +32312,7 @@ module.exports = require("zlib");
 /******/ 				if(installedChunkData) {
 /******/ 					promises.push(installedChunkData[2]);
 /******/ 				} else {
-/******/ 					if(true) { // all chunks have JS
+/******/ 					if("webpack_sharing_consume_default_axios_axios" != chunkId) {
 /******/ 						// load the chunk and return promise to it
 /******/ 						var promise = new Promise(function(resolve, reject) {
 /******/ 							installedChunkData = installedChunks[chunkId] = [resolve, reject];

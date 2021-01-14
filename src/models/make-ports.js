@@ -27,8 +27,8 @@ function setPortTimeout({ portName, portConf, model }) {
 
     // Call the port's timeout handler if one is specified
     const handler = portConf.timeoutCallback || timeoutCallback;
+    
     if (handler) {
-
       handler({
         model,
         portName,

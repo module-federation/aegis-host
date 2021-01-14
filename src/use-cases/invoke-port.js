@@ -18,12 +18,14 @@ export default async function invokePort(models, model, query) {
 
   if (query.port && spec.ports[query.port]) {
     const callback = spec.ports[query.port].callback;
+
     if (callback) {
       const result = await model[query.port](callback);
       if (result) {
         return { ...model, ...result };
       }
     }
+    
     const result = await model[query.port]();
     if (result) {
       return { ...model, ...result };

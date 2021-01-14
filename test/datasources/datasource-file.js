@@ -6,7 +6,7 @@ const { default: DataSourceFactory } = require("../../src/datasources");
 
 describe("datasources", function () {
     var ds = DataSourceFactory.getDataSource("test");
-    ds.init({
+    ds.load({
         name: "test"
     });
     ds.save(1, "data");

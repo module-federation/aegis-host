@@ -2,9 +2,10 @@
  * Abstraction
  */
 export default class DataSource {
-  constructor(dataSource, factory) {
+  constructor(dataSource, factory, name) {
     this.dataSource = dataSource;
     this.factory = factory;
+    this.name = name;
   }
   /**
    * Upsert model instance
@@ -26,9 +27,10 @@ export default class DataSource {
 
   /**
    * list model instances
+   * @param {boolean} cached - list cached items or query source
    * @returns {Promise<any[]>}
    */
-  async list() {
+  async list(cached = false) {
     throw new Error("abstract method not implemented");
   }
 
@@ -37,10 +39,10 @@ export default class DataSource {
   }
 
   /**
-   * 
-   * @param {*} options 
+   *
+   * @param {*} options
    */
-  load(options) {} 
+  load(options) {}
 
   close() {}
 

@@ -9,8 +9,8 @@ export class DataSourceFile extends DataSourceMemory {
   /**
    * @param {Set} dataSource
    */
-  constructor(dataSource, factory) {
-    super(dataSource, factory);
+  constructor(dataSource, factory, name) {
+    super(dataSource, factory, name);
   }
 
   load({ fileName, hydrate, serializer, directory = __dirname }) {
@@ -24,6 +24,7 @@ export class DataSourceFile extends DataSourceMemory {
       return this.serializer.serialize(key, value);
     }
     return value;
+    d;
   }
 
   revive(key, value) {

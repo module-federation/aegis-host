@@ -4,9 +4,9 @@
  *
  * @param {import("../models").ModelFactory} models
  * @param {import("../models").Model} model
- * @param {{port:string}} query
+ * @param {{relation:string}} query
  */
-export default async function fetchRelatedModels(models, model, query) {
+export default async function fetchRelatedModels(models, model, relation) {
   const spec = models
     .getRemoteModels()
     .find((s) => s.modelName === models.getModelName(model));
@@ -16,10 +16,10 @@ export default async function fetchRelatedModels(models, model, query) {
     return null;
   }
 
-  if (query.relation && spec.relations[query.relation]) {
-    const related = await model[query.relation]();
+  if (relation && spec.relations[relation]) {
+    const related = await model[relation]();
     if (related) {
-      return { model, [query.relation]: related };
+      return { model, [relation]: related };
     }
   }
 

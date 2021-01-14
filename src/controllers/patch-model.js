@@ -13,10 +13,10 @@ export default function patchModelFactory(editModel, getModelId, hash) {
       }
       log(source);
       const id = httpRequest.params.id;
-      const query = httpRequest.query;
+      const command = httpRequest.params.command;
 
-      const model = await editModel(id, { ...modelInfo }, query);
-      
+      const model = await editModel(id, { ...modelInfo }, command);
+
       return {
         headers: {
           "Content-Type": "application/json",

@@ -6,11 +6,9 @@ import Serializer from "../lib/serializer";
  * Check `portFlow` history and resume any workflow
  * that was running before we shut down.
  *
- * @param {{
- *  list:Map<string,Model>,
- *  models:import('../models').ModelFactory,
- *  ports:import('../models/  odelSpecification[],
- * }}
+ * @param {function(import('../models').Model)} getPortFlow,
+ * @param {import("../models").ports} ports
+ * @returns {function(Map<string,Model>)}
  */
 function resumeWorkflow(getPortFlow, ports) {
   return async function (list) {
@@ -18,25 +16,42 @@ function resumeWorkflow(getPortFlow, ports) {
       await Promise.all(
         list.map(async function (model) {
           const flow = getPortFlow(model);
+
           if (flow?.length > 0) {
             const lastPort = flow.length - 1;
             const nextPort = ports[flow[lastPort]].producesEvent;
-            await model.emit(nextPort, model);
+
+            if (nextPort) {
+              await model.emit(nextPort, model);
+            }
           }
         })
       );
     }
-  }
+  };
 }
 
+/**
+ * @param {function():import()} loadModel
+ * @param {*} observer
+ * @param {*} repository
+ */
 function hydrateModels(loadModel, observer, repository) {
-  return function (savedModels) {
-    return new Map(
-      [...savedModels].map(function ([k, v]) {
-        const model = loadModel(observer, repository, v, v.modelName);
-        return [k, model];
-      })
-    );
+  return function (saved) {
+    if (!saved) return;
+
+    if (saved instanceof Map) {
+      return new Map(
+        [...saved].map(function ([k, v]) {
+          const model = loadModel(observer, repository, v, v.modelName);
+          return [k, model];
+        })
+      );
+    }
+
+    if (Object.getOwnPropertyNames(saved).includes("modelName")) {
+      return loadModel(observer, repository, saved, saved.modelName);
+    }
   };
 }
 
@@ -45,8 +60,8 @@ function handleError(e) {
 }
 
 /**
- * Factory returns function to unmarshal deserialized 
- * models and resume any workflow that was running 
+ * Factory returns function to unmarshal deserialized
+ * models and resume any workflow that was running
  * before we shut down.
  * @typedef {import('../models').Model} Model
  * @param {{
@@ -54,8 +69,7 @@ function handleError(e) {
  *  observer:import('../lib/observer').Observer,
  *  repository:import('../datasources/datasource').default,
  *  modelName:string
- * }}
- * @returns {function()}
+ * }} options
  */
 export default function ({ models, observer, repository, modelName }) {
   return function loadModels() {
@@ -70,7 +84,7 @@ export default function ({ models, observer, repository, modelName }) {
     });
 
     repository
-      .list()
+      .list(true)
       .then(resumeWorkflow(models.getPortFlow, spec.ports))
       .catch(handleError);
   };

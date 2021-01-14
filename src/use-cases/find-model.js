@@ -1,7 +1,7 @@
 "use strict";
 
-import executeCommand from './execute-command';
-import fetchRelatedModels from './fetch-related-models';
+import executeCommand from "./execute-command";
+import fetchRelatedModels from "./fetch-related-models";
 
 /**
  * @typedef {Object} ModelParam
@@ -24,15 +24,19 @@ export default function findModelFactory({ models, repository } = {}) {
       throw new Error("no such id");
     }
 
-    if (query) {
-      const related = await fetchRelatedModels(models, model, query);
+    console.log({ func: findModel.name, query });
+
+    if (query?.relation) {
+      const related = await fetchRelatedModels(models, model, query.relation);
       if (related) {
         return related;
       }
+    }
 
-      const command = await executeCommand(models, model, query);
-      if (command) {
-        return command;
+    if (query?.command) {
+      const result = await executeCommand(models, model, query.command, "read");
+      if (result) {
+        return result;
       }
     }
 

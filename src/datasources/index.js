@@ -13,7 +13,7 @@ const DataSourceFactory = (() => {
   let dataSources;
 
   /**
-   * Get the datasource for each model. Optionally inject logic 
+   * Get the datasource for each model. Optionally inject logic
    * for custom de/serialization and unmarshaling deserialized models
    * @param {string} name - model name
    * @param {import('../models/index').serializer[]} [serializers] - callbacks invoked during de/serialization
@@ -23,16 +23,18 @@ const DataSourceFactory = (() => {
     if (!dataSources) {
       dataSources = new Map();
     }
+
     if (dataSources.has(name)) {
       return dataSources.get(name);
     }
-    const newDs = new DataSource(new Map(), this);
+
+    const newDs = new DataSource(new Map(), this, name);
     dataSources.set(name, newDs);
     return newDs;
   }
 
   function close() {
-    dataSources.forEach(ds => ds.close());
+    dataSources.forEach((ds) => ds.close());
   }
 
   return Object.freeze({
@@ -41,7 +43,7 @@ const DataSourceFactory = (() => {
      * @returns {import('./datasource').default} DataSource singleton
      */
     getDataSource,
-    close
+    close,
   });
 })();
 

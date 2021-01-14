@@ -39,6 +39,7 @@ export default function removeModelFactory({
       repository.delete(id),
       observer.notify(event.eventName, event),
     ]).catch(async (error) => {
+      console.error(error);
       await repository.save(id, model);
       throw new Error(error);
     });

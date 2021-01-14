@@ -1,46 +1,113 @@
-// const { MongoClient } = require("mongodb");
-// 2	
-// 3	// Replace the uri string with your MongoDB deployment's connection string.
-// 4	const uri = "mongodb+localhost://tyson:secret@localhost:49154";
-// 6	
-// 7	const client = new MongoClient(uri);
-// 8	
-// 9	async function run() {
-// 10	  try {
-// 11	    await client.connect();
-// 12	
-// 13	    const database = client.db("fedmon");
-// 14	    const collection = database.collection("movies");
-// 15	
-// 16	    // create a filter for a movie to update
-// 17	    const filter = { title: "Blacksmith Scene" };
-// 18	
-// 19	    // this option instructs the method to create a document if no documents match the filter
-// 20	    const options = { upsert: true };
-// 21	
-// 22	    // create a document that sets the plot of the movie
-// 23	    const updateDoc = {
-// 24	      $set: {
-// 25	        plot:
-// 26	          "Blacksmith Scene is a silent film directed by William K.L. Dickson",
-// 27	      },
-// 28	    };
-// 29	
-// 30	    const result = await collection.updateOne(filter, updateDoc, options);
-// 31	    console.log(
-// 32	      `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
-// 33	    );
-// 34	  } finally {
-// 35	    await client.close();
-// 36	  }
-// 37	}
-// 38	run().catch(console.dir);
+"use strict";
 
+const MongoClient = require("mongodb").MongoClient;
+const DataSourceFile = require("./datasource-file").DataSourceFile;
 
-// // db.createUser(
-// //   {
-// //     user: "tyson",
-// //     pwd: "secret",  
-// //     roles: [ "readWrite", "dbAdmin" ]
-// //   }
-// // )
+const url = process.env.MONGODB_URL || "mongodb://localhost:27017";
+const cacheSize = Number(process.env.CACHE_SIZE) || 300;
+
+export class DataSourceMongoDb extends DataSourceFile {
+  constructor(datasource, factory, name) {
+    super(datasource, factory, name);
+  }
+
+  /**
+   * @override
+   * @param {{
+   *  hydrate:function(Map<string,import("../../models").Model>),
+   *  serializer:function(*,*):*
+   * }} options
+   */
+  load({ hydrate, serializer }) {
+    this.hydrate = hydrate;
+    this.serializer = serializer;
+
+    this.loadModels()
+      .then(() => console.log("models loaded from db"))
+      .catch((e) => console.error(e));
+  }
+
+  async connectDb() {
+    if (!this.client) {
+      this.client = await MongoClient.connect(url, {
+        useNewUrlParser: true, 
+        useUnifiedTopology: true 
+      });
+
+      if (!this.client) {
+        throw new Error("connection to mongodb failed");
+      }
+    }
+  }
+
+  async loadModels() {
+    try {
+      await this.connectDb();
+      this.collection = this.client.db("fedmon").collection(this.name);
+      const models = this.collection.find().limit(cacheSize);
+
+      models.forEach((model) =>
+        this.dataSource.set(model.id, this.hydrate(model))
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /**
+   * @override
+   * @param {*} id
+   */
+  async find(id) {
+    try {
+      const cached = this.dataSource.get(id);
+      if (!cached) {
+        const saved = await this.collection.findOne({ _id: id });
+        const model = this.hydrate(saved);
+        return this.dataSource.set(id, model);
+      }
+      return cached;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /**
+   * @override
+   * @param {*} id
+   * @param {*} data
+   */
+  async save(id, data) {
+    try {
+      const model = JSON.parse(JSON.stringify(data, this.replace), this.revive);
+      await this.collection.replaceOne(
+        { _id: id },
+        { ...model, _id: id },
+        { upsert: true }
+      );
+      return this.dataSource.set(id, data).get(id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async list(cached = false) {
+    if (cached) {
+      return [...this.dataSource.values()];
+    }
+    return this.collection.find().toArray();
+  }
+
+  /**
+   * @override
+   * @param {*} id
+   */
+  async delete(id) {
+    try {
+      await this.collection.deleteOne({ _id: id });
+      this.dataSource.delete(id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}

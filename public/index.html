@@ -11,30 +11,28 @@
         <td>
           <label for="model">Model</label>
         </td>
-      </tr>
-      <tr>
         <td>
-           <input id="model" value="orders"></input><pre></pre>
+          <label for="modelId">Model ID</label>
         </td>
-      </tr>
-      <tr>
+        <td>
+          <label for="parameter">Parameter</label>
+        </td>
         <td>
           <label for="query">Query</label>
         </td>
       </tr>
       <tr>
         <td>
-           <input id="query" value="relation=customer"></input><pre></pre>
+          <input id="model" value="orders"></input>
         </td>
-      </tr>
-      <tr>
         <td>
-          <label for="modelId">Model ID</label>
+          <input id="modelId"></input>
         </td>
-      </tr>
-      <tr>
         <td>
-          <input id="modelId"></input><pre></pre>
+          <input id="parameter" value="approve"></input>
+        </td>
+        <td>
+          <input id="query" value="command=decrypt"></input>
         </td>
       </tr>
       <tr>
@@ -43,8 +41,8 @@
         </td>
       </tr>
       <tr>
-        <td>
-          <textarea id="payload" style="height: 150px; width: 420px;">
+    </table>
+    <textarea id="payload" style="height: 150px; width: 420px;">
 {
   "firstName":"Uncle",
   "lastName":"Bob",
@@ -57,10 +55,7 @@
    "shippingAddress":"123 Park Ave. NY, NY 45678",
    "billingAddress":"123 Park Ave. NY, NY 45678"
 }
-          </textarea>          
-        </td>
-      </tr>
-    </table>
+    </textarea>          
     <pre id="url"></pre>
     <button id="post" type="button" title="post">Post</button>
     <button id="patch" type="button" title="patch">Patch</button>

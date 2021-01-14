@@ -1,4 +1,6 @@
-'use strict'
+"use strict";
+
+import executeCommand from "./execute-command";
 
 /**
  * @typedef {Object} dependencies injected dependencies
@@ -10,21 +12,26 @@
  */
 
 /**
- * @param {dependencies} param0 
+ * @param {dependencies} param0
  */
 export default function addModelFactory({
   modelName,
   models,
   repository,
   observer,
-  handlers = []
+  handlers = [],
 } = {}) {
   const eventType = models.EventTypes.CREATE;
   const eventName = models.getEventName(eventType, modelName);
-  handlers.forEach(handler => observer.on(eventName, handler));
+  handlers.forEach((handler) => observer.on(eventName, handler));
 
-  return async function addModel(input) {
-    const model = await models.createModel(observer, repository, modelName, input);
+  return async function addModel(input, command) {
+    const model = await models.createModel(
+      observer,
+      repository,
+      modelName,
+      input
+    );
     const event = await models.createEvent(eventType, modelName, model);
 
     try {
@@ -35,6 +42,13 @@ export default function addModelFactory({
       throw new Error(error);
     }
 
+    if (command) {
+      const result = await executeCommand(models, model, command, "write");
+      if (result) {
+        return result;
+      }
+    }
+
     return model;
-  }
+  };
 }
