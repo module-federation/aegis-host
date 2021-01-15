@@ -1,6 +1,6 @@
 "use strict";
 
-import pipe from '../lib/pipe';
+import pipe from "../lib/pipe";
 
 /**
  * @callback functionalMixin
@@ -36,7 +36,6 @@ export const withTimestamp = (propName, fnTimestamp = time) => {
   return (o) => ({ [propName]: fnTimestamp(), ...o });
 };
 
-
 /**
  * Convert keys from symbols to strings when
  * the object is serialized so the properties
@@ -44,14 +43,15 @@ export const withTimestamp = (propName, fnTimestamp = time) => {
  * @param {{key: string, value: Symbol}} keyMap
  */
 export const fromSymbol = (keyMap) => (o) => {
-  const stringifySymbols = () => Object.keys(keyMap)
+  const stringifySymbols = () =>
+    Object.keys(keyMap)
       .map((k) => ({ [k]: o[keyMap[k]] }))
       .reduce((p, c) => ({ ...c, ...p }));
-  
+
   return {
     ...o,
-    ...stringifySymbols()
-  }
+    ...stringifySymbols(),
+  };
 };
 
 /**
@@ -73,15 +73,17 @@ export const toSymbol = (keyMap) => (o) => {
 
 /**
  * Convert timestamp number to formatted date string.
- * @param {number[]} timestamps 
+ * @param {number[]} timestamps
  * @param {"utc"|"iso"} format
  */
 export const fromTimestamp = (timestamps, format = "utc") => (o) => {
   const formats = { utc: "toUTCString", iso: "toISOString" };
   const fn = formats[format];
+
   if (!fn) {
     throw new Error("invalid date format");
   }
+
   const stringifyTimestamps = () =>
     timestamps
       .map((k) => (o[k] ? { [k]: new Date(o[k])[fn]() } : {}))
@@ -102,13 +104,13 @@ export const withSerializers = (...funcs) => (o) => {
     ...o,
     toJSON() {
       return pipe(...funcs)(this);
-    }
+    },
   };
-}
+};
 
 /**
  * Pipes multiple deserializing mixins together.
- * @param  {...functionalMixin} funcs 
+ * @param  {...functionalMixin} funcs
  */
 export const withDeserializers = (...funcs) => (o) => {
   function fromJSON() {
@@ -124,7 +126,7 @@ export const withDeserializers = (...funcs) => (o) => {
 
 /**
  * Subscribe to and emit application and domain events.
- * @param {import('../lib/observer').Observer} observer 
+ * @param {import('../lib/observer').Observer} observer
  */
 export const withObserver = (observer) => (o) => {
   return {
@@ -134,6 +136,6 @@ export const withObserver = (observer) => (o) => {
     },
     subscribe(eventName, callback) {
       observer.on(eventName, callback);
-    }
+    },
   };
 };

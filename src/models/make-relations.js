@@ -10,7 +10,7 @@ const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) =>
-    (await ds.list()).filter(v => Model.getId(model) !== v[rel.foreignKey]),
+    (await ds.list()).filter((v) => Model.getId(model) === v[rel.foreignKey]),
   /**
    *
    * @param {import("../models").Model} model
@@ -26,14 +26,14 @@ const relationType = {
  * @param {import("./index").relations} relations
  * @param {*} dataSource
  */
-export default function makeRelations (model, relations, dataSource) {
+export default function makeRelations(model, relations, dataSource) {
   if (Object.getOwnPropertyNames(relations).length < 1) return;
 
   return Object.keys(relations)
     .map(function (relation) {
       return {
-        async [relation] () {
-          const rel = relations[relation];          
+        async [relation]() {
+          const rel = relations[relation];
           const ds = dataSource.getFactory().getDataSource(rel.modelName);
 
           if (!ds || !relationType[rel.type]) {

@@ -11,38 +11,28 @@
   const paramText = document.querySelector("#parameter");
 
   function updateUrl(url) {
-    document.getElementById("url").textContent = [
-      `http://${location.host}`,
-      url,
-    ].join("/");
+    document.getElementById(
+      "url"
+    ).textContent = `http://${location.host}/${url}`;
   }
 
-  function getUrl(add = () => "") {
+  function getUrl() {
     const model = document.getElementById("model").value;
     const id = document.getElementById("modelId").value;
-    const url = ["api", model, id].join("/") + add();
+    const param = document.getElementById("parameter").value;
+    const query = document.getElementById("query").value;
+    let url = `api/${model}`;
+    if (id) url += `/${id}`;
+    if (param) url += `/${param}`;
+    if (query) url += `?${query}`;
     updateUrl(url);
     return url;
   }
 
-  function addQuery() {
-    const query = document.getElementById("query").value;
-    if (query) {
-      return `?${query}`;
-    }
-    return "";
-  }
-
-  function addParameter() {
-    const param = document.getElementById("parameter").value;
-    if (param) return param;
-    return "";
-  }
-
   modelText.onchange = getUrl;
   modelIdText.onchange = getUrl;
-  queryText.onchange = () => getUrl(addQuery);
-  paramText.onchange = () => getUrl(addParameter);
+  queryText.onchange = getUrl;
+  paramText.onchange = getUrl;
 
   function showMessage(message) {
     messages.textContent += `\n${message}`;
@@ -72,7 +62,7 @@
   }
 
   postButton.onclick = function () {
-    fetch(getUrl(addParameter), {
+    fetch(getUrl(), {
       method: "POST",
       body: document.getElementById("payload").value,
       headers: { "Content-Type": "application/json" },
@@ -85,7 +75,7 @@
   };
 
   patchButton.onclick = function () {
-    fetch(getUrl(addParameter), {
+    fetch(getUrl(), {
       method: "PATCH",
       body: document.getElementById("payload").value,
       headers: { "Content-Type": "application/json" },
@@ -98,7 +88,8 @@
   };
 
   getButton.onclick = function () {
-    fetch(getUrl(addQuery))
+    paramText.textContent = "";
+    fetch(getUrl())
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {

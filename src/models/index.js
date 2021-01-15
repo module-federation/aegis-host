@@ -2,6 +2,7 @@
 
 import ModelFactory from "./model-factory";
 import makeAdapters from "./make-adapters";
+
 import {
   importRemoteModels,
   importRemoteServices,
@@ -10,9 +11,9 @@ import {
 
 /**
  * @typedef {string} eventName
- * @typedef {Object} Model Every imported domain object created by the framework 
- * is a `Model`, which allows it to be extended and controlled through configuration. 
- * Note that the framework does not use inheritance. All objects are immutable; 
+ * @typedef {Object} Model Every imported domain object created by the framework
+ * is a `Model`, which allows it to be extended and controlled through configuration.
+ * Note that the framework does not use inheritance. All objects are immutable;
  * all extensions are applied to copies of the original.
  * @property {string} id
  * @property {string} modelName
@@ -21,7 +22,7 @@ import {
  * @property {string} onDelete
  * @property {function():Promise<Model>} update user code calls this to update the model
  * @property {function(eventName,function(eventName,Model):void)} addListener listen for domain events
- * @property {function(eventName,Model):Promise<void>} emit emit domain event 
+ * @property {function(eventName,Model):Promise<void>} emit emit domain event
  *
  * @typedef {import('../models/event').Event} Event
  *
@@ -33,9 +34,9 @@ import {
  * @property {function(string,string):string} getEventName
  * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
  * @property {function(any):string} getModelId
- * @property {function(Model):string[]} getPortFlow 
+ * @property {function(Model):string[]} getPortFlow
  * @property {function(Model,string):Model} loadModel
- * @property {function():ModelSpecification[]} getRemoteModels  
+ * @property {function():ModelSpecification[]} getRemoteModels
  *
  * @typedef {string} service - name of the service object to inject in adapter
  * @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds
@@ -65,7 +66,7 @@ import {
  *    undo: function(Model, port)
  *  }
  * }} ports - input/output ports for the domain
- * 
+ *
  * @typedef {{
  *  [x: string]: {
  *    modelName:string,
@@ -83,7 +84,7 @@ import {
  *  type: (function(key,value):boolean) | "string" | "object" | "number" | "function" | "any" | RegExp
  *  value: function(key, value):any
  * }} serializer
- * 
+ *
  * @typedef {Array<function({
  *  eventName:string,
  *  eventType:string,
@@ -117,10 +118,7 @@ const createEvent = (model) => ({
 /**
  * @param {{updated:Model,changes:Object}} param0
  */
-const updateEvent = ({
-  updated,
-  changes
-}) => ({
+const updateEvent = ({ updated, changes }) => ({
   model: updated,
   changes: {
     ...changes,
@@ -200,13 +198,16 @@ export async function initRemotes(overrides) {
     overrides,
   });
 
-  await initModels({
-    ...services,
-    ...overrides,
-  }, {
-    ...adapters,
-    ...overrides,
-  });
+  await initModels(
+    {
+      ...services,
+      ...overrides,
+    },
+    {
+      ...adapters,
+      ...overrides,
+    }
+  );
 }
 
 export default ModelFactory;

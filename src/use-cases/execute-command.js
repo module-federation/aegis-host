@@ -50,10 +50,13 @@ export default async function executeCommand(
     const cmd = spec.commands[command].command;
 
     if (commandType[typeof cmd]) {
-      const result = await commandType[typeof cmd](cmd, model);
-
-      if (result) {
-        return { ...model, ...result };
+      try {
+        const result = await commandType[typeof cmd](cmd, model);
+        if (result) {
+          return { ...model, ...result };
+        }
+      } catch (error) {
+        console.error({ func: executeCommand.name, command, error });
       }
     }
   }

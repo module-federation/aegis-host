@@ -27,7 +27,7 @@ function setPortTimeout({ portName, portConf, model }) {
 
     // Call the port's timeout handler if one is specified
     const handler = portConf.timeoutCallback || timeoutCallback;
-    
+
     if (handler) {
       handler({
         model,
@@ -77,7 +77,7 @@ function handleError({ portName, portConf, model, error }) {
 
   if (handler) {
     console.error("invoking error callback");
-    
+
     handler({
       model,
       error,
@@ -93,23 +93,22 @@ function stopTimer(model, portConf, timerId) {
   const lastUpdate = model[Model.getKey("updateTime")];
   const now = new Date().getTime();
   const totalSeconds = new Date(now - lastUpdate).getSeconds();
-  
+
   if (totalSeconds > retryTimeout) {
-    clearTimeout(timerId); 
+    clearTimeout(timerId);
     return true;
   }
   return false;
 }
 
 /**
- * Generate functions to handle I/O between
- * the domain and application layers. Each port
- * is assigned an adapter, which either invokes
- * the port (inbound) or is invoked by it (outbound).
- * Ports can be instrumented for exceptions and timeouts.
- * They can also be piped together in a control flow by
- * specifying the output event of one port as the input or
- * triggering event of another.
+ * Generate functions to handle I/O between the domain
+ * and application layers. Each port is assigned an adapter,
+ * which either invokes the port (inbound) or is invoked by
+ * it (outbound). Ports can be instrumented for exceptions
+ * and timeouts. They can also be piped together in a control
+ * flow by specifying the output event of one port as the input
+ * or triggering event of another.
  *
  * See the `ModelSpecification` for port configuration options.
  *
@@ -133,7 +132,7 @@ export default function makePorts(ports, adapters, observer) {
       if (disabled) {
         console.warn("warning: port disabled or adapter missing: %s", port);
       } else {
-        // Listen for event that will invoke this port  
+        // Listen for event that will invoke this port
         recordPort = setPortEvent(portName, portConf, observer);
       }
 
@@ -166,7 +165,7 @@ export default function makePorts(ports, adapters, observer) {
             }
           } catch (error) {
             console.error(error);
-            
+
             if (stopTimer(this, portConf, timerId)) {
               handleError({
                 model: this,

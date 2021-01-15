@@ -23,7 +23,7 @@ export class DataSourceMongoDb extends DataSourceFile {
     this.serializer = serializer;
 
     this.loadModels()
-      .then(() => console.log("models loaded from db"))
+      .then()
       .catch((e) => console.error(e));
   }
 

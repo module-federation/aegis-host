@@ -17,9 +17,13 @@ export default async function fetchRelatedModels(models, model, relation) {
   }
 
   if (relation && spec.relations[relation]) {
-    const related = await model[relation]();
-    if (related) {
-      return { model, [relation]: related };
+    try {
+      const related = await model[relation]();
+      if (related) {
+        return { model, [relation]: related };
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
