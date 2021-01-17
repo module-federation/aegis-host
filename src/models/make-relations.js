@@ -5,7 +5,7 @@ import Model from "./model";
 const relationType = {
   /**
    *
-   * @param {import("../models").Model} model
+   * @param {import("../models/model-factory").Model} model
    * @param {import("../datasources/datasource").default} ds
    * @param {import("./index").relations[relation]} rel
    */

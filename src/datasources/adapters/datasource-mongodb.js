@@ -22,16 +22,16 @@ export class DataSourceMongoDb extends DataSourceFile {
     this.hydrate = hydrate;
     this.serializer = serializer;
 
-    this.loadModels()
-      .then()
+    this.connectDb()
+      .then(() => this.loadModels())
       .catch((e) => console.error(e));
   }
 
   async connectDb() {
     if (!this.client) {
       this.client = await MongoClient.connect(url, {
-        useNewUrlParser: true, 
-        useUnifiedTopology: true 
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
       });
 
       if (!this.client) {
@@ -42,7 +42,6 @@ export class DataSourceMongoDb extends DataSourceFile {
 
   async loadModels() {
     try {
-      await this.connectDb();
       this.collection = this.client.db("fedmon").collection(this.name);
       const models = this.collection.find().limit(cacheSize);
 
@@ -61,11 +60,12 @@ export class DataSourceMongoDb extends DataSourceFile {
   async find(id) {
     try {
       const cached = this.dataSource.get(id);
+
       if (!cached) {
-        const saved = await this.collection.findOne({ _id: id });
-        const model = this.hydrate(saved);
-        return this.dataSource.set(id, model);
+        const model = await this.collection.findOne({ _id: id });
+        return this.dataSource.set(id, this.hydrate(model));
       }
+
       return cached;
     } catch (error) {
       console.error(error);
@@ -109,5 +109,9 @@ export class DataSourceMongoDb extends DataSourceFile {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  close() {
+    this.client.close();
   }
 }

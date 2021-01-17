@@ -5,7 +5,7 @@ import executeCommand from "./execute-command";
 /**
  * @typedef {Object} dependencies injected dependencies
  * @property {String} modelName - name of the domain model
- * @property {import('../models/index').ModelFactory} models - model factory
+ * @property {import('../models/model-factory').ModelFactory} models - model factory
  * @property {import('../datasources/datasource').default} repository - persistence service
  * @property {import('../lib/observer').Observer} observer - application events, propagated to domain
  * @property {...Function} handlers - event handlers can be registered by the domain

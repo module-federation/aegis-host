@@ -1,12 +1,13 @@
 "use strict";
 
 import Model from "./model";
-import timeoutCallback from "./timeout-callback";
-import errorCallback from "./error-callback";
+import retryCallback from "./retry-callback";
+import async from "../lib/async-error";
 
 const TIMEOUT_SECONDS = 60;
 
 /**
+ *
  * Set an appropriate timeout interval and handler for the port.
  * @param {{
  *  portName: string,
@@ -26,15 +27,8 @@ function setPortTimeout({ portName, portConf, model }) {
     console.error("port operation timed out: %s", portName);
 
     // Call the port's timeout handler if one is specified
-    const handler = portConf.timeoutCallback || timeoutCallback;
-
-    if (handler) {
-      handler({
-        model,
-        portName,
-        portConf,
-      });
-    }
+    const handler = portConf.timeoutCallback || retryCallback;
+    handler({ model, portName, portConf });
   }, timeout);
 
   return timerId;
@@ -46,17 +40,16 @@ function setPortTimeout({ portName, portConf, model }) {
  * @returns {boolean} whether or not to remember this port
  * for compensation and restart
  */
-function setPortEvent(portName, portConf, observer) {
+function addPortListener(portName, portConf, observer) {
   if (portConf.consumesEvent) {
     // listen for the triggering event to invoke this port
     observer.on(
       portConf.consumesEvent,
       async function (model) {
-        try {
-          // Invoke this port and pass a callack if one is specified
-          await model[portName](portConf.callback);
-        } catch (error) {
-          throw new Error(error);
+        // Invoke this port and pass a callack if one is specified
+        const result = await async(model[portName](portConf.callback));
+        if (!result.ok) {
+          throw new Error(result.error);
         }
       },
       false
@@ -74,30 +67,36 @@ function handleError({ portName, portConf, model, error }) {
 
   // Call the port's error handler if one is specified
   const handler = portConf.errorCallback || errorCallback;
-
-  if (handler) {
-    console.error("invoking error callback");
-
-    handler({
-      model,
-      error,
-      portName,
-      portConf,
-    });
-  }
+  handler({ model, error, portName, portConf });
 }
 
 function stopTimer(model, portConf, timerId) {
-  const FIFTEEN_MINUTES = 15 * 60 * 60;
-  const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
-  const lastUpdate = model[Model.getKey("updateTime")];
+  const timeout = (portConf.timeout || TIMEOUT_SECONDS) * 1000;
   const now = new Date().getTime();
+  const lastUpdate = model[Model.getKey("updateTime")];
   const totalSeconds = new Date(now - lastUpdate).getSeconds();
+  const FIFTEEN_MINUTES = 15 * 60 * 1000;
+  const retryTimeout = portConf.retryTimeout || FIFTEEN_MINUTES;
+
+  if (retryTimeout < timeout) {
+    console.warn(
+      "config error: retryTimeout < timeout",
+      Model.getName(model),
+      porfConf
+    );
+    model.emit("configError", {
+      desc: "retryTimeout < timeout",
+      portConf,
+      modelName: Model.getName(model),
+    });
+    return true;
+  }
 
   if (totalSeconds > retryTimeout) {
     clearTimeout(timerId);
     return true;
   }
+
   return false;
 }
 
@@ -118,7 +117,6 @@ function stopTimer(model, portConf, timerId) {
  */
 export default function makePorts(ports, adapters, observer) {
   if (!ports || !adapters) {
-    console.warn("no ports or adapters configured");
     return;
   }
 
@@ -129,11 +127,9 @@ export default function makePorts(ports, adapters, observer) {
       const disabled = portConf.disabled || !adapters[port];
       let recordPort = false;
 
-      if (disabled) {
-        console.warn("warning: port disabled or adapter missing: %s", port);
-      } else {
+      if (!disabled) {
         // Listen for event that will invoke this port
-        recordPort = setPortEvent(portName, portConf, observer);
+        recordPort = addPortListener(portName, portConf, observer);
       }
 
       return {
@@ -166,6 +162,7 @@ export default function makePorts(ports, adapters, observer) {
           } catch (error) {
             console.error(error);
 
+            // Keep retrying until timeout expires
             if (stopTimer(this, portConf, timerId)) {
               handleError({
                 model: this,
@@ -178,8 +175,5 @@ export default function makePorts(ports, adapters, observer) {
         },
       };
     })
-    .reduce((p, c) => ({
-      ...c,
-      ...p,
-    }));
+    .reduce((p, c) => ({ ...c, ...p }));
 }

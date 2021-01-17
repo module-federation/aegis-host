@@ -10,46 +10,27 @@ import {
 } from "../services/federation-service";
 
 /**
+ * @typedef {import("./model").Model} Model
+ * @typedef {import('./event').Event} Event
  * @typedef {string} eventName
- * @typedef {Object} Model Every imported domain object created by the framework
- * is a `Model`, which allows it to be extended and controlled through configuration.
- * Note that the framework does not use inheritance. All objects are immutable;
- * all extensions are applied to copies of the original.
- * @property {string} id
- * @property {string} modelName
- * @property {string} createTime
- * @property {string} onUpdate
- * @property {string} onDelete
- * @property {function():Promise<Model>} update user code calls this to update the model
- * @property {function(eventName,function(eventName,Model):void)} addListener listen for domain events
- * @property {function(eventName,Model):Promise<void>} emit emit domain event
- *
- * @typedef {import('../models/event').Event} Event
- *
- * @typedef {Object} ModelFactory Creates new model instances.
- * @property {function(string,*):Promise<Readonly<Model>>} createModel
- * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
- * @property {function(Model,object):Model} updateModel
- * @property {function(Model):Model} deleteModel
- * @property {function(string,string):string} getEventName
- * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
- * @property {function(any):string} getModelId
- * @property {function(Model):string[]} getPortFlow
- * @property {function(Model,string):Model} loadModel
- * @property {function():ModelSpecification[]} getRemoteModels
- *
  * @typedef {string} service - name of the service object to inject in adapter
  * @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds
- *
+ */
+
+/**
  * @callback onUpdate
  * @param {Model} model
  * @param {Object} changes
  * @returns {Model | Error} updated model or throw
- *
+ */
+
+/**
  * @callback onDelete
  * @param {Model} model
  * @returns {Model | Error} updated model or throw
- *
+ */
+
+/**
  * @typedef {{
  *  [x: string]: {
  *    service?: service,
@@ -66,7 +47,9 @@ import {
  *    undo: function(Model, port)
  *  }
  * }} ports - input/output ports for the domain
- *
+ */
+
+/**
  * @typedef {{
  *  [x: string]: {
  *    modelName:string,
@@ -74,37 +57,82 @@ import {
  *    foreignKey:any,
  *  }
  * }} relations - define related domain entities
- *
+ */
+
+/**
  * @typedef {any} value
  * @typedef {any} key
- *
+ */
+
+/**
  * @typedef {{
  *  on: "serialize" | "deserialize",
  *  key: string | "*" | RegExp | function(key,value):boolean
  *  type: (function(key,value):boolean) | "string" | "object" | "number" | "function" | "any" | RegExp
- *  value: function(key, value):any
+ *  value: function(key,value):any
  * }} serializer
- *
+
+/**
  * @typedef {Array<function({
  *  eventName:string,
  *  eventType:string,
  *  eventTime:string,
  *  modelName:string,
  *  model:Model
- * }):Promise<void>>} eventHandler
- *
+ * }):Promise<void>>} eventHandler - callbacks invoked to handle domain and
+ * application events
+ */
+
+/**
+ * @typedef {{
+ *  on: "serialize" | "deserialize",
+ *  key: string | RegExp | "*" | (function(key,value):boolean)
+ *  type: "string" | "object" | "number" | "function" | "any" | (function(key,value):boolean)
+ *  value(key, value):value
+ * }} serializer
+ */
+
+/**
+ * @typedef {{
+ *  [x:string]: {
+ *    allow:string|function(*):boolean|Array<string|function(*):boolean>
+ *    deny:string|function(*):boolean|Array<string|function(*):boolean>
+ *    type:"role"|"relation"
+ *    desc?:string
+ *  }
+ * }} accessControlList
+ */
+
+/**
+ * @typedef {{
+ *   [x: string]: {
+ *    command:string|function(Model):Promise<any>,
+ *    acl:accessControlList[]
+ *  }
+ * }} command - configure functions to execute when specified in a
+ * URL parameter or query of the auto-generate REST API
+ */
+
+/**
  * @typedef {Object} ModelSpecification Specify model data and behavior
  * @property {string} modelName name of model (case-insenstive)
  * @property {string} endpoint URI reference (e.g. plural of `modelName`)
- * @property {function(...args): any} factory factory function that creates model
- * @property {object} [dependencies] injected into the model for inverted control
- * @property {Array<import("./mixins").functionalMixin>} [mixins] functional mixins
- * @property {onUpdate} [onUpdate] function called to handle update requests
- * @property {onDelete} [onDelete] function called before deletion
- * @property {ports} [ports] input/output ports for the domain
- * @property {eventHandler[]} [eventHandlers] callbacks invoked (after save) when CRUD write events occur
- * @property {serializer[]} serializers callbacks invoked to de/serialzed the model
- * @property {relations} relations
+ * @property {function(...args): any} factory factory function that creates model insetance
+ * @property {object} [dependencies] injected into the model for control inversion
+ * @property {Array<import("./mixins").functionalMixin>} [mixins] - use mixins
+ * to implement domain logic, like input validation.
+ * @property {onUpdate} [onUpdate] - Function called to handle update requests. Called
+ * before save.
+ * @property {onDelete} [onDelete] - Function called before deletion.
+ * @property {ports} [ports] - input/output ports for the domain
+ * @property {eventHandler[]} [eventHandlers] - callbacks invoked to handle application
+ * events, e.g. CRUD events
+ * @property {serializer[]} [serializers] - use for custom de/serialization of the model
+ * when reading or writing to storage or network
+ * @property {relations} [relations] - link related domain models
+ * @property {command} [commands] - define functions to execute when specified in a
+ * URL parameter or query of the auto-generated REST API
+ * @property {accessControlList} [accessControlList] - configure authorization
  */
 
 /**

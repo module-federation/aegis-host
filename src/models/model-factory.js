@@ -5,16 +5,25 @@ import Event from "./event";
 
 /**
  * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType
- * 
- * @typedef {{
- *  id:string,
- *  createTime:string,
- *  modelName:string,
- *  onUpdate:function(Model,*):Model,
- *  onDelete:function(Model):Model
- * }} Model
- * 
+ */
+
+/**
  * @typedef {import('./index').ModelSpecification} ModelSpecification
+ */
+
+/**
+ * @typedef {Object} ModelFactory Creates new model instances.
+ * @property {function(string,*):Promise<Readonly<Model>>} createModel
+ * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
+ * @property {function(Model,object):Model} updateModel
+ * @property {function(Model):Model} deleteModel
+ * @property {function(string,string):string} getEventName
+ * @property {{CREATE:string,UPDATE:string,DELETE:string}} EventTypes
+ * @property {function(any):string} getModelId
+ * @property {function(Model):string[]} getPortFlow
+ * @property {function(Model,string):Model} loadModel
+ * @property {function():ModelSpecification[]} getRemoteModels
+ * @property {function(Model|string):ModelSpecification} getModelSpec
  */
 
 /**
@@ -69,6 +78,7 @@ const eventFactories = {
 
 /**
  * Register and create models.
+ * @type {ModelFactory}
  */
 const ModelFactory = {
   /**
@@ -110,11 +120,11 @@ const ModelFactory = {
     if (spec) {
       return Model.create({
         args,
-        spec: { 
-          ...spec, 
+        spec: {
+          ...spec,
           observer,
-          datasource
-        }
+          datasource,
+        },
       });
     }
     throw new Error("unregistered model");
@@ -122,14 +132,14 @@ const ModelFactory = {
 
   /**
    * Unmarshalls deserialized model.
-   * @param {import(".").Model} model 
-   * @param {*} modelName 
+   * @param {import(".").Model} model
+   * @param {*} modelName
    */
   loadModel: (observer, datasource, model, modelName) => {
     const name = checkModelName(modelName);
     const spec = modelFactories.get(name);
 
-    if (spec) { 
+    if (spec) {
       return Model.load({
         model,
         spec: {
@@ -153,13 +163,13 @@ const ModelFactory = {
     const name = checkModelName(modelName);
     const type = checkEventType(eventType);
     const factory = eventFactories[type].get(name);
-    
+
     if (factory) {
       return Event.create({
         args,
         factory,
         eventType: type,
-        modelName: name
+        modelName: name,
       });
     }
     throw new Error("unregistered model event");
@@ -182,8 +192,18 @@ const ModelFactory = {
   },
 
   /**
+   * Get the model's specification
+   * @param {Model|string} model
+   */
+  getModelSpec: (model) => {
+    if (!model) return;
+    const name = typeof model === "object" ? Model.getName(model) : model;
+    return modelFactories.get(name.toUpperCase());
+  },
+
+  /**
    * History of port invocation
-   * @param {Model} model 
+   * @param {Model} model
    */
   getPortFlow: (model) => Model.getPortFlow(model),
 

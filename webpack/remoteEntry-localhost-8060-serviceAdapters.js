@@ -31626,14 +31626,14 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 "use strict";
 var moduleMap = {
-	"./service1": () => {
-		return __webpack_require__.e("src_services-mock_service1_js").then(() => () => (__webpack_require__(/*! ./src/services-mock/service1 */ "./src/services-mock/service1.js")));
-	},
 	"./models": () => {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
 	"./adapters": () => {
 		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+	},
+	"./service1": () => {
+		return __webpack_require__.e("src_services-mock_service1_js").then(() => () => (__webpack_require__(/*! ./src/services-mock/service1 */ "./src/services-mock/service1.js")));
 	},
 	"./publish-event": () => {
 		return __webpack_require__.e("src_services_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services/publish-event */ "./src/services/publish-event.js")));

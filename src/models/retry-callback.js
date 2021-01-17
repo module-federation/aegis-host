@@ -3,8 +3,8 @@
 import errorActions from "./error-actions";
 
 /**
- * Default timeout handler: 
- * Retries port every `port.retryInterval` seconds 
+ * Default timeout handler:
+ * Retries port every `port.retryInterval` seconds
  * for up to `port.retryTimeout` minutes.
  * Then attempts to reverse any previous transactions.
  * @param {{
@@ -13,8 +13,8 @@ import errorActions from "./error-actions";
  *  model:import('./index').Model
  * }} args
  */
-export default async function timeoutCallback(args) {
+export default async function retryCallback(args) {
   const { portName } = args;
-  console.warn("timeout handler retrying port:", portName);
+  console.warn("timeout handler retrying port", portName);
   errorActions.retryAction(args);
 }

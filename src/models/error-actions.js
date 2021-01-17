@@ -1,6 +1,7 @@
 "use strict";
 
 import Model from "./model";
+import async from "../lib/async-error";
 
 const RETRY_TIMEOUT = 15 * 60; // seconds
 
@@ -26,7 +27,7 @@ const errorActions = {
     console.log({ func: this.retryAction.name, totalSeconds, retryTimeout });
 
     if (totalSeconds < retryTimeout) {
-      await model[portName](portConf.callback);
+      await async(model[portName](portConf.callback));
     }
   },
 
@@ -37,14 +38,13 @@ const errorActions = {
   undoAction: async function ({ portName, model }) {
     const eventData = { portName, model };
     console.log("reversing transactions", eventData);
-    
-    try {
-      await model.compensate();
+
+    const result = await async(model.compensate());
+    if (result.ok) {
       console.log("compensate completed", eventData);
-    } catch (error) {
-      console.error("compensate failed", { eventData, error });
-      model.emit("compensateFailed", { eventData, error });
+      return;
     }
+    model.emit("compensateFailed", { eventData, error });
   },
 
   exitAction: () => process.exit(),

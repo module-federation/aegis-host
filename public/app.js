@@ -88,7 +88,7 @@
   };
 
   getButton.onclick = function () {
-    paramText.textContent = "";
+    document.getElementById("parameter").value = "";
     fetch(getUrl())
       .then(handleResponse)
       .then(showMessage)

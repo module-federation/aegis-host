@@ -6,7 +6,7 @@ import invokePort from "./invoke-port";
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName
- * @property {import('../models').ModelFactory} models
+ * @property {import('../models/model-factory').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository
  * @property {import('../lib/observer').Observer} observer
  * @property {Function[]} handlers

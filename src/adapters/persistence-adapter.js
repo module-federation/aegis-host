@@ -1,38 +1,34 @@
 "use strict";
 
+import async from "../lib/async-error";
+
 export function save(service) {
   return async function ({ model }) {
-    try {
-      const saved = await service.save(model);
-      return saved;
-    } catch (error) {
-      console.error(error);
-      throw new Error(error);
+    const result = await async(service.save(model));
+    if (result.ok) {
+      return result.data;
     }
+    throw new Error(result.error);
   };
 }
 
 export function find(service) {
   return async function ({ model }) {
-    try {
-      const updated = await service.find(model);
-      return updated;
-    } catch (error) {
-      console.error(error);
-      throw new Error(error);
+    const result = await async(service.find(model));
+    if (result.ok) {
+      return result.data;
     }
+    throw new Error(result.error);
   };
 }
 
 export function update(service) {
   return async function ({ model, args: [changes] }) {
-    try {
-      const update = await service.update(model, changes);
-      return update;
-    } catch (error) {
-      console.error(error);
-      throw new Error(error);
+    const result = await async(service.update(model, changes));
+    if (result.ok) {
+      return result.data;
     }
+    throw new Error(result.error);
   };
 }
 

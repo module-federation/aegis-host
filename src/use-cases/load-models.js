@@ -6,7 +6,7 @@ import Serializer from "../lib/serializer";
  * Check `portFlow` history and resume any workflow
  * that was running before we shut down.
  *
- * @param {function(import('../models').Model)} getPortFlow,
+ * @param {function(Model):string[]} getPortFlow history of port calls
  * @param {import("../models").ports} ports
  * @returns {function(Map<string,Model>)}
  */
@@ -15,11 +15,11 @@ function resumeWorkflow(getPortFlow, ports) {
     if (list?.length > 0) {
       await Promise.all(
         list.map(async function (model) {
-          const flow = getPortFlow(model);
+          const history = getPortflow(model);
 
-          if (flow?.length > 0) {
-            const lastPort = flow.length - 1;
-            const nextPort = ports[flow[lastPort]].producesEvent;
+          if (history?.length > 0) {
+            const lastPort = history.length - 1;
+            const nextPort = ports[history[lastPort]].producesEvent;
 
             if (nextPort) {
               await model.emit(nextPort, model);
@@ -65,7 +65,7 @@ function handleError(e) {
  * before we shut down.
  * @typedef {import('../models').Model} Model
  * @param {{
- *  models:import('../models').ModelFactory,
+ *  models:import('../models/model-factory').ModelFactory,
  *  observer:import('../lib/observer').Observer,
  *  repository:import('../datasources/datasource').default,
  *  modelName:string
@@ -73,9 +73,7 @@ function handleError(e) {
  */
 export default function ({ models, observer, repository, modelName }) {
   return function loadModels() {
-    const spec = models
-      .getRemoteModels()
-      .find((s) => s.modelName === modelName);
+    const spec = models.getModelSpec(modelName);
 
     repository.load({
       fileName: modelName,

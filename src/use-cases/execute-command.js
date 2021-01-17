@@ -1,18 +1,19 @@
 "use strict";
 
 import checkAcl from "../lib/check-acl";
+import async from "../lib/async-error";
 
 const commandType = {
   /**
    *
-   * @param {function(import("../models").Model)} command
-   * @param {import("../models").Model} model
+   * @param {function(import("../models/model").Model)} command
+   * @param {import("../models/model").Model} model
    */
   function: async (command, model) => command(model),
   /**
    *
    * @param {string} command
-   * @param {import("../models").Model} model
+   * @param {import("../models/model").Model} model
    */
   string: async (command, model) => model[command](),
 };
@@ -20,6 +21,7 @@ const commandType = {
 function commandAuthorized(spec, command, permission) {
   return (
     command &&
+    spec.commands &&
     spec.commands[command] &&
     checkAcl(spec.commands[command].acl, permission)
   );
@@ -27,9 +29,10 @@ function commandAuthorized(spec, command, permission) {
 
 /**
  *
- * @param {import("../models").ModelFactory} models
- * @param {import("../models").Model} model
- * @param {{command:string}} query
+ * @param {import("../models/model-factory").ModelFactory} models
+ * @param {import("../models/model").Model} model
+ * @param {command:string} command - name of command
+ * @param {string} permission - permission of caller
  */
 export default async function executeCommand(
   models,
@@ -37,9 +40,7 @@ export default async function executeCommand(
   command,
   permission
 ) {
-  const spec = models
-    .getRemoteModels()
-    .find((s) => s.modelName === models.getModelName(model));
+  const spec = models.getModelSpec(model);
 
   if (!spec) {
     console.log("can't find spec for", models.getModelName(model));
@@ -49,16 +50,18 @@ export default async function executeCommand(
   if (commandAuthorized(spec, command, permission)) {
     const cmd = spec.commands[command].command;
 
-    if (commandType[typeof cmd]) {
-      try {
-        const result = await commandType[typeof cmd](cmd, model);
-        if (result) {
-          return { ...model, ...result };
-        }
-      } catch (error) {
-        console.error({ func: executeCommand.name, command, error });
+    if (typeof cmd === "function" || model[cmd]) {
+      const result = await async(commandType[typeof cmd](cmd, model));
+
+      if (result.ok) {
+        return { ...model, ...result.data };
       }
     }
+
+    console.warn("command not found", command);
+    model.emit("unkownCommand", model);
   }
+  console.warn("command unauthorized", command);
+
   return null;
 }

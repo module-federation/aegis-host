@@ -1,29 +1,26 @@
 "use strict";
 
+import async from "../lib/async-error";
+
 /**
- *
- * @param {import("../models").ModelFactory} models
- * @param {import("../models").Model} model
+ *models").ModelFactory
+ * @param {import("../} models
+ * @param {import("../models/model-factory").Model} model
  * @param {{relation:string}} query
  */
 export default async function fetchRelatedModels(models, model, relation) {
-  const spec = models
-    .getRemoteModels()
-    .find((s) => s.modelName === models.getModelName(model));
+  const spec = models.getModelSpec(model);
 
   if (!spec) {
     console.log("can't find spec for", models.getModelName(model));
     return null;
   }
 
-  if (relation && spec.relations[relation]) {
-    try {
-      const related = await model[relation]();
-      if (related) {
-        return { model, [relation]: related };
-      }
-    } catch (error) {
-      console.error(error);
+  if (relation && spec.relations && spec.relations[relation]) {
+    const result = await async(model[relation]());
+
+    if (result.ok) {
+      return { model, [relation]: result.data };
     }
   }
 

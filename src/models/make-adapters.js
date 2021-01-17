@@ -15,6 +15,7 @@ export default function makeAdapters(ports, adapters, services = {}) {
   if (!ports || !adapters) {
     return;
   }
+
   return Object.keys(ports)
     .map((port) => {
       try {
@@ -27,8 +28,5 @@ export default function makeAdapters(ports, adapters, services = {}) {
         console.warn(e.message);
       }
     })
-    .reduce((p, c) => ({
-      ...c,
-      ...p,
-    }));
+    .reduce((p, c) => ({ ...c, ...p }));
 }

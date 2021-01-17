@@ -1,5 +1,5 @@
 /**
- * Abstraction
+ * Abstract datasource class
  */
 export default class DataSource {
   constructor(dataSource, factory, name) {
@@ -27,7 +27,7 @@ export default class DataSource {
 
   /**
    * list model instances
-   * @param {boolean} cached - list cached items or query source
+   * @param {boolean} [cached] - list cached items, default is false
    * @returns {Promise<any[]>}
    */
   async list(cached = false) {
