@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 import {
   addModels,
@@ -8,18 +8,18 @@ import {
   removeModels,
   getModelId,
   loadModels,
-} from '../use-cases';
-import postModelFactory from './post-model';
-import patchModelFactory from './patch-model';
-import getModelFactory from './get-model';
-import getModelByIdFactory from './get-model-by-id';
+} from "../use-cases";
+import postModelFactory from "./post-model";
+import patchModelFactory from "./patch-model";
+import getModelFactory from "./get-model";
+import getModelByIdFactory from "./get-model-by-id";
 import deleteModelFactory from "./delete-model";
-import hash from '../lib/hash';
+import hash from "../lib/hash";
 
 function make(useCases, controllerFactory) {
-  return useCases().map(uc => ({
+  return useCases().map((uc) => ({
     endpoint: uc.endpoint,
-    fn: controllerFactory(uc.fn, getModelId, hash)
+    fn: controllerFactory(uc.fn, getModelId, hash),
   }));
 }
 
@@ -28,5 +28,13 @@ export const patchModels = () => make(editModels, patchModelFactory);
 export const getModels = () => make(listModels, getModelFactory);
 export const getModelsById = () => make(findModels, getModelByIdFactory);
 export const deleteModels = () => make(removeModels, deleteModelFactory);
-export const loadSavedModels = () => loadModels().forEach(m => m.fn());
 
+export const initLoader = () => {
+  const models = loadModels();
+  function loadSavedModels() {
+    models.forEach(m => m.fn());
+  }
+  return {
+    loadSavedModels
+  }
+}

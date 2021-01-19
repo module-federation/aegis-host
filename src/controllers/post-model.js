@@ -15,7 +15,7 @@ export default function postModelFactory(addModel, getModelId, hash) {
 
       log({ func: postModel.name, params: httpRequest.params });
 
-      const model = await addModel({ ...modelInfo }, command);
+      const model = await addModel({ ...modelInfo });
       log({ function: addModel.name, modelData: { ...model }, command });
 
       return {

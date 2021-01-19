@@ -5,9 +5,8 @@ import async from "../lib/async-error";
 const MAXRETRY = 10;
 /**
  * Default timeout handler:
- * Retries port every `port.retryInterval` seconds
+ * Retries port every `port.timeout` seconds
  * for up to `port.maxRetry` attempts.
- * Then attempts to reverse any previous transactions.
  * @param {{
  *  portName: string,
  *  portConf:import('./index').ports,

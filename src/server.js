@@ -9,7 +9,7 @@ import {
   getModels,
   getModelsById,
   deleteModels,
-  loadSavedModels,
+  initLoader,
 } from "./controllers";
 
 import { initRemotes } from "./models";
@@ -23,7 +23,6 @@ const Server = (() => {
   const API_ROOT = "/api";
   const PORT = 8070;
   const ENDPOINT = (e) => `${API_ROOT}/${e}`;
-  const ENDPOINTCMD = (e) => `${API_ROOT}/${e}/:command`;
   const ENDPOINTID = (e) => `${API_ROOT}/${e}/:id`;
   const ENDPOINTIDCMD = (e) => `${API_ROOT}/${e}/:id/:command`;
 
@@ -44,10 +43,9 @@ const Server = (() => {
     const overrides = { save, find, Persistence };
 
     initRemotes(overrides).then(() => {
-      loadSavedModels();
+      const loader = initLoader();
 
       make(ENDPOINT, app, "post", postModels);
-      make(ENDPOINTCMD, app, "post", postModels);
       make(ENDPOINT, app, "get", getModels);
       make(ENDPOINTID, app, "patch", patchModels);
       make(ENDPOINTIDCMD, app, "patch", patchModels);
@@ -55,6 +53,8 @@ const Server = (() => {
       make(ENDPOINTID, app, "delete", deleteModels);
 
       console.timeEnd(label);
+      
+      loader.loadSavedModels();
 
       app.listen(PORT, function () {
         console.log(`\nServer listening on http://localhost:${PORT}`);

@@ -1,5 +1,7 @@
 "use strict";
 
+import async from "../../lib/async-error";
+
 const MongoClient = require("mongodb").MongoClient;
 const DataSourceFile = require("./datasource-file").DataSourceFile;
 
@@ -24,7 +26,8 @@ export class DataSourceMongoDb extends DataSourceFile {
 
     this.connectDb()
       .then(() => this.loadModels())
-      .catch((e) => console.error(e));
+      .then(() => console.log("db loaded"))
+      .catch((e) => console.log(e));
   }
 
   async connectDb() {
@@ -44,10 +47,11 @@ export class DataSourceMongoDb extends DataSourceFile {
     try {
       this.collection = this.client.db("fedmon").collection(this.name);
       const models = this.collection.find().limit(cacheSize);
-
-      models.forEach((model) =>
-        this.dataSource.set(model.id, this.hydrate(model))
-      );
+      models.forEach((model) => {
+        const hydrated = this.hydrate(model);
+        //console.log(hydrated);
+        this.dataSource.set(model.id, hydrated);
+      });
     } catch (e) {
       console.error(e);
     }

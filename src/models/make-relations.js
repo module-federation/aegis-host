@@ -10,8 +10,9 @@ const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
-    const list = await ds.list();
+    const list = await ds.list(true);
     const pk = model.id || Model.getId(model);
+    console.log({ func: "oneToMany", pk, rel, model });
     return list.filter((m) => {
       const fk = m[rel.foreignKey];
       if (fk) {
