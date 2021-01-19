@@ -103,8 +103,6 @@ const Model = (() => {
       ...makePorts(ports, dependencies, observer),
       // Remember port calls
       [PORTFLOW]: [],
-      // Undo port transactions
-      compensate: compensate.call(model, ports),
       // name
       [MODELNAME]: modelName,
       // uuid
@@ -116,6 +114,10 @@ const Model = (() => {
       // Call before deleting
       [ONDELETE]() {
         return onDelete(this);
+      },
+      // Undo port transactions
+      async undo() {
+        compensate(this, ports);
       },
       /**
        * User code calls this to persist any updates it makes.

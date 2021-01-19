@@ -17,19 +17,7 @@ const errorActions = {
    *  model:import('../models').Model
    * }} param0
    */
-  retryAction: async function ({ portConf, portName, model }) {
-    const now = new Date().getTime();
-    const lastUpdate = model[Model.getKey("updateTime")];
-
-    const retryTimeout = portConf.retryTimeout || RETRY_TIMEOUT;
-    const totalSeconds = new Date(now - lastUpdate).getSeconds();
-
-    console.log({ func: this.retryAction.name, totalSeconds, retryTimeout });
-
-    if (totalSeconds < retryTimeout) {
-      await async(model[portName](portConf.callback));
-    }
-  },
+  retryAction: async function ({ args, portConf, portName, model }) {},
 
   /**
    * Backout transactions: execute compensating actions.
@@ -39,7 +27,7 @@ const errorActions = {
     const eventData = { portName, model };
     console.log("reversing transactions", eventData);
 
-    const result = await async(model.compensate());
+    const result = await async(model.undo());
     if (result.ok) {
       console.log("compensate completed", eventData);
       return;

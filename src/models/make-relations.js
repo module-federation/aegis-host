@@ -9,15 +9,24 @@ const relationType = {
    * @param {import("../datasources/datasource").default} ds
    * @param {import("./index").relations[relation]} rel
    */
-  oneToMany: async (model, ds, rel) =>
-    (await ds.list()).filter((v) => Model.getId(model) === v[rel.foreignKey]),
+  oneToMany: async (model, ds, rel) => {
+    const list = await ds.list();
+    const pk = model.id || Model.getId(model);
+    return list.filter((m) => {
+      const fk = m[rel.foreignKey];
+      if (fk) {
+        return fk === pk;
+      }
+      return false;
+    });
+  },
   /**
    *
    * @param {import("../models").Model} model
    * @param {import("../datasources/datasource").default} ds
    * @param {import("./index").relations[relation]} config
    */
-  manyToOne: async (model, ds, rel) => ds.find(model[rel.foreignKey]),
+  manyToOne: async (model, ds, rel) => await ds.find(model[rel.foreignKey]),
 };
 
 /**

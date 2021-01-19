@@ -15,7 +15,7 @@ function resumeWorkflow(getPortFlow, ports) {
     if (list?.length > 0) {
       await Promise.all(
         list.map(async function (model) {
-          const history = getPortflow(model);
+          const history = getPortFlow(model);
 
           if (history?.length > 0) {
             const lastPort = history.length - 1;

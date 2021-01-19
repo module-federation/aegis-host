@@ -198,6 +198,7 @@ const ModelFactory = {
   getModelSpec: (model) => {
     if (!model) return;
     const name = typeof model === "object" ? Model.getName(model) : model;
+    if (!name) return;
     return modelFactories.get(name.toUpperCase());
   },
 

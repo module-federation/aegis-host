@@ -80,11 +80,13 @@ export class DataSourceMongoDb extends DataSourceFile {
   async save(id, data) {
     try {
       const model = JSON.parse(JSON.stringify(data, this.replace), this.revive);
+
       await this.collection.replaceOne(
         { _id: id },
         { ...model, _id: id },
         { upsert: true }
       );
+
       return this.dataSource.set(id, data).get(id);
     } catch (error) {
       console.error(error);

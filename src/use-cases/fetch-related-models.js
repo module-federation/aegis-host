@@ -17,6 +17,11 @@ export default async function fetchRelatedModels(models, model, relation) {
   }
 
   if (relation && spec.relations && spec.relations[relation]) {
+    console.log(
+      relation,
+      models.getModelName(model),
+      model[relation].toString()
+    );
     const result = await async(model[relation]());
 
     if (result.ok) {
