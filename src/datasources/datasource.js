@@ -44,9 +44,22 @@ export default class DataSource {
    */
   load(options) {}
 
-  close() {}
-
+  /**
+   *
+   */
   getFactory() {
     return this.factory;
   }
+
+  /**
+   *
+   */
+  getCacheSize() {
+    return this.dataSource.size;
+  }
+
+  /**
+   *
+   */
+  close() {}
 }

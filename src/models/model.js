@@ -1,5 +1,36 @@
 "use strict";
 
+/**
+ * @typedef {Object} Model Domain entity/service object - conforms to `ModelSpecification`
+ * @property {string} Symbol_id - immutable/private model instance uuid
+ * @property {string} Symbol_modelName - immutable/private model name
+ * @property {string} Symbol_createTime - immutable/private time of creation
+ * @property {string} Symbol_updateTime - immutable/private time of last update
+ * @property {function(*,Model):Model} Symbol_onUpdate - immutable/private update function
+ * @property {function(Model)} Symbol_onDelete - immutable/private delete function
+ * @property {function(Object)} update - use this function to update the model -
+ * specify changes as properties of an object
+ * @property {function()} toJSON - de/serialization logic
+ * @property {function(eventName,function(eventName,Model):void)} addListener listen
+ * for domain events
+ * @property {function(eventName,Model):Promise<void>} emit emit a domain event
+ * @property {import('./mixins').functionalMixin} [mixinMethod] - when the user
+ * specifies a mixin, it is applied to the model on creation - adding methods is
+ * a common result.
+ * @property {*} [mixinData] - when the user specifies a mixin, it is applied to
+ * the model on creation - adding fields is a common result.
+ * @property {function(function():Promise<Model>):Promise<Model>} [port] - when a
+ * port is configured, the framework generates a method on the model object to invoke it.
+ * When data arrives on the port, the port's adapter invokes the callback specified
+ * in the port configuration, which is passed as an argument to the port function.
+ * The callback returns an updated `Model`, and control is returned to the caller.
+ * Optionally, an event is fired to trigger the next port function to run
+ * @property {function():Promise<any>} [relation] - when you configure a relation,
+ * the framework generates a function that your code calls to run the query
+ * @property {function(*):*} [command] - the framework will call any model method
+ * you specify when passed as a parameter or query in an API call.
+ */
+
 import {
   withTimestamp,
   withSerializers,
@@ -15,31 +46,6 @@ import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
 import pipe from "../lib/pipe";
 import uuid from "../lib/uuid";
-
-/**
- * @typedef {Object} Model
- * @property {string} Symbol_id - immutable/private uuid
- * @property {string} Symbol_modelName - immutable/private name
- * @property {string} Symbol_createTime - immutable/private createTime
- * @property {onUpdate} Symbol_onUpdate - immutable/private update function
- * @property {onDelete} Symbol_onDelete
- * @property {function(Object)} update - use this function to update model
- * specify changes in an object
- * @property {function()} toJSON - de/serialization logic
- * @property {function(eventName,function(eventName,Model):void)} addListener listen
- * for domain events
- * @property {function(eventName,Model):Promise<void>} emit emit domain event
- * @property {function(function():Promise<Model>):Promise<Model>} [port] - when a
- * port is configured, the framework generates a method on the model object to invoke it.
- * When data arrives on the port, the port's adapter invokes the callback specified
- * in the port configuration, which is passed as an argument to the port function.
- * The callback returns an updated `Model`, and control is returned to the caller.
- * Optionally, an event is fired to trigger the next port function to run
- * @property {function():Promise<any>} [relation] - when you configure a relation,
- * the framework generates a function that your code calls to run the query
- * @property {function(*):*} [command] - the framework will call any model method
- * you specify when passed as a parameter or query in an API call.
- */
 
 /**
  * @namespace
@@ -74,7 +80,7 @@ const Model = (() => {
   });
 
   /**
-   * Add data and methods that support framework services.
+   * Add data and functions that support framework services.
    * @param {{
    *  model:Model,
    *  spec:import('./index').ModelSpecification
@@ -103,19 +109,19 @@ const Model = (() => {
       ...makePorts(ports, dependencies, observer),
       // Remember port calls
       [PORTFLOW]: [],
-      // name
+      // model class name
       [MODELNAME]: modelName,
-      // uuid
+      // model instance uuid
       [ID]: uuid(),
-      // Call before saving
+      // Called before update is committed
       [ONUPDATE](changes) {
         return onUpdate(this, changes);
       },
-      // Call before deleting
+      // Called before delete is committed
       [ONDELETE]() {
         return onDelete(this);
       },
-      // Undo port transactions
+      // Back out all port transactions
       async undo() {
         compensate(this, ports);
       },

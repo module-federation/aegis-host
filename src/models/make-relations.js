@@ -11,13 +11,12 @@ const relationType = {
    */
   oneToMany: async (model, ds, rel) => {
     const list = await ds.list();
-    const pk = Model.getId(model);
+    const pk = Model.getId(model) || model.id;
     return list.filter((m) => {
       const fk = m[rel.foreignKey];
       if (fk && pk) {
         return fk === pk;
       }
-      console.error("pk or fk missing", model, rel);
       return false;
     });
   },

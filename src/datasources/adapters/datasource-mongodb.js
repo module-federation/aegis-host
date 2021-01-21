@@ -46,10 +46,9 @@ export class DataSourceMongoDb extends DataSourceFile {
     try {
       this.collection = this.client.db("fedmon").collection(this.name);
       const models = this.collection.find().limit(cacheSize);
+
       models.forEach((model) => {
-        const hydrated = this.hydrate(model);
-        //console.log(hydrated);
-        this.dataSource.set(model.id, hydrated);
+        this.dataSource.set(model.id, this.hydrate(model));
       });
     } catch (e) {
       console.error(e);
@@ -66,6 +65,9 @@ export class DataSourceMongoDb extends DataSourceFile {
 
       if (!cached) {
         const model = await this.collection.findOne({ _id: id });
+        if (!model) {
+          return null;
+        }
         return this.dataSource.set(id, this.hydrate(model));
       }
 
@@ -82,6 +84,8 @@ export class DataSourceMongoDb extends DataSourceFile {
    */
   async save(id, data) {
     try {
+      this.dataSource.set(id, data);
+
       const model = JSON.parse(JSON.stringify(data, this.replace), this.revive);
 
       await this.collection.replaceOne(
@@ -90,7 +94,7 @@ export class DataSourceMongoDb extends DataSourceFile {
         { upsert: true }
       );
 
-      return this.dataSource.set(id, data).get(id);
+      return data;
     } catch (error) {
       console.error(error);
     }
@@ -98,10 +102,11 @@ export class DataSourceMongoDb extends DataSourceFile {
 
   /**
    * @override
-   * @param {boolean} cached 
+   * @param {boolean} cached
    */
   async list(cached = true) {
     if (cached) {
+      console.log("cache size", this.dataSource.size);
       return [...this.dataSource.values()];
     }
     return this.collection.find().toArray();
@@ -113,8 +118,8 @@ export class DataSourceMongoDb extends DataSourceFile {
    */
   async delete(id) {
     try {
-      await this.collection.deleteOne({ _id: id });
       this.dataSource.delete(id);
+      await this.collection.deleteOne({ _id: id });
     } catch (error) {
       console.error(error);
     }

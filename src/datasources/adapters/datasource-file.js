@@ -24,7 +24,6 @@ export class DataSourceFile extends DataSourceMemory {
       return this.serializer.serialize(key, value);
     }
     return value;
-    d;
   }
 
   revive(key, value) {

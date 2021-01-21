@@ -12,8 +12,16 @@ import Event from "./event";
  */
 
 /**
+ * @typedef {import('../lib/observer').Observer} Observer
+ */
+
+/**
+ * @typedef {import('../datasources/datasource').default} Datasource
+ */
+
+/**
  * @typedef {Object} ModelFactory Creates new model instances.
- * @property {function(string,*):Promise<Readonly<Model>>} createModel
+ * @property {function(Observer,Datasource,string,...args):Promise<Readonly<Model>>} createModel
  * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
  * @property {function(Model,object):Model} updateModel
  * @property {function(Model):Model} deleteModel
@@ -69,7 +77,14 @@ function createEventName(eventType, modelName) {
   return checkEventType(eventType) + checkModelName(modelName);
 }
 
+/**
+ * @type {Map<string,ModelSpecification>}
+ */
 const modelFactories = new Map();
+
+/**
+ * @type {{[x: string]: Map<string,function(string,EventType,function()):Event>}}
+ */
 const eventFactories = {
   [EventTypes.CREATE]: new Map(),
   [EventTypes.UPDATE]: new Map(),
@@ -110,7 +125,9 @@ const ModelFactory = {
   /**
    * Call the factory function previously registered for `modelName`
    * @param {String} modelName - model's name
-   * @param {*} args - input sent in the request
+   * @param {*[]} args - input sent in the request
+   * @param {import('../lib/observer').Observer} observer - send & receive events
+   * @param {import('../datasources/datasource').default} datasource - persistence/cache
    * @returns {Promise<Readonly<Model>>} the model instance
    */
   createModel: async function (observer, datasource, modelName, ...args) {
@@ -131,7 +148,7 @@ const ModelFactory = {
   },
 
   /**
-   * Unmarshalls deserialized model.
+   * Unmarshalls a deserialized model.
    * @param {import(".").Model} model
    * @param {*} modelName
    */
@@ -198,8 +215,7 @@ const ModelFactory = {
   getModelSpec: (model) => {
     if (!model) return;
     const name = typeof model === "object" ? Model.getName(model) : model;
-    if (!name) return;
-    return modelFactories.get(name.toUpperCase());
+    return modelFactories.get(checkModelName(name));
   },
 
   /**
@@ -218,7 +234,7 @@ const ModelFactory = {
 
   /**
    *
-   * @param {*} model
+   * @param {Model} model
    */
   deleteModel: (model) => Model.delete(model),
 
