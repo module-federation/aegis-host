@@ -29,7 +29,7 @@ function retryOnTimeout(retryCount, { ports, port, model }) {
  */
 export default function compensate(model, ports) {
   return async function undo(retryCount = 0) {
-    const changes = { ...model, undo: true };
+    const changes = { ...model, compensate: true };
     const updated = await model.update(changes);
     let port = Model.getPortFlow(updated).pop();
 

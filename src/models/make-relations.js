@@ -10,14 +10,14 @@ const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
-    const list = await ds.list(true);
-    const pk = model.id || Model.getId(model);
-    console.log({ func: "oneToMany", pk, rel, model });
+    const list = await ds.list();
+    const pk = Model.getId(model);
     return list.filter((m) => {
       const fk = m[rel.foreignKey];
-      if (fk) {
+      if (fk && pk) {
         return fk === pk;
       }
+      console.error("pk or fk missing", model, rel);
       return false;
     });
   },

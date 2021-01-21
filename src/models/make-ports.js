@@ -1,33 +1,89 @@
 "use strict";
 
 import Model from "./model";
-import retryCallback from "./retry-callback";
 import portHandler from "./port-handler";
 import async from "../lib/async-error";
 
 const TIMEOUT_SECONDS = 60;
+const MAX_RETRY = 3;
+let retryCount = 0;
 
+async function retryHandler(options) {
+  const { portName, model, timeout, maxRetry, args } = options;
+
+  args.push({ calledByTimer: true });
+  retryCount++;
+  let timerId;
+
+  console.log("retry count", retryCount);
+
+  if (retryCount < maxRetry) {
+    timerId = setTimeout(retryHandler, timeout, options);
+    console.log("calling port", portName, retryCount, maxRetry, args);
+    await model[portName](...args);
+    clearTimeout(timerId);
+    return;
+  }
+  console.log("max retry attempts reached", portName);
+}
 /**
- *
  * Set an appropriate timeout interval and handler for the port.
  * @param {{
  *  portName: string,
  *  portConf: import('../models').ports,
  * }} options
- * @returns {number} timerId
  */
-function setPortTimeout(options) {
+function setPortTimeout(options, ...args) {
   // Set an appropriate timeout for the port
-  const { portConf, portName } = options;
-  if (portConf.timeout === 0) {
-    return 0;
-  }
+  const { portName, portConf } = options;
+  const noTimer = portConf.timeout === 0 ? true : false;
   const timeout = (portConf.timeout || TIMEOUT_SECONDS) * 1000;
-  console.error("port operation timed out: %s", portName);
 
-  // Call the port's timeout handler if configured, otherwise retry
-  const handler = portConf.timeoutCallback || retryCallback;
-  return setTimeout(handler, timeout, options);
+  // Call the port's timeout handler if configured
+  const handler = portConf.timeoutCallback || retryHandler;
+  const maxRetry = portConf.maxRetry || MAX_RETRY;
+
+  let timerId = -1;
+  const lastArg = args.pop();
+
+  if (noTimer || (typeof lastArg === "object" && lastArg.calledByTimer)) {
+    console.log(
+      "either called by a timer or port has no timeout, skipping...",
+      portName
+    );
+  } else {
+    console.log(
+      "setting timeout handler ",
+      portName,
+      retryCount,
+      maxRetry,
+      timeout
+    );
+
+    timerId = setTimeout(
+      handler,
+      timeout,
+      {
+        ...options,
+        timeout,
+        maxRetry,
+      },
+      ...args
+    );
+  }
+
+  return {
+    stopTimer() {
+      if (timerId > 0) {
+        clearTimeout(timerId);
+        retryCount = 0;
+      }
+    },
+
+    done() {
+      return timerId < 0;
+    },
+  };
 }
 
 /**
@@ -48,15 +104,14 @@ function getPortCallback(cb) {
  */
 function addPortListener(portName, portConf, observer) {
   if (portConf.consumesEvent) {
+    const callback = getPortCallback(portConf.callback);
+
     // listen for the triggering event to invoke this port
     observer.on(
       portConf.consumesEvent,
       async function (model) {
-        const callback = getPortCallback(portConf.callback);
-
         // Invoke this port and pass a callack
         const result = await async(model[portName](callback));
-
         if (!result.ok) {
           throw new Error(result.error);
         }
@@ -103,20 +158,25 @@ export default function makePorts(ports, adapters, observer) {
       return {
         // The port function
         async [port](...args) {
-          // If the port is disabled, return
+          // Don't run if port is disabled
           if (disabled) {
             return;
           }
 
           // Handle port timeouts
-          const timerId = setPortTimeout({ port, portConf, model: this, args });
+          const timer = setPortTimeout({
+            portName,
+            portConf,
+            model: this,
+            args,
+          });
 
           try {
             // Call the adapter and wait
             const model = await adapters[port]({ model: this, port, args });
 
             // Stop the timer
-            clearTimeout(timerId);
+            timer.stopTimer();
 
             // Remember invocations for undo and restart
             if (recordPort) {
@@ -124,11 +184,21 @@ export default function makePorts(ports, adapters, observer) {
             }
 
             // Signal the next task to run, unless undo is running
-            if (!model.undo && recordPort) {
+            if (!model.compensate && recordPort) {
               observer.notify(portConf.producesEvent, model);
             }
           } catch (error) {
             console.error(error);
+
+            // Is the timer still running?
+            if (timer.done()) {
+              // Try to back out previous transactions.
+              const result = await async(this.undo());
+
+              if (result.ok) {
+                console.log("undo: transactions rolled back.");
+              }
+            }
           }
         },
       };

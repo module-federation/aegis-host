@@ -80,9 +80,9 @@ export default function ({ models, observer, repository, modelName }) {
       hydrate: hydrateModels(models.loadModel, observer, repository),
       serializer: Serializer.addSerializer(spec.serializers),
     });
-    
+
     repository
-      .list(true)
+      .list()
       .then(resumeWorkflow(models.getPortFlow, spec.ports))
       .catch(handleError);
   };

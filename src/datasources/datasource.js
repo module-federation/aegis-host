@@ -27,10 +27,10 @@ export default class DataSource {
 
   /**
    * list model instances
-   * @param {boolean} [cached] - list cached items, default is false
+   * @param {boolean} [cached] - list cached items, default is true
    * @returns {Promise<any[]>}
    */
-  async list(cached = false) {
+  async list(cached = true) {
     throw new Error("abstract method not implemented");
   }
 

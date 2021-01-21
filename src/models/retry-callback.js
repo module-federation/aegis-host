@@ -15,20 +15,14 @@ const MAXRETRY = 10;
  */
 export default async function retryCallback(options) {
   const {
-    args: [retryCount, callback],
+    args: [callback, timerId],
     port,
     portConf,
     model,
+    adapter,
   } = options;
 
-  const max = portConf.maxRetry || MAXRETRY;
-
-  if (retryCount < max) {
-    console.warn("timeout handler retrying port", port);
-    await async(model[port](callback, retryCount++));
-    return;
-  }
-
-  console.warn("max retries attempted without success", options);
-  model.emit("retryFailed", options);
+  console.log({ func: retryCallback.name, options, portConf, retryCount });
+  console.warn("timeout handler retrying port", port);
+  await async(model[port](callback, timerId));
 }

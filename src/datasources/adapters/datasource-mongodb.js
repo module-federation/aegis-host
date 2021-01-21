@@ -26,7 +26,6 @@ export class DataSourceMongoDb extends DataSourceFile {
 
     this.connectDb()
       .then(() => this.loadModels())
-      .then(() => console.log("db loaded"))
       .catch((e) => console.log(e));
   }
 
@@ -97,7 +96,11 @@ export class DataSourceMongoDb extends DataSourceFile {
     }
   }
 
-  async list(cached = false) {
+  /**
+   * @override
+   * @param {boolean} cached 
+   */
+  async list(cached = true) {
     if (cached) {
       return [...this.dataSource.values()];
     }
