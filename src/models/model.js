@@ -234,7 +234,7 @@ const Model = (() => {
     },
 
     /**
-     * Process model update request.
+     * Process update request.
      * (Invokes user-provided `onUpdate` callback.)
      * @param {Model} model - model instance to update
      * @param {Object} changes - Object containing changes
@@ -251,7 +251,7 @@ const Model = (() => {
     },
 
     /**
-     * Process model delete request.
+     * Process delete request.
      * (Invokes provided `onDelete` callback.)
      * @param {Model} model
      * @returns {Model}
