@@ -10,16 +10,12 @@ let retryCount = 0;
 
 async function retryHandler(options) {
   const { portName, model, timeout, maxRetry, args } = options;
-
   args.push({ calledByTimer: true });
   retryCount++;
   let timerId;
 
-  console.log("retry count", retryCount);
-
   if (retryCount < maxRetry) {
     timerId = setTimeout(retryHandler, timeout, options);
-    console.log("calling port", portName, retryCount, maxRetry, args);
     await model[portName](...args);
     clearTimeout(timerId);
     return;
@@ -46,20 +42,7 @@ function setPortTimeout(options, ...args) {
   let timerId = -1;
   const lastArg = args.pop();
 
-  if (noTimer || (typeof lastArg === "object" && lastArg.calledByTimer)) {
-    console.log(
-      "either called by a timer or port has no timeout, skipping...",
-      portName
-    );
-  } else {
-    console.log(
-      "setting timeout handler ",
-      portName,
-      retryCount,
-      maxRetry,
-      timeout
-    );
-
+  if (!noTimer && !(typeof lastArg === "object" && lastArg.calledByTimer)) {
     timerId = setTimeout(
       handler,
       timeout,
