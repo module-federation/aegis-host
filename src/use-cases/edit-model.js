@@ -2,6 +2,7 @@
 
 import executeCommand from "./execute-command";
 import invokePort from "./invoke-port";
+import async from "../lib/async-error";
 
 /**
  * @typedef {Object} ModelParam
@@ -49,10 +50,17 @@ export default function editModelFactory({
     }
 
     if (command) {
-      const result = await executeCommand(models, updated, command, "write");
-      if (result) {
-        return result;
+      const result = await async(
+        executeCommand(models, updated, command, "write")
+      );
+      if (result.ok) {
+        return result.data;
       }
+    }
+
+    const result = await async(invokePort(models, updated, command, "write"));
+    if (result.ok) {
+      return result.data;
     }
 
     return updated;

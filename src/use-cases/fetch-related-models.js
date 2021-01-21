@@ -3,10 +3,9 @@
 import async from "../lib/async-error";
 
 /**
- *models").ModelFactory
- * @param {import("../} models
- * @param {import("../models/model-factory").Model} model
- * @param {{relation:string}} query
+ * @param {import("../models/model-factory).ModelFactory} models
+ * @param {import("../models/model").Model} model
+ * @param {import("../models".relations)} relation
  */
 export default async function fetchRelatedModels(models, model, relation) {
   const spec = models.getModelSpec(model);
@@ -17,11 +16,6 @@ export default async function fetchRelatedModels(models, model, relation) {
   }
 
   if (relation && spec.relations && spec.relations[relation]) {
-    console.log(
-      relation,
-      models.getModelName(model),
-      model[relation].toString()
-    );
     const result = await async(model[relation]());
 
     if (result.ok) {
