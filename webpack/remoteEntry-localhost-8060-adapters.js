@@ -31632,26 +31632,8 @@ var moduleMap = {
 	"./adapters": () => {
 		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
-	"./service1": () => {
-		return __webpack_require__.e("src_services-mock_service1_js").then(() => () => (__webpack_require__(/*! ./src/services-mock/service1 */ "./src/services-mock/service1.js")));
-	},
-	"./publish-event": () => {
-		return __webpack_require__.e("src_services_publish-event_js").then(() => () => (__webpack_require__(/*! ./src/services/publish-event */ "./src/services/publish-event.js")));
-	},
-	"./orderService": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_express_index_js"), __webpack_require__.e("webpack_sharing_consume_default_axios_axios"), __webpack_require__.e("src_services_order-service_js-node_modules_express_lib_sync_recursive")]).then(() => () => (__webpack_require__(/*! ../../../src/services/order-service */ "./src/services/order-service.js")));
-	},
-	"./eventService": () => {
-		return __webpack_require__.e("src_services_event-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/event-service */ "./src/services/event-service.js")));
-	},
-	"./paymentService": () => {
-		return Promise.all([__webpack_require__.e("webpack_sharing_consume_default_axios_axios"), __webpack_require__.e("src_services_payment-service_js")]).then(() => () => (__webpack_require__(/*! ../../../src/services/payment-service */ "./src/services/payment-service.js")));
-	},
-	"./shippingService": () => {
-		return __webpack_require__.e("src_services_shipping-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/shipping-service */ "./src/services/shipping-service.js")));
-	},
-	"./addressService": () => {
-		return __webpack_require__.e("src_services_address-service_js").then(() => () => (__webpack_require__(/*! ../../../src/services/address-service */ "./src/services/address-service.js")));
+	"./services": () => {
+		return __webpack_require__.e("src_services_index_js").then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	}
 };
 var get = (module) => {
@@ -31689,19 +31671,6 @@ __webpack_require__.d(exports, {
 
 "use strict";
 module.exports = require("assert");
-
-/***/ }),
-
-/***/ "buffer":
-/*!*************************!*\
-  !*** external "buffer" ***!
-  \*************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("buffer");
 
 /***/ }),
 
@@ -31796,32 +31765,6 @@ module.exports = require("net");
 
 /***/ }),
 
-/***/ "path":
-/*!***********************!*\
-  !*** external "path" ***!
-  \***********************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("path");
-
-/***/ }),
-
-/***/ "querystring":
-/*!******************************!*\
-  !*** external "querystring" ***!
-  \******************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("querystring");
-
-/***/ }),
-
 /***/ "stream":
 /*!*************************!*\
   !*** external "stream" ***!
@@ -31832,19 +31775,6 @@ module.exports = require("querystring");
 
 "use strict";
 module.exports = require("stream");
-
-/***/ }),
-
-/***/ "string_decoder":
-/*!*********************************!*\
-  !*** external "string_decoder" ***!
-  \*********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("string_decoder");
 
 /***/ }),
 
@@ -31926,16 +31856,13 @@ module.exports = require("zlib");
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			loaded: false,
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -31991,21 +31918,6 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/harmony module decorator */
-/******/ 	(() => {
-/******/ 		__webpack_require__.hmd = (module) => {
-/******/ 			module = Object.create(module);
-/******/ 			if (!module.children) module.children = [];
-/******/ 			Object.defineProperty(module, 'exports', {
-/******/ 				enumerable: true,
-/******/ 				set: () => {
-/******/ 					throw new Error('ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: ' + module.id);
-/******/ 				}
-/******/ 			});
-/******/ 			return module;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
@@ -32019,15 +31931,6 @@ module.exports = require("zlib");
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/node module decorator */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nmd = (module) => {
-/******/ 			module.paths = [];
-/******/ 			if (!module.children) module.children = [];
-/******/ 			return module;
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -32204,22 +32107,18 @@ module.exports = require("zlib");
 /******/ 		var installedModules = {};
 /******/ 		var moduleToHandlerMapping = {
 /******/ 			"webpack/sharing/consume/default/kafkajs/kafkajs": () => loadStrictVersionCheckFallback("default", "kafkajs", [1,1,14,0], () => () => __webpack_require__(/*! kafkajs */ "./node_modules/kafkajs/index.js")),
-/******/ 			"webpack/sharing/consume/default/axios/axios": () => loadStrictVersionCheckFallback("default", "axios", [2,0,20,0], () => () => __webpack_require__(/*! axios */ "./node_modules/axios/index.js")),
-/******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js"))
+/******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js")),
+/******/ 			"webpack/sharing/consume/default/axios/axios": () => loadStrictVersionCheckFallback("default", "axios", [2,0,20,0], () => () => __webpack_require__(/*! axios */ "./node_modules/axios/index.js"))
 /******/ 		};
 /******/ 		// no consumes in initial chunks
 /******/ 		var chunkMapping = {
 /******/ 			"src_adapters_index_js": [
 /******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
 /******/ 			],
-/******/ 			"webpack_sharing_consume_default_axios_axios": [
+/******/ 			"src_services_index_js": [
+/******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk",
+/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs",
 /******/ 				"webpack/sharing/consume/default/axios/axios"
-/******/ 			],
-/******/ 			"src_services_event-service_js": [
-/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
-/******/ 			],
-/******/ 			"src_services_address-service_js": [
-/******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			]
 /******/ 		};
 /******/ 		__webpack_require__.f.consumes = (chunkId, promises) => {
@@ -32312,7 +32211,7 @@ module.exports = require("zlib");
 /******/ 				if(installedChunkData) {
 /******/ 					promises.push(installedChunkData[2]);
 /******/ 				} else {
-/******/ 					if("webpack_sharing_consume_default_axios_axios" != chunkId) {
+/******/ 					if(true) { // all chunks have JS
 /******/ 						// load the chunk and return promise to it
 /******/ 						var promise = new Promise(function(resolve, reject) {
 /******/ 							installedChunkData = installedChunks[chunkId] = [resolve, reject];

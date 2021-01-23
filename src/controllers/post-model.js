@@ -11,12 +11,9 @@ export default function postModelFactory(addModel, getModelId, hash) {
         source.referrer = httpRequest.headers["Referer"];
       }
       log(source);
-      const command = httpRequest.params.command;
-
-      log({ func: postModel.name, params: httpRequest.params });
 
       const model = await addModel({ ...modelInfo });
-      log({ function: addModel.name, modelData: { ...model }, command });
+      log({ function: addModel.name, modelData: { ...model } });
 
       return {
         headers: {

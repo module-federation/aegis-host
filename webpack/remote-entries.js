@@ -10,63 +10,23 @@ module.exports = [
     },
   },
   {
-    name: "serviceAdapters",
+    name: "adapters",
     url: "http://localhost:8060/remoteEntry.js",
     path: __dirname,
     type: "adapter",
     importRemote: async () => {
-      const services = await import("orderService/adapters");
-      return services;
+      const adapters = await import("orderService/adapters");
+      return adapters;
     },
   },
   {
-    name: "eventService",
+    name: "services",
     url: "http://localhost:8060/remoteEntry.js",
     path: __dirname,
     type: "service",
     importRemote: async () => {
-      const services = await import("orderService/eventService");
+      const services = await import("orderService/services");
       return services;
     },
   },
-  {
-    name: "paymentService",
-    url: "http://localhost:8060/remoteEntry.js",
-    path: __dirname,
-    type: "service",
-    importRemote: async () => {
-      const services = await import("orderService/paymentService");
-      return services;
-    },
-  },
-  {
-    name: "shippingService",
-    url: "http://localhost:8060/remoteEntry.js",
-    path: __dirname,
-    type: "service",
-    importRemote: async () => {
-      const services = await import("orderService/shippingService");
-      return services;
-    },
-  },
-  {
-    name: "addressService",
-    url: "http://localhost:8060/remoteEntry.js",
-    path: __dirname,
-    type: "service",
-    importRemote: async () => {
-      const services = await import("orderService/addressService");
-      return services;
-    },
-  },
-  // {
-  //   name: 'inventoryService',
-  //   url: 'http://localhost:8060/remoteEntry.js',
-  //   path: __dirname,
-  //   type: 'service',
-  //   importRemote: async () => {
-  //     const services = await import('orderService/inventoryService');
-  //     return services;
-  //   }
-  // }
 ];
