@@ -25,8 +25,15 @@ export class DataSourceMemory extends DataSource {
   /**
    * @override
    */
-  async list() {
-    return [...this.dataSource.values()];
+  async list(query) {
+    const values = [...this.dataSource.values()];
+    if (query) {
+      const keys = Object.keys(query);
+      if (keys.length > 0) {
+        return values.filter((v) => keys.some((k) => query[k] === v[k]));
+      }
+    }
+    return values;
   }
 
   /**

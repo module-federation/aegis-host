@@ -1,14 +1,16 @@
 "use strict";
 
-import async from "../../lib/async-error";
-
 const MongoClient = require("mongodb").MongoClient;
-const DataSourceFile = require("./datasource-file").DataSourceFile;
+const DataSourceMemory = require("./datasource-memory").DataSourceMemory;
 
 const url = process.env.MONGODB_URL || "mongodb://localhost:27017";
 const cacheSize = Number(process.env.CACHE_SIZE) || 300;
+const dbName = "fedmon";
 
-export class DataSourceMongoDb extends DataSourceFile {
+/**
+ * MongoDB adapter extends in-memory datasource to support caching
+ */
+export class DataSourceMongoDb extends DataSourceMemory {
   constructor(datasource, factory, name) {
     super(datasource, factory, name);
   }
@@ -17,7 +19,7 @@ export class DataSourceMongoDb extends DataSourceFile {
    * @override
    * @param {{
    *  hydrate:function(Map<string,import("../../models").Model>),
-   *  serializer:function(*,*):*
+   *  serializer:import("../../lib/serializer").Serializer
    * }} options
    */
   load({ hydrate, serializer }) {
@@ -25,6 +27,7 @@ export class DataSourceMongoDb extends DataSourceFile {
     this.serializer = serializer;
 
     this.connectDb()
+      .then(() => this.setCollection())
       .then(() => this.loadModels())
       .catch((e) => console.log(e));
   }
@@ -42,17 +45,15 @@ export class DataSourceMongoDb extends DataSourceFile {
     }
   }
 
-  async loadModels() {
-    try {
-      this.collection = this.client.db("fedmon").collection(this.name);
-      const models = this.collection.find().limit(cacheSize);
+  setCollection() {
+    this.collection = this.client.db(this.name).collection(this.name);
+  }
 
-      models.forEach((model) => {
-        this.dataSource.set(model.id, this.hydrate(model));
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  async loadModels() {
+    const models = this.collection.find().limit(cacheSize);
+    models.forEach((model) => {
+      super.save(model.id, this.hydrate(model));
+    });
   }
 
   /**
@@ -61,14 +62,14 @@ export class DataSourceMongoDb extends DataSourceFile {
    */
   async find(id) {
     try {
-      const cached = this.dataSource.get(id);
+      const cached = super.find(id);
 
       if (!cached) {
         const model = await this.collection.findOne({ _id: id });
         if (!model) {
           return null;
         }
-        return this.dataSource.set(id, this.hydrate(model));
+        return super.save(id, this.hydrate(model));
       }
 
       return cached;
@@ -84,9 +85,9 @@ export class DataSourceMongoDb extends DataSourceFile {
    */
   async save(id, data) {
     try {
-      this.dataSource.set(id, data);
+      super.save(id, data);
 
-      const model = JSON.parse(JSON.stringify(data, this.replace), this.revive);
+      const model = JSON.parse(JSON.stringify(data, this.serializer.serialize));
 
       await this.collection.replaceOne(
         { _id: id },
@@ -104,12 +105,16 @@ export class DataSourceMongoDb extends DataSourceFile {
    * @override
    * @param {boolean} cached
    */
-  async list(cached = true) {
-    if (cached) {
-      console.log("cache size", this.dataSource.size);
-      return [...this.dataSource.values()];
+  async list(query = null, cached = true) {
+    try {
+      if (cached) {
+        console.log("cache size", this.dataSource.size);
+        return super.list(query);
+      }
+      return await this.collection.find().toArray();
+    } catch (error) {
+      console.error(error);
     }
-    return this.collection.find().toArray();
   }
 
   /**
@@ -118,7 +123,7 @@ export class DataSourceMongoDb extends DataSourceFile {
    */
   async delete(id) {
     try {
-      this.dataSource.delete(id);
+      super.delete(id);
       await this.collection.deleteOne({ _id: id });
     } catch (error) {
       console.error(error);

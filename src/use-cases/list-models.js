@@ -1,9 +1,10 @@
 /**
- * 
- * @param {import('../datasources/datasource').default } repository 
+ *
+ * @param {import('../datasources/datasource').default } repository
  */
 export default function listModelsFactory({ repository } = {}) {
-  return async function listModels() {
-    return repository.list();
-  }
+  return async function listModels(query) {
+    console.log("query", query);
+    return repository.list(query);
+  };
 }

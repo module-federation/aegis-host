@@ -3,69 +3,77 @@
 import Model from "./model";
 import portHandler from "./port-handler";
 import async from "../lib/async-error";
+import domainEvents from "./domain-events";
 
 const TIMEOUT_SECONDS = 60;
-const MAX_RETRY = 3;
-let retryCount = 0;
+const MAX_RETRY = 5;
 
-async function retryHandler(options) {
-  const { portName, model, timeout, maxRetry, args } = options;
-  args.push({ calledByTimer: true });
-  retryCount++;
-  let timerId;
-
-  if (retryCount < maxRetry) {
-    timerId = setTimeout(retryHandler, timeout, options);
-    await model[portName](...args);
-    clearTimeout(timerId);
-    return;
-  }
-  console.log("max retry attempts reached", portName);
+function getTimerArgs(args) {
+  const timerArg = { calledByTimer: new Date().toUTCString() };
+  if (args) return [...args, timerArg];
+  return [timerArg];
 }
+
 /**
- * Set an appropriate timeout interval and handler for the port.
+ * We keep track of retries by passing a new argument each time
+ * @param {*} args
+ */
+function getRetries(args) {
+  const timerArgs = getTimerArgs(args);
+  const retries = timerArgs.filter((arg) => arg.calledByTimer);
+  return {
+    count: retries.length,
+    nextArg: timerArgs,
+  };
+}
+
+/**
+ * Implements retry with recursive timeout.
  * @param {{
  *  portName: string,
  *  portConf: import('../models').ports,
  * }} options
  */
-function setPortTimeout(options, ...args) {
-  // Set an appropriate timeout for the port
-  const { portName, portConf } = options;
+function setPortTimeout(options) {
+  const { portConf, portName, model, args } = options;
+  const handler = portConf.timeoutCallback;
   const noTimer = portConf.timeout === 0 ? true : false;
   const timeout = (portConf.timeout || TIMEOUT_SECONDS) * 1000;
-
-  // Call the port's timeout handler if configured
-  const handler = portConf.timeoutCallback || retryHandler;
   const maxRetry = portConf.maxRetry || MAX_RETRY;
+  const timerArgs = getRetries(args);
 
-  let timerId = -1;
-  const lastArg = args.pop();
+  const noOp = {
+    stopTimer: () => void 0,
+    done: () => true,
+  };
 
-  if (!noTimer && !(typeof lastArg === "object" && lastArg.calledByTimer)) {
-    timerId = setTimeout(
-      handler,
-      timeout,
-      {
-        ...options,
-        timeout,
-        maxRetry,
-      },
-      ...args
-    );
+  if (noTimer) {
+    return noOp;
   }
 
-  return {
-    stopTimer() {
-      if (timerId > 0) {
-        clearTimeout(timerId);
-        retryCount = 0;
-      }
-    },
+  if (timerArgs.count > maxRetry) {
+    console.warn("max retries reached", timerArgs);
+    return noOp;
+  }
 
-    done() {
-      return timerId < 0;
-    },
+  // Retry the port
+  const timerId = setTimeout(async () => {
+    // Notify interested parties
+    model.emit(domainEvents.portTimeout(model), options);
+
+    // Invoke custom handler
+    if (handler) handler(options);
+
+    // Keep track of retries by adding a new arg each time
+    await model[portName](...timerArgs.nextArg);
+
+    // Retry worked
+    model.emit(domainEvents.portRetryWorked(model), options);
+  }, timeout);
+
+  return {
+    stopTimer: () => clearTimeout(timerId),
+    done: () => timerArgs.count > maxRetry,
   };
 }
 
@@ -85,7 +93,9 @@ function getPortCallback(cb) {
  * @returns {boolean} whether or not to remember this port
  * for compensation and restart
  */
-function addPortListener(portName, portConf, observer) {
+function addPortListener(portName, portConf, observer, disabled) {
+  if (disabled) return false;
+
   if (portConf.consumesEvent) {
     const callback = getPortCallback(portConf.callback);
 
@@ -104,6 +114,19 @@ function addPortListener(portName, portConf, observer) {
     return true;
   }
   return false;
+}
+
+/**
+ * The Immutable way to say model.portFlow.pop().
+ * @param {Model} model
+ * @param {*} port
+ * @param {*} remember
+ */
+function updatePortFlow(model, port, remember) {
+  if (!remember) return model;
+  return model.update({
+    [Model.getKey("portFlow")]: [...Model.getPortFlow(model), port],
+  });
 }
 
 /**
@@ -131,12 +154,14 @@ export default function makePorts(ports, adapters, observer) {
       const portName = port;
       const portConf = ports[port];
       const disabled = portConf.disabled || !adapters[port];
-      let recordPort = false;
 
-      if (!disabled) {
-        // Listen for event that will invoke this port
-        recordPort = addPortListener(portName, portConf, observer);
-      }
+      // Listen for event that will invoke this port
+      const recordPort = addPortListener(
+        portName,
+        portConf,
+        observer,
+        disabled
+      );
 
       return {
         // The port function
@@ -162,13 +187,11 @@ export default function makePorts(ports, adapters, observer) {
             timer.stopTimer();
 
             // Remember invocations for undo and restart
-            if (recordPort) {
-              Model.getPortFlow(model).push(port);
-            }
+            const updated = updatePortFlow(model, port, recordPort);
 
             // Signal the next task to run, unless undo is running
-            if (!model.compensate && recordPort) {
-              observer.notify(portConf.producesEvent, model);
+            if (!updated.compensate && recordPort) {
+              observer.notify(portConf.producesEvent, updated);
             }
           } catch (error) {
             console.error(error);

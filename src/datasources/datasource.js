@@ -30,7 +30,7 @@ export default class DataSource {
    * @param {boolean} [cached] - list cached items, default is true
    * @returns {Promise<any[]>}
    */
-  async list(cached = true) {
+  async list(query = null, cached = true) {
     throw new Error("abstract method not implemented");
   }
 

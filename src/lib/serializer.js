@@ -147,6 +147,17 @@ function findSerializer(key, value) {
   return serializers["serialize"].find((s) => applies(s, key, value));
 }
 
+/**
+ * @typedef {{
+ *  addSerializer:function(serializerType|serializerType[]):Serializer,
+ *  serialize(object):string,
+ *  deserialize(string):object
+ * }} Serializer
+ */
+
+/**
+ * @type {Serializer}
+ */
 const Serializer = {
   /**
    *

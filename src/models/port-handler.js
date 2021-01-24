@@ -1,11 +1,5 @@
 import ModelFactory from ".";
-
-function makeObject(prop) {
-  if (Array.isArray(prop)) {
-    return prop.reduce((p, c) => ({ ...c, ...p }));
-  }
-  return prop;
-}
+import async from "../lib/async-error";
 
 async function checkProperty(
   key,
@@ -48,6 +42,7 @@ async function checkProperty(
 
   const error = "property is missing " + key;
   console.error({ port, error, payload, model, latest });
+  throw new Error(error);
 }
 
 /**
@@ -64,9 +59,12 @@ export default async function portHandler(options = {}, payload = {}) {
     const keys = spec.ports[port].keys;
 
     if (keys) {
-      const prop = await checkProperty(keys, options, payload, port);
-      return model.update(makeObject(prop));
+      const result = await async(checkProperty(keys, options, payload, port));
+      if (result.ok) {
+        return model.update(result.asObject());
+      }
     }
+    console.warn("no keys or callback set for port", port);
   }
   console.warn("port configuration problem", model, port, spec);
 }

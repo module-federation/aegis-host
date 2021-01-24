@@ -50,8 +50,10 @@ export default function editModelFactory({
     }
 
     if (command) {
+      const latest = await repository.find(id);
+
       const result = await async(
-        executeCommand(models, updated, command, "write")
+        executeCommand(models, latest, command, "write")
       );
       if (result.ok) {
         return result.data;
