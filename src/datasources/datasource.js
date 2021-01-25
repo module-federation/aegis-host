@@ -44,9 +44,6 @@ export default class DataSource {
    */
   load(options) {}
 
-  /**
-   *
-   */
   getFactory() {
     return this.factory;
   }

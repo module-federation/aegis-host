@@ -2,6 +2,7 @@
 
 import checkAcl from "../lib/check-acl";
 import async from "../lib/async-error";
+import domainEvents from "../models/domain-events";
 
 const commandType = {
   /**
@@ -59,8 +60,8 @@ export default async function executeCommand(
     }
 
     console.warn("command not found", command);
-    model.emit("unkownCommand", model);
   }
+  model.emit(domainEvents.unauthorizedCommand(model), { model, cmd });
   console.warn("command unauthorized", command);
 
   return null;

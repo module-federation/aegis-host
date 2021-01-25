@@ -191,7 +191,7 @@ export default function makePorts(ports, adapters, observer) {
 
             // Signal the next task to run, unless undo is running
             if (!updated.compensate && recordPort) {
-              observer.notify(portConf.producesEvent, updated);
+              this.emit(portConf.producesEvent, updated);
             }
           } catch (error) {
             console.error(error);
