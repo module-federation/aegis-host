@@ -1,14 +1,5 @@
 "use strict";
 
-import ModelFactory from "./model-factory";
-import makeAdapters from "./make-adapters";
-
-import {
-  importRemoteModels,
-  importRemoteServices,
-  importRemoteAdapters,
-} from "../services/federation-service";
-
 /**
  * @typedef {import("./model").Model} Model
  * @typedef {import('./event').Event} Event
@@ -21,13 +12,23 @@ import {
  * @callback onUpdate
  * @param {Model} model
  * @param {Object} changes
- * @returns {Model | Error} updated model or throw
+ * @returns {Model} updated model or throw
+ * @throws {Error}
  */
 
 /**
  * @callback onDelete
  * @param {Model} model
- * @returns {Model | Error} updated model or throw
+ * @returns {Model} updated model or throw
+ * @throws {Error}
+ */
+
+/**
+ * @callback validate
+ * @param {Model} model
+ * @param {*} changes
+ * @returns {Model}
+ * @throws {Error}
  */
 
 /**
@@ -124,6 +125,7 @@ import {
  * @property {onUpdate} [onUpdate] - Function called to handle update requests. Called
  * before save.
  * @property {onDelete} [onDelete] - Function called before deletion.
+ * @property {validate} [validate] - validate model on creation and update
  * @property {ports} [ports] - input/output ports for the domain
  * @property {eventHandler[]} [eventHandlers] - callbacks invoked to handle application
  * events, e.g. CRUD events
@@ -134,6 +136,16 @@ import {
  * URL parameter or query of the auto-generated REST API
  * @property {accessControlList} [accessControlList] - configure authorization
  */
+
+import ModelFactory from "./model-factory";
+import makeAdapters from "./make-adapters";
+
+import {
+  importRemoteModels,
+  importRemoteServices,
+  importRemoteAdapters,
+} from "../services/federation-service";
+
 
 /**
  *

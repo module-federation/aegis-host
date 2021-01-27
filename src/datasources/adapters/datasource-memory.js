@@ -27,10 +27,14 @@ export class DataSourceMemory extends DataSource {
    */
   async list(query) {
     const values = [...this.dataSource.values()];
+
     if (query) {
       const keys = Object.keys(query);
+
       if (keys.length > 0) {
-        return values.filter((v) => keys.some((k) => query[k] === v[k]));
+        return values.filter(v =>
+          keys.some(k => (v[k] ? query[k] === v[k] : false))
+        );
       }
     }
     return values;

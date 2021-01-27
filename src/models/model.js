@@ -58,6 +58,7 @@ const Model = (() => {
   const UPDATETIME = Symbol("updateTime");
   const ONUPDATE = Symbol("onUpdate");
   const ONDELETE = Symbol("onDelete");
+  const VALIDATE = Symbol("validate");
   const PORTFLOW = Symbol("portFlow");
 
   const keyMap = {
@@ -67,17 +68,30 @@ const Model = (() => {
     updateTime: UPDATETIME,
     onUpdate: ONUPDATE,
     onDelete: ONDELETE,
+    validate: VALIDATE,
     portFlow: PORTFLOW,
   };
 
-  const defaultUpdate = (model, changes) => ({
-    ...model,
-    ...changes,
-  });
+  /**
+   * bitmask for identying events
+   */
+  const eventMask = {
+    update: 1, //  0001 Update
+    create: 1 << 1, //  0010 Create
+    onload: 1 << 2, //  0100 Load
+  };
 
-  const defaultDelete = (model) => ({
-    ...withTimestamp("deleteTime")(model),
-  });
+  const defaultOnUpdate = (model, changes) => {
+    return model;
+  };
+
+  const defaultOnDelete = model => {
+    return { ...withTimestamp("deleteTime")(model) };
+  };
+
+  const defaultValidate = (model, changes) => {
+    return model;
+  };
 
   /**
    * Add data and functions that support framework services.
@@ -96,8 +110,9 @@ const Model = (() => {
       mixins = [],
       dependencies,
       relations = {},
-      onUpdate = defaultUpdate,
-      onDelete = defaultDelete,
+      onUpdate = defaultOnUpdate,
+      onDelete = defaultOnDelete,
+      validate = defaultValidate,
     },
   }) {
     return {
@@ -121,6 +136,9 @@ const Model = (() => {
       [ONDELETE]() {
         return onDelete(this);
       },
+      [VALIDATE](changes, event) {
+        return validate(this, changes, event);
+      },
       // Back out all port transactions
       async undo() {
         compensate(this, ports);
@@ -130,12 +148,12 @@ const Model = (() => {
        * @param {*} changes
        */
       async update(changes) {
-        const model = this[ONUPDATE](changes);
-        const update = await datasource.save(model[ID], {
-          ...model,
+        const correct = this[VALIDATE](changes, eventMask.update);
+        const updated = await datasource.save(model[ID], {
+          ...correct,
           [UPDATETIME]: new Date().getTime(),
         });
-        return update;
+        return updated;
       },
       /**
        * Listen for domain events.
@@ -171,20 +189,23 @@ const Model = (() => {
    *  spec: import('./index').ModelSpecification
    * }} modelInfo
    */
-  const Model = async (modelInfo) =>
+  const Model = async modelInfo =>
     Promise.resolve(
       // Call factory
       modelInfo.spec.factory(...modelInfo.args)
-    ).then((model) =>
+    ).then(model =>
       make({
         model,
         spec: modelInfo.spec,
       })
     );
 
+  const validate = event => model => model[VALIDATE]({}, event);
+
   // Create model instance
   const makeModel = asyncPipe(
     Model,
+    validate(eventMask.create),
     withTimestamp(CREATETIME),
     withSerializers(
       fromSymbol(keyMap),
@@ -197,6 +218,7 @@ const Model = (() => {
   // Recreate model instance
   const loadModel = pipe(
     make,
+    validate(eventMask.onload),
     withSerializers(
       fromSymbol(keyMap),
       fromTimestamp(["createTime", "updateTime"])
@@ -214,24 +236,14 @@ const Model = (() => {
      * }} modelInfo
      * @returns {Promise<Readonly<Model>>}
      */
-    create: async (modelInfo) => makeModel(modelInfo),
+    create: async modelInfo => makeModel(modelInfo),
 
     /**
      * Load a saved model
      * @param {Model} savedModel deserialized model
      * @param {import('../models').ModelSpecification} spec
      */
-    load: function (modelInfo) {
-      return loadModel({
-        model: {
-          ...modelInfo.model,
-          isLoading: true,
-        },
-        spec: {
-          ...modelInfo.spec,
-        },
-      });
-    },
+    load: modelInfo => loadModel(modelInfo),
 
     /**
      * Process update request.
@@ -242,13 +254,20 @@ const Model = (() => {
      *
      */
     update: function (model, changes) {
+      const correct = model[VALIDATE](changes, eventMask.update);
       const updates = {
-        ...changes,
+        ...correct,
         [UPDATETIME]: new Date().getTime(),
-        isLoading: false,
       };
-      return model[ONUPDATE](updates);
+      return updates;
     },
+
+    /**
+     *
+     * @param {Model} model
+     * @param {*} changes
+     */
+    validate: (model, changes) => model[VALIDATE](changes),
 
     /**
      * Process delete request.
@@ -256,33 +275,33 @@ const Model = (() => {
      * @param {Model} model
      * @returns {Model}
      */
-    delete: (model) => model[ONDELETE](),
+    delete: model => model[ONDELETE](),
 
     /**
      * Get private symbol for `key`
      * @param {string} key
      * @returns {Symbol} unique symbol
      */
-    getKey: (key) => keyMap[key],
+    getKey: key => keyMap[key],
 
     /**
      * Get model ID
      * @param {Model} model
      * @returns {string} model's ID
      */
-    getId: (model) => model[ID],
+    getId: model => model[ID],
 
     /**
      * Get model name
      * @param {Model} model
      * @returns {string} model's name
      */
-    getName: (model) => model[MODELNAME],
+    getName: model => model[MODELNAME],
 
     /**
      * History of port invocation
      */
-    getPortFlow: (model) => model[PORTFLOW],
+    getPortFlow: model => model[PORTFLOW],
   };
 })();
 

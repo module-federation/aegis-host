@@ -34,15 +34,20 @@ export const reviveFunction = {
   value: (key, value) => eval(`(${value})`),
 };
 
+const type = {
+  serialize: "serialize",
+  deserialize: "deserialize",
+};
+
 const serializers = {
   /**
    * @type {serializerType[]}
    */
-  serialize: [],
+  [type.serialize]: [],
   /**
    * @type {serializerType[]}
    */
-  deserialize: [],
+  [type.deserialize]: [],
 };
 
 /**
@@ -67,7 +72,7 @@ function checkTypes(s) {
  */
 function checkRequiredProps(serializer) {
   const requiredProps = ["on", "key", "type", "value"];
-  const missing = requiredProps.filter((key) => !serializer[key]);
+  const missing = requiredProps.filter(key => !serializer[key]);
   if (missing && missing.length > 0) {
     throw new Error("missing required property: ", missing);
   }
@@ -82,10 +87,10 @@ function validateSerializer(serializers) {
   const newSerializers = Array.isArray(serializers)
     ? serializers
     : [serializers];
-  const enabled = newSerializers.filter((n) => n.enabled);
-  enabled.every((e) => checkRequiredProps(e));
+  const enabled = newSerializers.filter(n => n.enabled);
+  enabled.every(e => checkRequiredProps(e));
 
-  if (!enabled.every((e) => checkTypes(e))) {
+  if (!enabled.every(e => checkTypes(e))) {
     throw new Error("invalid serializer, check property types");
   }
   return enabled;
@@ -140,11 +145,11 @@ function applies(serializer, key, value) {
 }
 
 function findDeserializer(key, value) {
-  return serializers["deserialize"].find((s) => applies(s, key, value));
+  return serializers[type.deserialize].find(s => applies(s, key, value));
 }
 
 function findSerializer(key, value) {
-  return serializers["serialize"].find((s) => applies(s, key, value));
+  return serializers[type.serialize].find(s => applies(s, key, value));
 }
 
 /**
@@ -166,7 +171,7 @@ const Serializer = {
   addSerializer(s) {
     if (!s) return null;
     const newSerializers = validateSerializer(s);
-    newSerializers.forEach((s) => serializers[s.on].push(s));
+    newSerializers.forEach(s => serializers[s.on].push(s));
     return this;
   },
 

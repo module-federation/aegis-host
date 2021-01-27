@@ -24,7 +24,7 @@ export const time = () => new Date().getTime();
  * @param {Function} fnCreateId function that returns unique id
  */
 export const withId = (propName, fnCreateId) => {
-  return (o) => ({ ...o, [propName]: fnCreateId() });
+  return o => ({ ...o, [propName]: fnCreateId() });
 };
 
 /**
@@ -33,7 +33,7 @@ export const withId = (propName, fnCreateId) => {
  * @param {Function} [fnTimestamp] default is UTC
  */
 export const withTimestamp = (propName, fnTimestamp = time) => {
-  return (o) => ({ [propName]: fnTimestamp(), ...o });
+  return o => ({ [propName]: fnTimestamp(), ...o });
 };
 
 /**
@@ -42,11 +42,11 @@ export const withTimestamp = (propName, fnTimestamp = time) => {
  * can be seen in JSON output.
  * @param {{key: string, value: Symbol}} keyMap
  */
-export const fromSymbol = (keyMap) => (o) => {
+export const fromSymbol = keyMap => o => {
   const stringifySymbols = () =>
     Object.keys(keyMap)
-      .map((k) => ({ [k]: o[keyMap[k]] }))
-      .reduce((p, c) => ({ ...c, ...p }));
+      .map(k => ({ [k]: o[keyMap[k]] }))
+      .reduce((p, c) => ({ ...p, ...c }));
 
   return {
     ...o,
@@ -59,11 +59,11 @@ export const fromSymbol = (keyMap) => (o) => {
  * the object is deserialized.
  * @param {{key: string, value: Symbol}} keyMap
  */
-export const toSymbol = (keyMap) => (o) => {
+export const toSymbol = keyMap => o => {
   function parseSymbols() {
     return Object.keys(keyMap)
-      .map((k) => (o[k] ? { [keyMap[k]]: o[k] } : {}))
-      .reduce((p, c) => ({ ...c, ...p }));
+      .map(k => (o[k] ? { [keyMap[k]]: o[k] } : {}))
+      .reduce((p, c) => ({ ...p, ...c }));
   }
   return {
     ...o,
@@ -76,7 +76,7 @@ export const toSymbol = (keyMap) => (o) => {
  * @param {number[]} timestamps
  * @param {"utc"|"iso"} format
  */
-export const fromTimestamp = (timestamps, format = "utc") => (o) => {
+export const fromTimestamp = (timestamps, format = "utc") => o => {
   const formats = { utc: "toUTCString", iso: "toISOString" };
   const fn = formats[format];
 
@@ -86,7 +86,7 @@ export const fromTimestamp = (timestamps, format = "utc") => (o) => {
 
   const stringifyTimestamps = () =>
     timestamps
-      .map((k) => (o[k] ? { [k]: new Date(o[k])[fn]() } : {}))
+      .map(k => (o[k] ? { [k]: new Date(o[k])[fn]() } : {}))
       .reduce((p, c) => ({ ...c, ...p }));
 
   return {
@@ -99,7 +99,7 @@ export const fromTimestamp = (timestamps, format = "utc") => (o) => {
  * Adds `toJSON` method that pipes multiple serializing mixins together.
  * @param {...functionalMixin} keyMap
  */
-export const withSerializers = (...funcs) => (o) => {
+export const withSerializers = (...funcs) => o => {
   return {
     ...o,
     toJSON() {
@@ -112,11 +112,9 @@ export const withSerializers = (...funcs) => (o) => {
  * Pipes multiple deserializing mixins together.
  * @param  {...functionalMixin} funcs
  */
-export const withDeserializers = (...funcs) => (o) => {
+export const withDeserializers = (...funcs) => o => {
   function fromJSON() {
-    if (o.isLoading) {
-      return pipe(...funcs)(o);
-    }
+    return pipe(...funcs)(o);
   }
   return {
     ...o,
@@ -128,7 +126,7 @@ export const withDeserializers = (...funcs) => (o) => {
  * Subscribe to and emit application and domain events.
  * @param {import('../lib/observer').Observer} observer
  */
-export const withObserver = (observer) => (o) => {
+export const withObserver = observer => o => {
   return {
     ...o,
     async emit(eventName, eventData) {

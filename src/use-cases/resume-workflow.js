@@ -1,0 +1,30 @@
+"use strict";
+
+/**
+ * Check `portFlow` history and resume any workflow
+ * that was running before we shut down.
+ *
+ * @param {function(Model):string[]} getPortFlow history of port calls
+ * @param {import("../models").ports} ports
+ * @returns {function(Map<string,Model>)}
+ */
+export default function resumeWorkflow(getPortFlow, ports) {
+  return async function (list) {
+    if (list?.length > 0) {
+      await Promise.all(
+        list.map(async function (model) {
+          const history = getPortFlow(model);
+
+          if (history?.length > 0) {
+            const lastPort = history.length - 1;
+            const nextPort = ports[history[lastPort]].producesEvent;
+
+            if (nextPort && nextPort !== "workflowComplete") {
+              await model.emit(nextPort, model);
+            }
+          }
+        })
+      );
+    }
+  };
+}

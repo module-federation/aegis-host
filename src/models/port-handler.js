@@ -1,48 +1,53 @@
 import ModelFactory from ".";
-import async from "../lib/async-error";
 
-async function checkProperty(
+function checkPayload(
   key,
   options = {},
   payload = {},
-  port = checkProperty.name
+  port = checkPayload.name
 ) {
   const { model } = options;
 
-  if (!model || !payload || !key) {
-    console.error({
-      port,
-      error: "model, payload, or key is missing",
+  if (!model || Object.keys(payload) < 1 || !key) {
+    throw new Error({
+      desc: "model, payload, or key is missing",
       model,
+      port,
+      error,
       payload,
       key,
     });
-    return;
   }
 
+  // Call recursively if array
   if (Array.isArray(key)) {
-    const keys = await Promise.all(
-      key.map((k) => checkProperty(k, options, payload, port))
-    );
-    return keys;
+    const keys = key.map(k => checkPayload(k, options, payload, port));
+    return keys.reduce((p, c) => ({ ...p, ...c }));
   }
 
+  // find prop in payload
   if (payload[key]) {
     return { [key]: payload[key] };
   }
 
+  // find prop, already in model,
   if (model[key]) {
     return { [key]: model[key] };
   }
 
-  const latest = await model.find();
-  if (latest?.[key]) {
-    return { [key]: latest[key] };
-  }
-
-  const error = "property is missing " + key;
-  console.error({ port, error, payload, model, latest });
-  throw new Error(error);
+  // find prop in saved model
+  return model
+    .find()
+    .then(latest => ({ [key]: latest[key] }))
+    .catch(error => {
+      throw new Error({
+        desc: "property is missing" + key,
+        port,
+        error,
+        payload,
+        model,
+      });
+    });
 }
 
 /**
@@ -59,10 +64,8 @@ export default async function portHandler(options = {}, payload = {}) {
     const keys = spec.ports[port].keys;
 
     if (keys) {
-      const result = await async(checkProperty(keys, options, payload, port));
-      if (result.ok) {
-        return model.update(result.asObject());
-      }
+      const changes = checkPayload(keys, options, payload, port);
+      return model.update(changes);
     }
     console.warn("no keys or callback set for port", port);
   }

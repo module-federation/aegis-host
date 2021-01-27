@@ -17,7 +17,7 @@ export default function makeAdapters(ports, adapters, services = {}) {
   }
 
   return Object.keys(ports)
-    .map((port) => {
+    .map(port => {
       try {
         if (adapters[port] && !ports[port].disabled) {
           return {
@@ -28,5 +28,5 @@ export default function makeAdapters(ports, adapters, services = {}) {
         console.warn(e.message);
       }
     })
-    .reduce((p, c) => ({ ...c, ...p }));
+    .reduce((p, c) => ({ ...p, ...c }));
 }

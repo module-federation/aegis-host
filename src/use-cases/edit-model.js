@@ -26,7 +26,7 @@ export default function editModelFactory({
 } = {}) {
   const eventType = models.EventTypes.UPDATE;
   const eventName = models.getEventName(eventType, modelName);
-  handlers.forEach((handler) => observer.on(eventName, handler));
+  handlers.forEach(handler => observer.on(eventName, handler));
 
   return async function editModel(id, changes, command) {
     const model = await repository.find(id);
@@ -50,10 +50,8 @@ export default function editModelFactory({
     }
 
     if (command) {
-      const latest = await repository.find(id);
-
       const result = await async(
-        executeCommand(models, latest, command, "write")
+        executeCommand(models, updated, command, "write")
       );
       if (result.ok) {
         return result.data;

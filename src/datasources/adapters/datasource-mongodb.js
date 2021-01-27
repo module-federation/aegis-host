@@ -5,7 +5,6 @@ const DataSourceMemory = require("./datasource-memory").DataSourceMemory;
 
 const url = process.env.MONGODB_URL || "mongodb://localhost:27017";
 const cacheSize = Number(process.env.CACHE_SIZE) || 300;
-const dbName = "fedmon";
 
 /**
  * MongoDB adapter extends in-memory datasource to support caching
@@ -67,6 +66,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
       if (!cached) {
         const model = await this.collection.findOne({ _id: id });
         if (!model) {
+          console.warn("document not found in mongodb", id);
           return null;
         }
         return super.save(id, this.hydrate(model));
@@ -78,6 +78,13 @@ export class DataSourceMongoDb extends DataSourceMemory {
     }
   }
 
+  serialize(data) {
+    if (this.serializer) {
+      return JSON.stringify(data, this.serializer.serialize);
+    }
+    return JSON.stringify(data);
+  }
+
   /**
    * @override
    * @param {*} id
@@ -87,7 +94,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
     try {
       super.save(id, data);
 
-      const model = JSON.parse(JSON.stringify(data, this.serializer.serialize));
+      const model = JSON.parse(this.serialize(data));
 
       await this.collection.replaceOne(
         { _id: id },

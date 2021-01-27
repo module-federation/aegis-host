@@ -18,11 +18,9 @@ export default function compensate(model, ports) {
 
     const undo = portFlow.reduceRight(async (model, port, index) => {
       const result = await async(ports[port].undo(model));
-      if (result.ok) {
-        return model.update({
-          [Model.getKey("portFlow")]: portFlow.splice(0, index),
-        });
-      }
+      return model.update({
+        [Model.getKey("portFlow")]: portFlow.splice(0, index),
+      });
     }, updated);
 
     const msg =

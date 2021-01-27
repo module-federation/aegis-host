@@ -1,35 +1,7 @@
 "use strict";
 
 import Serializer from "../lib/serializer";
-
-/**
- * Check `portFlow` history and resume any workflow
- * that was running before we shut down.
- *
- * @param {function(Model):string[]} getPortFlow history of port calls
- * @param {import("../models").ports} ports
- * @returns {function(Map<string,Model>)}
- */
-function resumeWorkflow(getPortFlow, ports) {
-  return async function (list) {
-    if (list?.length > 0) {
-      await Promise.all(
-        list.map(async function (model) {
-          const history = getPortFlow(model);
-
-          if (history?.length > 0) {
-            const lastPort = history.length - 1;
-            const nextPort = ports[history[lastPort]].producesEvent;
-
-            if (nextPort) {
-              await model.emit(nextPort, model);
-            }
-          }
-        })
-      );
-    }
-  };
-}
+import resumeWorkflow from "./resume-workflow";
 
 /**
  * @param {function():import()} loadModel
@@ -68,9 +40,7 @@ function handleRestart(repository, models, spec) {
 }
 
 /**
- * Factory returns function to unmarshal deserialized
- * models and resume any workflow that was running
- * before we shut down.
+ * Factory returns function to unmarshal deserialized models
  * @typedef {import('../models').Model} Model
  * @param {{
  *  models:import('../models/model-factory').ModelFactory,
@@ -84,7 +54,6 @@ export default function ({ models, observer, repository, modelName }) {
     const spec = models.getModelSpec(modelName);
 
     repository.load({
-      fileName: modelName,
       hydrate: hydrateModels(models.loadModel, observer, repository),
       serializer: Serializer.addSerializer(spec.serializers),
     });

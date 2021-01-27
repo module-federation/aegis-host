@@ -19,7 +19,7 @@ export default async function invokePort(models, model, port, permission) {
 
   if (!spec) {
     console.log("can't find spec for", models.getModelName(model));
-    return null;
+    return model;
   }
 
   if (portAuthorized(spec, port, permission)) {
@@ -37,5 +37,5 @@ export default async function invokePort(models, model, port, permission) {
       return { ...model, ...result.data };
     }
   }
-  return null;
+  return model;
 }

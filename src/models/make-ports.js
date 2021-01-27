@@ -15,12 +15,12 @@ function getTimerArgs(args) {
 }
 
 /**
- * We keep track of retries by passing a new argument each time
+ * We keep track of recursive retries by passing a new argument each time
  * @param {*} args
  */
 function getRetries(args) {
   const timerArgs = getTimerArgs(args);
-  const retries = timerArgs.filter((arg) => arg.calledByTimer);
+  const retries = timerArgs.filter(arg => arg.calledByTimer);
   return {
     count: retries.length,
     nextArg: timerArgs,
@@ -189,6 +189,7 @@ export default function makePorts(ports, adapters, observer) {
             // Remember invocations for undo and restart
             const updated = updatePortFlow(model, port, recordPort);
 
+            console.log("port called", port, updated);
             // Signal the next task to run, unless undo is running
             if (!updated.compensate && recordPort) {
               this.emit(portConf.producesEvent, updated);
@@ -209,5 +210,5 @@ export default function makePorts(ports, adapters, observer) {
         },
       };
     })
-    .reduce((p, c) => ({ ...c, ...p }));
+    .reduce((p, c) => ({ ...p, ...c }));
 }

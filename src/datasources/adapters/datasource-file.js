@@ -13,8 +13,8 @@ export class DataSourceFile extends DataSourceMemory {
     super(dataSource, factory, name);
   }
 
-  load({ fileName, hydrate, serializer, directory = __dirname }) {
-    this.file = path.resolve(directory, fileName.concat(".json"));
+  load({ hydrate, serializer, directory = __dirname }) {
+    this.file = path.resolve(directory, this.name.concat(".json"));
     this.serializer = serializer;
     this.dataSource = this.readFile(hydrate);
   }
@@ -36,7 +36,7 @@ export class DataSourceFile extends DataSourceMemory {
   writeFile(async = true) {
     const dataStr = JSON.stringify([...this.dataSource], this.replace);
     if (async) {
-      fs.writeFile(this.file, dataStr, (err) => console.error(err));
+      fs.writeFile(this.file, dataStr, err => console.error(err));
     } else {
       fs.writeFileSync(this.file, dataStr);
     }

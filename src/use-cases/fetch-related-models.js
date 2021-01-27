@@ -12,7 +12,7 @@ export default async function fetchRelatedModels(models, model, relation) {
 
   if (!spec) {
     console.log("can't find spec for", models.getModelName(model));
-    return null;
+    return model;
   }
 
   if (relation && spec.relations && spec.relations[relation]) {
@@ -23,5 +23,5 @@ export default async function fetchRelatedModels(models, model, relation) {
     }
   }
 
-  return null;
+  return model;
 }

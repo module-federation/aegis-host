@@ -20,12 +20,12 @@ export async function importRemoteModels() {
   console.timeEnd(label);
 
   return remoteModels
-    .map((m) => ({
+    .map(m => ({
       ...m,
     }))
     .reduce((p, c) => ({
-      ...c,
       ...p,
+      ...c,
     }));
 }
 
@@ -49,8 +49,8 @@ export async function importRemoteServices() {
   if (services.length === 0) return {};
 
   return services.reduce((p, c) => ({
-    ...c,
     ...p,
+    ...c,
   }));
 }
 
@@ -71,7 +71,7 @@ export async function importRemoteAdapters() {
   if (adapters.length === 0) return {};
 
   return adapters.reduce((p, c) => ({
-    ...c,
     ...p,
+    ...c,
   }));
 }

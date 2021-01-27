@@ -45,7 +45,7 @@ export default async function executeCommand(
 
   if (!spec) {
     console.log("can't find spec for", models.getModelName(model));
-    return null;
+    return model;
   }
 
   if (commandAuthorized(spec, command, permission)) {
@@ -58,11 +58,12 @@ export default async function executeCommand(
         return { ...model, ...result.data };
       }
     }
-
+                  
     console.warn("command not found", command);
   }
-  model.emit(domainEvents.unauthorizedCommand(model), { model, cmd });
+  model.emit(domainEvents.unauthorizedCommand(model), { model, command });
   console.warn("command unauthorized", command);
 
-  return null;
+  return model;
 }
+
