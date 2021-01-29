@@ -92,7 +92,7 @@ const eventFactories = {
 };
 
 /**
- * Register and create models.
+ * Register model types and create model instances.
  * @type {ModelFactory}
  */
 const ModelFactory = {
@@ -100,7 +100,7 @@ const ModelFactory = {
    * Register a factory function to create the model `modelName`
    * @param {ModelSpecification} model
    */
-  registerModel: (model) => {
+  registerModel: model => {
     const name = checkModelName(model.modelName);
     if (!modelFactories.has(name)) {
       modelFactories.set(name, model);
@@ -193,7 +193,7 @@ const ModelFactory = {
   },
 
   /**
-   * Get models imported from remote server
+   * Get federated models imported from remote server
    */
   getRemoteModels: () => {
     let models = [];
@@ -212,7 +212,7 @@ const ModelFactory = {
    * Get the model's specification
    * @param {Model|string} model
    */
-  getModelSpec: (model) => {
+  getModelSpec: model => {
     if (!model) return;
     const name = typeof model === "object" ? Model.getName(model) : model;
     return modelFactories.get(checkModelName(name));
@@ -222,7 +222,7 @@ const ModelFactory = {
    * History of port invocation
    * @param {Model} model
    */
-  getPortFlow: (model) => Model.getPortFlow(model),
+  getPortFlow: model => Model.getPortFlow(model),
 
   /**
    *
@@ -236,18 +236,18 @@ const ModelFactory = {
    *
    * @param {Model} model
    */
-  deleteModel: (model) => Model.delete(model),
+  deleteModel: model => Model.delete(model),
 
   /**
    * Get ID of model
    * @param {Model} model
    */
-  getModelId: (model) => Model.getId(model),
+  getModelId: model => Model.getId(model),
 
   /**
    * Get model's name
    */
-  getModelName: (model) => Model.getName(model),
+  getModelName: model => Model.getName(model),
 
   /**
    * Get `eventName` value

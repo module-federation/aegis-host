@@ -1,6 +1,6 @@
 import log from "../lib/logger";
 
-export default function deleteModelFactory(removeModel, getModelId, hash) {
+export default function deleteModelFactory(removeModel, hash) {
   return async function deleteModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body;
@@ -23,7 +23,7 @@ export default function deleteModelFactory(removeModel, getModelId, hash) {
           ETag: hash(JSON.stringify(model)),
         },
         statusCode: 201,
-        body: { modelId: getModelId(model) },
+        body: { modelId: model.getId() },
       };
     } catch (e) {
       log(e);

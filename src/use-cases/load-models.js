@@ -31,12 +31,9 @@ function handleError(e) {
   console.error(e);
 }
 
-function handleRestart(repository, models, spec) {
+function handleRestart(repository) {
   console.log("resuming workflow");
-  repository
-    .list()
-    .then(resumeWorkflow(models.getPortFlow, spec.ports))
-    .catch(handleError);
+  repository.list().then(resumeWorkflow).catch(handleError);
 }
 
 /**
@@ -58,6 +55,6 @@ export default function ({ models, observer, repository, modelName }) {
       serializer: Serializer.addSerializer(spec.serializers),
     });
 
-    setTimeout(handleRestart, 30000, repository, models, spec);
+    setTimeout(handleRestart, 30000, repository);
   };
 }

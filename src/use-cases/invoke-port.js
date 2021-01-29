@@ -14,13 +14,8 @@ function portAuthorized(spec, port, permission) {
  * @param {import("../models/model").Model} model
  * @param {{port:string}} query
  */
-export default async function invokePort(models, model, port, permission) {
-  const spec = models.getModelSpec(model);
-
-  if (!spec) {
-    console.log("can't find spec for", models.getModelName(model));
-    return model;
-  }
+export default async function invokePort(model, port, permission) {
+  const spec = model.getSpec();
 
   if (portAuthorized(spec, port, permission)) {
     const callback = spec.ports[port].callback;

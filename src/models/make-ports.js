@@ -1,6 +1,5 @@
 "use strict";
 
-import Model from "./model";
 import portHandler from "./port-handler";
 import async from "../lib/async-error";
 import domainEvents from "./domain-events";
@@ -117,16 +116,16 @@ function addPortListener(portName, portConf, observer, disabled) {
 }
 
 /**
- * The Immutable way to say model.portFlow.pop().
- * @param {Model} model
+ * Pop the stack and update the model, immutably.
+ * @param {import(".").Model} model
  * @param {*} port
  * @param {*} remember
  */
-function updatePortFlow(model, port, remember) {
+async function updatePortFlow(model, port, remember) {
   if (!remember) return model;
   return model.update({
-    [Model.getKey("portFlow")]: [...Model.getPortFlow(model), port],
-  });
+    [model.getKey("portFlow")]: [...model.getPortFlow(), port],
+  }, false);
 }
 
 /**
@@ -187,13 +186,13 @@ export default function makePorts(ports, adapters, observer) {
             timer.stopTimer();
 
             // Remember invocations for undo and restart
-            const updated = updatePortFlow(model, port, recordPort);
+            const updated = await updatePortFlow(model, port, recordPort);
 
-            console.log("port called", port, updated);
             // Signal the next task to run, unless undo is running
             if (!updated.compensate && recordPort) {
               this.emit(portConf.producesEvent, updated);
             }
+            return updated;
           } catch (error) {
             console.error(error);
 

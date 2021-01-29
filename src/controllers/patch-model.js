@@ -1,6 +1,9 @@
 import log from "../lib/logger";
-
-export default function patchModelFactory(editModel, getModelId, hash) {
+/**
+ *
+ * @param {import("../use-cases/edit-model").editModel}
+ */
+export default function patchModelFactory(editModel, hash) {
   return async function patchModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body;
@@ -24,7 +27,7 @@ export default function patchModelFactory(editModel, getModelId, hash) {
           ETag: hash(JSON.stringify(model)),
         },
         statusCode: 201,
-        body: { modelId: getModelId(model) },
+        body: { modelId: model.getId() },
       };
     } catch (e) {
       log(e);

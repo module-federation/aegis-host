@@ -23,13 +23,13 @@ function buildOptions(model) {
     models: ModelFactory,
     observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers,
-    repository: DataSourceFactory.getDataSource(model.modelName)
+    repository: DataSourceFactory.getDataSource(model.modelName),
   };
 }
 
 function make(factory) {
   const models = ModelFactory.getRemoteModels();
-  return models.map((model) => ({
+  return models.map(model => ({
     endpoint: model.endpoint,
     fn: factory(buildOptions(model)),
   }));
@@ -41,4 +41,3 @@ export const listModels = () => make(listModelsFactory);
 export const findModels = () => make(findModelFactory);
 export const removeModels = () => make(removeModelFactory);
 export const loadModels = () => make(loadModelsFactory);
-export const getModelId = (model) => ModelFactory.getModelId(model);

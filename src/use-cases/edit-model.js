@@ -14,8 +14,9 @@ import async from "../lib/async-error";
  */
 
 /**
- *
+ * @typedef editModel
  * @param {ModelParam} param0
+ * @returns {function():Promise<import("../models/model").Model>}
  */
 export default function editModelFactory({
   modelName,
@@ -50,15 +51,13 @@ export default function editModelFactory({
     }
 
     if (command) {
-      const result = await async(
-        executeCommand(models, updated, command, "write")
-      );
+      const result = await async(executeCommand(updated, command, "write"));
       if (result.ok) {
         return result.data;
       }
     }
 
-    const result = await async(invokePort(models, updated, command, "write"));
+    const result = await async(invokePort(updated, command, "write"));
     if (result.ok) {
       return result.data;
     }

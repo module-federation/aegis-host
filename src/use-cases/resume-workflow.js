@@ -8,23 +8,22 @@
  * @param {import("../models").ports} ports
  * @returns {function(Map<string,Model>)}
  */
-export default function resumeWorkflow(getPortFlow, ports) {
-  return async function (list) {
-    if (list?.length > 0) {
-      await Promise.all(
-        list.map(async function (model) {
-          const history = getPortFlow(model);
+export default async function resumeWorkflow(list) {
+  if (list?.length > 0) {
+    await Promise.all(
+      list.map(async function (model) {
+        const history = model.getPortFlow();
+        const ports = model.getSpec();
 
-          if (history?.length > 0) {
-            const lastPort = history.length - 1;
-            const nextPort = ports[history[lastPort]].producesEvent;
+        if (history?.length > 0) {
+          const lastPort = history.length - 1;
+          const nextPort = ports[history[lastPort]].producesEvent;
 
-            if (nextPort && nextPort !== "workflowComplete") {
-              await model.emit(nextPort, model);
-            }
+          if (nextPort && nextPort !== "workflowComplete") {
+            await model.emit(nextPort, model);
           }
-        })
-      );
-    }
-  };
+        }
+      })
+    );
+  }
 }

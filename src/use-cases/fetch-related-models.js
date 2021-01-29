@@ -3,17 +3,11 @@
 import async from "../lib/async-error";
 
 /**
- * @param {import("../models/model-factory).ModelFactory} models
  * @param {import("../models/model").Model} model
  * @param {import("../models".relations)} relation
  */
-export default async function fetchRelatedModels(models, model, relation) {
-  const spec = models.getModelSpec(model);
-
-  if (!spec) {
-    console.log("can't find spec for", models.getModelName(model));
-    return model;
-  }
+export default async function fetchRelatedModels(model, relation) {
+  const spec = model.getSpec();
 
   if (relation && spec.relations && spec.relations[relation]) {
     const result = await async(model[relation]());

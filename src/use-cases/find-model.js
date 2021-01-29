@@ -16,7 +16,7 @@ import fetchRelatedModels from "./fetch-related-models";
  *
  * @param {ModelParam} param0
  */
-export default function findModelFactory({ models, repository } = {}) {
+export default function findModelFactory({ repository } = {}) {
   return async function findModel(id, query) {
     const model = await repository.find(id);
 
@@ -27,14 +27,14 @@ export default function findModelFactory({ models, repository } = {}) {
     console.log({ func: findModel.name, model, query });
 
     if (query?.relation) {
-      const related = await fetchRelatedModels(models, model, query.relation);
+      const related = await fetchRelatedModels(model, query.relation);
       if (related) {
         return related;
       }
     }
 
     if (query?.command) {
-      const result = await executeCommand(models, model, query.command, "read");
+      const result = await executeCommand(model, query.command, "read");
       if (result) {
         return result;
       }

@@ -6,7 +6,6 @@ import {
   listModels,
   findModels,
   removeModels,
-  getModelId,
   loadModels,
 } from "../use-cases";
 import postModelFactory from "./post-model";
@@ -17,9 +16,9 @@ import deleteModelFactory from "./delete-model";
 import hash from "../lib/hash";
 
 function make(useCases, controllerFactory) {
-  return useCases().map((uc) => ({
+  return useCases().map(uc => ({
     endpoint: uc.endpoint,
-    fn: controllerFactory(uc.fn, getModelId, hash),
+    fn: controllerFactory(uc.fn, hash),
   }));
 }
 
@@ -35,6 +34,6 @@ export const initLoader = () => {
     models.forEach(m => m.fn());
   }
   return {
-    loadSavedModels
-  }
-}
+    loadSavedModels,
+  };
+};

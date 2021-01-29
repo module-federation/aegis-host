@@ -6,7 +6,8 @@
  * @property {string} Symbol_modelName - immutable/private model name
  * @property {string} Symbol_createTime - immutable/private time of creation
  * @property {string} Symbol_updateTime - immutable/private time of last update
- * @property {function(*,Model):Model} Symbol_onUpdate - immutable/private update function
+ * @property {function(Model,*,number):Model} Symbol_validate - run validations for event
+ * @property {function(Model,*):Model} Symbol_onUpdate - immutable/private update function
  * @property {function(Model)} Symbol_onDelete - immutable/private delete function
  * @property {function(Object)} update - use this function to update the model -
  * specify changes as properties of an object
@@ -14,7 +15,7 @@
  * @property {function(eventName,function(eventName,Model):void)} addListener listen
  * for domain events
  * @property {function(eventName,Model):Promise<void>} emit emit a domain event
- * @property {import('./mixins').functionalMixin} [mixinMethod] - when the user
+ * @property {function()} [mixinMethod] - when the user
  * specifies a mixin, it is applied to the model on creation - adding methods is
  * a common result.
  * @property {*} [mixinData] - when the user specifies a mixin, it is applied to
@@ -29,6 +30,16 @@
  * the framework generates a function that your code calls to run the query
  * @property {function(*):*} [command] - the framework will call any model method
  * you specify when passed as a parameter or query in an API call.
+ * @property {function():string} getName - model name
+ * @property {function():string} getId - model id
+ * @property {function():ModelSpecification} getSpec - get ModelSpec
+ * @property {function():string[]} getPortFlow - get history of port calls
+ * @property {function():string} getName - model name
+ * @property {function()} undo - back out transactions
+ */
+
+/**
+ * @typedef {import(".").Event} Event
  */
 
 import {
@@ -73,7 +84,7 @@ const Model = (() => {
   };
 
   /**
-   * bitmask for identying events
+   * bitmask for identifying events
    */
   const eventMask = {
     update: 1, //  0001 Update
@@ -81,16 +92,20 @@ const Model = (() => {
     onload: 1 << 2, //  0100 Load
   };
 
-  const defaultOnUpdate = (model, changes) => {
-    return model;
-  };
+  const defaultOnUpdate = (model, changes) => ({ ...model, ...changes });
 
   const defaultOnDelete = model => {
-    return { ...withTimestamp("deleteTime")(model) };
+    return withTimestamp("deleteTime")(model);
   };
 
-  const defaultValidate = (model, changes) => {
-    return model;
+  const defaultValidate = (model, changes) => model;
+
+  const optionalValidation = (model, changes, option = false) => {
+    if (option) return model[VALIDATE](changes, eventMask.update);
+    return {
+      ...model,
+      ...changes,
+    };
   };
 
   /**
@@ -100,21 +115,23 @@ const Model = (() => {
    *  spec:import('./index').ModelSpecification
    * }} param0
    */
-  function make({
-    model,
-    spec: {
-      ports,
-      observer,
-      modelName,
-      datasource,
-      mixins = [],
-      dependencies,
-      relations = {},
-      onUpdate = defaultOnUpdate,
-      onDelete = defaultOnDelete,
-      validate = defaultValidate,
-    },
-  }) {
+  function make(modelInfo) {
+    const {
+      model,
+      spec: {
+        ports,
+        observer,
+        modelName,
+        datasource,
+        mixins = [],
+        dependencies,
+        relations = {},
+        onUpdate = defaultOnUpdate,
+        onDelete = defaultOnDelete,
+        validate = defaultValidate,
+      },
+    } = modelInfo;
+
     return {
       // Optional mixins
       ...compose(...mixins)(model),
@@ -136,24 +153,31 @@ const Model = (() => {
       [ONDELETE]() {
         return onDelete(this);
       },
+      /**
+       * Run validation logic
+       * @param {*} changes
+       * @param {number} event
+       * @returns {Model}
+       */
       [VALIDATE](changes, event) {
         return validate(this, changes, event);
       },
-      // Back out all port transactions
+      /**
+       * Back out port transactions
+       */
       async undo() {
-        compensate(this, ports);
+        compensate(this);
       },
       /**
        * User code calls this to persist any updates it makes.
        * @param {*} changes
        */
-      async update(changes) {
-        const correct = this[VALIDATE](changes, eventMask.update);
-        const updated = await datasource.save(model[ID], {
-          ...correct,
+      async update(changes, validate = false) {
+        const valid = optionalValidation(this, changes, validate);
+        return datasource.save(valid[ID], {
+          ...valid,
           [UPDATETIME]: new Date().getTime(),
         });
-        return updated;
       },
       /**
        * Listen for domain events.
@@ -166,12 +190,27 @@ const Model = (() => {
         observer.on(eventName, callback, multi);
       },
       /**
-       * Emit domain events.
+       * Fire domain events.
        * @param {string} eventName - event identifier, unique string
-       * @param {*} eventData - any, buy typically `Model`
+       * @param {Model|Event} eventData - any, but typically `Model`
        */
       async emit(eventName, eventData) {
         await observer.notify(eventName, eventData);
+      },
+      getSpec() {
+        return modelInfo.spec;
+      },
+      getName() {
+        return this[MODELNAME];
+      },
+      getId() {
+        return this[ID];
+      },
+      getPortFlow() {
+        return this[PORTFLOW];
+      },
+      getKey(key) {
+        return keyMap[key];
       },
     };
   }
@@ -205,25 +244,25 @@ const Model = (() => {
   // Create model instance
   const makeModel = asyncPipe(
     Model,
-    validate(eventMask.create),
     withTimestamp(CREATETIME),
     withSerializers(
       fromSymbol(keyMap),
       fromTimestamp(["createTime", "updateTime"])
     ),
     withDeserializers(toSymbol(keyMap)),
+    validate(eventMask.create),
     Object.freeze
   );
 
   // Recreate model instance
   const loadModel = pipe(
     make,
-    validate(eventMask.onload),
     withSerializers(
       fromSymbol(keyMap),
       fromTimestamp(["createTime", "updateTime"])
     ),
     withDeserializers(toSymbol(keyMap)),
+    validate(eventMask.onload),
     Object.freeze
   );
 
@@ -247,19 +286,18 @@ const Model = (() => {
 
     /**
      * Process update request.
-     * (Invokes user-provided `onUpdate` callback.)
+     * (Invokes user-provided `onUpdate` and `validate` callback.)
      * @param {Model} model - model instance to update
      * @param {Object} changes - Object containing changes
      * @returns {Model} updated model
      *
      */
-    update: function (model, changes) {
-      const correct = model[VALIDATE](changes, eventMask.update);
-      const updates = {
-        ...correct,
+    update: function (model, edits) {
+      const valid = model[VALIDATE](edits, eventMask.update);
+      return {
+        ...valid,
         [UPDATETIME]: new Date().getTime(),
       };
-      return updates;
     },
 
     /**
@@ -267,7 +305,7 @@ const Model = (() => {
      * @param {Model} model
      * @param {*} changes
      */
-    validate: (model, changes) => model[VALIDATE](changes),
+    validate: (model, changes) => model[VALIDATE](changes, eventMask.update),
 
     /**
      * Process delete request.

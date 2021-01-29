@@ -30,23 +30,12 @@ function commandAuthorized(spec, command, permission) {
 
 /**
  *
- * @param {import("../models/model-factory").ModelFactory} models
  * @param {import("../models/model").Model} model
  * @param {command:string} command - name of command
  * @param {string} permission - permission of caller
  */
-export default async function executeCommand(
-  models,
-  model,
-  command,
-  permission
-) {
-  const spec = models.getModelSpec(model);
-
-  if (!spec) {
-    console.log("can't find spec for", models.getModelName(model));
-    return model;
-  }
+export default async function executeCommand(model, command, permission) {
+  const spec = model.getSpec();
 
   if (commandAuthorized(spec, command, permission)) {
     const cmd = spec.commands[command].command;
@@ -58,12 +47,10 @@ export default async function executeCommand(
         return { ...model, ...result.data };
       }
     }
-                  
+
     console.warn("command not found", command);
   }
   model.emit(domainEvents.unauthorizedCommand(model), { model, command });
-  console.warn("command unauthorized", command);
 
   return model;
 }
-

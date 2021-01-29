@@ -1,6 +1,11 @@
 import log from "../lib/logger";
 
-export default function postModelFactory(addModel, getModelId, hash) {
+/**
+ *
+ * @param {import("../use-cases/add-model").addModel} addModel
+ * @param {*} hash
+ */
+export default function postModelFactory(addModel, hash) {
   return async function postModel(httpRequest) {
     try {
       const { source = {}, ...modelInfo } = httpRequest.body;
@@ -22,7 +27,7 @@ export default function postModelFactory(addModel, getModelId, hash) {
           ETag: hash(JSON.stringify(model)),
         },
         statusCode: 201,
-        body: { modelId: getModelId(model) },
+        body: { modelId: model.getId() },
       };
     } catch (e) {
       log(e);

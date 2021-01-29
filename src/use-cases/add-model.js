@@ -10,7 +10,9 @@
  */
 
 /**
+ * @typedef addModel
  * @param {dependencies} param0
+ * @returns {function():Promise<import('../models').Model>}
  */
 export default function addModelFactory({
   modelName,
@@ -33,13 +35,14 @@ export default function addModelFactory({
     const event = await models.createEvent(eventType, modelName, model);
 
     try {
-      await repository.save(models.getModelId(model), model);
+      await repository.save(model.getId(), model);
       await observer.notify(event.eventName, event);
     } catch (error) {
-      await repository.delete(models.getModelId(model));
+      await repository.delete(model.getId());
       throw new Error(error);
     }
 
-    return model;
+    // Return the latest changes
+    return repository.find(model.getId());
   };
 }
