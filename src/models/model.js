@@ -32,7 +32,7 @@
  * you specify when passed as a parameter or query in an API call.
  * @property {function():string} getName - model name
  * @property {function():string} getId - model id
- * @property {function():ModelSpecification} getSpec - get ModelSpec
+ * @property {function():import(".").ModelSpecification} getSpec - get ModelSpec
  * @property {function():string[]} getPortFlow - get history of port calls
  * @property {function():string} getName - model name
  * @property {function()} undo - back out transactions
@@ -101,7 +101,7 @@ const Model = (() => {
   const defaultValidate = (model, changes) => model;
 
   const optionalValidation = (model, changes, option = false) => {
-    if (option) return model[VALIDATE](changes, eventMask.update);
+    if (option) return model[VALIDATE](changes, option);
     return {
       ...model,
       ...changes,

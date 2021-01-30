@@ -1,4 +1,4 @@
-import ModelFactory from ".";
+"use strict";
 
 function checkPayload(
   key,
@@ -9,14 +9,16 @@ function checkPayload(
   const { model } = options;
 
   if (!model || Object.keys(payload) < 1 || !key) {
-    throw new Error({
-      desc: "model, payload, or key is missing",
+    console.error({
+      desc: "model, payload or key is missing or invalid",
       model,
       port,
       error,
       payload,
       key,
     });
+
+    return;
   }
 
   // Call recursively if array
@@ -30,7 +32,7 @@ function checkPayload(
     return { [key]: payload[key] };
   }
 
-  // find prop, already in model,
+  // find prop already in model,
   if (model[key]) {
     return { [key]: model[key] };
   }
@@ -38,10 +40,12 @@ function checkPayload(
   // find prop in saved model
   return model
     .find()
-    .then(latest => ({ [key]: latest[key] }))
+    .then(latest =>
+      latest[key] ? { [key]: latest[key] } : { [key]: "not found" }
+    )
     .catch(error => {
-      throw new Error({
-        desc: "property is missing" + key,
+      console.error({
+        desc: error + key,
         port,
         error,
         payload,
@@ -51,23 +55,29 @@ function checkPayload(
 }
 
 /**
- * Default port handler called by adapter if no callback is specified.
- * Requires `port.keys` to be configured.
- * @param {*} options
+ * Default callback used by adapters if no callback is specified for the port.
+ * Requires `[port].keys` to be configured in `ModelSpecification.ports[port]`
+ * to determine if payload contains expected data. Either way, any properties
+ * of the payload object are saved to the model.
+ *
+ * @param {{model:import(".").Model,port:import(".").ports[""]}} options
  * @param {*} payload
  */
 export default async function portHandler(options = {}, payload = {}) {
   const { model, port } = options;
-  const spec = ModelFactory.getModelSpec(model);
+  const spec = model.getSpec();
 
   if (spec?.ports && spec.ports[port]) {
     const keys = spec.ports[port].keys;
 
     if (keys) {
-      const changes = checkPayload(keys, options, payload, port);
-      return model.update(changes);
+      const expectedPayload = checkPayload(keys, options, payload, port);
+      return model.update(expectedPayload);
     }
     console.warn("no keys or callback set for port", port);
   }
-  console.warn("port configuration problem", model, port, spec);
+  console.warn("port configuration problem", model.getName(), port, spec);
+
+  // degrade gracefully
+  return model.update(payload);
 }

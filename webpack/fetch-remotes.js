@@ -14,13 +14,13 @@ const fs = require('fs');
  */
 module.exports = async (remoteEntry) => {
   console.log(remoteEntry);
-  var entries = Array.isArray(remoteEntry)
+  const entries = Array.isArray(remoteEntry)
     ? remoteEntry
     : [remoteEntry];
 
   const getPath = (entry) => {
-    let url = new URL(entry.url);
-    var path = [
+    const url = new URL(entry.url);
+    const path = [
       url.pathname.replace('.js', ''),
       url.hostname.replace('.', '-'),
       url.port,
@@ -37,7 +37,7 @@ module.exports = async (remoteEntry) => {
     return new Promise((resolve, reject) => {
       const rslv = () => resolve({ [entry.name]: path });
 
-      var req = http.request(entry.url, (res) => {
+      const req = http.request(entry.url, (res) => {
         res.on('error', rslv);
         if (res.statusCode < 200 || res.statusCode >= 300) {
           return rslv();

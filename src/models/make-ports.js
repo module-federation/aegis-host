@@ -123,9 +123,12 @@ function addPortListener(portName, portConf, observer, disabled) {
  */
 async function updatePortFlow(model, port, remember) {
   if (!remember) return model;
-  return model.update({
-    [model.getKey("portFlow")]: [...model.getPortFlow(), port],
-  }, false);
+  return model.update(
+    {
+      [model.getKey("portFlow")]: [...model.getPortFlow(), port],
+    },
+    false
+  );
 }
 
 /**
@@ -192,6 +195,7 @@ export default function makePorts(ports, adapters, observer) {
             if (!updated.compensate && recordPort) {
               this.emit(portConf.producesEvent, updated);
             }
+
             return updated;
           } catch (error) {
             console.error(error);
