@@ -15,7 +15,7 @@ If that was ever the case, it is no longer. With the introduction of module fede
 ***
 
 ## Features 
-The main benefit of "collocated microservices" is clear. MicroLib goes further in organizing components according to hexagonal architecture, such that the boundaries and relations between federated components is clear and useful. Features include:
+The main benefit of collocated services is clear. MicroLib goes further in organizing components according to hexagonal architecture, such that the boundaries and relations between federated components is clear and useful. Features include:
 
 * Dynamic API generation for imported modules
 * Dynamic, independent persistence of imported modules
@@ -47,16 +47,15 @@ A **_model_** is a domain entity/service that implements all or part of the serv
 
 One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An **_adapter_** implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
 
-A **_service_** provides an optional layer of abstraction for adapters and usually implements a client library. Services allow adapters to be generalized for common integration patterns. A service represents a particular implementation of a pattern. The framework dynamically imports and binds services to adapters at runtime.
+A **_service_** provides an optional layer of abstraction for adapters and usually implements a client library. Services allow adapters to be generalized for common integration patterns, where a service represents a particular implementation of a pattern. Like ports to adapters, the framework dynamically imports and binds services to adapters at runtime.
 
 ***
 
 ![Persistence](https://github.com/tysonrm/MicroLib/blob/master/wiki/persistence.png)
 ## Persistence
-The framework automatically persists domain models as JSON documents using the default adapter configured for the server instance. In-memory, file-system, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
+The framework automatically persists domain models as JSON documents using the default adapter configured for the server instance. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource.
-The factory supports federated schemas through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
 
 ***
 
@@ -78,10 +77,25 @@ Ports also have an undo callback for implementing compensating logic. The framew
 
 ### Local & Remote Events
 
+In addition to in-memory function calls, services can communicate locally the same way they do remotely: by publishing and subscribing to events. Using locally shared events, microservice libraries are virtually as decoupled as they would be running remotely.
+
+The framework provides a common broker for inter-service events and injects pub/sub functions into each model:
+
+`ModelA.listen(event, callback)`
+
+`ModelB.notify(event, data)`
+
+Like any external integration, ports must be configured to integrate with external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
+
 ***
 
 ![Workflow](https://github.com/tysonrm/MicroLib/blob/master/wiki/workflow.png)
 ## Workflow
+
+
+
+
+
 # Composable Microservices
 
 Cf. [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
