@@ -30,7 +30,7 @@ The main benefit of collocated services is clear. MicroLib goes further in organ
 * Dependency/control inversion (IoC)
 * Zero downtime, "zero install" deployment
 * Evergreen deployment and semantic versioning
-* Dynamic A/B testing deployment
+* Dynamic A/B testing
 * Serverless deployment
 * Configurable serialization for network and storage I/O
 * Code reuse that works with multiple repos
@@ -55,7 +55,7 @@ A **_service_** provides an optional layer of abstraction for adapters and usual
 ## Persistence
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server instance. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas, similar to what you find in GraphQL, through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
 
 ***
 
@@ -85,15 +85,16 @@ The framework provides a common broker for inter-service events and injects pub/
 
 `ModelB.notify(event, data)`
 
-Like any external integration, ports must be configured to integrate with external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
+Like any external integration, ports must be configured to integrate with remote event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
 
 ***
 
 ![Workflow](https://github.com/tysonrm/MicroLib/blob/master/wiki/workflow.png)
 ## Workflow
 
+Service orchestration is built on the framework’s port-adapter implementation. As mentioned, ports both produce and consume events, allowing them to be piped together in control flows by specifying the output event of one port as the input event of another. Because events are shared internally and can be forwarded externally, this implementation works equally well whether services are local or remote.
 
-
+Callbacks specified for ports in the _ModelSpec_ can process data received on a port before its output event is fired and the next port runs. If not specified, the framework nevertheless saves the port output to the model. Of course, you can implement your own event handlers or adapter logic to customize the flow.
 
 
 # Composable Microservices
