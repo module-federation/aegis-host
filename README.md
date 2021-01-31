@@ -21,6 +21,7 @@ The main benefit of "collocated microservices" is clear. MicroLib goes further i
 * Dynamic, independent persistence of imported modules
 * Dynamic port generation for imported modules
 * Dynamic port-adapter binding
+* Dynamic adapter-service binding
 * Configuration-based service integration
 * Configuration-based service orchestration
 * Common broker for local, shared events
@@ -31,8 +32,8 @@ The main benefit of "collocated microservices" is clear. MicroLib goes further i
 * Evergreen deployment and semantic versioning
 * Dynamic A/B testing deployment
 * Serverless deployment
-* Code reuse that works with multiple repos
 * Configurable serialization for network and storage I/O
+* Code reuse that works with multiple repos
 
 ***
 
