@@ -13,7 +13,7 @@ export default async function resumeWorkflow(list) {
     await Promise.all(
       list.map(async function (model) {
         const history = model.getPortFlow();
-        const ports = model.getSpec();
+        const ports = model.getSpec().ports;
 
         console.debug({ func: resumeWorkflow.name, history });
 

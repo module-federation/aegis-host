@@ -28,7 +28,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
     this.connectDb()
       .then(() => this.setCollection())
       .then(() => this.loadModels())
-      .catch((e) => console.log(e));
+      .catch(e => console.log(e));
   }
 
   async connectDb() {
@@ -38,43 +38,64 @@ export class DataSourceMongoDb extends DataSourceMemory {
         useUnifiedTopology: true,
       });
 
-      if (!this.client) {
-        throw new Error("connection to mongodb failed");
+      if (!this.client || !this.client.isConnected) {
+        console.error("can't connect to db - using memory", error);
       }
     }
   }
 
   setCollection() {
-    this.collection = this.client.db(this.name).collection(this.name);
+    try {
+      this.collection = this.client.db(this.name).collection(this.name);
+    } catch (error) {
+      console.error("error setting collection", error);
+    }
   }
 
   async loadModels() {
-    const models = this.collection.find().limit(cacheSize);
-    models.forEach((model) => {
-      super.save(model.id, this.hydrate(model));
-    });
+    try {
+      const cursor = this.collection.find().limit(cacheSize);
+      cursor.forEach(model => {
+        super.save(model.id, this.hydrate(model));
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async checkConnection(error) {
+    try {
+      console.error("check connection on error", error);
+      if (!this.client || !this.client.isConnected) {
+        await this.connectDb();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async findDb(id) {
+    const model = await this.collection.findOne({ _id: id });
+    if (!model) {
+      await this.checkConnnection("document not found");
+      return null;
+    }
+    return super.save(id, this.hydrate(model));
   }
 
   /**
-   * @override
+   * @overrid
    * @param {*} id
    */
   async find(id) {
     try {
-      const cached = super.find(id);
-
+      const cached = await super.find(id);
       if (!cached) {
-        const model = await this.collection.findOne({ _id: id });
-        if (!model) {
-          console.warn("document not found in mongodb", id);
-          return null;
-        }
-        return super.save(id, this.hydrate(model));
+        return this.findDb(id);
       }
-
       return cached;
     } catch (error) {
-      console.error(error);
+      await this.checkConnection(error);
     }
   }
 
@@ -85,6 +106,16 @@ export class DataSourceMongoDb extends DataSourceMemory {
     return JSON.stringify(data);
   }
 
+  async saveDb(id, data) {
+    const clone = JSON.parse(this.serialize(data));
+    await this.collection.replaceOne(
+      { _id: id },
+      { ...clone, _id: id },
+      { upsert: true }
+    );
+    return data;
+  }
+
   /**
    * @override
    * @param {*} id
@@ -92,19 +123,10 @@ export class DataSourceMongoDb extends DataSourceMemory {
    */
   async save(id, data) {
     try {
-      super.save(id, data);
-
-      const model = JSON.parse(this.serialize(data));
-
-      await this.collection.replaceOne(
-        { _id: id },
-        { ...model, _id: id },
-        { upsert: true }
-      );
-
+      await Promise.allSettled([super.save(id, data), this.saveDb(id, data)]);
       return data;
     } catch (error) {
-      console.error(error);
+      await this.checkConnection(error);
     }
   }
 
@@ -120,24 +142,44 @@ export class DataSourceMongoDb extends DataSourceMemory {
       }
       return await this.collection.find().toArray();
     } catch (error) {
-      console.error(error);
+      await this.checkConnection(error);
     }
   }
 
   /**
+   * 
    * @override
    * @param {*} id
    */
   async delete(id) {
+    await Promise.allSettled([
+      super.delete(id),
+      this.collection.deleteOne({ _id: id }),
+    ]).catch(error => this.checkConnection(error));
+  }
+
+  /**
+   * Flush the cache to disk.
+   */
+  flush() {
     try {
-      super.delete(id);
-      await this.collection.deleteOne({ _id: id });
+      this.dataSource
+        .values()
+        .reduce(
+          (data, model) => data.then(this.saveDb(model.getId())),
+          Promise.resolve()
+        );
     } catch (error) {
       console.error(error);
     }
   }
 
+  /**
+   * Process terminating, flush cache, close connections.
+   * @override
+   */
   close() {
+    this.flush();
     this.client.close();
   }
 }

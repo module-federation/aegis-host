@@ -101,11 +101,11 @@ const Model = (() => {
   const defaultValidate = (model, changes) => model;
 
   const optionalValidation = (model, changes, option = false) => {
-    if (option) return model[VALIDATE](changes, option);
+    if (option) return model[VALIDATE](changes, eventMask.update);
     return {
       ...model,
       ...changes,
-    };
+    }; 
   };
 
   /**

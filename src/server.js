@@ -9,7 +9,7 @@ import {
   getModels,
   getModelsById,
   deleteModels,
-  initLoader,
+  initCache,
 } from "./controllers";
 
 import { initRemotes } from "./models";
@@ -22,15 +22,15 @@ const Server = (() => {
   const app = express();
   const API_ROOT = "/api";
   const PORT = 8070;
-  const ENDPOINT = (e) => `${API_ROOT}/${e}`;
-  const ENDPOINTID = (e) => `${API_ROOT}/${e}/:id`;
-  const ENDPOINTCMD = (e) => `${API_ROOT}/${e}/:id/:command`;
+  const ENDPOINT = e => `${API_ROOT}/${e}`;
+  const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
+  const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
 
   app.use(bodyParser.json());
   app.use(express.static("public"));
 
   function make(path, app, method, controllers) {
-    controllers().forEach((ctlr) => {
+    controllers().forEach(ctlr => {
       console.log(ctlr);
       app[method](path(ctlr.endpoint), http(ctlr.fn));
     });
@@ -43,18 +43,18 @@ const Server = (() => {
     const overrides = { save, find, Persistence };
 
     initRemotes(overrides).then(() => {
-      const loader = initLoader();
+      const cache = initCache();
 
       make(ENDPOINT, app, "post", postModels);
       make(ENDPOINT, app, "get", getModels);
+      make(ENDPOINTID, app, "get", getModelsById);
       make(ENDPOINTID, app, "patch", patchModels);
       make(ENDPOINTCMD, app, "patch", patchModels);
-      make(ENDPOINTID, app, "get", getModelsById);
       make(ENDPOINTID, app, "delete", deleteModels);
 
       console.timeEnd(label);
 
-      loader.loadSavedModels();
+      cache.load();
 
       app.listen(PORT, function () {
         console.log(`\nServer listening on http://localhost:${PORT}`);
