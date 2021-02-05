@@ -1,5 +1,9 @@
 import log from "../lib/logger";
 
+/**
+ *
+ * @param {import("../use-cases/find-model").findModel} findModel
+ */
 export default function getModelByIdFactory(findModel) {
   return async function getModelById(httpRequest) {
     log({ function: "findModel" });

@@ -21,7 +21,11 @@ export default async function resumeWorkflow(list) {
           const lastPort = history.length - 1;
           const nextPort = ports[history[lastPort]].producesEvent;
 
-          if (nextPort && nextPort !== "workflowComplete") {
+          if (nextPort) {
+            if (nextPort === "workflowComplete") {
+              console.log("workflow complete");
+              return;
+            }
             await model.emit(nextPort, model);
           }
         }

@@ -13,8 +13,9 @@ import fetchRelatedModels from "./fetch-related-models";
  */
 
 /**
- *
+ * @typedef findModel
  * @param {ModelParam} param0
+ * @returns {function(id:string, {query:string})}
  */
 export default function findModelFactory({ repository } = {}) {
   return async function findModel(id, query) {

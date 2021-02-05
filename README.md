@@ -8,9 +8,9 @@ The implicit premise behind this tradeoff is expressed by [Fowler](https://marti
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While, in fact, there are, and have been, technologies to deploy libraries without redeploying the application (consider [OSGi](https://www.osgi.org/)), it seems their complexity and the level of effort required to use them outweighed any potential benefit. 
+While, in fact, there are, and have been, technologies to deploy libraries without redeploying the application (consider [OSGi](https://www.osgi.org/)), it seems their complexity and the level of effort required to use them outweighed any potential benefit. At least until now...
 
-If that was ever the case, it is no longer. With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with only a few simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries running in the same process, or what might loosely be called, **microservice libraries**.
+With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with only a few simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries running in the same process, or what might be loosely called, **microservice libraries**.
 
 ***
 
@@ -55,7 +55,7 @@ A **_service_** provides an optional layer of abstraction for adapters and usual
 ## Persistence
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server instance. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas, similar to what you find in GraphQL, through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas, think GraphQL, through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
 
 ***
 
@@ -96,11 +96,7 @@ Service orchestration is built on the framework’s port-adapter implementation.
 
 Callbacks specified for ports in the _ModelSpec_ can process data received on a port before its output event is fired and the next port runs. If not specified, the framework nevertheless saves the port output to the model. Of course, you can implement your own event handlers or adapter logic to customize the flow.
 
+## Futher Reading
 
-# Composable Microservices
+[Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
-Cf. [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
-
-Using module federation (a la [Zack Jackson](https://github.com/ScriptedAlchemy)) and clean architecture (a la Uncle Bob), composable microservices combine the independence and agility of microservices with the integration and deployment simplicity of monoliths. This simple API framework supports CRUD operations for domain models whose source code, and that of any dependencies, is streamed over HTTP from a remote server at runtime. Following hexagonal architecture, the framework can be configured to generate ports and bind them dynamically to local or federated adapters. Similarly, adapters can be wired to remotely imported services at runtime. Ports can be piped together to form control flows by configuring the output event of one port as the input or triggering event of another. The history of port invocations is recorded so compensating flows are generated automatically.
-
-The sample code in [composable-microservices-remotes](https://github.com/tysonrm/federated-monolith-services) shows a domain object, Order, whose ports are bound to a payment, inventory, and shipping service. The ports are configured to participate in a control flow that implements the saga orchestrator pattern to manage an order process from beginning to end.

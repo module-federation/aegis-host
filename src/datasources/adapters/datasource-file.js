@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import Model from "../../models/model";
 import { DataSourceMemory } from "./datasource-memory";
 
 /**
@@ -13,6 +14,14 @@ export class DataSourceFile extends DataSourceMemory {
     super(dataSource, factory, name);
   }
 
+  /**
+   *
+   * @param {{
+   *  hydrate:function(Map<string,import("../../models/model").Model>),
+   *  serializer:import("../../lib/serializer").Serializer,
+   *  directory:string,
+   * }} param0
+   */
   load({ hydrate, serializer, directory = __dirname }) {
     this.file = path.resolve(directory, this.name.concat(".json"));
     this.serializer = serializer;

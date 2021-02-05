@@ -33,7 +33,7 @@ export class DataSourceMemory extends DataSource {
 
       if (keys.length > 0) {
         return values.filter(v =>
-          keys.some(k => (v[k] ? query[k] === v[k] : false))
+          keys.every(k => (v[k] ? query[k] === v[k] : false))
         );
       }
     }

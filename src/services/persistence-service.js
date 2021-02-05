@@ -1,20 +1,14 @@
 "use strict";
 
 import DataSource from "../datasources";
-import Model from "../models/model";
 
 export const Persistence = {
   async save(model) {
-    return DataSource.getDataSource(Model.getName(model)).save(
-      Model.getId(model),
-      model
-    );
+    return DataSource.getDataSource(model.getName()).save(model.getId(), model);
   },
 
   async find(model) {
-    return DataSource.getDataSource(Model.getName(model)).find(
-      Model.getId(model)
-    );
+    return DataSource.getDataSource(model.getName()).find(model.getId());
   },
 
   close() {
