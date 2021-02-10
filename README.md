@@ -9,7 +9,7 @@ The implicit premise behind this tradeoff is expressed by [Fowler](https://marti
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While, in fact, there are, and have been, technologies to deploy libraries without redeploying the application they comprise (consider [OSGi](https://www.osgi.org/)), it seems their complexity, and the level of effort required to use them, has outweighed any potential benefit. At least until now...
+While, in fact, there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems their complexity, and the level of effort required to use them, has outweighed any potential benefit. At least until now...
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with only a few simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries running in the same process, or what might be loosely called, **microservice libraries**.
 
@@ -25,7 +25,7 @@ The main benefit of collocated services is clear. MicroLib goes further in organ
 * Dynamic adapter-service binding
 * Configuration-based service integration
 * Configuration-based service orchestration
-* Common broker for local, shared events
+* Common broker for locally shared events
 * Persistence API for cached datasources
 * Datasource relations for federated schemas
 * Dependency/control inversion (IoC)
@@ -48,7 +48,7 @@ A **model** is a domain entity/service that implements all or part of the servic
 
 One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An **adapter** implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
 
-A **service** provides an optional layer of abstraction for adapters and usually implements a client library. Services allow adapters to be generalized for common integration patterns, whereas a service represents a particular implementation of a pattern. Like ports to adapters, the framework dynamically imports and binds services to adapters at runtime.
+A **service** provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like ports to adapters, the framework dynamically imports and binds services to adapters at runtime.
 
 ***
 
@@ -91,7 +91,7 @@ Like any external integration, ports must be configured to integrate with remote
 ***
 
 ![Workflow](https://github.com/tysonrm/MicroLib/blob/master/wiki/workflow.png)
-## Workflow
+## Orchestration
 
 Service orchestration is built on the framework’s port-adapter implementation. As mentioned, ports both produce and consume events, allowing them to be piped together in control flows by specifying the output event of one port as the input event of another. Because events are shared internally and can be forwarded externally, this implementation works equally well whether services are local or remote.
 
