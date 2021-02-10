@@ -88,7 +88,10 @@ function getPortCallback(cb) {
 
 /**
  * Register an event handler that invokes the `port`.
- * @param {import('./index').Model} model
+ * @param {string} portName
+ * @param {import('.').ports[portName]} portConf
+ * @param {import("../lib/observer").Observer} observer
+ * @param {boolean} disabled
  * @returns {boolean} whether or not to remember this port
  * for compensation and restart
  */

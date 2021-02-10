@@ -4,7 +4,7 @@ import domainEvents from "./domain-events";
 /**
  * Steps through the sequence of port calls
  * in LIFO order executing their undo functions.
- * @param {import('./index').port} ports
+ * @param {import('.').Model} model
  * @returns {function():Promise<void>}
  */
 export default function compensate(model) {
@@ -19,7 +19,7 @@ export default function compensate(model) {
     const undo = portFlow.reduceRight(async (model, port, index) => {
       await async(ports[port].undo(model));
       return model.update({
-        [Model.getKey("portFlow")]: portFlow.splice(0, index),
+        [model.getKey("portFlow")]: portFlow.splice(0, index),
       });
     }, updated);
 

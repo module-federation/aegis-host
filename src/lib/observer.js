@@ -24,7 +24,7 @@ export class Observer {
    * Register callback `handler` to fire on event `eventName`
    * @param {String | RegExp} eventName
    * @param {eventHandler} handler
-   * @param {boolean} [allowMultiple] - true by default; if false, event handled only once
+   * @param {boolean} [allowMultiple] - true by default; if false, event can be handled by only one callback
    */
   on(eventName, handler, allowMultiple = true) {
     throw new Error("unimplemented abstract method");
@@ -75,14 +75,14 @@ class ObserverImpl extends Observer {
     if (this._handlers.has(eventName)) {
       return Promise.all(
         this._handlers.get(eventName).map(handler => handler(eventData))
-      ).catch(reason => {
-        console.error(reason);
-      });
-      if (eventName !== "*") {
-        await this.notify("*", eventData);
-      }
-    } else if (eventName !== "*") {
-      await this.notify("*", eventData);
+      ).catch(error => console.error(error));
+    } else {
+      return Promise.all(
+        this._handlers
+          .values()
+          .filter(key => key instanceof RegExp && key.test(eventName))
+          .map(handler => handler(eventData))
+      ).catch(error => console.error(error));
     }
   }
 }

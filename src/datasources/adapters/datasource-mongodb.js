@@ -26,8 +26,8 @@ export class DataSourceMongoDb extends DataSourceMemory {
     this.serializer = serializer;
 
     this.connectDb()
-      .then(() => this.setCollection())
-      .then(() => this.loadModels())
+      .then(this.setCollection)
+      .then(this.loadModels)
       .catch(e => console.log(e));
   }
 
@@ -63,11 +63,11 @@ export class DataSourceMongoDb extends DataSourceMemory {
     }
   }
 
-  async checkConnection(error) {
+  checkConnection(error) {
     try {
       console.error("check connection on error", error);
       if (!this.client || !this.client.isConnected) {
-        await this.connectDb();
+        return this.connectDb().then(this.setCollection);
       }
     } catch (error) {
       console.error(error);
@@ -77,8 +77,8 @@ export class DataSourceMongoDb extends DataSourceMemory {
   async findDb(id) {
     const model = await this.collection.findOne({ _id: id });
     if (!model) {
-      await this.checkConnnection("document not found");
-      return null;
+      await this.checkConnection("document not found");
+      return model;
     }
     return super.save(id, this.hydrate(model));
   }

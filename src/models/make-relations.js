@@ -1,7 +1,5 @@
 "use strict";
 
-import Model from "./model";
-
 const relationType = {
   /**
    *
@@ -10,7 +8,7 @@ const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
-    const pk = Model.getId(model) || model.id;
+    const pk = model.id || model.getId();
     return ds.list({ [rel.foreignKey]: pk });
   },
   /**

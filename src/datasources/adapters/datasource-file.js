@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import Model from "../../models/model";
 import { DataSourceMemory } from "./datasource-memory";
 
 /**

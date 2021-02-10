@@ -111,7 +111,7 @@
  *    acl:accessControlList[]
  *  }
  * }} command - configure functions to execute when specified in a
- * URL parameter or query of the auto-generate REST API
+ * URL parameter or query of the auto-generated REST API
  */
 
 /**
@@ -146,12 +146,11 @@ import {
   importRemoteAdapters,
 } from "../services/federation-service";
 
-
 /**
  *
  * @param {Model} model
  */
-const createEvent = (model) => ({
+const createEvent = model => ({
   model: model,
 });
 
@@ -165,7 +164,7 @@ const updateEvent = ({ updated, changes }) => ({
   },
 });
 
-const deleteEvent = (model) => ({
+const deleteEvent = model => ({
   modelId: ModelFactory.getModelId(model),
   model: model,
 });
@@ -181,7 +180,7 @@ async function initModels(services, adapters) {
 
   console.log("models", models);
 
-  Object.values(models).forEach((model) => {
+  Object.values(models).forEach(model => {
     if (
       model.hasOwnProperty("modelName") &&
       model.hasOwnProperty("factory") &&

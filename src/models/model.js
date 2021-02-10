@@ -4,8 +4,8 @@
  * @typedef {Object} Model Domain entity/service object - conforms to `ModelSpecification`
  * @property {string} Symbol_id - immutable/private model instance uuid
  * @property {string} Symbol_modelName - immutable/private model name
- * @property {string} Symbol_createTime - immutable/private time of creation
- * @property {string} Symbol_updateTime - immutable/private time of last update
+ * @property {number} Symbol_createTime - immutable/private time of creation
+ * @property {number} Symbol_updateTime - immutable/private time of last update
  * @property {function(Model,*,number):Model} Symbol_validate - run validations for event
  * @property {function(Model,*):Model} Symbol_onUpdate - immutable/private update function
  * @property {function(Model)} Symbol_onDelete - immutable/private delete function
@@ -29,13 +29,14 @@
  * @property {function():Promise<any>} [relation] - when you configure a relation,
  * the framework generates a function that your code calls to run the query
  * @property {function(*):*} [command] - the framework will call any model method
- * you specify when passed as a parameter or query in an API call.
+ * or function you specify when passed as a parameter or query in an API call.
  * @property {function():string} getName - model name
  * @property {function():string} getId - model id
  * @property {function():import(".").ModelSpecification} getSpec - get ModelSpec
  * @property {function():string[]} getPortFlow - get history of port calls
  * @property {function():string} getName - model name
- * @property {function()} undo - back out transactions
+ * @property {function(string):{arg0:string,symbol:Symbol}} getKey
+ * @property {function():throws} undo - back out transactions
  */
 
 /**
@@ -85,6 +86,7 @@ const Model = (() => {
 
   /**
    * bitmask for identifying events
+   * @enum {number}
    */
   const eventMask = {
     update: 1, //  0001 Update
@@ -94,9 +96,7 @@ const Model = (() => {
 
   const defaultOnUpdate = (model, changes) => ({ ...model, ...changes });
 
-  const defaultOnDelete = model => {
-    return withTimestamp("deleteTime")(model);
-  };
+  const defaultOnDelete = model => withTimestamp("deleteTime")(model);
 
   const defaultValidate = (model, changes) => model;
 
@@ -105,7 +105,7 @@ const Model = (() => {
     return {
       ...model,
       ...changes,
-    }; 
+    };
   };
 
   /**
@@ -113,7 +113,7 @@ const Model = (() => {
    * @param {{
    *  model:Model,
    *  spec:import('./index').ModelSpecification
-   * }} param0
+   * }} modelInfo
    */
   function make(modelInfo) {
     const {
@@ -155,9 +155,9 @@ const Model = (() => {
       },
       /**
        * Run validation logic
-       * @param {*} changes
-       * @param {number} event
-       * @returns {Model}
+       * @param {*} changes - updated values
+       * @param {eventMask} event - event type, see `eventMask`
+       * @returns {Model} - updated model
        */
       [VALIDATE](changes, event) {
         return validate(this, changes, event);
@@ -169,7 +169,7 @@ const Model = (() => {
         compensate(this);
       },
       /**
-       * User code calls this to persist any updates it makes.
+       * User code calls this method to persist any updates it makes.
        * @param {*} changes
        */
       async update(changes, validate = false) {
@@ -230,7 +230,7 @@ const Model = (() => {
    */
   const Model = async modelInfo =>
     Promise.resolve(
-      // Call factory
+      // Call factory with data in request payload
       modelInfo.spec.factory(...modelInfo.args)
     ).then(model =>
       make({
@@ -316,6 +316,13 @@ const Model = (() => {
     delete: model => model[ONDELETE](),
 
     /**
+     * Get model name
+     * @param {Model} model
+     * @returns {string} model's name
+     */
+    getName: model => model[MODELNAME],
+
+    /**
      * Get private symbol for `key`
      * @param {string} key
      * @returns {Symbol} unique symbol
@@ -328,18 +335,6 @@ const Model = (() => {
      * @returns {string} model's ID
      */
     getId: model => model[ID],
-
-    /**
-     * Get model name
-     * @param {Model} model
-     * @returns {string} model's name
-     */
-    getName: model => model[MODELNAME],
-
-    /**
-     * History of port invocation
-     */
-    getPortFlow: model => model[PORTFLOW],
   };
 })();
 
