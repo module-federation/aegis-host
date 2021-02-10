@@ -48,13 +48,13 @@ A **model** is a domain entity/service that implements all or part of the servic
 
 One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An **adapter** implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
 
-A **service** provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like ports to adapters, the framework dynamically imports and binds services to adapters at runtime.
+A **service** provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
 
 ***
 
 ![Persistence](https://github.com/tysonrm/MicroLib/blob/master/wiki/persistence.png)
 ## Persistence
-The framework automatically persists domain models as JSON documents using the default adapter configured for the server instance. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
+The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
 A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
 
@@ -70,7 +70,7 @@ Ports can be instrumented for exceptions and timeouts to extend the framework’
 They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
 
 An adapter either implements an external interface or exposes an interface for external clients to consume.
-On the port side, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which should remain static in the face of environmental changes.
+On the port side, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to external or environmental aspects, like I/O protocols.
 
 Ports optionally specify a callback to process data received on the port before control is returned to the caller. The callback is passed as an argument to the port function. Ports can be configured to run on receipt of an event, API request, or called directly from code.
 
@@ -97,7 +97,7 @@ Service orchestration is built on the framework’s port-adapter implementation.
 
 Callbacks specified for ports in the _ModelSpec_ can process data received on a port before its output event is fired and the next port runs. If not specified, the framework nevertheless saves the port output to the model. Of course, you can implement your own event handlers or adapter logic to customize the flow.
 
-## Futher Reading
+## Further Reading
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
