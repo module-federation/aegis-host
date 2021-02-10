@@ -1,5 +1,6 @@
 ![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/wiki/microlib.png)
 # MicroLib
+Microservice Libraries
 
 ## Purpose
 Get rid of the bad, keep the good. Like any architecture, microservice-style architectures impose a number of tradeoffs. Chief among them is deployment independence versus operational complexity. Building the components of an application as a set of separate, networked executables provides the freedom to deploy at your own pace, but managing a distributed application is inherently more difficult than running a monolith. 
@@ -8,18 +9,18 @@ The implicit premise behind this tradeoff is expressed by [Fowler](https://marti
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While, in fact, there are, and have been, technologies to deploy libraries without redeploying the application (consider [OSGi](https://www.osgi.org/)), it seems their complexity and the level of effort required to use them outweighed any potential benefit. At least until now...
+While, in fact, there are, and have been, technologies to deploy libraries without redeploying the application they comprise (consider [OSGi](https://www.osgi.org/)), it seems their complexity, and the level of effort required to use them, has outweighed any potential benefit. At least until now...
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with only a few simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries running in the same process, or what might be loosely called, **microservice libraries**.
 
 ***
 
 ## Features 
-The main benefit of collocated services is clear. MicroLib goes further in organizing components according to hexagonal architecture, such that the boundaries and relations between federated components is clear and useful. Features include:
+The main benefit of collocated services is clear. MicroLib goes further in organizing components according to hexagonal architecture, such that the boundaries and relations between federated components are clear and useful. Features include:
 
-* Dynamic API generation for imported modules
-* Dynamic, independent persistence of imported modules
-* Dynamic port generation for imported modules
+* Dynamic API generation for federated modules
+* Dynamic, independent persistence of federated modules
+* Dynamic port generation for federated modules
 * Dynamic port-adapter binding
 * Dynamic adapter-service binding
 * Configuration-based service integration
@@ -40,14 +41,14 @@ The main benefit of collocated services is clear. MicroLib goes further in organ
 ![Components](https://github.com/tysonrm/MicroLib/blob/master/wiki/port-adapter.png)
 ## Components
 
-MicroLib uses [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/#building-blocks) to import remote modules into the host framework at runtime. 
+MicroLib uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/#building-blocks) to import remote modules over the network into the host framework at runtime. 
 MicroLib modules fall into three categories: **_model_**, **_adapter_** and **_service_**.
 
-A **_model_** is a domain entity/service that implements all or part of the service’s core logic. It also implements the MicroLib **_ModelSpecification_** interface. The interface has few requirements, but many options. The more options a model implements, the more framework capabilities it takes advantage of. 
+A **model** is a domain entity/service that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has only a few simple requirements, but many options. The more options a model implements, the more framework capabilities it takes advantage of. 
 
-One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An **_adapter_** implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
+One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An **adapter** implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
 
-A **_service_** provides an optional layer of abstraction for adapters and usually implements a client library. Services allow adapters to be generalized for common integration patterns, where a service represents a particular implementation of a pattern. Like ports to adapters, the framework dynamically imports and binds services to adapters at runtime.
+A **service** provides an optional layer of abstraction for adapters and usually implements a client library. Services allow adapters to be generalized for common integration patterns, whereas a service represents a particular implementation of a pattern. Like ports to adapters, the framework dynamically imports and binds services to adapters at runtime.
 
 ***
 
@@ -55,7 +56,7 @@ A **_service_** provides an optional layer of abstraction for adapters and usual
 ## Persistence
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server instance. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas, think GraphQL, through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. Apart from this, services cannot access one another’s data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter. 
 
 ***
 
@@ -77,13 +78,13 @@ Ports also have an undo callback for implementing compensating logic. The framew
 
 ### Local & Remote Events
 
-In addition to in-memory function calls, services can communicate locally the same way they do remotely: by publishing and subscribing to events. Using locally shared events, microservice libraries are virtually as decoupled as they would be running remotely.
+In addition to in-memory function calls and ports, services can communicate with one another locally the same way they do remotely: by publishing and subscribing to events. Using locally shared events, microservice libraries are virtually as decoupled as they would be running remotely.
 
 The framework provides a common broker for inter-service events and injects pub/sub functions into each model:
 
-`ModelA.listen(event, callback)`
+    ModelA.listen(event, callback)
 
-`ModelB.notify(event, data)`
+    ModelB.notify(event, data)
 
 Like any external integration, ports must be configured to integrate with remote event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
 
