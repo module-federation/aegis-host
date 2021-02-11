@@ -3,6 +3,7 @@
 import executeCommand from "./execute-command";
 import invokePort from "./invoke-port";
 import async from "../lib/async-error";
+import domainEvents from "../models/domain-events";
 
 /**
  * @typedef {Object} ModelParam
@@ -29,7 +30,10 @@ export default function editModelFactory({
   const eventName = models.getEventName(eventType, modelName);
   handlers.forEach(handler => observer.on(eventName, handler));
 
-  return async function editModel(id, changes, command) {
+  // Add an event that can be used to edit this model
+  observer.on(domainEvents.editModel(eventName), editModelLocal());
+
+  async function editModel(id, changes, command) {
     const model = await repository.find(id);
 
     if (!model) {
@@ -63,5 +67,13 @@ export default function editModelFactory({
     }
 
     return updated;
+  }
+
+  return editModel;
+}
+
+function editModelLocal() {
+  return async function (event) {
+    return editModel(event.id, event.changes, event.command);
   };
 }
