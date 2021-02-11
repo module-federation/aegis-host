@@ -7,7 +7,7 @@ import findModelFactory from "./find-model";
 import removeModelFactory from "./remove-model";
 import loadModelsFactory from "./load-models";
 import DataSourceFactory from "../datasources";
-import ObserverFactory from "../lib/observer";
+import ObserverFactory from "../models/observer";
 import ModelFactory from "../models";
 import handleEvents from "./handle-events";
 

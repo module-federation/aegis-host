@@ -41,7 +41,7 @@ function handleRestart(repository) {
  * @typedef {import('../models').Model} Model
  * @param {{
  *  models:import('../models/model-factory').ModelFactory,
- *  observer:import('../lib/observer').Observer,
+ *  observer:import('../models/observer').Observer,
  *  repository:import('../datasources/datasource').default,
  *  modelName:string
  * }} options

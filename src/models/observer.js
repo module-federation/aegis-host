@@ -1,6 +1,6 @@
 /**
- * @typedef {import('../models/event').Event} Event
- * @typedef {import('../models').Model} Model
+ * @typedef {import('./event').Event} Event
+ * @typedef {import('.').Model} Model
  */
 
 /**

@@ -12,7 +12,7 @@ import Event from "./event";
  */
 
 /**
- * @typedef {import('../lib/observer').Observer} Observer
+ * @typedef {import('./observer').Observer} Observer
  */
 
 /**
@@ -126,7 +126,7 @@ const ModelFactory = {
    * Call the factory function previously registered for `modelName`
    * @param {String} modelName - model's name
    * @param {*[]} args - input sent in the request
-   * @param {import('../lib/observer').Observer} observer - send & receive events
+   * @param {import('./observer').Observer} observer - send & receive events
    * @param {import('../datasources/datasource').default} datasource - persistence/cache
    * @returns {Promise<Readonly<Model>>} the model instance
    */

@@ -90,7 +90,7 @@ function getPortCallback(cb) {
  * Register an event handler that invokes the `port`.
  * @param {string} portName
  * @param {import('.').ports[portName]} portConf
- * @param {import("../lib/observer").Observer} observer
+ * @param {import("./observer").Observer} observer
  * @param {boolean} disabled
  * @returns {boolean} whether or not to remember this port
  * for compensation and restart
@@ -147,7 +147,7 @@ async function updatePortFlow(model, port, remember) {
  *
  * @param {import('./index').ports} ports - object containing domain interfaces
  * @param {object} adapters - object containing application adapters
- * @param {import('../lib/observer').Observer} observer
+ * @param {import('./observer').Observer} observer
  */
 export default function makePorts(ports, adapters, observer) {
   if (!ports || !adapters) {

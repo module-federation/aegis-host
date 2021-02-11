@@ -124,7 +124,7 @@ export const withDeserializers = (...funcs) => o => {
 
 /**
  * Subscribe to and emit application and domain events.
- * @param {import('../lib/observer').Observer} observer
+ * @param {import('./observer').Observer} observer
  */
 export const withObserver = observer => o => {
   return {

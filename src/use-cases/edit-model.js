@@ -10,7 +10,7 @@ import domainEvents from "../models/domain-events";
  * @property {String} modelName
  * @property {import('../models/model-factory').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository
- * @property {import('../lib/observer').Observer} observer
+ * @property {import('../models/observer').Observer} observer
  * @property {Function[]} handlers
  */
 

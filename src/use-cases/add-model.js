@@ -7,7 +7,7 @@ import domainEvents from "../models/domain-events";
  * @property {String} modelName - name of the domain model
  * @property {import('../models/model-factory').ModelFactory} models - model factory
  * @property {import('../datasources/datasource').default} repository - persistence service
- * @property {import('../lib/observer').Observer} observer - application events, propagated to domain
+ * @property {import('../models/observer').Observer} observer - application events, propagated to domain
  * @property {...Function} handlers - event handlers can be registered by the domain
  */
 

@@ -7,7 +7,7 @@ import fetchRelatedModels from "./fetch-related-models";
  * @typedef {Object} ModelParam
  * @property {String} modelName
  * @property {import('../datasources/datasource').default} repository
- * @property {import('../lib/observer').Observer} observer
+ * @property {import('../models/observer').Observer} observer
  * @property {import('../models/index').ModelFactory} models
  * @property {...Function} handlers
  */
