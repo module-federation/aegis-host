@@ -12,7 +12,7 @@ The implicit premise behind this tradeoff is expressed by [Fowler](https://marti
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While, in fact, there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems their complexity, and the level of effort required to use them, has outweighed any potential benefit. At least until now...
+While, in fact, there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems their complexity, and the level of effort required to use them, has outweighed their potential benefits. At least until now...
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with only a few simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries running in the same process, or what might be loosely called, **microservice libraries**.
 
@@ -20,7 +20,7 @@ With the introduction of module federation, it is possible to dynamically import
 
 ## Features
 
-The main benefit of collocated services is clear. MicroLib goes further in organizing components according to hexagonal architecture, such that the boundaries and relations between federated components are clear and useful. Features include:
+The goal of MicroLib is clear: to preserve autonomy while eliminating or containing the havoc it can wreak when implemented as a distributed system. No more "Death Stars". To this end, MicroLib organizes components according to hexagonal architecture, such that the boundaries and relations between federated components are clear and useful. Features include:
 
 - Dynamic API generation for federated modules
 - Dynamic, independent persistence of federated modules
