@@ -20,7 +20,7 @@ With the introduction of module federation, it is possible to dynamically import
 
 ## Features
 
-The goal of MicroLib is clear: to preserve autonomy while eliminating or containing the havoc it can wreak when implemented as a distributed system. No more "Death Stars". To this end, MicroLib organizes components according to hexagonal architecture, such that the boundaries and relations between federated components are clear and useful. Features include:
+The goal of MicroLib is to provide an alternative to distributed systems and the performance and operational challenges that come with them, while preserving the benefits of deployment independence. To this end, MicroLib organizes components according to hexagonal architecture, such that the boundaries of, and relations between, federated components are clear and useful. In this way, components can be collocated, yet uncoupled. Features include:
 
 - Dynamic API generation for federated modules
 - Dynamic, independent persistence of federated modules
@@ -46,7 +46,7 @@ The goal of MicroLib is clear: to preserve autonomy while eliminating or contain
 
 ## Components
 
-MicroLib uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/#building-blocks) to import remote modules over the network into the host framework at runtime.
+MicroLib uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime.
 MicroLib modules fall into three categories: **_model_**, **_adapter_** and **_service_**.
 
 A **model** is a domain entity/service that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has only a few simple requirements, but many options. The more options a model implements, the more framework capabilities it takes advantage of.
@@ -112,3 +112,5 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
 [Webpack 5 Module Federation: A game-changer in JavaScript architecture](https://medium.com/swlh/webpack-5-module-federation-a-game-changer-to-javascript-architecture-bcdd30e02669)
+
+[Microservice trade-offs](https://martinfowler.com/articles/microservice-trade-offs.html)

@@ -22,10 +22,6 @@ export class DataSourceMemory extends DataSource {
     return this.dataSource.get(id);
   }
 
-  handleEncryption(data) {
-    return data.map(d => ({ ...d, ...d.decrypt() }));
-  }
-
   /**
    * @override
    */
@@ -36,8 +32,6 @@ export class DataSourceMemory extends DataSource {
       const keys = Object.keys(query);
 
       if (keys.length > 0) {
-        //const decrypted = this.handleEncryption(values);
-
         return values.filter(v =>
           keys.every(k => (v[k] ? query[k] === v[k] : false))
         );
