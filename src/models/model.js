@@ -6,7 +6,7 @@
  * @property {string} Symbol_modelName - immutable/private model name
  * @property {number} Symbol_createTime - immutable/private time of creation
  * @property {number} Symbol_updateTime - immutable/private time of last update
- * @property {function(Model,*,number):Model} Symbol_validate - run validations for event
+ * @property {function(Model,*,number):Model} Symbol_validate - run validations, see `eventMask`
  * @property {function(Model,*):Model} Symbol_onUpdate - immutable/private update function
  * @property {function(Model)} Symbol_onDelete - immutable/private delete function
  * @property {function(Object)} update - use this function to update the model -
@@ -180,6 +180,14 @@ const Model = (() => {
         });
       },
       /**
+       * Search existing model instances, e.g. to determine uniqueness
+       * @param {{key1, keyN}} filter 
+       * @returns {Model[]}
+       */
+      async list(filter) {
+        return datasource.list(filter);
+      },
+      /**
        * Listen for domain events.
        * @param {string} eventName - name of event
        * @param {function(Model)} callback - called when event is heard
@@ -230,7 +238,7 @@ const Model = (() => {
    */
   const Model = async modelInfo =>
     Promise.resolve(
-      // Call factory with data in request payload
+      // Call factory with data from request payload
       modelInfo.spec.factory(...modelInfo.args)
     ).then(model =>
       make({
