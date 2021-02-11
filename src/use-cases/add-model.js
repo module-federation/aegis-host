@@ -1,5 +1,7 @@
 "use strict";
 
+import domainEvents from "../models/domain-events";
+
 /**
  * @typedef {Object} dependencies injected dependencies
  * @property {String} modelName - name of the domain model
@@ -25,7 +27,10 @@ export default function addModelFactory({
   const eventName = models.getEventName(eventType, modelName);
   handlers.forEach(handler => observer.on(eventName, handler));
 
-  return async function addModel(input) {
+  // Now add an event that a local model can invoke to create this model.
+  observer.on(domainEvents.addModel(eventName), addModel, false);
+
+  async function addModel(input) {
     const model = await models.createModel(
       observer,
       repository,
@@ -44,5 +49,7 @@ export default function addModelFactory({
 
     // Return the latest changes
     return repository.find(model.getId());
-  };
+  }
+
+  return addModel;
 }

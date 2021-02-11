@@ -26,8 +26,8 @@ export class DataSourceMongoDb extends DataSourceMemory {
     this.serializer = serializer;
 
     this.connectDb()
-      .then(this.setCollection)
-      .then(this.loadModels)
+      .then(() => this.setCollection())
+      .then(() => this.loadModels())
       .catch(e => console.log(e));
   }
 
@@ -67,7 +67,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
     try {
       console.error("check connection on error", error);
       if (!this.client || !this.client.isConnected) {
-        return this.connectDb().then(this.setCollection);
+        return this.connectDb().then(() => this.setCollection());
       }
     } catch (error) {
       console.error(error);
