@@ -6,5 +6,5 @@ import publishEvent from "../services/publish-event";
  * @param {import('../adapters/event-adapter').EventService} eventService
  */
 export default function handleEvents(observer) {
-  observer.on(".*", async event => publishEvent(event));
+  observer.on(/.*/, async event => publishEvent(event));
 }

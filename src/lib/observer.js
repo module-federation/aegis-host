@@ -78,9 +78,11 @@ class ObserverImpl extends Observer {
       ).catch(error => console.error(error));
     } else {
       return Promise.all(
-        [...this._handlers.values()]
+        [...this._handlers.keys()]
           .filter(key => key instanceof RegExp && key.test(eventName))
-          .map(handler => handler(eventData))
+          .map(key =>
+            this._handlers.get(key).forEach(handler => handler(eventData))
+          )
       ).catch(error => console.error(error));
     }
   }
