@@ -7,7 +7,7 @@
     "pnp": false
   },
   "repository": {
-    "url": "https://github.com/tysonrm/composable-microservices"
+    "url": "https://github.com/tysonrm/microlib"
   },
   "scripts": {
     "build": "npm run clean && webpack --config webpack.config.js",
