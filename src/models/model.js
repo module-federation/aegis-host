@@ -169,7 +169,7 @@ const Model = (() => {
         compensate(this);
       },
       /**
-       * User code calls this method to persist any updates it makes.
+       * User code calls this method to persist updates.
        * @param {*} changes
        */
       async update(changes, validate = false) {
@@ -181,11 +181,14 @@ const Model = (() => {
       },
       /**
        * Search existing model instances, e.g. to determine uniqueness
-       * @param {{key1, keyN}} filter 
+       * @param {{key1, keyN}} filter
        * @returns {Model[]}
        */
-      async list(filter) {
-        return datasource.list(filter);
+      listSync(filter) {
+        return datasource.listSync(filter);
+      },
+      async list(filter, cache) {
+        return datasource.list(filter, cache);
       },
       /**
        * Listen for domain events.

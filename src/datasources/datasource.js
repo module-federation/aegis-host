@@ -34,6 +34,8 @@ export default class DataSource {
     throw new Error("abstract method not implemented");
   }
 
+  listSync(query) {}
+
   async delete(id) {
     throw new Error("abstract method not implemented");
   }

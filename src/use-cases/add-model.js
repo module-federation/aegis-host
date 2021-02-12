@@ -27,7 +27,7 @@ export default function addModelFactory({
   const eventName = models.getEventName(eventType, modelName);
   handlers.forEach(handler => observer.on(eventName, handler));
 
-  // Now add an event that a local model can invoke to create this model.
+  // Now add an event that a local model can fire to call this.
   observer.on(domainEvents.addModel(eventName), addModel, false);
 
   async function addModel(input) {

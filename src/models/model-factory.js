@@ -222,7 +222,7 @@ const ModelFactory = {
    * History of port invocation
    * @param {Model} model
    */
-  getPortFlow: model => Model.getPortFlow(model),
+  getPortFlow: model => model.getPortFlow(),
 
   /**
    *

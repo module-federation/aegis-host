@@ -27,7 +27,7 @@ function getRetries(args) {
 }
 
 /**
- * Implements retry with recursive timeout.
+ * Implements recursive retry if port times out.
  * @param {{
  *  portName: string,
  *  portConf: import('../models').ports,
@@ -55,15 +55,15 @@ function setPortTimeout(options) {
     return noOp;
   }
 
-  // Retry the port
+  // Retry the port on timeout
   const timerId = setTimeout(async () => {
     // Notify interested parties
     model.emit(domainEvents.portTimeout(model), options);
 
-    // Invoke custom handler
+    // Invoke optional custom handler
     if (handler) handler(options);
 
-    // Keep track of retries by adding a new arg each time
+    // Keep track of retry attempts by expanding the array arg
     await model[portName](...timerArgs.nextArg);
 
     // Retry worked
@@ -105,11 +105,8 @@ function addPortListener(portName, portConf, observer, disabled) {
     observer.on(
       portConf.consumesEvent,
       async function (model) {
-        // Invoke this port and pass a callack
+        // Invoke this port
         const result = await async(model[portName](callback));
-        if (!result.ok) {
-          throw new Error(result.error);
-        }
       },
       false
     );
@@ -207,10 +204,6 @@ export default function makePorts(ports, adapters, observer) {
             if (timer.done()) {
               // Try to back out previous transactions.
               const result = await async(this.undo());
-
-              if (result.ok) {
-                console.log("undo: transactions rolled back.");
-              }
             }
           }
         },

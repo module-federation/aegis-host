@@ -17,7 +17,7 @@ export class Observer {
    * @param {Map<string, eventHandler[]>} eventHandlers
    */
   constructor(eventHandlers) {
-    this._handlers = eventHandlers;
+    this.handlers = eventHandlers;
   }
 
   /**
@@ -59,12 +59,13 @@ class ObserverImpl extends Observer {
     if (!eventName || typeof handler !== "function") {
       throw new Error("eventName or handler invalid");
     }
-    if (this._handlers.has(eventName)) {
+
+    if (this.handlers.has(eventName)) {
       if (allowMultiple) {
-        this._handlers.get(eventName).push(handler);
+        this.handlers.get(eventName).push(handler);
       }
     } else {
-      this._handlers.set(eventName, [handler]);
+      this.handlers.set(eventName, [handler]);
     }
   }
 
@@ -72,19 +73,19 @@ class ObserverImpl extends Observer {
    * @override
    */
   async notify(eventName, eventData) {
-    if (this._handlers.has(eventName)) {
+    if (this.handlers.has(eventName)) {
       return Promise.all(
-        this._handlers.get(eventName).map(handler => handler(eventData))
-      ).catch(error => console.error(error));
-    } else {
-      return Promise.all(
-        [...this._handlers.keys()]
-          .filter(key => key instanceof RegExp && key.test(eventName))
-          .map(key =>
-            this._handlers.get(key).forEach(handler => handler(eventData))
-          )
+        this.handlers.get(eventName).map(handler => handler(eventData))
       ).catch(error => console.error(error));
     }
+
+    return Promise.all(
+      [...this.handlers.keys()]
+        .filter(key => key instanceof RegExp && key.test(eventName))
+        .map(key =>
+          this.handlers.get(key).forEach(handler => handler(eventData))
+        )
+    ).catch(error => console.error(error));
   }
 }
 

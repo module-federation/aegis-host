@@ -1,23 +1,24 @@
-const path = require('path');
-const ContainerReferencePlugin = require('webpack').container.ContainerReferencePlugin;
-const fetchRemotes = require('./webpack/fetch-remotes');
-const remoteEntries = require('./webpack/remote-entries');
+const path = require("path");
+const ContainerReferencePlugin = require("webpack").container
+  .ContainerReferencePlugin;
+const fetchRemotes = require("./webpack/fetch-remotes");
+const remoteEntries = require("./webpack/remote-entries");
 
 module.exports = () => {
-  return new Promise((resolve, reject) => {
-    fetchRemotes(remoteEntries)
-      .then(remotes => resolve({
-        target: 'async-node',
-        mode: 'development',
-        devtool: 'source-map',
-        entry: ['@babel/polyfill', path.resolve(__dirname, 'src/index.js')],
+  return new Promise(resolve => {
+    fetchRemotes(remoteEntries).then(remotes =>
+      resolve({
+        target: "async-node",
+        mode: "development",
+        devtool: "source-map",
+        entry: ["@babel/polyfill", path.resolve(__dirname, "src/index.js")],
         output: {
-          publicPath: 'http://localhost:8070',
-          path: path.resolve(__dirname, 'dist'),
-          libraryTarget: 'commonjs2',
+          publicPath: "http://localhost:8070",
+          path: path.resolve(__dirname, "dist"),
+          libraryTarget: "commonjs2",
         },
         resolve: {
-          extensions: ['.js'],
+          extensions: [".js"],
         },
         module: {
           rules: [
@@ -25,20 +26,21 @@ module.exports = () => {
               test: /\.js?$/,
               exclude: /node_modules/,
               use: {
-                loader: 'babel-loader',
+                loader: "babel-loader",
                 options: {
-                  presets: ['@babel/preset-env'],
-                }
-              }
+                  presets: ["@babel/preset-env"],
+                },
+              },
             },
-          ]
+          ],
         },
         plugins: [
           new ContainerReferencePlugin({
-            remoteType: 'commonjs-module',
-            remotes: remotes
+            remoteType: "commonjs-module",
+            remotes: remotes,
           }),
-        ]
-      }));
+        ],
+      })
+    );
   });
-}
+};

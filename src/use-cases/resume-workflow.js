@@ -15,17 +15,11 @@ export default async function resumeWorkflow(list) {
         const history = model.getPortFlow();
         const ports = model.getSpec().ports;
 
-        console.debug({ func: resumeWorkflow.name, history });
-
         if (history?.length > 0) {
           const lastPort = history.length - 1;
           const nextPort = ports[history[lastPort]].producesEvent;
 
-          if (nextPort) {
-            if (nextPort === "workflowComplete") {
-              console.log("workflow complete");
-              return;
-            }
+          if (nextPort && nextPort !== "workflowComplete") {
             await model.emit(nextPort, model);
           }
         }
