@@ -31,18 +31,17 @@ export default function makeRelations(model, relations, dataSource) {
 
   return Object.keys(relations)
     .map(function (relation) {
+      const rel = relations[relation];
+      const ds = dataSource.getFactory().getDataSource(rel.modelName);
+
+      if (!ds || !relationType[rel.type]) {
+        console.warn("invalid relation", rel);
+        return;
+      }
+
       return {
         async [relation]() {
-          const rel = relations[relation];
-          const ds = dataSource.getFactory().getDataSource(rel.modelName);
-
-          if (!ds || !relationType[rel.type]) {
-            console.warn("invalid relation", rel);
-            return;
-          }
-
-          const result = await relationType[rel.type](model, ds, rel);
-          return result;
+          return relationType[rel.type](model, ds, rel);
         },
       };
     })

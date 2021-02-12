@@ -25,8 +25,6 @@ export default function findModelFactory({ repository } = {}) {
       throw new Error("no such id");
     }
 
-    console.log({ func: findModel.name, model, query });
-
     if (query?.relation) {
       const related = await fetchRelatedModels(model, query.relation);
       if (related) {

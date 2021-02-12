@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<style>
+  input {
+    font-size: medium;
+  }
+  label {
+    font-size: medium;
+  }
+  button {
+    font-size: medium;
+  }
+
+</style>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -46,7 +58,7 @@
         </td>
       </tr>
       <tr>
-    </table>
+        
     <textarea id="payload" style="height: 150px; width: 560px;">
 {
   "firstName":"Uncle",
@@ -60,7 +72,9 @@
    "shippingAddress":"123 Park Ave. NY, NY 45678",
    "billingAddress":"123 Park Ave. NY, NY 45678"
 }
+
     </textarea>          
+      </tr>
     <pre id="url"></pre>
     <button id="post" type="button" title="post">Post</button>
     <button id="patch" type="button" title="patch">Patch</button>
