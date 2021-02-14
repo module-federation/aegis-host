@@ -35,6 +35,7 @@
     "@babel/polyfill": "^7.11.5",
     "@babel/preset-env": "^7.11.0",
     "babel-loader": "^8.1.0",
+    "bootstrap": "^4.6.0",
     "esm": "^3.2.25",
     "express-cli": "0.0.1",
     "jsdoc": "^3.6.6",

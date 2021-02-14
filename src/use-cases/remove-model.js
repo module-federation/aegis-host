@@ -1,7 +1,5 @@
 "use strict";
 
-import log from "../lib/logger";
-
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName

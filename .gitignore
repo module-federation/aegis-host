@@ -67,3 +67,4 @@ src/models/out/styles/prettify-jsdoc.css
 src/models/out/styles/prettify-tomorrow.css
 .deleteme.swp
 src/models/.DS_Store
+.DS_Store

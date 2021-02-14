@@ -187,7 +187,7 @@ const Model = (() => {
       listSync(filter) {
         return datasource.listSync(filter);
       },
-      async list(filter, cache) {
+      async list(filter, cache = false) {
         return datasource.list(filter, cache);
       },
       /**
