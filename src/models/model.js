@@ -28,10 +28,11 @@
  * Optionally, an event is fired to trigger the next port function to run
  * @property {function():Promise<any>} [relation] - when you configure a relation,
  * the framework generates a function that your code calls to run the query
- * @property {function(*):*} [command] - the framework will call any model method
- * or function you specify when passed as a parameter or query in an API call.
+ * @property {function(*):*} [command] - the framework will call any authorized
+ * model method or function you specify when passed as a parameter or query in
+ * an API call.
  * @property {function():string} getName - model name
- * @property {function():string} getId - model id
+ * @property {function():string} getId - model instance id
  * @property {function():import(".").ModelSpecification} getSpec - get ModelSpec
  * @property {function():string[]} getPortFlow - get history of port calls
  * @property {function():string} getName - model name
@@ -63,7 +64,7 @@ import uuid from "../lib/uuid";
  * @namespace
  */
 const Model = (() => {
-  // Render immutable w/ local symbols
+  // Protect core properties from user mixins
   const ID = Symbol("id");
   const MODELNAME = Symbol("modelName");
   const CREATETIME = Symbol("createTime");
@@ -173,20 +174,27 @@ const Model = (() => {
        * @param {*} changes
        */
       async update(changes, validate = false) {
-        const valid = optionalValidation(this, changes, validate);
-        return datasource.save(valid[ID], {
-          ...valid,
+        const model = optionalValidation(this, changes, validate);
+        return datasource.save(model[ID], {
+          ...model,
           [UPDATETIME]: new Date().getTime(),
         });
       },
       /**
-       * Search existing model instances, e.g. to determine uniqueness
-       * @param {{key1, keyN}} filter
+       * Search existing model instances (synchronously).
+       * Only searches the cache. Does not search persistent storage.
+       * @param {{key1, keyN}} filter - list of required matching key-values
        * @returns {Model[]}
        */
       listSync(filter) {
         return datasource.listSync(filter);
       },
+      /**
+       * Search existing model instances (asynchronously).
+       * Searches cache first, then persistent storage if not found.
+       * @param {{key1, keyN}} filter
+       * @returns {Model[]}
+       */
       async list(filter, cache = false) {
         return datasource.list(filter, cache);
       },
@@ -208,18 +216,46 @@ const Model = (() => {
       async emit(eventName, eventData) {
         await observer.notify(eventName, eventData);
       },
+      /**
+       * Returns the `ModelSpecification` for this model.
+       * @returns {import(".").ModelSpecification}
+       */
       getSpec() {
         return modelInfo.spec;
       },
+      /**
+       * Returns the `ports` for this model.
+       * @returns {import("../models").ports}
+       */
+      getPorts() {
+        return modelInfo.spec.ports;
+      },
+      /**
+       * Returns the `modelName` of this model instance.
+       * @returns
+       */
       getName() {
         return this[MODELNAME];
       },
+      /**
+       * Returns the ID of this model instance.
+       * @returns {string}
+       */
       getId() {
         return this[ID];
       },
+      /**
+       * Return a list of ports invoked by this model instance, in LIFO order.
+       * @returns {string[]}
+       */
       getPortFlow() {
         return this[PORTFLOW];
       },
+      /**
+       * Get the `Symbol` key value for protected properties.
+       * @param {string} key - string representation of Symbol
+       * @returns {Symbol}
+       */
       getKey(key) {
         return keyMap[key];
       },
