@@ -15,7 +15,7 @@ import domainEvents from "../models/domain-events";
  */
 
 /**
- * @typedef editModel
+ * @typedef {function(ModelParam):Promise<import("../models").Model>} editModel
  * @param {ModelParam} param0
  * @returns {function():Promise<import("../models/model").Model>}
  */

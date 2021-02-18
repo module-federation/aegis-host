@@ -219,12 +219,6 @@ const ModelFactory = {
   },
 
   /**
-   * History of port invocation
-   * @param {Model} model
-   */
-  getPortFlow: model => model.getPortFlow(),
-
-  /**
    *
    * @param {Model} model - original model
    * @param {*} changes - object with updated properties

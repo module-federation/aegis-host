@@ -1,90 +1,89 @@
-<!DOCTYPE html>
-<style>
-  input {
-    font-size: medium;
-  }
-  label {
-    font-size: medium;
-  }
-  button {
-    font-size: medium;
-  }
-
-</style>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Call APIs</title>
-  </head>
-  <body>
-    <h3>Call APIs</h2>
-    <table>
-      <tr>
-        <td>
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+  <title>Call APIs</title>
+</head>
+
+<body>
+  <!-- Optional JavaScript; choose one of the two! -->
+
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+    crossorigin="anonymous"></script>
+
+  <!-- Option 2: Separate Popper and Bootstrap JS -->
+  <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
+    -->
+  <!-- <div class="container"> 
+   <-- Content here-->
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h1>
+          <small class="text-muted">Call APIs</small>
+        </h1>
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="model" placeholder="orders" value="orders">
           <label for="model">Model</label>
-        </td>
-        <td>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="modelId" placeholder="">
           <label for="modelId">Model ID</label>
-        </td>
-        <td>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="parameter" placeholder="submit">
           <label for="parameter">Parameter</label>
-        </td>
-        <td>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="query" placeholder="command=decrypt">
           <label for="query">Query</label>
-        </td>
-      </tr>
-      <tr >
-        <td>
-          <input id="model" value="orders"></input>
-        </td>
-        <td>
-          <input id="modelId"></input>
-        </td>
-        <td>
-          <input id="parameter"></input>
-        </td>
-        <td>
-          <input id="query"></input>
-        </td>
-      </tr>
-      <tr>
-        <td>
+        </div>
+
+        <div class="form-floating mb-3">
+          <textarea class="form-control" style="height: 100px; margin-top: 20px;" placeholder="" id="payload">
+            {
+              "firstName":"Uncle",
+              "lastName":"Bob",
+              "email":"bob@email.com",
+              "creditCardNumber":"378282246310005",
+              "shippingAddress":"123 Park Ave. NY, NY 45678",
+              "billingAddress":"123 Park Ave. NY, NY 45678",
+              "orderItems": [ 
+                { "itemId": "item1", "price": 329.95 },
+                { "itemId": "item2", "price": 59.00, "qty": 4 }
+              ]
+            }
+            </textarea>
           <label for="payload">Payload</label>
-        </td>
-      </tr>
-<tr>
-<td>
-    <textarea id="payload" style="height: 150px; width: 560px;">
-{
-  "firstName":"Uncle",
-  "lastName":"Bob",
-  "email":"bob@email.com",
-  "orderItems":[
-     {"itemId":"item1","price":92.05,"qty":2},
-     {"itemId":"item2","price":75.35}
-   ],
-   "creditCardNumber":"378282246310005",
-   "shippingAddress":"123 Park Ave. NY, NY 45678",
-   "billingAddress":"123 Park Ave. NY, NY 45678"
-}
-
-    </textarea>          
-    <pre id="url"></pre>
-  </td>
-     
-    </tr>
-    <tr>
-
-      <td>
-    <button id="post" type="button" title="post">Post</button>
-    <button id="patch" type="button" title="patch">Patch</button>
-    <button id="get" type="button" title="get">Get</button>
-    <button id="delete" type="button" title="delete">Delete</button>
-    <button id="clear" type="button" title="clear">Clear</button>
-    <pre id="messages" style="height: 400px; overflow: scroll"></pre>
-  </td>
-  </td>
-</table>
+        </div>
+        <button id="post" class="btn btn-primary" value="orders" title="post">Post</button>
+        <button id="patch" class="btn btn-primary" title="patch">Patch</button>
+        <button id="get" class="btn btn-primary" title="get">Get</button>
+        <button id="delete" class="btn btn-primary" title="delete">Delete</button>
+        <button id="clear" class="btn btn-primary" title="clear">Clear</button>
+      </div>
+      <div class="col-md-6">
+        <pre id="url" style="margin-top: 20px;"></pre>
+        <pre id="messages" style="height: 400px; overflow: scroll; margin-top: 20px"></pre>
+      </div>
+    </div>
     <script src="app.js"></script>
-  </body>
+</body>
+
 </html>

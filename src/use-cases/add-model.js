@@ -12,7 +12,7 @@ import domainEvents from "../models/domain-events";
  */
 
 /**
- * @typedef addModel
+ * @typedef {function(ModelParam):Promise<import("../models").Model>} addModel
  * @param {dependencies} param0
  * @returns {function():Promise<import('../models').Model>}
  */
@@ -27,7 +27,7 @@ export default function addModelFactory({
   const eventName = models.getEventName(eventType, modelName);
   handlers.forEach(handler => observer.on(eventName, handler));
 
-  // Now add an event that a local model can fire to call this.
+  // Add an event whose callback invokes this factory.
   observer.on(domainEvents.addModel(eventName), addModel, false);
 
   async function addModel(input) {

@@ -1,7 +1,7 @@
 import log from "../lib/logger";
 /**
  *
- * @param {import("../use-cases/edit-model").editModel}
+ * @param {import("../use-cases/edit-model").editModel} editModel
  */
 export default function patchModelFactory(editModel, hash) {
   return async function patchModel(httpRequest) {

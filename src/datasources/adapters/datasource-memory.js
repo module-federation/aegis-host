@@ -29,6 +29,11 @@ export class DataSourceMemory extends DataSource {
     return this.listSync(query);
   }
 
+  /**
+   * @override
+   * @param {{key1,keyN}} query
+   * @returns
+   */
   listSync(query) {
     const values = [...this.dataSource.values()];
 

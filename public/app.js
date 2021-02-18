@@ -21,7 +21,7 @@
     const id = document.getElementById("modelId").value;
     const param = document.getElementById("parameter").value;
     const query = document.getElementById("query").value;
-    let url = `api/${model}`;
+    let url = `api/${model}`; 
     if (id) url += `/${id}`;
     if (param) url += `/${param}`;
     if (query) url += `?${query}`;
@@ -62,8 +62,9 @@
   }
 
   postButton.onclick = function () {
-    fetch(getUrl(), {
-      method: "POST",
+    const method = "POST";
+    fetch(getUrl(method), {
+      method,
       body: document.getElementById("payload").value,
       headers: { "Content-Type": "application/json" },
     })
@@ -75,8 +76,9 @@
   };
 
   patchButton.onclick = function () {
-    fetch(getUrl(), {
-      method: "PATCH",
+    const method = "PATCH";
+    fetch(getUrl(method), {
+      method,
       body: document.getElementById("payload").value,
       headers: { "Content-Type": "application/json" },
     })
@@ -84,12 +86,12 @@
       .then(showMessage)
       .catch(function (err) {
         showMessage(err.message);
-      });
+      });q
   };
 
   getButton.onclick = function () {
     document.getElementById("parameter").value = "";
-    fetch(getUrl())
+    fetch(getUrl("GET"))
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -98,8 +100,9 @@
   };
 
   deleteButton.onclick = function () {
-    fetch(getUrl(), {
-      method: "DELETE",
+    const method = "DELETE";
+    fetch(getUrl(method), {
+      method,
       headers: { "Content-Type": "application/json" },
     })
       .then(handleResponse)
