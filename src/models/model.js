@@ -172,8 +172,9 @@ const Model = (() => {
       /**
        * User code calls this method to persist updates.
        * @param {*} changes
+       * @param {boolean} validate - defaults to `true`
        */
-      async update(changes, validate = false) {
+      async update(changes, validate = true) {
         const model = optionalValidation(this, changes, validate);
         return datasource.save(model[ID], {
           ...model,
@@ -267,6 +268,7 @@ const Model = (() => {
    * Pass the caller's input as arguments to the function. Then call
    * `make` to enrich the model with ports, relations, commands, user
    * mixins, etc.
+   *
    * @lends Model
    * @namespace
    * @class
@@ -286,7 +288,14 @@ const Model = (() => {
       })
     );
 
-  const validate = event => model => model[VALIDATE]({}, event);
+  const validate = event => model => {
+    console.debug({
+      desc: ">>>>>>>>>>>>>>>>>",
+      func: validate.name,
+      event: event & eventMask.create,
+    });
+    return model[VALIDATE]({}, event);
+  };
 
   // Create model instance
   const makeModel = asyncPipe(
@@ -339,8 +348,8 @@ const Model = (() => {
      * @returns {Model} updated model
      *
      */
-    update: function (model, edits) {
-      const valid = model[VALIDATE](edits, eventMask.update);
+    update: function (model, changes) {
+      const valid = model[VALIDATE](changes, eventMask.update);
       return {
         ...valid,
         [UPDATETIME]: new Date().getTime(),

@@ -4,9 +4,10 @@ import Serializer from "../lib/serializer";
 import resumeWorkflow from "./resume-workflow";
 
 /**
- * @param {function():import()} loadModel
- * @param {*} observer
- * @param {*} repository
+ * @param {function(import("../models").Model)} loadModel
+ * @param {import("../models/observer").Observer} observer
+ * @param {import("../datasources/datasource").default} repository
+ * @returns {function(Map<string,Model>|Model)}
  */
 function hydrateModels(loadModel, observer, repository) {
   return function (saved) {

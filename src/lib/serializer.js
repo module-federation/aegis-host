@@ -157,7 +157,7 @@ function findSerializer(key, value) {
  *  addSerializer:function(serializerType|serializerType[]):Serializer,
  *  serialize(object):string,
  *  deserialize(string):object
- * }} Serializer
+ * }} Serializer Control de/serialization
  */
 
 /**
@@ -166,7 +166,7 @@ function findSerializer(key, value) {
 const Serializer = {
   /**
    *
-   * @param {serializerType | serializerType[]} s
+   * @param {serializerType | serializerType[]}
    */
   addSerializer(s) {
     if (!s) return null;

@@ -1,5 +1,7 @@
 "use strict";
 
+import async from "../lib/async-error";
+
 /**
  * Check `portFlow` history and resume any workflow
  * that was running before we shut down.
@@ -20,7 +22,7 @@ export default async function resumeWorkflow(list) {
           const nextPort = ports[history[lastPort]].producesEvent;
 
           if (nextPort && nextPort !== "workflowComplete") {
-            await model.emit(nextPort, model);
+            await async(model.emit(nextPort, model));
           }
         }
       })

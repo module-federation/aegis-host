@@ -3,7 +3,6 @@
 /**
  * @typedef {import('../models').Model} Model
  */
-
 import * as adapters from "./adapters";
 
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
@@ -34,7 +33,7 @@ const DataSourceFactory = (() => {
   }
 
   function close() {
-    dataSources.forEach((ds) => ds.close());
+    dataSources.forEach(ds => ds.close());
   }
 
   return Object.freeze({

@@ -7,7 +7,9 @@ const url = process.env.MONGODB_URL || "mongodb://localhost:27017";
 const cacheSize = Number(process.env.CACHE_SIZE) || 300;
 
 /**
- * MongoDB adapter extends in-memory datasource to support caching
+ * MongoDB adapter extends in-memory datasource to support caching.
+ * The cache is always updated first, which allows the system to run
+ * even when the database is offline.
  */
 export class DataSourceMongoDb extends DataSourceMemory {
   constructor(datasource, factory, name) {
@@ -67,7 +69,9 @@ export class DataSourceMongoDb extends DataSourceMemory {
     try {
       console.error("check connection on error", error);
       if (!this.client || !this.client.isConnected) {
-        return this.connectDb().then(() => this.setCollection());
+        return this.connectDb()
+          .then(() => this.setCollection())
+          .then(() => this.flush());
       }
     } catch (error) {
       console.error(error);
@@ -84,8 +88,9 @@ export class DataSourceMongoDb extends DataSourceMemory {
   }
 
   /**
+   * Check the cache first.
    * @overrid
-   * @param {*} id
+   * @param {*} id - `Model.id`
    */
   async find(id) {
     try {
@@ -117,6 +122,10 @@ export class DataSourceMongoDb extends DataSourceMemory {
   }
 
   /**
+   * Save to the cache first, then the db.
+   * Wait for both functions to complete. We
+   * keep running even if the db is offline.
+   *
    * @override
    * @param {*} id
    * @param {*} data
@@ -132,13 +141,14 @@ export class DataSourceMongoDb extends DataSourceMemory {
 
   /**
    * @override
-   * @param {boolean} cached
+   * @param {{key1:string, keyN:string}} filter - e.g. http query
+   * @param {boolean} cached - use the cache if true, otherwise go to db.
    */
-  async list(query = null, cached = true) {
+  async list(filter = null, cached = true) {
     try {
       if (cached) {
         console.log("cache size", this.dataSource.size);
-        return super.list(query);
+        return super.list(filter);
       }
       return await this.collection.find().toArray();
     } catch (error) {
@@ -147,15 +157,21 @@ export class DataSourceMongoDb extends DataSourceMemory {
   }
 
   /**
+   * Delete from db, then cache.
+   * If db fails, keep it cached.
    *
    * @override
    * @param {*} id
    */
   async delete(id) {
-    await Promise.allSettled([
-      super.delete(id),
-      this.collection.deleteOne({ _id: id }),
-    ]).catch(error => this.checkConnection(error));
+    try {
+      await Promise.all([
+        this.collection.deleteOne({ _id: id }),
+        super.delete(id),
+      ]);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   /**
@@ -163,12 +179,10 @@ export class DataSourceMongoDb extends DataSourceMemory {
    */
   flush() {
     try {
-      this.dataSource
-        .values()
-        .reduce(
-          (data, model) => data.then(this.saveDb(model.getId())),
-          Promise.resolve()
-        );
+      [...this.dataSource.values()].reduce(
+        (data, model) => data.then(this.saveDb(model.getId())),
+        Promise.resolve()
+      );
     } catch (error) {
       console.error(error);
     }

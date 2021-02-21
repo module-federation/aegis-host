@@ -31,7 +31,7 @@ export default function editModelFactory({
   handlers.forEach(handler => observer.on(eventName, handler));
 
   // Add an event that can be used to edit this model
-  observer.on(domainEvents.editModel(eventName), editModelLocal());
+  observer.on(domainEvents.editModel(eventName), editModelHandler);
 
   async function editModel(id, changes, command) {
     const model = await repository.find(id);
@@ -69,11 +69,9 @@ export default function editModelFactory({
     return updated;
   }
 
-  return editModel;
-}
-
-function editModelLocal() {
-  return async function (event) {
+  async function editModelHandler(event) {
     return editModel(event.id, event.changes, event.command);
-  };
+  }
+
+  return editModel;
 }

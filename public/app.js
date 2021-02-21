@@ -10,6 +10,30 @@
   const queryText = document.querySelector("#query");
   const paramText = document.querySelector("#parameter");
 
+  function prettifyJson(json) {
+    if (typeof json !== "string") {
+      json = JSON.stringify(json, null, 2);
+    }
+    return json.replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+      function (match) {
+        let cls = "<span>";
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            cls = "<span class='text-warning'>";
+          } else {
+            cls = "<span>";
+          }
+        } else if (/true|false/.test(match)) {
+          cls = "<span class='text-light'>";
+        } else if (/null/.test(match)) {
+          cls = "<span class='text-info'>";
+        }
+        return cls + match + "</span>";
+      }
+    );
+  }
+
   function updateUrl(url) {
     document.getElementById(
       "url"
@@ -21,7 +45,7 @@
     const id = document.getElementById("modelId").value;
     const param = document.getElementById("parameter").value;
     const query = document.getElementById("query").value;
-    let url = `api/${model}`; 
+    let url = `api/${model}`;
     if (id) url += `/${id}`;
     if (param) url += `/${param}`;
     if (query) url += `?${query}`;
@@ -35,22 +59,19 @@
   paramText.onchange = getUrl;
 
   function showMessage(message) {
-    messages.textContent += `\n${message}`;
+    document.getElementById("jsonCode").innerHTML = prettifyJson(message);
     messages.scrollTop = messages.scrollHeight;
   }
 
-  function updateModelId(modelId) {
-    modelIdText.value = modelId;
+  function updateModelId(id) {
+    if (id) modelIdText.value = id;
   }
 
   function handleResponse(response) {
     try {
       return [200, 201, 400].includes(response.status)
         ? response.json().then(function (data) {
-            if (data.modelId) {
-              updateModelId(data.modelId);
-              getUrl();
-            }
+            updateModelId(data.modelId);
             return JSON.stringify(data, null, 2);
           })
         : Promise.reject(
@@ -62,9 +83,8 @@
   }
 
   postButton.onclick = function () {
-    const method = "POST";
-    fetch(getUrl(method), {
-      method,
+    fetch(getUrl(), {
+      method: "POST",
       body: document.getElementById("payload").value,
       headers: { "Content-Type": "application/json" },
     })
@@ -76,9 +96,8 @@
   };
 
   patchButton.onclick = function () {
-    const method = "PATCH";
-    fetch(getUrl(method), {
-      method,
+    fetch(getUrl(), {
+      method: "PATCH",
       body: document.getElementById("payload").value,
       headers: { "Content-Type": "application/json" },
     })
@@ -86,12 +105,13 @@
       .then(showMessage)
       .catch(function (err) {
         showMessage(err.message);
-      });q
+      });
+    q;
   };
 
   getButton.onclick = function () {
     document.getElementById("parameter").value = "";
-    fetch(getUrl("GET"))
+    fetch(getUrl())
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -100,9 +120,8 @@
   };
 
   deleteButton.onclick = function () {
-    const method = "DELETE";
-    fetch(getUrl(method), {
-      method,
+    fetch(getUrl(), {
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
     })
       .then(handleResponse)
@@ -113,6 +132,6 @@
   };
 
   clearButton.onclick = function () {
-    messages.textContent = "";
+    document.getElementById("jsonCode").innerHTML = "";
   };
 })();
