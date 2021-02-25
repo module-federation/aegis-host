@@ -13,7 +13,7 @@
   <title>MicroLib Domain Model APIs</title>
 </head>
 
-<body style="background-color:black">
+<body style="background-color:black" onload="populateModels">
   <!-- Optional JavaScript; choose one of the two! -->
 
   <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -22,61 +22,89 @@
     </script>
 
   <nav class="navbar navbar-dark">
-    <div class="container-fluid">
+    <div class="container">
       <a class="navbar-brand" href="#">
         <img src="microlib.png" alt="MicroLib" width="30" height="24">
         <span class="navbar-brand mb-0 h1 text-warning">MicroLib</span>
+        <span class="navbar-brand text-muted mb-0">Domain Model API</span>
       </a>
     </div>
   </nav>
 
   <div class="container">
-    <div class="row row-cols-2">
-      <div class="col">
-        <div class="form-floatingc mb-3">
-          <input type="text" class="form-control bg-dark text-white" id="model" placeholder="orders">
+    <div class="row">
+      <div class="col-md-5">
+        <!--div class="form-floating mb-3">
+          <input type="text" class="form-control bg-dark text-white" id="model" placeholder="orders" value="orders">
           <label class="text-white" for="model">Model</label>
+        </div-->
+
+        <!--select class="form-select" aria-label="Default select example">
+          <option selected>Open this select menu</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select-->
+
+        <div class="form-floating mb-3">
+          <input class="form-control bg-dark text-white" list="datalistOptions" id="model"
+            placeholder="Type to search...">
+          <datalist id="datalistOptions">
+            <option value="orders">
+            <option value="customers">
+            <option value="users">
+          </datalist>
+          <label for="model" class="form-label text-white">Model</label>
         </div>
 
         <div class="form-floating mb-3">
           <input type="text" class="form-control bg-dark text-white" id="modelId" placeholder="id">
-          <label for="modelId" class="text-white">Model ID</label>
+          <label for="modelId" class="form-label text-white">Model ID</label>
         </div>
 
         <div class="form-floating mb-3">
           <input type="text" class="form-control bg-dark text-white" id="parameter" placeholder="approve">
-          <label for="parameter" class="text-white">Parameter</label>
+          <label for="parameter" class="form-label accordion-body">Parameter</label>
         </div>
 
         <div class="form-floating mb-3">
           <input type="text" class="form-control bg-dark text-white" id="query" placeholder="command=decrypt">
-          <label for="query" class="text-white">Query</label>
+          <label for="query" class="form-label text-white">Query</label>
         </div>
 
         <div class="form-floating mb-3">
-          <textarea class="form-control bg-dark text-white" style="height: 140px" placeholder="{}"
-            id="payload"></textarea>
+          <textarea class="form-control bg-dark text-white" style="height: 100px" placeholder="{}" id="payload">
+            {
+              "firstName":"Uncle",
+              "lastName":"Bob",
+              "email":"bob@email.com",
+              "creditCardNumber":"378282246310005",
+              "shippingAddress":"123 Park Ave. NY, NY 45678",
+              "billingAddress":"123 Park Ave. NY, NY 45678",
+              "orderItems": [ 
+                { "itemId": "item1", "price": 329.95 },
+                { "itemId": "item2", "price": 59.00, "qty": 4 }
+              ]
+            }</textarea>
           <label for="payload" class="text-white">Payload</label>
         </div>
 
-        <button id="post" class="btn btn-outline-light" value="orders" title="post">Post</button>
-        <button id="patch" class="btn btn-outline-light" title="patch">Patch</button>
-        <button id="get" class="btn btn-outline-light" title="get">Get</button>
-        <button id="delete" class="btn btn-outline-light" title="delete">Delete</button>
-        <button id="clear" class="btn btn-outline-light" title="clear">Clear</button>
+        <div class="mb-3">
+          <button id="post" class="btn btn-outline-light" value="orders" title="post">Post</button>
+          <button id="patch" class="btn btn-outline-light" title="patch">Patch</button>
+          <button id="get" class="btn btn-outline-light" title="get">Get</button>
+          <button id="delete" class="btn btn-outline-light" title="delete">Delete</button>
+          <button id="clear" class="btn btn-outline-light" title="clear">Clear</button>
+        </div>
       </div>
-    </div>
-    <div>
+
+      <div class="col-md-7">
+        <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
+        <pre id="messages" class="text-light mb-3 overflow-scroll"
+          style="height: 400px; "><code id="jsonCode"></code></pre>
+      </div>
 
     </div>
-
-    <div class="col">
-      <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
-      <pre id="messages" class="text-light mb-3 overflow-scroll"
-        style="height: 440px; "><code id="jsonCode"></code></pre>
-    </div>
-
-  </div>
   </div>
   <script src="app.js"></script>
 </body>

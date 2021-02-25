@@ -10,6 +10,7 @@ import {
   getModelsById,
   deleteModels,
   initCache,
+  getConfigs,
 } from "./controllers";
 
 import { initRemotes } from "./models";
@@ -25,6 +26,7 @@ const Server = (() => {
   const ENDPOINT = e => `${API_ROOT}/${e}`;
   const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
   const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
+  const ENDPOINTCFG = () => `${API_ROOT}/config`;
 
   app.use(bodyParser.json());
   app.use(express.static("public"));

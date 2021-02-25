@@ -59,7 +59,9 @@
   paramText.onchange = getUrl;
 
   function showMessage(message) {
-    document.getElementById("jsonCode").innerHTML = prettifyJson(message);
+    document.getElementById("jsonCode").innerHTML += `\n${prettifyJson(
+      message
+    )}`;
     messages.scrollTop = messages.scrollHeight;
   }
 

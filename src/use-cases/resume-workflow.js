@@ -26,6 +26,6 @@ export default async function resumeWorkflow(list) {
           }
         }
       })
-    );
+    ).catch(error => console.error(error));
   }
 }
