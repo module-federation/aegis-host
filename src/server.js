@@ -10,7 +10,7 @@ import {
   getModelsById,
   deleteModels,
   initCache,
-  getConfigs,
+  getConfig,
 } from "./controllers";
 
 import { initRemotes } from "./models";
@@ -26,7 +26,6 @@ const Server = (() => {
   const ENDPOINT = e => `${API_ROOT}/${e}`;
   const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
   const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
-  const ENDPOINTCFG = () => `${API_ROOT}/config`;
 
   app.use(bodyParser.json());
   app.use(express.static("public"));
@@ -53,6 +52,7 @@ const Server = (() => {
       make(ENDPOINTID, app, "patch", patchModels);
       make(ENDPOINTCMD, app, "patch", patchModels);
       make(ENDPOINTID, app, "delete", deleteModels);
+      app.get(ENDPOINT("config"), http(getConfig()));
 
       console.timeEnd(label);
 

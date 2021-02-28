@@ -1,7 +1,6 @@
 import log from "../lib/logger";
 
 /**
- *
  * @param {import("../use-cases/find-model").findModel} findModel
  */
 export default function getModelByIdFactory(findModel) {
@@ -14,9 +13,9 @@ export default function getModelByIdFactory(findModel) {
       if (httpRequest.headers["Referer"]) {
         source.referrer = httpRequest.headers["Referer"];
       }
-      log(source);
       const id = httpRequest.params.id;
       const query = httpRequest.query;
+      log({ source, id, query });
 
       const model = await findModel(id, query);
 

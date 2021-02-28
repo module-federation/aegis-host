@@ -9,6 +9,7 @@
   const modelIdText = document.querySelector("#modelId");
   const queryText = document.querySelector("#query");
   const paramText = document.querySelector("#parameter");
+  const model = document.querySelector(".model");
 
   function prettifyJson(json) {
     if (typeof json !== "string") {

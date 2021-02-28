@@ -1,7 +1,7 @@
 import log from "../lib/logger";
 
-export default function getConfigsFactory(listConfigs) {
-  return async function getConfigs(httpRequest) {
+export default function getConfigFactory(listConfigs) {
+  return async function getConfig(httpRequest) {
     log({ function: "getConfigs" });
     try {
       const { source = {} } = httpRequest.body;

@@ -13,8 +13,7 @@
   <title>MicroLib Domain Model APIs</title>
 </head>
 
-<body style="background-color:black" onload="populateModels">
-  <!-- Optional JavaScript; choose one of the two! -->
+<body style="background-color:black" onload="populateModels()">
 
   <!-- Option 1: Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
@@ -34,27 +33,11 @@
   <div class="container">
     <div class="row">
       <div class="col-md-5">
-        <!--div class="form-floating mb-3">
-          <input type="text" class="form-control bg-dark text-white" id="model" placeholder="orders" value="orders">
-          <label class="text-white" for="model">Model</label>
-        </div-->
-
-        <!--select class="form-select" aria-label="Default select example">
-          <option selected>Open this select menu</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
-        </select-->
 
         <div class="form-floating mb-3">
-          <input class="form-control bg-dark text-white" list="datalistOptions" id="model"
-            placeholder="Type to search...">
-          <datalist id="datalistOptions">
-            <option value="orders">
-            <option value="customers">
-            <option value="users">
-          </datalist>
+          <input class="form-control bg-dark text-white" id="model" list="modelList" placeholder="Type to search...">
           <label for="model" class="form-label text-white">Model</label>
+          <datalist id="modelList"></datalist>
         </div>
 
         <div class="form-floating mb-3">
@@ -64,7 +47,7 @@
 
         <div class="form-floating mb-3">
           <input type="text" class="form-control bg-dark text-white" id="parameter" placeholder="approve">
-          <label for="parameter" class="form-label accordion-body">Parameter</label>
+          <label for="parameter" class="form-label text-white">Parameter</label>
         </div>
 
         <div class="form-floating mb-3">
@@ -90,7 +73,7 @@
         </div>
 
         <div class="mb-3">
-          <button id="post" class="btn btn-outline-light" value="orders" title="post">Post</button>
+          <button id="post" class="btn btn-outline-light" title="post">Post</button>
           <button id="patch" class="btn btn-outline-light" title="patch">Patch</button>
           <button id="get" class="btn btn-outline-light" title="get">Get</button>
           <button id="delete" class="btn btn-outline-light" title="delete">Delete</button>
@@ -101,12 +84,26 @@
       <div class="col-md-7">
         <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
         <pre id="messages" class="text-light mb-3 overflow-scroll"
-          style="height: 400px; "><code id="jsonCode"></code></pre>
+          style="height: 420px; "><code id="jsonCode" class="line-nowrap"></code></pre>
       </div>
 
     </div>
   </div>
+  
   <script src="app.js"></script>
+
+  <script>
+    const modelList = document.getElementById("modelList");
+    function populateModels() {
+      fetch("api/config")
+        .then(data => data.json())
+        .then(models => models.forEach(
+          m => modelList.appendChild(new Option(m.endpoint))
+        ))
+        .catch(e => alert(e));
+    }
+  </script>
+
 </body>
 
 </html>

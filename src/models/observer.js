@@ -8,6 +8,10 @@
  * @param {Event | Model | *} eventData
  */
 
+const handleError = error => {
+  console.error({ file: __filename, error });
+};
+
 /**
  * Abstract observer
  */
@@ -29,6 +33,7 @@ export class Observer {
   on(eventName, handler, allowMultiple = true) {
     throw new Error("unimplemented abstract method");
   }
+
   /**
    * Fire event `eventName` and pass `eventData` to listeners.
    * @param {String} eventName
@@ -76,7 +81,7 @@ class ObserverImpl extends Observer {
     if (this.handlers.has(eventName)) {
       return Promise.all(
         this.handlers.get(eventName).map(handler => handler(eventData))
-      ).catch(error => console.error(error));
+      ).catch(handleError);
     }
 
     return Promise.all(
@@ -85,7 +90,7 @@ class ObserverImpl extends Observer {
         .map(key =>
           this.handlers.get(key).forEach(handler => handler(eventData))
         )
-    ).catch(error => console.error(error));
+    ).catch(handleError);
   }
 }
 

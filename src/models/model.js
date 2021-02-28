@@ -288,14 +288,7 @@ const Model = (() => {
       })
     );
 
-  const validate = event => model => {
-    console.debug({
-      desc: ">>>>>>>>>>>>>>>>>",
-      func: validate.name,
-      event: event & eventMask.create,
-    });
-    return model[VALIDATE]({}, event);
-  };
+  const validate = event => model => model[VALIDATE]({}, event);
 
   // Create model instance
   const makeModel = asyncPipe(

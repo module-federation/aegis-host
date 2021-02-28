@@ -13,9 +13,13 @@ import fetchRelatedModels from "./fetch-related-models";
  */
 
 /**
- * @typedef findModel
+ * @callback findModel
+ * @param {string} id
+ * @param {{key1:string,keyN:string}} query
+ * @returns {Promise<import("../models/model").Model>}
+ *
  * @param {ModelParam} param0
- * @returns {function(id:string, {query:string})}
+ * @returns {findModel}
  */
 export default function findModelFactory({ repository } = {}) {
   return async function findModel(id, query) {

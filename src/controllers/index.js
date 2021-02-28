@@ -14,7 +14,7 @@ import patchModelFactory from "./patch-model";
 import getModelFactory from "./get-model";
 import getModelByIdFactory from "./get-model-by-id";
 import deleteModelFactory from "./delete-model";
-import getConfigsFactory from "./get-configs";
+import getConfigFactory from "./get-config";
 import hash from "../lib/hash";
 
 function make(useCases, controllerFactory) {
@@ -29,7 +29,7 @@ export const patchModels = () => make(editModels, patchModelFactory);
 export const getModels = () => make(listModels, getModelFactory);
 export const getModelsById = () => make(findModels, getModelByIdFactory);
 export const deleteModels = () => make(removeModels, deleteModelFactory);
-export const getConfigs = (app, path) => getConfigsFactory(listConfigs);
+export const getConfig = () => getConfigFactory(listConfigs());
 
 export const initCache = () => {
   const models = loadModels();

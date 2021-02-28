@@ -68,3 +68,7 @@ src/models/out/styles/prettify-tomorrow.css
 .deleteme.swp
 src/models/.DS_Store
 .DS_Store
+public/dynamic-select.html
+public/dynamic.html
+.DS_Store
+.DS_Store
