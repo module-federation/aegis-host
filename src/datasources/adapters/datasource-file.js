@@ -44,7 +44,7 @@ export class DataSourceFile extends DataSourceMemory {
   writeFile(async = true) {
     const dataStr = JSON.stringify([...this.dataSource], this.replace);
     if (async) {
-      fs.writeFile(this.file, dataStr, err => console.error(err));
+      fs.writeFile(this.file, dataStr, () => void 0);
     } else {
       fs.writeFileSync(this.file, dataStr);
     }

@@ -5,9 +5,14 @@
 
 /**
  * @callback eventHandler
- * @param {Event | Model | *} eventData
+ * @param {Event | Model | {eventName:string, Model}} eventData
+ * @returns {Promise<void>}
  */
 
+/**
+ *
+ * @param {Error} error
+ */
 const handleError = error => {
   console.error({ file: __filename, error });
 };
@@ -18,7 +23,7 @@ const handleError = error => {
 export class Observer {
   /**
    *
-   * @param {Map<string, eventHandler[]>} eventHandlers
+   * @param {Map<string | RegExp, eventHandler[]>} eventHandlers
    */
   constructor(eventHandlers) {
     this.handlers = eventHandlers;
@@ -58,7 +63,9 @@ class ObserverImpl extends Observer {
 
   /**
    * @override
-   *
+   * @param {string | RegExp} eventName
+   * @param {eventHandler} handler
+   * @param {boolean} [allowMultiple]
    */
   on(eventName, handler, allowMultiple = true) {
     if (!eventName || typeof handler !== "function") {
@@ -79,23 +86,20 @@ class ObserverImpl extends Observer {
    */
   async notify(eventName, eventData) {
     if (this.handlers.has(eventName)) {
-      return Promise.all(
+      await Promise.allSettled(
         this.handlers.get(eventName).map(handler => handler(eventData))
       ).catch(handleError);
     }
 
-    return Promise.all(
-      [...this.handlers.keys()]
-        .filter(key => key instanceof RegExp && key.test(eventName))
-        .map(key =>
-          this.handlers.get(key).forEach(handler => handler(eventData))
-        )
+    return Promise.allSettled(
+      [...this.handlers]
+        .filter(([k, v]) => k instanceof RegExp && k.test(eventName))
+        .map(([k, v]) => v.map(f => f(eventData)))
     ).catch(handleError);
   }
 }
 
 /**
- * Observer is a singleton
  */
 const ObserverFactory = (() => {
   let instance;
