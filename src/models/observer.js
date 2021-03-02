@@ -85,17 +85,21 @@ class ObserverImpl extends Observer {
    * @override
    */
   async notify(eventName, eventData) {
-    if (this.handlers.has(eventName)) {
-      await Promise.allSettled(
-        this.handlers.get(eventName).map(handler => handler(eventData))
-      ).catch(handleError);
-    }
+    try {
+      if (this.handlers.has(eventName)) {
+        await Promise.allSettled(
+          this.handlers.get(eventName).map(handler => handler(eventData))
+        );
+      }
 
-    return Promise.allSettled(
-      [...this.handlers]
-        .filter(([k, v]) => k instanceof RegExp && k.test(eventName))
-        .map(([k, v]) => v.map(f => f(eventData)))
-    ).catch(handleError);
+      await Promise.allSettled(
+        [...this.handlers]
+          .filter(([k, v]) => k instanceof RegExp && k.test(eventName))
+          .map(([k, v]) => v.map(f => f(eventData)))
+      );
+    } catch (error) {
+      handleError(error);
+    }
   }
 }
 

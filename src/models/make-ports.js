@@ -36,7 +36,7 @@ function getRetries(args) {
 function setPortTimeout(options) {
   const { portConf, portName, model, args } = options;
   const handler = portConf.timeoutCallback;
-  const noTimer = portConf.timeout === 0 ? true : false;
+  const noTimer = portConf.timeout === 0;
   const timeout = (portConf.timeout || TIMEOUT_SECONDS) * 1000;
   const maxRetry = portConf.maxRetry || MAX_RETRY;
   const timerArgs = getRetries(args);
@@ -68,7 +68,7 @@ function setPortTimeout(options) {
     await model[portName](...timerArgs.nextArg);
 
     // Retry worked
-    const retyWorked = domainEvents.portRetryWorked(model);
+    const retryWorked = domainEvents.portRetryWorked(model);
     model.emit(retryWorked, { eventName: retryWorked, options });
   }, timeout);
 
@@ -162,7 +162,7 @@ export default function makePorts(ports, adapters, observer) {
       const disabled = portConf.disabled || !adapters[port];
 
       // Listen for event that will invoke this port
-      const recordPort = addPortListener(
+      const rememberPort = addPortListener(
         portName,
         portConf,
         observer,
@@ -193,10 +193,10 @@ export default function makePorts(ports, adapters, observer) {
             timer.stopTimer();
 
             // Remember what ports we called for undo and restart
-            const updated = await updatePortFlow(model, port, recordPort);
+            const updated = await updatePortFlow(model, port, rememberPort);
 
             // Signal the next task to run, unless undo is running
-            if (!updated.compensate && recordPort) {
+            if (!updated.compensate && rememberPort) {
               this.emit(portConf.producesEvent, {
                 eventName: portConf.producesEvent,
                 model: updated,
@@ -205,7 +205,7 @@ export default function makePorts(ports, adapters, observer) {
 
             return updated;
           } catch (error) {
-            console.error({ func: makePorts.name, port, args, error });
+            console.error({ file: __filename, func: port, args, error });
 
             // Is the timer still running?
             if (timer.done()) {
