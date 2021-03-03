@@ -2,7 +2,6 @@ node_modules
 dist
 .vscode
 .prettierrc.json
-package-lock.json
 *.cpuprofile
 webpack/remoteEntry_js_localhost_8060_.js
 webpack/remoteEntry_js_localhost_8060_fedmonserv_.js
