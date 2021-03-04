@@ -41,13 +41,9 @@ export class DataSourceFile extends DataSourceMemory {
     return value;
   }
 
-  writeFile(async = true) {
+  writeFile() {
     const dataStr = JSON.stringify([...this.dataSource], this.replace);
-    if (async) {
-      fs.writeFile(this.file, dataStr, () => void 0);
-    } else {
-      fs.writeFileSync(this.file, dataStr);
-    }
+    fs.writeFileSync(this.file, dataStr);
   }
 
   /**
@@ -84,6 +80,6 @@ export class DataSourceFile extends DataSourceMemory {
   }
 
   close() {
-    this.writeFile(false);
+    this.writeFile();
   }
 }
