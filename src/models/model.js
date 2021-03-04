@@ -101,7 +101,7 @@ const Model = (() => {
 
   const defaultValidate = (model, changes) => model;
 
-  const optionalValidation = (model, changes, option = false) => {
+  const optionalValidation = (model, changes, option = true) => {
     if (option) return model[VALIDATE](changes, eventMask.update);
     return {
       ...model,
@@ -206,7 +206,7 @@ const Model = (() => {
        * @param {boolean} [multi] - allow multiple listeners for event,
        * defaults to `true`
        */
-      addListener(eventName, callback, multi) {
+      addListener(eventName, callback, multi = true) {
         observer.on(eventName, callback, multi);
       },
       /**

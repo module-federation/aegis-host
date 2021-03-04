@@ -5,11 +5,11 @@
   const getButton = document.querySelector("#get");
   const deleteButton = document.querySelector("#delete");
   const clearButton = document.querySelector("#clear");
-  const modelText = document.querySelector("#model");
-  const modelIdText = document.querySelector("#modelId");
-  const queryText = document.querySelector("#query");
-  const paramText = document.querySelector("#parameter");
-  const model = document.querySelector(".model");
+  const modelInput = document.querySelector("#model");
+  const modelIdInput = document.querySelector("#modelId");
+  const queryInput = document.querySelector("#query");
+  const paramInput = document.querySelector("#parameter");
+  const copyButton = document.querySelector("#copyButton");
 
   function prettifyJson(json) {
     if (typeof json !== "string") {
@@ -29,13 +29,15 @@
           cls = "<span class='text-light'>";
         } else if (/null/.test(match)) {
           cls = "<span class='text-info'>";
+        } else if (/modelId/.test(match)) {
+          cls = "<span class='text-decoration-underline'>";
         }
         return cls + match + "</span>";
       }
     );
   }
 
-  function updateUrl(url) {
+  function displayUrl(url) {
     document.getElementById(
       "url"
     ).textContent = `http://${location.host}/${url}`;
@@ -50,14 +52,14 @@
     if (id) url += `/${id}`;
     if (param) url += `/${param}`;
     if (query) url += `?${query}`;
-    updateUrl(url);
+    displayUrl(url);
     return url;
   }
 
-  modelText.onchange = getUrl;
-  modelIdText.onchange = getUrl;
-  queryText.onchange = getUrl;
-  paramText.onchange = getUrl;
+  modelInput.onchange = getUrl;
+  modelIdInput.onchange = getUrl;
+  queryInput.onchange = getUrl;
+  paramInput.onchange = getUrl;
 
   function showMessage(message) {
     document.getElementById("jsonCode").innerHTML += `\n${prettifyJson(
@@ -67,7 +69,7 @@
   }
 
   function updateModelId(id) {
-    if (id) modelIdText.value = id;
+    if (id) modelIdInput.value = id;
   }
 
   function handleResponse(response) {
@@ -109,7 +111,6 @@
       .catch(function (err) {
         showMessage(err.message);
       });
-    q;
   };
 
   getButton.onclick = function () {
@@ -137,4 +138,19 @@
   clearButton.onclick = function () {
     document.getElementById("jsonCode").innerHTML = "";
   };
+
+  copyButton.addEventListener("click", function () {
+    modelIdInput.select();
+    document.execCommand("copy");
+  });
+
+  window.addEventListener("load", function () {
+    const modelList = document.getElementById("modelList");
+    fetch("api/config")
+      .then(data => data.json())
+      .then(models =>
+        models.forEach(m => modelList.appendChild(new Option(m.endpoint)))
+      )
+      .catch(e => alert(e));
+  });
 })();

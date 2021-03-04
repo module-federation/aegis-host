@@ -14,7 +14,7 @@
   <title>MicroLib Domain Model APIs</title>
 </head>
 
-<body style="background-color:black" onload="populateModels()">
+<body style="background-color:black">
 
   <!-- Option 1: Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
@@ -41,9 +41,10 @@
           <datalist id="modelList"></datalist>
         </div>
 
-        <div class="form-floating mb-3">
-          <input type="text" class="form-control bg-dark text-white" id="modelId" placeholder="id">
+        <div class="form-floating mb-3 input-group">
+          <input class="form-control bg-dark text-white" id="modelId" placeholder="Model ID">
           <label for="modelId" class="form-label text-white">Model ID</label>
+          <button class="btn btn-outline-light" type="button" id="copyButton">Copy</button>
         </div>
 
         <div class="form-floating mb-3">
@@ -96,26 +97,12 @@
       <div class="col-md-7">
         <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
         <pre id="messages" class="text-light mb-3 overflow-scroll"
-          style="height: 420px; "><code id="jsonCode" class="line-nowrap"></code></pre>
+          style="height: 410px; "><code id="jsonCode" class="line-nowrap"></code></pre>
       </div>
 
     </div>
   </div>
-
   <script src="app.js"></script>
-
-  <script>
-    const modelList = document.getElementById("modelList");
-    function populateModels() {
-      fetch("api/config")
-        .then(data => data.json())
-        .then(models => models.forEach(
-          m => modelList.appendChild(new Option(m.endpoint))
-        ))
-        .catch(e => alert(e));
-    }
-  </script>
-
 </body>
 
 </html>
