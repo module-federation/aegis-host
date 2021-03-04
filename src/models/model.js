@@ -137,7 +137,7 @@ const Model = (() => {
       // Optional mixins
       ...compose(...mixins)(model),
       // Generate functions to fetch related objects
-      ...makeRelations(model, relations, datasource),
+      ...makeRelations(relations, datasource),
       // Create ports for domain I/O
       ...makePorts(ports, dependencies, observer),
       // Remember port calls

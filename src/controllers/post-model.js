@@ -1,24 +1,19 @@
-import log from "../lib/logger";
+"use strict";
 
 /**
  *
  * @param {import("../use-cases/add-model").addModel} addModel
- * @param {*} hash
+ * @param {function():string} hash
+ * @returns {import("../adapters/http-adapter").httpController}
  */
 export default function postModelFactory(addModel, hash) {
   return async function postModel(httpRequest) {
     try {
-      const { source = {}, ...modelInfo } = httpRequest.body;
-      log({ function: "postModel", ...modelInfo });
-      source.ip = httpRequest.ip;
-      source.browser = httpRequest.headers["User-Agent"];
-      if (httpRequest.headers["Referer"]) {
-        source.referrer = httpRequest.headers["Referer"];
-      }
-      log(source);
+      httpRequest.log(postModel.name);
 
-      const model = await addModel({ ...modelInfo });
-      log({ function: addModel.name, modelData: { ...model } });
+      const model = await addModel({ ...httpRequest.body });
+
+      console.debug({ function: addModel.name, output: model });
 
       return {
         headers: {
@@ -30,7 +25,7 @@ export default function postModelFactory(addModel, hash) {
         body: { modelId: model.getId() },
       };
     } catch (e) {
-      log(e);
+      console.error(e);
 
       return {
         headers: {

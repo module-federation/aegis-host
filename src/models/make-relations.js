@@ -22,11 +22,10 @@ const relationType = {
 
 /**
  * Generate functions to retrieve related domain objects.
- * @param {import("./index").Model} model
  * @param {import("./index").relations} relations
  * @param {*} dataSource
  */
-export default function makeRelations(model, relations, dataSource) {
+export default function makeRelations(relations, dataSource) {
   if (Object.getOwnPropertyNames(relations).length < 1) return;
 
   return Object.keys(relations)
@@ -41,7 +40,7 @@ export default function makeRelations(model, relations, dataSource) {
 
       return {
         async [relation]() {
-          return relationType[rel.type](model, ds, rel);
+          return relationType[rel.type](this, ds, rel);
         },
       };
     })

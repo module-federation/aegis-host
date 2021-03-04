@@ -47,13 +47,24 @@
         </div>
 
         <div class="form-floating mb-3">
-          <input type="text" class="form-control bg-dark text-white" id="parameter" placeholder="approve">
+          <input type="text" class="form-control bg-dark text-white" list="paramList" id="parameter"
+            placeholder="approve">
           <label for="parameter" class="form-label text-white">Parameter</label>
+          <datalist id="paramList">
+            <option value="approve"></option>
+            <option value="cancel"></option>
+          </datalist>
         </div>
 
         <div class="form-floating mb-3">
-          <input type="text" class="form-control bg-dark text-white" id="query" placeholder="command=decrypt">
+          <input type="text" class="form-control bg-dark text-white" list="queryList" id="query"
+            placeholder="command=decrypt">
           <label for="query" class="form-label text-white">Query</label>
+          <datalist id="queryList">
+            <option value="command=decrypt"></option>
+            <option value="relation=customer"></option>
+            <option value="relation=orders"></option>
+          </datalist>
         </div>
 
         <div class="form-floating mb-3">
