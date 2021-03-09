@@ -4,16 +4,9 @@ export default function getConfigFactory(listConfigs) {
   return async function getConfig(httpRequest) {
     log({ function: "getConfigs" });
     try {
-      const { source = {} } = httpRequest.body;
-      source.ip = httpRequest.ip;
-      source.browser = httpRequest.headers["User-Agent"];
-      if (httpRequest.headers["Referer"]) {
-        source.referrer = httpRequest.headers["Referer"];
-      }
-      log(source);
+      httpRequest.log(getConfig.name);
 
       const configs = await listConfigs();
-      log(configs);
 
       return {
         headers: {

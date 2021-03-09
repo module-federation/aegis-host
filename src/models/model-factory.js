@@ -101,9 +101,12 @@ const ModelFactory = {
    * @param {ModelSpecification} model
    */
   registerModel: model => {
+    console.log({ func: "registerModel", model });
     const name = checkModelName(model.modelName);
     if (!modelFactories.has(name)) {
       modelFactories.set(name, model);
+    } else {
+      console.log("not setting model", model);
     }
   },
 
@@ -196,16 +199,7 @@ const ModelFactory = {
    * Get federated models imported from remote server
    */
   getRemoteModels: () => {
-    let models = [];
-    for (let [k, v] of modelFactories) {
-      if (v.isRemote) {
-        models.push({
-          modelName: k,
-          ...v,
-        });
-      }
-    }
-    return models;
+    return [...modelFactories.values()];
   },
 
   /**

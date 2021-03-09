@@ -10,13 +10,10 @@ import {
   getConfig,
 } from "./controllers";
 
-import chalk from "chalk";
 import { initRemotes } from "./models";
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
-import { Router } from "express";
-//import initMiddleware from "./middleware";
 
 const Server = (() => {
   const API_ROOT = "/api";
@@ -24,7 +21,6 @@ const Server = (() => {
   const ENDPOINT = e => `${API_ROOT}/${e}`;
   const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
   const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
-
 
   function makeAdmin(path, app, adapter) {
     app.get(path("config"), adapter(getConfig()));
