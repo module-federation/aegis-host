@@ -101,7 +101,6 @@ const ModelFactory = {
    * @param {ModelSpecification} model
    */
   registerModel: model => {
-    console.log({ func: "registerModel", model });
     const name = checkModelName(model.modelName);
     if (!modelFactories.has(name)) {
       modelFactories.set(name, model);

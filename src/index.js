@@ -24,6 +24,7 @@ app.get("/restart", (req, res) => {
       console.log("deleting module: ", k);
       delete require.cache[k];
     });
+  
   res.send("{ status: 'reloading...' }");
   const remoteEntry = require("./remoteEntry");
   startMicroLib(remoteEntry, app);
