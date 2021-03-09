@@ -3,20 +3,12 @@ import log from "../lib/logger";
 /**
  *
  * @param {import("../use-cases/list-models").listModels} listModels
+ * @returns {import("../adapters/http-adapter").httpController}
  */
 export default function getModelFactory(listModels) {
   return async function getModel(httpRequest) {
-    log({ function: "getModel" });
-
     try {
-      const { source = {} } = httpRequest.body;
-      source.ip = httpRequest.ip;
-      source.browser = httpRequest.headers["User-Agent"];
-
-      if (httpRequest.headers["Referer"]) {
-        source.referrer = httpRequest.headers["Referer"];
-      }
-      log({ source, query: httpRequest.query });
+      httpRequest.log(getModel.name);
 
       const models = await listModels(httpRequest.query);
 
@@ -25,7 +17,7 @@ export default function getModelFactory(listModels) {
           "Content-Type": "application/json",
         },
         statusCode: 200,
-        body: { models },
+        body: models,
       };
     } catch (e) {
       log(e);

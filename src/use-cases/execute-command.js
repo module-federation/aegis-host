@@ -47,7 +47,6 @@ export default async function executeCommand(model, command, permission) {
         return { ...model, ...result.data };
       }
     }
-
     console.warn("command not found", command);
   }
   model.emit(domainEvents.unauthorizedCommand(model), { model, command });

@@ -1,3 +1,1 @@
-import Server from './server';
-
-Server.start();
+require("./server").default.start();

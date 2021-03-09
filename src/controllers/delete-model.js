@@ -1,20 +1,16 @@
 import log from "../lib/logger";
 
+/**
+ *
+ * @param {import("../use-cases/remove-model").removeModel} removeModel
+ * @returns {import("../adapters/http-adapter").httpController}
+ */
 export default function deleteModelFactory(removeModel, hash) {
   return async function deleteModel(httpRequest) {
     try {
-      const { source = {}, ...modelInfo } = httpRequest.body;
-      log({ function: "patchModel", ...modelInfo });
+      httpRequest.log(deleteModel.name);
 
-      source.ip = httpRequest.ip;
-      source.browser = httpRequest.headers["User-Agent"];
-      if (httpRequest.headers["Referer"]) {
-        source.referrer = httpRequest.headers["Referer"];
-      }
-      log(source);
-      const id = httpRequest.params.id;
-
-      const model = await removeModel(id);
+      const model = await removeModel(httpRequest.params.id);
 
       return {
         headers: {

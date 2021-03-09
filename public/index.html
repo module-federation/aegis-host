@@ -52,7 +52,7 @@
             placeholder="approve">
           <label for="parameter" class="form-label text-white">Parameter</label>
           <datalist id="paramList">
-            <option value="approve"></option>
+            <option value="approve">Checkout</option>
             <option value="cancel"></option>
           </datalist>
         </div>
@@ -65,11 +65,13 @@
             <option value="command=decrypt"></option>
             <option value="relation=customer"></option>
             <option value="relation=orders"></option>
+            <option value="count=today"></option>
           </datalist>
         </div>
 
         <div class="form-floating mb-3">
-          <textarea class="form-control bg-dark text-white" style="height: 100px" placeholder="{}" id="payload">
+          <textarea class="form-control bg-dark text-white overflow-auto" style="height: 100px; white-space:pre;"
+            placeholder="{}" id="payload">
             {
               "firstName":"Uncle",
               "lastName":"Bob",
@@ -96,8 +98,9 @@
 
       <div class="col-md-7">
         <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
-        <pre id="messages" class="text-light mb-3 overflow-scroll"
-          style="height: 410px; "><code id="jsonCode" class="line-nowrap"></code></pre>
+        <pre id="messages" class="text-light mb-3 overflow-scroll" style="height:415px">
+          <code id="jsonCode"></code>
+        </pre>
       </div>
 
     </div>
