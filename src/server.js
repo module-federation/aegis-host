@@ -15,15 +15,14 @@ import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
-
 const Server = (() => {
-    const getInitiRemotes = __non_webpack_require__("./remoteEntry")
-        .microlib.get("./models")
-        .then(factory => {
-          const Module = factory();
-          console.log(Module)
-          return Module.initRemotes
-        });
+  const getRemoteModules = __non_webpack_require__("./remoteEntry")
+    .microlib.get("./models")
+    .then(factory => {
+      const Module = factory();
+      console.log(Module);
+      return Module.initRemotes;
+    });
 
   const API_ROOT = "/api";
   const PORT = 8070;
@@ -48,8 +47,8 @@ const Server = (() => {
 
     const overrides = { save, find, Persistence };
 
-    getInitiRemotes.then((initRemotes)=>{
-      console.log(initRemotes)
+    getRemoteModules.then(initRemotes => {
+      console.log(initRemotes);
       initRemotes(overrides).then(() => {
         const cache = initCache();
 
@@ -70,8 +69,7 @@ const Server = (() => {
 
         process.on("SIGTERM", () => close());
       });
-    })
-
+    });
   }
 
   // function start() {

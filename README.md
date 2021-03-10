@@ -109,10 +109,22 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
-* Clone the repo
+- Clone the repo
+
 ```shell
   git clone https:.//github.com/module-federation/MicroLib.git
 ```
+
+```shell
+  npm ci
+```
+
+```shell
+  npm run restart
+```
+
+![install](https://github.com/tysonrm/MicroLib/blob/master/wiki/install-microlib-4k.gif)
+
 ## Further Reading
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)

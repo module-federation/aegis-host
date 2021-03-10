@@ -3,10 +3,6 @@ const ModuleFederationPlugin = require("webpack").container
   .ModuleFederationPlugin;
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
-// import path from "path";
-// import ModuleFederationPlugin from "webpack/lib/container";
-// import fetchRemotes from "./webpack/fetch-remotes";
-// import remoteEntries from "./webpack/remote-entries";
 
 module.exports = () => {
   return new Promise(resolve => {
@@ -44,7 +40,7 @@ module.exports = () => {
             filename: "remoteEntry.js",
             library: {
               name: "microlib",
-              type: "commonjs-module"
+              type: "commonjs-module",
             },
             remoteType: "commonjs-module",
             remotes: {
@@ -53,7 +49,7 @@ module.exports = () => {
             },
             exposes: {
               "./server": "./src/server",
-              './models':"./src/models"
+              "./models": "./src/models",
             },
           }),
         ],

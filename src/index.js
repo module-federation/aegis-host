@@ -2,30 +2,30 @@
 const express = require("express");
 const app = express();
 require("regenerator-runtime");
-const PORT = 8070;
 const importFresh = require("import-fresh");
+const PORT = 8070;
 
-function startMicroLib(app) {
- const microLib = importFresh("./remoteEntry").microlib
-
-    microLib.get("./server")
-    .then(factory => {
-      const Module = factory();
-      Module.default.start(app);
-    });
+async function startMicroLib(app) {
+  const remoteEntry = importFresh("./remoteEntry");
+  const factory = await remoteEntry.microlib.get("./server");
+  const serverModule = factory();
+  serverModule.default.start(app);
 }
 
-app.use(express.json());
-app.use(express.static("public"));
-startMicroLib(app);
+//app.use(express.json());
+//app.use(express.static("public"));
+startMicroLib(app).then(() => {
+  app.use(express.json());
+  app.use(express.static("public"));
+});
 
 app.get("/restart", (req, res) => {
-  // Object.keys(require.cache)
-  //   .filter(k => /remoteEntry/.test(k))
-  //   .forEach(k => {
-  //     console.log("deleting module: ", k);
-  //     delete require.cache[k];
-  //   });
+  Object.keys(require.cache)
+    .filter(k => /remoteEntry/.test(k))
+    .forEach(k => {
+      console.log("deleting module: ", k);
+      delete require.cache[k];
+    });
 
   res.send("hot reload of federated models...");
   startMicroLib(app);
