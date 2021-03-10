@@ -45,7 +45,21 @@ const Server = (() => {
   function clear() {
     // getConfig(true)(); // clear config when true
     ModelFactory.clearModels();
-    console.log(ModelFactory.getRemoteModels());
+    console.log("models:", ModelFactory.getRemoteModels());
+
+    Object.keys(__non_webpack_require__.cache).forEach(k => {
+      console.log("deleting cached module", k);
+      delete __non_webpack_require__.cache[k];
+    });
+    
+    Object.keys(__webpack_require__.m)
+      .filter(k => /.\/src\/|src_/.test(k))
+      .forEach(k => {
+        console.log("deleting cached module", k);
+        delete __webpack_require__.m[k];
+      });
+
+    console.log(__webpack_exports_info__);
   }
 
   function run(router) {
