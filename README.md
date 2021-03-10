@@ -123,7 +123,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
   npm run restart
 ```
 
-![install](https://github.com/module-federation/MicroLib/blob/master/wiki/install-microlib-4k.gif)
+![install](https://github.com/module-federation/MicroLib/blob/hot-reload/wiki/microlib-install-4k.gif)
 
 ## Further Reading
 
