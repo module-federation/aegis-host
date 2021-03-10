@@ -24,7 +24,8 @@ export default function patchModelFactory(editModel, hash) {
         body: { modelId: model.getId() },
       };
     } catch (e) {
-      log(e);
+      console.error(e);
+
       if (e.message === "no such id") {
         return {
           headers: {

@@ -105,7 +105,9 @@ const ModelFactory = {
     if (!modelFactories.has(name)) {
       modelFactories.set(name, model);
     } else {
-      console.log("not setting model", model);
+      console.log("deleting and readding model spec", name);
+      modelFactories.delete(name);
+      modelFactories.set(name, model);
     }
   },
 

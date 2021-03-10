@@ -55,6 +55,8 @@ const Server = (() => {
 
       cache.load();
 
+      console.log("http://localhost:8070");
+
       process.on("SIGTERM", () => close());
     });
   }

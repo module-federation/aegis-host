@@ -25,6 +25,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "import-fresh": "^3.3.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.3",
     "passport-jwt": "^4.0.0",

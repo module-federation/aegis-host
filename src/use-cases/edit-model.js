@@ -61,9 +61,11 @@ export default function editModelFactory({
       }
     }
 
-    const result = await async(invokePort(updated, command, "write"));
-    if (result.ok) {
-      return result.data;
+    if (command) {
+      const result = await async(invokePort(updated, command, "write"));
+      if (result.ok) {
+        return result.data;
+      }
     }
 
     return updated;

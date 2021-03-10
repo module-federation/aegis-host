@@ -7,13 +7,21 @@ import publishEvent from "../services/publish-event";
  */
 export default function handleEvents(observer) {
   observer.on(/.*/, async event => publishEvent(event, observer));
-  setInterval(
-    () =>
-      observer.notify("hotReload", {
-        eventName: "hot-reload",
-        eventType: "register-webhook",
-        eventData: { url: "http://localhost:8070/restart" },
-      }),
-    30000
-  );
+  // setTimeout(
+  //   observer.notify("hotReload", {
+  //     eventName: "hot-reload",
+  //     eventType: "register-webhook",
+  //     eventData: { url: "http://localhost:8070/restart" },
+  //   }),
+  //   30000
+  // );
+  // setInterval(
+  //   () =>
+  //     observer.notify("hotReload", {
+  //       eventName: "hot-reload",
+  //       eventType: "register-webhook",
+  //       eventData: { url: "http://localhost:8070/restart" },
+  //     }),
+  //   30000
+  // );
 }
