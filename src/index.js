@@ -6,8 +6,9 @@ const PORT = 8070;
 const importFresh = require("import-fresh");
 
 function startMicroLib(app) {
-  importFresh("./remoteEntry")
-    .microlib.get("./server")
+ const microLib = importFresh("./remoteEntry").microlib
+
+    microLib.get("./server")
     .then(factory => {
       const Module = factory();
       Module.default.start(app);

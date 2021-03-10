@@ -15,7 +15,16 @@ import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
+
 const Server = (() => {
+    const getInitiRemotes = __non_webpack_require__("./remoteEntry")
+        .microlib.get("./models")
+        .then(factory => {
+          const Module = factory();
+          console.log(Module)
+          return Module.initRemotes
+        });
+
   const API_ROOT = "/api";
   const PORT = 8070;
   const ENDPOINT = e => `${API_ROOT}/${e}`;
@@ -39,26 +48,30 @@ const Server = (() => {
 
     const overrides = { save, find, Persistence };
 
-    initRemotes(overrides).then(() => {
-      const cache = initCache();
+    getInitiRemotes.then((initRemotes)=>{
+      console.log(initRemotes)
+      initRemotes(overrides).then(() => {
+        const cache = initCache();
 
-      make(ENDPOINT, router, "post", postModels);
-      make(ENDPOINT, router, "get", getModels);
-      make(ENDPOINTID, router, "get", getModelsById);
-      make(ENDPOINTID, router, "patch", patchModels);
-      make(ENDPOINTCMD, router, "patch", patchModels);
-      make(ENDPOINTID, router, "delete", deleteModels);
+        make(ENDPOINT, router, "post", postModels);
+        make(ENDPOINT, router, "get", getModels);
+        make(ENDPOINTID, router, "get", getModelsById);
+        make(ENDPOINTID, router, "patch", patchModels);
+        make(ENDPOINTCMD, router, "patch", patchModels);
+        make(ENDPOINTID, router, "delete", deleteModels);
 
-      console.timeEnd(label);
+        console.timeEnd(label);
 
-      makeAdmin(ENDPOINT, router, http);
+        makeAdmin(ENDPOINT, router, http);
 
-      cache.load();
+        cache.load();
 
-      console.log("http://localhost:8070");
+        console.log("http://localhost:8070");
 
-      process.on("SIGTERM", () => close());
-    });
+        process.on("SIGTERM", () => close());
+      });
+    })
+
   }
 
   // function start() {
