@@ -109,18 +109,24 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
-- Clone the repo
+Installation of Kafka is currently required to demo the sample app. Check back soon for simplified install. Otherwise, install Kafka in the same root dir as MicroLib and ln or rename to `kafka`.
 
 ```shell
-  git clone https:.//github.com/module-federation/MicroLib.git
+git clone https://github.com/module-federation/MicroLib-Example.git
+cd *Example
+npm ci
+echo "KAFKA_GROUP_ID=remote" > .env
+echo "ENCRYPTION_PWD=secret" >> .env
+npm run start-all
 ```
 
-```shell
-  npm ci
-```
-
-```shell
-  npm run restart
+```shell'
+git clone https://github.com/module-federation/MicroLib.git
+cd MicroLib
+npm ci
+echo "KAFKA_GROUP_ID=host" > .env
+echo "ENCRYPTION_PWD=secret" >> .env
+npm run restart
 ```
 
 ![install](https://github.com/module-federation/MicroLib/blob/hot-reload/wiki/microlib-install-4k.gif)
