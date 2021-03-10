@@ -7,11 +7,13 @@ const importFresh = require("import-fresh");
 const clearModule = require("clear-module");
 const PORT = 8070;
 
-async function startMicroLib(app) {
+async function startMicroLib(app, hot = false) {
   const remoteEntry = importFresh("./remoteEntry");
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
-  serverModule.default.clear();
+  if (hot) {
+    serverModule.default.clear();
+  }
   serverModule.default.start(app);
 }
 
@@ -26,12 +28,5 @@ startMicroLib(app).then(() => {
 app.get("/restart", (req, res) => {
   clearModule.all();
   res.send("<h1>hot reload of federated modules...<h1>");
-  startMicroLib(app);
+  startMicroLib(app, true);
 });
-
-// Object.keys(require.cache)
-//   .filter(k => /remoteEntry/.test(k))
-//   .forEach(k => {
-//     console.log("deleting module: ", k);
-//     delete require.cache[k];
-//   });
