@@ -2,11 +2,10 @@ import log from "../lib/logger";
 
 export default function getConfigFactory(listConfigs) {
   return async function getConfig(httpRequest) {
-    log({ function: "getConfigs" });
     try {
-      httpRequest.log(getConfig.name);
-
       const configs = await listConfigs();
+
+      //httpRequest.log(getConfig.name);
 
       return {
         headers: {

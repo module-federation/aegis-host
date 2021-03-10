@@ -1,5 +1,3 @@
-import log from "../lib/logger";
-
 /**
  *
  * @param {import("../use-cases/list-models").listModels} listModels
@@ -20,7 +18,7 @@ export default function getModelFactory(listModels) {
         body: models,
       };
     } catch (e) {
-      log(e);
+      console.error(e);
 
       return {
         headers: {

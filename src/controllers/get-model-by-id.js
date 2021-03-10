@@ -1,5 +1,3 @@
-import log from "../lib/logger";
-
 /**
  * @param {import("../use-cases/find-model").findModel} findModel
  * @returns {import("../adapters/http-adapter").httpController}
@@ -21,7 +19,7 @@ export default function getModelByIdFactory(findModel) {
         body: model,
       };
     } catch (e) {
-      log(e.message);
+      console.error(e.message);
 
       if (e.message === "no such id") {
         return {

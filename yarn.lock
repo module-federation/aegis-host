@@ -1499,7 +1499,7 @@
     "normalize-url" "^4.1.0"
     "responselike" "^1.0.2"
 
-"callsites@^3.0.0":
+"callsites@^3.0.0", "callsites@^3.1.0":
   "integrity" "sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ=="
   "resolved" "https://registry.npmjs.org/callsites/-/callsites-3.1.0.tgz"
   "version" "3.1.0"
@@ -1620,6 +1620,14 @@
     "define-property" "^0.2.5"
     "isobject" "^3.0.0"
     "static-extend" "^0.1.1"
+
+"clear-module@^4.1.1":
+  "integrity" "sha512-ng0E7LeODcT3QkazOckzZqbca+JByQy/Q2Z6qO24YsTp+pLxCfohGz2gJYJqZS0CWTX3LEUiHOqe5KlYeUbEMw=="
+  "resolved" "https://registry.npmjs.org/clear-module/-/clear-module-4.1.1.tgz"
+  "version" "4.1.1"
+  dependencies:
+    "parent-module" "^2.0.0"
+    "resolve-from" "^5.0.0"
 
 "cli-boxes@^2.2.0":
   "integrity" "sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw=="
@@ -3553,6 +3561,13 @@
   dependencies:
     "callsites" "^3.0.0"
 
+"parent-module@^2.0.0":
+  "integrity" "sha512-uo0Z9JJeWzv8BG+tRcapBKNJ0dro9cLyczGzulS6EfeyAdeC9sbojtW6XwvYxJkEne9En+J2XEl4zyglVeIwFg=="
+  "resolved" "https://registry.npmjs.org/parent-module/-/parent-module-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "callsites" "^3.1.0"
+
 "parse-passwd@^1.0.0":
   "integrity" "sha1-bVuTSkVpk7I9N/QKOC1vFmao5cY="
   "resolved" "https://registry.npmjs.org/parse-passwd/-/parse-passwd-1.0.0.tgz"
@@ -3903,6 +3918,11 @@
   "integrity" "sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g=="
   "resolved" "https://registry.npmjs.org/resolve-from/-/resolve-from-4.0.0.tgz"
   "version" "4.0.0"
+
+"resolve-from@^5.0.0":
+  "integrity" "sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw=="
+  "resolved" "https://registry.npmjs.org/resolve-from/-/resolve-from-5.0.0.tgz"
+  "version" "5.0.0"
 
 "resolve-url@^0.2.1":
   "integrity" "sha1-LGN/53yJOv0qZj/iGqkIAGjiBSo="

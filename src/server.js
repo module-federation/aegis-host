@@ -10,10 +10,11 @@ import {
   getConfig,
 } from "./controllers";
 
-import { initRemotes } from "./models";
+//import { initRemotes } from "./models";
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
+import ModelFactory from "./models";
 
 const Server = (() => {
   const getRemoteModules = __non_webpack_require__("./remoteEntry")
@@ -39,6 +40,12 @@ const Server = (() => {
       console.info(ctlr);
       app[method](path(ctlr.endpoint), http(ctlr.fn));
     });
+  }
+
+  function clear() {
+    // getConfig(true)(); // clear config when true
+    ModelFactory.clearModels();
+    console.log(ModelFactory.getRemoteModels());
   }
 
   function run(router) {
@@ -78,6 +85,7 @@ const Server = (() => {
 
   return {
     start: run,
+    clear,
   };
 })();
 

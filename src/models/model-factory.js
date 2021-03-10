@@ -227,6 +227,8 @@ const ModelFactory = {
    */
   deleteModel: model => Model.delete(model),
 
+  clearModels: () => modelFactories.clear(),
+
   /**
    * Get ID of model
    * @param {Model} model
