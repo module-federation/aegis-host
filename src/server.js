@@ -59,6 +59,13 @@ const Server = (() => {
         delete __webpack_require__.m[k];
       });
 
+    Object.keys(__webpack_require__.m)
+        .filter(k => /.\/webpack\/|webpack/.test(k))
+        .forEach(k => {
+          console.log("deleting webpack cached module", k);
+          delete __webpack_require__.m[k];
+        });
+
     console.log(__webpack_exports_info__);
   }
 
