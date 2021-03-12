@@ -10,13 +10,18 @@ import {
   getConfig,
 } from "./controllers";
 
-//import { initRemotes } from "./models";
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 import ModelFactory from "./models";
 
 const Server = (() => {
+  const API_ROOT = "/api";
+  const PORT = 8070;
+  const ENDPOINT = e => `${API_ROOT}/${e}`;
+  const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
+  const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
+
   const getRemoteModules = __non_webpack_require__("./remoteEntry")
     .microlib.get("./models")
     .then(factory => {
@@ -24,12 +29,6 @@ const Server = (() => {
       console.log(Module);
       return Module.initRemotes;
     });
-
-  const API_ROOT = "/api";
-  const PORT = 8070;
-  const ENDPOINT = e => `${API_ROOT}/${e}`;
-  const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
-  const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
 
   function makeAdmin(path, app, adapter) {
     app.get(path("config"), adapter(getConfig()));
@@ -43,15 +42,13 @@ const Server = (() => {
   }
 
   function clear() {
-    // getConfig(true)(); // clear config when true
     ModelFactory.clearModels();
-    console.log("models:", ModelFactory.getRemoteModels());
 
     Object.keys(__non_webpack_require__.cache).forEach(k => {
       console.log("deleting cached module", k);
       delete __non_webpack_require__.cache[k];
     });
-    
+
     Object.keys(__webpack_require__.m)
       .filter(k => /.\/src\/|src_/.test(k))
       .forEach(k => {
@@ -60,23 +57,24 @@ const Server = (() => {
       });
 
     Object.keys(__webpack_require__.m)
-        .filter(k => /.\/webpack\/|webpack/.test(k))
-        .forEach(k => {
-          console.log("deleting webpack cached module", k);
-          delete __webpack_require__.m[k];
-        });
+      .filter(k => /microlib|remote-entries/.test(k))
+      .forEach(k => {
+        console.log("deleting webpack cached module", k);
+        delete __webpack_require__.m[k];
+      });
 
-    console.log(__webpack_exports_info__);
+    Object.keys(__webpack_require__.m)
+      .filter(k => /express/.test(k))
+      .forEach(k => console.log(k));
   }
 
-  function run(router) {
+  function start(router) {
     const label = "\ntotal time to import & register remote modules";
     console.time(label);
 
     const overrides = { save, find, Persistence };
 
     getRemoteModules.then(initRemotes => {
-      console.log(initRemotes);
       initRemotes(overrides).then(() => {
         const cache = initCache();
 
@@ -100,13 +98,9 @@ const Server = (() => {
     });
   }
 
-  // function start() {
-  //   initMiddleware(app, API_ROOT, run);
-  // }
-
   return {
-    start: run,
     clear,
+    start,
   };
 })();
 

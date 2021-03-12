@@ -49,7 +49,7 @@ export default async function executeCommand(model, command, permission) {
     }
     console.warn("command not found", command);
   }
-  model.emit(domainEvents.unauthorizedCommand(model), { model, command });
+  model.emit(domainEvents.unauthorizedCommand(model), command);
 
   return model;
 }

@@ -215,7 +215,11 @@ const Model = (() => {
        * @param {Model|Event} eventData - any, but typically `Model`
        */
       async emit(eventName, eventData) {
-        await observer.notify(eventName, eventData);
+        await observer.notify(eventName, {
+          eventName,
+          eventData,
+          model: this,
+        });
       },
       /**
        * Returns the `ModelSpecification` for this model.

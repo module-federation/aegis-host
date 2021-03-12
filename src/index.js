@@ -12,7 +12,7 @@ async function startMicroLib(app, hot = false) {
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
   if (hot) {
-    serverModule.default.clear();
+    serverModule.default.clear(app);
   }
   serverModule.default.start(app);
 }
@@ -27,6 +27,11 @@ startMicroLib(app).then(() => {
 
 app.get("/restart", (req, res) => {
   clearModule.all();
+  console.log(
+    (app._router.stack = app._router.stack.filter(
+      k => !(k?.route?.path && k.route.path.startsWith("/api"))
+    ))
+  );
   res.send("<h1>hot reload of federated modules...<h1>");
   startMicroLib(app, true);
 });
