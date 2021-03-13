@@ -33,7 +33,7 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 - Persistence API for cached datasources
 - Datasource relations for federated schemas
 - Dependency/control inversion (IoC)
-- Zero downtime, "zero install" deployment
+- [Zero downtime, "zero install" deployment](#hot-reload)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
 - Serverless deployment
