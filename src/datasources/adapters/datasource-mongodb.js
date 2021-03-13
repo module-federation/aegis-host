@@ -30,7 +30,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
     this.connectDb()
       .then(() => this.setCollection())
       .then(() => this.loadModels())
-      .catch(e => console.log(e));
+      .catch(e => console.error(e));
   }
 
   async connectDb() {
@@ -57,9 +57,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
   async loadModels() {
     try {
       const cursor = this.collection.find().limit(cacheSize);
-      cursor.forEach(model => {
-        super.save(model.id, this.hydrate(model));
-      });
+      cursor.forEach(model => super.save(model.id, this.hydrate(model)));
     } catch (error) {
       console.error(error);
     }
