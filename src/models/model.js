@@ -9,8 +9,8 @@
  * @property {function(Model,*,number):Model} Symbol_validate - run validations, see `eventMask`
  * @property {function(Model,*):Model} Symbol_onUpdate - immutable/private update function
  * @property {function(Model)} Symbol_onDelete - immutable/private delete function
- * @property {function(Object)} update - use this function to update the model -
- * specify changes as properties of an object
+ * @property {function(Object, boolean)} update - use this function to update the model -
+ * specify changes as properties of an object, specify false to skip validation.
  * @property {function()} toJSON - de/serialization logic
  * @property {function(eventName,function(eventName,Model):void)} addListener listen
  * for domain events

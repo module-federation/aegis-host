@@ -39,13 +39,17 @@ const Server = (() => {
     });
   }
 
-  function clear() {
-    ModelFactory.clearModels();
+  function clear() {    
+    try {
+      ModelFactory.clearModels();
 
-    Object.keys(__non_webpack_require__.cache).forEach(k => {
-      console.log("deleting cached module", k);
-      delete __non_webpack_require__.cache[k];
-    });
+      Object.keys(__non_webpack_require__.cache).forEach(k => {
+        console.log("deleting cached module", k);
+        delete __non_webpack_require__.cache[k];
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function start(router) {

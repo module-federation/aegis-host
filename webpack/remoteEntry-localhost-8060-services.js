@@ -31665,13 +31665,16 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 "use strict";
 var moduleMap = {
 	"./models": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_mixins_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+		return Promise.all([__webpack_require__.e("src_models_mixins_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services-mock_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
 	"./adapters": () => {
 		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./services": () => {
 		return __webpack_require__.e("src_services_index_js").then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+	},
+	"./services-mock": () => {
+		return Promise.all([__webpack_require__.e("src_models_mixins_js"), __webpack_require__.e("src_services-mock_index_js"), __webpack_require__.e("src_services_event-service_js")]).then(() => () => (__webpack_require__(/*! ./src/services-mock */ "./src/services-mock/index.js")));
 	},
 	"./validations": () => {
 		return __webpack_require__.e("src_models_mixins_js").then(() => () => (__webpack_require__(/*! ./src/models/mixins */ "./src/models/mixins.js")));
@@ -32157,6 +32160,9 @@ module.exports = require("zlib");
 /******/ 			],
 /******/ 			"src_services_index_js": [
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk",
+/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
+/******/ 			],
+/******/ 			"src_services_event-service_js": [
 /******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
 /******/ 			]
 /******/ 		};
