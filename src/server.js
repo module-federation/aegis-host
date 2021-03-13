@@ -16,16 +16,15 @@ import http from "./adapters/http-adapter";
 import ModelFactory from "./models";
 
 const Server = (() => {
-  const API_ROOT = "/api";
-  const ENDPOINT = e => `${API_ROOT}/${e}`;
-  const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
-  const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
+  const apiRoot = "/api";
+  const endpoint = e => `${apiRoot}/${e}`;
+  const endpointId = e => `${apiRoot}/${e}/:id`;
+  const endpointCmd = e => `${apiRoot}/${e}/:id/:command`;
 
   const getRemoteModules = __non_webpack_require__("./remoteEntry")
     .microlib.get("./models")
     .then(factory => {
       const Module = factory();
-      console.log(Module);
       return Module.initRemotes;
     });
 
@@ -59,16 +58,16 @@ const Server = (() => {
       initRemotes(overrides).then(() => {
         const cache = initCache();
 
-        make(ENDPOINT, router, "post", postModels);
-        make(ENDPOINT, router, "get", getModels);
-        make(ENDPOINTID, router, "get", getModelsById);
-        make(ENDPOINTID, router, "patch", patchModels);
-        make(ENDPOINTCMD, router, "patch", patchModels);
-        make(ENDPOINTID, router, "delete", deleteModels);
+        make(endpoint, router, "post", postModels);
+        make(endpoint, router, "get", getModels);
+        make(endpointId, router, "get", getModelsById);
+        make(endpointId, router, "patch", patchModels);
+        make(endpointCmd, router, "patch", patchModels);
+        make(endpointId, router, "delete", deleteModels);
 
         console.timeEnd(label);
 
-        makeAdmin(ENDPOINT, router, http);
+        makeAdmin(endpoint, router, http);
 
         cache.load();
 

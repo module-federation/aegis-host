@@ -3,6 +3,9 @@ const ModuleFederationPlugin = require("webpack").container
   .ModuleFederationPlugin;
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
+require('dotenv').config()
+
+const port = process.env.PORT || 8070;
 
 module.exports = () => {
   return new Promise(resolve => {
@@ -13,7 +16,7 @@ module.exports = () => {
         devtool: "source-map",
         entry: ["@babel/polyfill", path.resolve(__dirname, "src/server.js")],
         output: {
-          publicPath: "http://localhost:8070",
+          publicPath: `http://localhost:${port}`,
           path: path.resolve(__dirname, "dist"),
           libraryTarget: "commonjs2",
         },

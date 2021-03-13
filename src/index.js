@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 require("regenerator-runtime");
 const importFresh = require("import-fresh");
-const PORT = 8070;
+const port = process.env.PORT || 8070;
 
 async function startMicroLib(app, hot = false) {
   const remoteEntry = importFresh("./remoteEntry");
@@ -19,8 +19,8 @@ async function startMicroLib(app, hot = false) {
 startMicroLib(app).then(() => {
   app.use(express.json());
   app.use(express.static("public"));
-  app.listen(PORT, function () {
-    console.log(`\n🌎 Server listening on http://localhost:${PORT} 🌎\n`);
+  app.listen(port, function () {
+    console.log(`\n🌎 MicroLib listening on http://localhost:${port} 🌎\n`);
   });
 });
 
