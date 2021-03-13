@@ -109,7 +109,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
-Installation of Kafka is currently required to demo the sample app. Check back soon for simplified install. Otherwise, install Kafka in the same root dir as MicroLib and ln or rename to `kafka`.
+Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, install Kafka in the same dir as MicroLib and run the following.
 
 ```shell
 git clone https://github.com/module-federation/MicroLib-Example.git
@@ -127,8 +127,14 @@ cd MicroLib
 npm ci
 echo "KAFKA_GROUP_ID=host" > .env
 echo "ENCRYPTION_PWD=secret" >> .env
+echo "DATASOURCE_ADAPTER=DataSourceFile" >> .env
 npm run restart
 ```
+
+Optionally, install MongoDB:
+
+- In .env, `Change DATASOURCE_ADAPTER=DataSourceMongoDb`
+- In .env, `add MONGODB_URL=mongodb://localhost:27017`
 
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
