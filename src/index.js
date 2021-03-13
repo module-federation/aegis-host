@@ -25,11 +25,9 @@ startMicroLib(app).then(() => {
 });
 
 app.get("/restart", (req, res) => {
-  console.log(
-    (app._router.stack = app._router.stack.filter(
-      k => !(k?.route?.path && k.route.path.startsWith("/api"))
-    ))
+  app._router.stack = app._router.stack.filter(
+    k => !(k?.route?.path && k.route.path.startsWith("/api"))
   );
-  res.send("<h1>hot reload of federated modules...<h1>");
+  res.send("<h1>hot reload of federated modules...</h1>");
   startMicroLib(app, true);
 });
