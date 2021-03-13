@@ -24,7 +24,7 @@ startMicroLib(app).then(() => {
   });
 });
 
-app.get("/restart", (req, res) => {
+app.get("/reload", (req, res) => {
   app._router.stack = app._router.stack.filter(
     k => !(k?.route?.path && k.route.path.startsWith("/api"))
   );
