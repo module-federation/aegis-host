@@ -117,6 +117,7 @@ cd *Example
 npm ci
 echo "KAFKA_GROUP_ID=remote" > .env
 echo "ENCRYPTION_PWD=secret" >> .env
+npm run build
 npm run start-all
 ```
 
