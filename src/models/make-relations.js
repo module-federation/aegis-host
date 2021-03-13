@@ -18,6 +18,10 @@ const relationType = {
    * @param {import("./index").relations[relation]} config
    */
   manyToOne: async (model, ds, rel) => await ds.find(model[rel.foreignKey]),
+
+  oneToOne(model, ds, rel) {
+    return this.manyToOne(model, ds, rel);
+  },
 };
 
 /**

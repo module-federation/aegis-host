@@ -17,7 +17,6 @@ import ModelFactory from "./models";
 
 const Server = (() => {
   const API_ROOT = "/api";
-  const PORT = 8070;
   const ENDPOINT = e => `${API_ROOT}/${e}`;
   const ENDPOINTID = e => `${API_ROOT}/${e}/:id`;
   const ENDPOINTCMD = e => `${API_ROOT}/${e}/:id/:command`;
@@ -48,20 +47,6 @@ const Server = (() => {
       console.log("deleting cached module", k);
       delete __non_webpack_require__.cache[k];
     });
-
-    Object.keys(__webpack_require__.m)
-      .filter(k => /.\/src\/|src_/.test(k))
-      .forEach(k => {
-        console.log("deleting cached module", k);
-        delete __webpack_require__.m[k];
-      });
-
-    Object.keys(__webpack_require__.m)
-      .filter(k => /microlib|remote-entries/.test(k))
-      .forEach(k => {
-        console.log("deleting webpack cached module", k);
-        delete __webpack_require__.m[k];
-      });
   }
 
   function start(router) {
