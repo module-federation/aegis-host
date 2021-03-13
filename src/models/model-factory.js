@@ -104,6 +104,10 @@ const ModelFactory = {
     const name = checkModelName(model.modelName);
     if (!modelFactories.has(name)) {
       modelFactories.set(name, model);
+    } else {
+      console.log("deleting and readding model spec", name);
+      modelFactories.delete(name);
+      modelFactories.set(name, model);
     }
   },
 
@@ -196,16 +200,7 @@ const ModelFactory = {
    * Get federated models imported from remote server
    */
   getRemoteModels: () => {
-    let models = [];
-    for (let [k, v] of modelFactories) {
-      if (v.isRemote) {
-        models.push({
-          modelName: k,
-          ...v,
-        });
-      }
-    }
-    return models;
+    return [...modelFactories.values()];
   },
 
   /**
@@ -231,6 +226,8 @@ const ModelFactory = {
    * @param {Model} model
    */
   deleteModel: model => Model.delete(model),
+
+  clearModels: () => modelFactories.clear(),
 
   /**
    * Get ID of model

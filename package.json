@@ -7,14 +7,15 @@
     "pnp": false
   },
   "repository": {
-    "url": "https://github.com/tysonrm/microlib"
+    "url": "https://github.com/module-federation/microlib"
   },
   "scripts": {
-    "build": "npm run clean && webpack --config webpack.config.js",
-    "start": "node -r dotenv/config dist/main.js",
+    "webpack": "webpack --config webpack.config.js",
+    "build": "npm run clean && webpack --config webpack.config.js && npm run transpile",
+    "start": "node -r dotenv/config dist/index.js",
     "dev-start": "nodemon --watch src --exec npm restart",
     "restart": "npm run build && npm run start",
-    "transpile": "babel src -d dist",
+    "transpile": "babel src/index.js -d dist",
     "test": "mocha --recursive -r esm",
     "demo": "open http://localhost:8070",
     "clean": "rm -rf dist"
@@ -22,11 +23,14 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.19.0",
+    "clear-module": "^4.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "import-fresh": "^3.3.0",
     "jsonwebtoken": "^8.5.1",
-    "mongodb": "^3.6.3"
+    "mongodb": "^3.6.3",
+    "passport-jwt": "^4.0.0",
+    "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",

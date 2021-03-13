@@ -11,7 +11,7 @@ export default function postModelFactory(addModel, hash) {
     try {
       httpRequest.log(postModel.name);
 
-      const model = await addModel({ ...httpRequest.body });
+      const model = await addModel(httpRequest.body);
 
       console.debug({ function: addModel.name, output: model });
 

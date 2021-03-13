@@ -1,24 +1,18 @@
-import log from "../lib/logger";
 /**
  *
  * @param {import("../use-cases/edit-model").editModel} editModel
+ * @returns {import("../adapters/http-adapter").httpController}
  */
 export default function patchModelFactory(editModel, hash) {
   return async function patchModel(httpRequest) {
     try {
-      const { source = {}, ...modelInfo } = httpRequest.body;
-      log({ function: "patchModel", ...modelInfo });
+      httpRequest.log(patchModel.name);
 
-      source.ip = httpRequest.ip;
-      source.browser = httpRequest.headers["User-Agent"];
-      if (httpRequest.headers["Referer"]) {
-        source.referrer = httpRequest.headers["Referer"];
-      }
-      log(source);
       const id = httpRequest.params.id;
       const command = httpRequest.params.command;
+      const payload = httpRequest.body;
 
-      const model = await editModel(id, { ...modelInfo }, command);
+      const model = await editModel(id, payload, command);
 
       return {
         headers: {
@@ -30,7 +24,8 @@ export default function patchModelFactory(editModel, hash) {
         body: { modelId: model.getId() },
       };
     } catch (e) {
-      log(e);
+      console.error(e);
+
       if (e.message === "no such id") {
         return {
           headers: {

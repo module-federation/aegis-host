@@ -1,21 +1,13 @@
-import log from "../lib/logger";
-
 /**
  * @param {import("../use-cases/find-model").findModel} findModel
+ * @returns {import("../adapters/http-adapter").httpController}
  */
 export default function getModelByIdFactory(findModel) {
   return async function getModelById(httpRequest) {
-    log({ function: "findModel" });
     try {
-      const { source = {} } = httpRequest.body;
-      source.ip = httpRequest.ip;
-      source.browser = httpRequest.headers["User-Agent"];
-      if (httpRequest.headers["Referer"]) {
-        source.referrer = httpRequest.headers["Referer"];
-      }
+      httpRequest.log(getModelById.name);
       const id = httpRequest.params.id;
       const query = httpRequest.query;
-      log({ source, id, query });
 
       const model = await findModel(id, query);
 
@@ -24,10 +16,10 @@ export default function getModelByIdFactory(findModel) {
           "Content-Type": "application/json",
         },
         statusCode: 200,
-        body: { model },
+        body: model,
       };
     } catch (e) {
-      log(e.message);
+      console.error(e.message);
 
       if (e.message === "no such id") {
         return {

@@ -1,14 +1,39 @@
+async function getCountByDateRange(range, repository) {
+  // TODO: implement
+  return {
+    count: (await repository.list()).length,
+  };
+}
+
 /**
  * @callback listModels
  * @param {{key1:string, keyN:string}} query
  * @returns {Promise<Array<import("../models/model").Model)>>}
  *
- * @param {import('../datasources/datasource').default} repository
+ * @param {{repository:import('../datasources/datasource').default}}
  * @returns {listModels}
  */
 export default function listModelsFactory({ repository } = {}) {
   return async function listModels(query) {
-    console.debug("query", query);
+    if (query?.count) {
+      if (
+        [
+          "today",
+          "thisWeek",
+          "thisMonth",
+          "thisYear",
+          "yesterday",
+          "lastWeek",
+          "lastMonth",
+          "lastYear"
+        ].includes(query.count)
+      ) {
+        return getCountByDateRange(query.count, repository);
+      }
+      return {
+        count: (await repository.list()).length,
+      };
+    }
     return repository.list(query);
   };
 }

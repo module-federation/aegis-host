@@ -13,7 +13,7 @@ export default async function fetchRelatedModels(model, relation) {
     const result = await async(model[relation]());
 
     if (result.ok) {
-      return { model, [relation]: result.data };
+      return { [model.getName()]: model, [relation]: result.data };
     }
   }
 

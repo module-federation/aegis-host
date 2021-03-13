@@ -58,8 +58,7 @@ function setPortTimeout(options) {
   // Retry the port on timeout
   const timerId = setTimeout(async () => {
     // Notify interested parties
-    const portTimeout = domainEvents.portTimeout(model);
-    model.emit(portTimeout, { eventName: portTimeout, options });
+    model.emit(domainEvents.portTimeout(model), options);
 
     // Invoke optional custom handler
     if (handler) handler(options);
@@ -68,8 +67,7 @@ function setPortTimeout(options) {
     await model[portName](...timerArgs.nextArg);
 
     // Retry worked
-    const retryWorked = domainEvents.portRetryWorked(model);
-    model.emit(retryWorked, { eventName: retryWorked, options });
+    model.emit(domainEvents.portRetryWorked(model), options);
   }, timeout);
 
   return {
@@ -197,10 +195,7 @@ export default function makePorts(ports, adapters, observer) {
 
             // Signal the next task to run, unless undo is running
             if (!updated.compensate && rememberPort) {
-              this.emit(portConf.producesEvent, {
-                eventName: portConf.producesEvent,
-                model: updated,
-              });
+              updated.emit(portConf.producesEvent, portName);
             }
 
             return updated;

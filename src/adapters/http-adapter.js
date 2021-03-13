@@ -2,11 +2,15 @@
 /**
  * @callback httpController
  * @param {{
- *  body:{key1:val1,keyN:valN},
- *  query:{key1:val1,keyN:valN},
- *  params:{key1:val1,keyN:valN},
+ *  body:{key1,keyN},
+ *  query:{key1,keyN},
+ *  params:{key1,keyN},
  *  log:(functionName)=>void
  * }} httpRequest
+ * @returns {{
+ *  body:{key1,keyN},
+ *  headers:{key1,keyN}
+ * }}
  */
 
 /**
@@ -39,6 +43,8 @@ export default function buildCallback(controller) {
         console.info({
           function: func,
           method: httpRequest.method,
+          params: httpRequest.params,
+          query: httpRequest.query,
           source,
           ...payload,
         });

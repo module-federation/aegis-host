@@ -10,8 +10,14 @@
  */
 
 /**
- *
+ * @callback removeModel
+ * @param {string} id
+ * @returns {Promise<import("../models").Model>}
+ */
+
+/**
  * @param {ModelParam} param0
+ * @returns {removeModel}
  */
 export default function removeModelFactory({
   modelName,
@@ -26,6 +32,7 @@ export default function removeModelFactory({
 
   return async function removeModel(id) {
     const model = await repository.find(id);
+
     if (!model) {
       throw new Error("no such id");
     }
@@ -33,14 +40,17 @@ export default function removeModelFactory({
     const deleted = models.deleteModel(model);
     const event = await models.createEvent(eventType, modelName, deleted);
 
-    await Promise.all([
-      repository.delete(id),
+    const [obsResult, repoResult] = await Promise.allSettled([
       observer.notify(event.eventName, event),
-    ]).catch(async error => {
-      console.error(error);
-      await repository.save(id, model);
-      throw new Error(error);
-    });
+      repository.delete(id),
+    ]);
+
+    if (obsResult.status === "rejected") {
+      if (repoResult.status === "fulfilled") {
+        await repository.save(id, model);
+      }
+      throw new Error("model not deleted", obsResult.reason);
+    }
 
     return model;
   };

@@ -26,11 +26,9 @@
             cls = "<span>";
           }
         } else if (/true|false/.test(match)) {
-          cls = "<span class='text-light'>";
+          cls = "<span style='color:lightviolet'>";
         } else if (/null/.test(match)) {
           cls = "<span class='text-info'>";
-        } else if (/modelId/.test(match)) {
-          cls = "<span class='text-decoration-underline'>";
         }
         return cls + match + "</span>";
       }

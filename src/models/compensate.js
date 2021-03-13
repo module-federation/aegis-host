@@ -14,7 +14,7 @@ export default function compensate(model) {
     const portFlow = model.getPortFlow();
     const ports = model.getSpec().ports;
 
-    updated.emit(domainEvents.undoStarted(updated), updated);
+    updated.emit(domainEvents.undoStarted(updated), "compensate started");
 
     const undo = portFlow.reduceRight(async (model, port, index) => {
       await async(ports[port].undo(model));
@@ -28,6 +28,6 @@ export default function compensate(model) {
         ? domainEvents.undoFailed(model)
         : domainEvents.undoWorked(model);
 
-    undo.emit(msg, undo);
+    undo.emit(msg, "compensate finished");
   };
 }
