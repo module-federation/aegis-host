@@ -120,7 +120,7 @@ echo "ENCRYPTION_PWD=secret" >> .env
 npm run start-all
 ```
 
-```shell'
+```shell
 git clone https://github.com/module-federation/MicroLib.git
 cd MicroLib
 npm ci
