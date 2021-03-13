@@ -8,28 +8,36 @@ import domainEvents from "./domain-events";
  * @returns {function():Promise<void>}
  */
 export default async function compensate(model) {
-  const updated = await model.update({ compensate: true });
-  const portFlow = model.getPortFlow();
-  const ports = model.getSpec().ports;
-  const PORTFLOW = model.getKey("portFlow");
+  try {
+    const updated = await model.update({ compensate: true });
+    const portFlow = model.getPortFlow();
+    const ports = model.getSpec().ports;
 
-  await updated.emit(domainEvents.undoStarted(updated), "compensate started");
+    await updated.emit(domainEvents.undoStarted(updated), "undo started");
 
-  const undoResult = await portFlow.reduceRight(async (model, port, index) => {
-    await async(ports[port].undo(model));
-    if (model?.update) {
-      return model.update({
-        [PORTFLOW]: portFlow.splice(0, index),
-      });
-    }
-  }, Promise.resolve(updated));
+    const undoResult = await portFlow.reduceRight(
+      async (_prev, port, index, arr) => {
+        if (ports[port].undo) {
+          console.log("calling undo on port: ", port);
+          const result = await async(ports[port].undo(updated));
+          if (result.ok) {
+            return arr.splice(0, index);
+          }
+          throw new Error("undo failed on port: ", port, result.error);
+        }
+        return arr.splice(0, index);
+      }
+    );
 
-  console.log(undoResult);
+    const eventName =
+      undoResult.length === 0
+        ? domainEvents.undoWorked(model)
+        : domainEvents.undoFailed(model);
 
-  // const eventName =
-  //   updated.getPortFlow().length > 0
-  //     ? domainEvents.undoFailed(model)
-  //     : domainEvents.undoWorked(model);
-
-  // await undo.emit(eventName, "compensate finished");
+    await updated.emit(eventName, "undo finished");
+    await updated.update({ compensateResult: eventName });
+  } catch (error) {
+    console.error(error);
+    await model.emit(domainEvents.undoFailed(model), error.message);
+  }
 }
