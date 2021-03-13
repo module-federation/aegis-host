@@ -62,10 +62,6 @@ const Server = (() => {
         console.log("deleting webpack cached module", k);
         delete __webpack_require__.m[k];
       });
-
-    Object.keys(__webpack_require__.m)
-      .filter(k => /express/.test(k))
-      .forEach(k => console.log(k));
   }
 
   function start(router) {
