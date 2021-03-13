@@ -136,9 +136,11 @@ Optionally, install MongoDB:
 - In .env, `DATASOURCE_ADAPTER=DataSourceMongoDb`
 - In .env, `MONGODB_URL=mongodb://localhost:27017`
 
+
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
 ## Further Reading
+
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
@@ -147,3 +149,6 @@ Optionally, install MongoDB:
 [Microservice trade-offs](https://martinfowler.com/articles/microservice-trade-offs.html)
 
 <img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=MicroLIb&dp=/email/MicroLib">
+
+## Hot Reload
+![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload2-md.gif)
