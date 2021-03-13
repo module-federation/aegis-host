@@ -129,7 +129,7 @@ echo "ENCRYPTION_PWD=secret" >> .env
 npm run restart
 ```
 
-![install](https://github.com/module-federation/MicroLib/blob/hot-reload/wiki/microlib-install-4k.gif)
+![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
 ## Further Reading
 

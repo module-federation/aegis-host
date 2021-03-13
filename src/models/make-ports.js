@@ -105,7 +105,7 @@ function addPortListener(portName, portConf, observer, disabled) {
     observer.on(
       portConf.consumesEvent,
       async function ({ eventName, model }) {
-        console.log(`event ${eventName} received, invoking port ${portName}`);
+        console.log(`event ${eventName} received: invoking port ${portName}`);
         // Invoke this port
         await async(model[portName](callback));
       },
@@ -121,6 +121,7 @@ function addPortListener(portName, portConf, observer, disabled) {
  * @param {import(".").Model} model
  * @param {*} port
  * @param {*} remember
+ * @returns {import(".").Model}
  */
 async function updatePortFlow(model, port, remember) {
   if (!remember) return model;
