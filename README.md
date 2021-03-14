@@ -1,6 +1,6 @@
 ![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/wiki/microlib.png)
 
-# MicroLib `codename Aegis`
+# MicroLib <sup>codename Aegis</sup>
 
 Microservice Libraries
 
