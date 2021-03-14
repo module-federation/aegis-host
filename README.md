@@ -47,13 +47,13 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 ## Components
 
 MicroLib uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime.
-MicroLib modules fall into three categories: **_model_**, **_adapter_** and **_service_**.
+MicroLib modules fall into three categories: `model`, `adapter` and `service`.
 
-A **model** is a domain entity/service that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
+A `model` is a domain entity/service that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
-One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An **adapter** implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
+One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An `adapter` implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
 
-A **service** provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
+A `service` provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
 
 ---
 
@@ -138,11 +138,13 @@ Optionally, install MongoDB:
 DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
 ```
-
+### Installation
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
-## Further Reading
+### Hot Reload
+![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
 
+## Further Reading
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
@@ -152,5 +154,4 @@ MONGODB_URL=mongodb://localhost:27017
 
 <img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=MicroLIb&dp=/email/MicroLib">
 
-## Hot Reload
-![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
+
