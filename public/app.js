@@ -86,6 +86,7 @@
   }
 
   postButton.onclick = function () {
+    document.getElementById("modelId").value = "";
     fetch(getUrl(), {
       method: "POST",
       body: document.getElementById("payload").value,
@@ -99,6 +100,7 @@
   };
 
   patchButton.onclick = function () {
+    document.getElementById("query").value = "";
     fetch(getUrl(), {
       method: "PATCH",
       body: document.getElementById("payload").value,

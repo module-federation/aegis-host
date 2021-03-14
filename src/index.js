@@ -10,10 +10,9 @@ const port = process.env.PORT || 8070;
  * Load federated server module. Call `clear` to delete non-webpack cache if 
  * hot reloading. Call `start` to import remote models, adapters, services, 
  * set API routes and load persisted data from storage.
- * @param {express} app express server
- * @param {boolean} hot `true` if hot reloading, `false` by default
+ * @param {boolean} hot `true` to hot reload
  */
-async function startMicroLib(app, hot = false) {
+async function startMicroLib(hot = false) {
   const remoteEntry = importFresh("./remoteEntry");
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
@@ -25,10 +24,9 @@ async function startMicroLib(app, hot = false) {
 
 /**
  * Callbacks attached to existing routes are stale.
- * Clear API routes.
- * @param {express} app express server
+ * Clear the routes we need to update.
  */
-function clearExpressRoutes(app) {
+function clearRoutes() {
   app._router.stack = app._router.stack.filter(
     k => !(k?.route?.path && k.route.path.startsWith("/api"))
   );
@@ -37,7 +35,7 @@ function clearExpressRoutes(app) {
 /**
  * Initial startup
  */
-startMicroLib(app).then(() => {
+startMicroLib().then(() => {
   app.use(express.json());
   app.use(express.static("public"));
   app.listen(port, function () {
@@ -53,8 +51,8 @@ startMicroLib(app).then(() => {
  */
 app.get("/reload", async (req, res) => {
   try {
-    clearExpressRoutes(app);
-    await startMicroLib(app, true);
+    clearRoutes();
+    await startMicroLib(true);
     res.send("<h1>hot reload complete</h1>");
   } catch (error) {
     console.error(error);
