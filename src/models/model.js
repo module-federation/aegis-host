@@ -181,27 +181,26 @@ const Model = (() => {
       },
 
       /**
-       * User code calls this method to save updates.
-       * 
        * Concurrency support: strategy is to merge with
-       * last update vs blindly overwriting.
-       * 
-       * Concomitant strategy is to add props dynamically
-       * as needed to minimize the potential for conflict. 
-       * 
-       * If updating same props, last one in wins.
-       * 
-       * @param {*} changes - object containg updated props
+       * last update vs blindly overwriting. Concomitant
+       * strategy is to add props dynamically as needed
+       * to minimize the potential for conflict. If
+       * updating same props, last one in wins.
+       *
+       * @param {*} changes - object containing updated props
        * @param {boolean} validate - run validation by default
+       * @param {boolean} overwrite - do not merge with last saved
+       * copy - the default behavior is to merge
        */
-      async update(changes, validate = true) {
+      async update(changes, validate = true, overwrite = false) {
         const model = optionalValidation(this, changes, validate);
         const saved = await datasource.find(model[ID]);
 
-        // merge the incoming model with the last saved one.
+        // by default merge the incoming model with the last one saved
+        const merge = overwrite ? model : { ...saved, ...model };
+
         return datasource.save(model[ID], {
-          ...saved,
-          ...model, 
+          ...merge,
           [UPDATETIME]: new Date().getTime(),
         });
       },
@@ -209,7 +208,7 @@ const Model = (() => {
       /**
        * Search existing model instances (synchronously).
        * Only searches the cache. Does not search persistent storage.
-       * 
+       *
        * @param {{key1, keyN}} filter - list of required matching key-values
        * @returns {Model[]}
        */
@@ -220,7 +219,7 @@ const Model = (() => {
       /**
        * Search existing model instances (asynchronously).
        * Searches cache first, then persistent storage if not found.
-       * 
+       *
        * @param {{key1, keyN}} filter
        * @returns {Model[]}
        */
@@ -230,7 +229,7 @@ const Model = (() => {
 
       /**
        * Listen for domain events.
-       * 
+       *
        * @param {string} eventName - name of event
        * @param {function(Model)} callback - called when event is heard
        * @param {boolean} [multi] - allow multiple listeners for event,
@@ -242,7 +241,7 @@ const Model = (() => {
 
       /**
        * Fire domain events.
-       * 
+       *
        * @param {string} eventName - event identifier, unique string
        * @param {Model|Event} eventData - any, but typically `Model`
        */
@@ -256,7 +255,7 @@ const Model = (() => {
 
       /**
        * Returns the `ModelSpecification` for this model.
-       * 
+       *
        * @returns {import(".").ModelSpecification}
        */
       getSpec() {
@@ -265,7 +264,7 @@ const Model = (() => {
 
       /**
        * Returns the `ports` for this model.
-       * 
+       *
        * @returns {import("../models").ports}
        */
       getPorts() {
@@ -274,7 +273,7 @@ const Model = (() => {
 
       /**
        * Returns the `modelName` of this model instance.
-       * 
+       *
        * @returns
        */
       getName() {
@@ -283,7 +282,7 @@ const Model = (() => {
 
       /**
        * Returns ID of this model instance.
-       * 
+       *
        * @returns {string}
        */
       getId() {
@@ -292,7 +291,7 @@ const Model = (() => {
 
       /**
        * Return a list of ports invoked by this model instance, in LIFO order.
-       * 
+       *
        * @returns {string[]}
        */
       getPortFlow() {
@@ -301,7 +300,7 @@ const Model = (() => {
 
       /**
        * Get the `Symbol` key value for protected properties.
-       * 
+       *
        * @param {string} key - string representation of Symbol
        * @returns {Symbol}
        */
