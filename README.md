@@ -6,9 +6,9 @@ Microservice Libraries
 
 ## Purpose
 
-Get rid of the bad, keep the good. Like any architecture, microservice-style architectures impose a number of tradeoffs. Chief among them is deployment independence versus operational complexity. Building the components of an application as a set of networked executables provides the freedom to deploy at your own pace, but managing a distributed application is inherently more difficult than running a monolith.
+Get rid of the bad, keep the good. Like any architecture, microservice-style architectures impose a number of trade-offs. Chief among them is deployment independence versus operational complexity. Building the components of an application as a set of networked executables provides the freedom to deploy at your own pace, but managing a distributed application is inherently more difficult than running a monolith.
 
-The implicit premise behind this tradeoff is expressed by [Fowler](https://martinfowler.com/articles/microservices.html):
+The implicit premise behind this trade-off is expressed by [Fowler](https://martinfowler.com/articles/microservices.html):
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
