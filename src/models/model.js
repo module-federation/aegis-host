@@ -34,7 +34,8 @@
  * @property {function():string} getName - model name
  * @property {function():string} getId - model instance id
  * @property {function():import(".").ModelSpecification} getSpec - get ModelSpec
- * @property {function():string[]} getPortFlow - get history of port calls
+ * @property {function():string[]} getPortFlow - get port history
+ * @property {function():import(".").ports} getPorts - get port config
  * @property {function():string} getName - model name
  * @property {function(string):{arg0:string,symbol:Symbol}} getKey
  * @property {function():throws} undo - back out transactions
@@ -176,7 +177,9 @@ const Model = (() => {
        */
       async update(changes, validate = true) {
         const model = optionalValidation(this, changes, validate);
+        const saved = await datasource.find(model[ID]);
         return datasource.save(model[ID], {
+          ...saved,
           ...model,
           [UPDATETIME]: new Date().getTime(),
         });

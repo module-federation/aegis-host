@@ -17,7 +17,7 @@ export default async function resumeWorkflow(list) {
         const history = model.getPortFlow();
         const ports = model.getSpec().ports;
 
-        if (history?.length > 0) {
+        if (history?.length > 0 && !model.compensate) {
           const lastPort = history.length - 1;
           const nextPort = ports[history[lastPort]].producesEvent;
 

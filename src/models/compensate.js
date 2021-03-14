@@ -11,9 +11,9 @@ export default async function compensate(model) {
   try {
     const updated = await model.update({ compensate: true });
     const portFlow = model.getPortFlow();
-    const ports = model.getSpec().ports;
+    const ports = model.getPorts();
 
-    await updated.emit(domainEvents.undoStarted(updated), "undo started");
+    await updated.emit(domainEvents.undoStarted(updated), "undo starting");
 
     const undoResult = await portFlow.reduceRight(
       async (_prev, port, index, arr) => {
@@ -28,14 +28,21 @@ export default async function compensate(model) {
         return arr.splice(0, index);
       }
     );
-
-    const eventName =
-      undoResult.length === 0
-        ? domainEvents.undoWorked(model)
-        : domainEvents.undoFailed(model);
-
-    await updated.emit(eventName, "undo finished");
-    await updated.update({ compensateResult: eventName });
+    
+    if (undoResult.length > 0) {
+      const lastPort = portFlow[undoResult.length - 1];
+      const msg = "undo incomplete, last port compensated " + lastPort;
+      const recordPort = await updated.update({
+        lastPort,
+        compensateResult: "INCOMPLETE",
+      });
+      await recordPort.emit(domainEvents.undoFailed(model), msg);
+      console.error(msg, updated);
+      return;
+    }
+    const compensateResult = "COMPLETE";
+    await updated.emit(domainEvents.undoWorked(model), compensateResult);
+    await updated.update({ compensateResult });
   } catch (error) {
     console.error(error);
     await model.emit(domainEvents.undoFailed(model), error.message);
