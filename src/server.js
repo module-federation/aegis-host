@@ -13,7 +13,6 @@ import {
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
-import ModelFactory from "./models";
 
 const Server = (() => {
   const apiRoot = "/api";
@@ -39,10 +38,8 @@ const Server = (() => {
     });
   }
 
-  function clear() {    
+  function clear() {
     try {
-      ModelFactory.clearModels();
-
       Object.keys(__non_webpack_require__.cache).forEach(k => {
         console.log("deleting cached module", k);
         delete __non_webpack_require__.cache[k];
