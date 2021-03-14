@@ -133,9 +133,11 @@ npm run restart
 
 Optionally, install MongoDB:
 
-- In .env, `DATASOURCE_ADAPTER=DataSourceMongoDb`
-- In .env, `MONGODB_URL=mongodb://localhost:27017`
-
+In .env
+```shell
+DATASOURCE_ADAPTER=DataSourceMongoDb
+MONGODB_URL=mongodb://localhost:27017
+```
 
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
