@@ -133,11 +133,17 @@ npm run restart
 
 Optionally, install MongoDB:
 
+```shell
+brew install mongodb-community@4.4
+mongod
+```
+
 .env
 ```shell
 DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
 ```
+
 ### Installation
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
