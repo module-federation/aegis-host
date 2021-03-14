@@ -133,7 +133,7 @@ npm run restart
 
 Optionally, install MongoDB:
 
-In .env
+.env
 ```shell
 DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
