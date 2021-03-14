@@ -87,6 +87,16 @@ function getPortCallback(cb) {
 }
 
 /**
+ * Are we compensating for a failed or canceled transaction?
+ * @param {import(".").Model} model
+ * @returns
+ */
+async function isUndoRunning(model) {
+  const latest = await model.find(model.getId());
+  return latest.compensate;
+}
+
+/**
  * Register an event handler that invokes this `port`.
  * @param {string} portName
  * @param {import('.').ports[portName]} portConf
@@ -105,8 +115,15 @@ function addPortListener(portName, portConf, observer, disabled) {
     observer.on(
       portConf.consumesEvent,
       async function ({ eventName, model }) {
-        console.log(`event ${eventName} received: invoking port ${portName}`);
-        // Invoke this port
+        // Don't call any more ports if we are backing out a transaction.
+        if (await isUndoRunning(model)) {
+          console.warn("undo running, canceling port opertion");
+          return;
+        }
+
+        console.info(`event ${eventName} fired: calling port ${portName}`);
+
+        // invoke this port
         await async(model[portName](callback));
       },
       false
@@ -121,7 +138,7 @@ function addPortListener(portName, portConf, observer, disabled) {
  * @param {import(".").Model} model
  * @param {*} port
  * @param {*} remember
- * @returns {import(".").Model}
+ * @returns {Promise<import(".").Model>}
  */
 async function updatePortFlow(model, port, remember) {
   if (!remember) return model;
@@ -194,9 +211,9 @@ export default function makePorts(ports, adapters, observer) {
             // Remember what ports we called for undo and restart
             const updated = await updatePortFlow(model, port, rememberPort);
 
-            // Signal the next task to run, unless undo is running
-            if (!updated.compensate && rememberPort) {
-              updated.emit(portConf.producesEvent, portName);
+            // Signal the next port to run.
+            if (rememberPort) {
+              await updated.emit(portConf.producesEvent, portName);
             }
 
             return updated;
