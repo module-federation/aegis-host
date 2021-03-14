@@ -135,26 +135,34 @@ const Model = (() => {
     } = modelInfo;
 
     return {
-      // Optional mixins
+      // User mixins
       ...compose(...mixins)(model),
+
       // Generate functions to fetch related objects
       ...makeRelations(relations, datasource),
-      // Create ports for domain I/O
+
+      // Generate port functions to handle domain I/O
       ...makePorts(ports, dependencies, observer),
+
       // Remember port calls
       [PORTFLOW]: [],
+
       // model class name
       [MODELNAME]: modelName,
+
       // model instance uuid
       [ID]: uuid(),
+
       // Called before update is committed
       [ONUPDATE](changes) {
         return onUpdate(this, changes);
       },
+
       // Called before delete is committed
       [ONDELETE]() {
         return onDelete(this);
       },
+
       /**
        * Run validation logic
        * @param {*} changes - updated values
@@ -164,46 +172,65 @@ const Model = (() => {
       [VALIDATE](changes, event) {
         return validate(this, changes, event);
       },
+
       /**
        * Back out port transactions
        */
       async undo() {
         compensate(this);
       },
+
       /**
-       * User code calls this method to persist updates.
-       * @param {*} changes
-       * @param {boolean} validate - defaults to `true`
+       * User code calls this method to save updates.
+       * 
+       * Concurrency support: strategy is to merge with
+       * last update vs blindly overwriting.
+       * 
+       * Concomitant strategy is to add props dynamically
+       * as needed to minimize the potential for conflict. 
+       * 
+       * If updating same props, last one in wins.
+       * 
+       * @param {*} changes - object containg updated props
+       * @param {boolean} validate - run validation by default
        */
       async update(changes, validate = true) {
         const model = optionalValidation(this, changes, validate);
         const saved = await datasource.find(model[ID]);
+
+        // merge the incoming model with the last saved one.
         return datasource.save(model[ID], {
           ...saved,
-          ...model,
+          ...model, 
           [UPDATETIME]: new Date().getTime(),
         });
       },
+
       /**
        * Search existing model instances (synchronously).
        * Only searches the cache. Does not search persistent storage.
+       * 
        * @param {{key1, keyN}} filter - list of required matching key-values
        * @returns {Model[]}
        */
       listSync(filter) {
         return datasource.listSync(filter);
       },
+
       /**
        * Search existing model instances (asynchronously).
        * Searches cache first, then persistent storage if not found.
+       * 
        * @param {{key1, keyN}} filter
        * @returns {Model[]}
        */
       async list(filter, cache = false) {
         return datasource.list(filter, cache);
       },
+
       /**
        * Listen for domain events.
+       * 
        * @param {string} eventName - name of event
        * @param {function(Model)} callback - called when event is heard
        * @param {boolean} [multi] - allow multiple listeners for event,
@@ -212,8 +239,10 @@ const Model = (() => {
       addListener(eventName, callback, multi = true) {
         observer.on(eventName, callback, multi);
       },
+
       /**
        * Fire domain events.
+       * 
        * @param {string} eventName - event identifier, unique string
        * @param {Model|Event} eventData - any, but typically `Model`
        */
@@ -224,43 +253,55 @@ const Model = (() => {
           model: this,
         });
       },
+
       /**
        * Returns the `ModelSpecification` for this model.
+       * 
        * @returns {import(".").ModelSpecification}
        */
       getSpec() {
         return modelInfo.spec;
       },
+
       /**
        * Returns the `ports` for this model.
+       * 
        * @returns {import("../models").ports}
        */
       getPorts() {
         return modelInfo.spec.ports;
       },
+
       /**
        * Returns the `modelName` of this model instance.
+       * 
        * @returns
        */
       getName() {
         return this[MODELNAME];
       },
+
       /**
-       * Returns the ID of this model instance.
+       * Returns ID of this model instance.
+       * 
        * @returns {string}
        */
       getId() {
         return this[ID];
       },
+
       /**
        * Return a list of ports invoked by this model instance, in LIFO order.
+       * 
        * @returns {string[]}
        */
       getPortFlow() {
         return this[PORTFLOW];
       },
+
       /**
        * Get the `Symbol` key value for protected properties.
+       * 
        * @param {string} key - string representation of Symbol
        * @returns {Symbol}
        */
@@ -310,7 +351,7 @@ const Model = (() => {
     Object.freeze
   );
 
-  // Recreate model instance
+  // Recreate model from deserialized object
   const loadModel = pipe(
     make,
     withSerializers(
