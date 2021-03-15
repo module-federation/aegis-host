@@ -114,7 +114,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, [download](https://kafka.apache.org/downloads) the kafka tarball and extract it to the same dir MicroLib is in. 
 
-You directory structure should look like this (your kafka version might be different):
+After cloning the two MicroLib repos, your directory structure should look like this (your kafka version might be different):
 
 ```shell
 ls -l
