@@ -14,7 +14,7 @@ The implicit premise behind this trade-off is expressed by [Fowler](https://mart
 
 While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems the benefits of these technologies have not been worth the effort required to implement them. At least not until now...
 
-With the introduction of module federation, it is possible to dynamically import remote libraries, with just a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. 
+With the introduction of module federation, it is possible to dynamically import remote libraries, as if they were installed locally, with just a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. 
 
 With MicroLib, you are no longer forced to choose between mangeability and autonomy. Instead, you avoid the microservices premium by building "microservice monoliths." Because of MicroLib's clean architecture and zero-downtime, zero-install deployment capability, there is no need for teams to coordinate deployments. They are free to deploy as they like.
 
