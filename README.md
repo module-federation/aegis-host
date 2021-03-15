@@ -6,7 +6,7 @@ Microservice Libraries
 
 ## Purpose
 
-Get rid of the bad, keep the good. Like any architecture, microservice-style architectures impose a number of trade-offs. Chief among them is deployment independence versus operational complexity. Building the components of an application as a set of independent deployment units might afford you the freedom to deploy at your own pace, but it comes at a significant cost and risk to the business, compared with the alternative monolith-based solution. The fact is, distributed systems are simply harder to develop and maintain. This is known as the "microservices premium." 
+Get rid of the bad, keep the good. Like any architecture, microservice-style architectures impose a number of trade-offs. Chief among them is deployment independence versus operational complexity. Building the components of an application as a set of distributed deployment units might afford you the freedom to deploy at your own pace, but it comes at a significant cost and risk to the business, compared with the alternative approach of using a monolith-based solution. The fact is, distributed systems are simply harder to develop and maintain. This barrier to entry is known as the "microservices premium." 
 
 The implicit premise behind this trade-off is expressed by [Fowler](https://martinfowler.com/articles/microservices.html):
 
