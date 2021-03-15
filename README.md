@@ -6,7 +6,7 @@ Microservice Libraries
 
 ## Purpose
 
-Get rid of the bad, keep the good. Like any architecture, microservice-style architectures impose a number of trade-offs. Chief among them is deployment independence versus operational complexity. Building the components of an application as a set of independently deployable executables can provide the freedom to deploy at your own pace, but it comes at a potentially significant cost and risk to the business, compared with the traditional monolith approach. Many microservice projecgts fail. Distributed systems are just harder to develop and operate. This is known as the "microservices premium." Is deployment autonomy worth the pains of a distributed architecture or do you need to stick with the more manageable solution?  
+Get rid of the bad, keep the good. Like any architecture, microservice-style architectures impose a number of trade-offs. Chief among them is deployment independence versus operational complexity. Building the components of an application as a set of independently deployable components can provide the freedom to deploy at your own pace, but it comes at a significant cost and risk to the business, compared with the traditional monolithlic approach. Many microservice projects fail. Distributed systems are simply harder to develop and operate. This is known as the "microservices premium." So is deployment autonomy worth the pains of a distributed architecture or do you stick with the more manageable solution?  
 
 The implicit premise behind this trade-off is expressed by [Fowler](https://martinfowler.com/articles/microservices.html):
 
@@ -14,7 +14,9 @@ The implicit premise behind this trade-off is expressed by [Fowler](https://mart
 
 While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems the benefits of these technologies have not been worth the effort required to implement them. At least not until now...
 
-With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with just a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. Using MicroLib, you eliminate the "microservices premium" by building "microservice monoliths." You no longer have to choose between autonomy and manageability. 
+With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with just a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. 
+
+Using MicroLib, you are no longer forced to choose between mangeability and autonomy. You eliminate the microservices premium by building "microservice monoliths." As in distributed solution, development teams deploy whenever they choose. Using zero-downtime, "zero-install" deployment, there's no need to coordinate with other teams.
 
 ---
 
