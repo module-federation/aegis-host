@@ -152,9 +152,6 @@ MONGODB_URL=mongodb://localhost:27017
 
 ## Further Reading
 
- <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Clean Microservices. Building Composable Microservices with… | by Tyson Midboe | Medium <a href="https://t.co/COvdDoDYAJ">https://t.co/COvdDoDYAJ</a></p>&mdash; Zack Jackson (@ScriptedAlchemy) <a href="https://twitter.com/ScriptedAlchemy/status/1371252253915418627?ref_src=twsrc%5Etfw">March 15, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
 [Webpack 5 Module Federation: A game-changer in JavaScript architecture](https://medium.com/swlh/webpack-5-module-federation-a-game-changer-to-javascript-architecture-bcdd30e02669)
