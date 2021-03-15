@@ -16,7 +16,7 @@ While there are, and have been, technologies to deploy libraries without redeplo
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, with just a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. 
 
-With MicroLib, you are no longer forced to choose between mangeability and autonomy. Instead, you avoid the microservices premium by building "microservice monoliths." Because of MicroLib's clean architecture and zero-downtime, zero-install deployment capability, there is no need for teams to coordinate deployments. Teams are free to deploy as they like.
+With MicroLib, you are no longer forced to choose between mangeability and autonomy. Instead, you avoid the microservices premium by building "microservice monoliths." Because of MicroLib's clean architecture and zero-downtime, zero-install deployment capability, there is no need for teams to coordinate deployments. They are free to deploy as they like.
 
 ---
 
