@@ -147,7 +147,7 @@ MONGODB_URL=mongodb://localhost:27017
 ### Installation
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
-### Hot Reload
+### Zero Downtime, Zero Install Deployment, API Generation
 ![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
 
 ## Further Reading
