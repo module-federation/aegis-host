@@ -8,8 +8,6 @@ import {
   removeModels,
   loadModels,
   listConfigs,
-  liveReload,
-  clearModels,
 } from "../use-cases";
 import postModelFactory from "./post-model";
 import patchModelFactory from "./patch-model";
@@ -31,8 +29,7 @@ export const patchModels = () => make(editModels, patchModelFactory);
 export const getModels = () => make(listModels, getModelFactory);
 export const getModelsById = () => make(findModels, getModelByIdFactory);
 export const deleteModels = () => make(removeModels, deleteModelFactory);
-export const getConfig = clear => getConfigFactory(listConfigs(clear));
-//export const postLiveReload =  () => liveReloadFactory(liveReload());
+export const getConfig = () => getConfigFactory(listConfigs());
 
 export const initCache = () => {
   const models = loadModels();

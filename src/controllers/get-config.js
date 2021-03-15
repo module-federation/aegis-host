@@ -1,11 +1,11 @@
-import log from "../lib/logger";
+"use strict";
 
 export default function getConfigFactory(listConfigs) {
   return async function getConfig(httpRequest) {
     try {
-      const configs = await listConfigs();
+      httpRequest.log(getConfig.name);
 
-      //httpRequest.log(getConfig.name);
+      const configs = await listConfigs();
 
       return {
         headers: {
@@ -15,8 +15,6 @@ export default function getConfigFactory(listConfigs) {
         body: configs,
       };
     } catch (e) {
-      log(e);
-
       return {
         headers: {
           "Content-Type": "application/json",

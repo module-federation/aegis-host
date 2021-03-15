@@ -42,5 +42,4 @@ export const listModels = () => make(listModelsFactory);
 export const findModels = () => make(findModelFactory);
 export const removeModels = () => make(removeModelFactory);
 export const loadModels = () => make(loadModelsFactory);
-export const listConfigs = clear =>
-  listConfigFactory({ models: ModelFactory, clear });
+export const listConfigs = () => listConfigFactory({ models: ModelFactory });
