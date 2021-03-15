@@ -22,7 +22,7 @@ With the introduction of module federation, it is possible to dynamically import
 
 The goal of MicroLib is to provide an alternative to distributed systems and the performance and operational challenges that come with them, while preserving the benefits of deployment independence. To this end, MicroLib organizes components according to hexagonal architecture, such that the boundaries of, and relations between, federated components are clear and useful. MicroLib prevents coupling of collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
 
-- [Dynamic API generation for federated modules](#zero-downtime-zero-install-deployment-api-generation)
+- [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Dynamic, independent persistence of federated modules
 - Dynamic port generation for federated modules
 - Dynamic port-adapter binding
@@ -33,7 +33,7 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 - Persistence API for cached datasources
 - Datasource relations for federated schemas
 - Dependency/control inversion (IoC)
-- [Zero downtime, "zero install" deployment](#zero-downtime-zero-install-deployment-api-generation)
+- [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
 - Serverless deployment
