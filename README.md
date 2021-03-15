@@ -12,7 +12,7 @@ The implicit premise behind this trade-off is expressed by [Fowler](https://mart
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems the level of effort required to use these tecnologies has so far outweighed their potential benefits. At least until now...
+While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems the benefits of these technologies have not been worth the effort required to implement them. At least until now...
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with only a few simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries running in the same process, or what might be loosely called, **microservice libraries**.
 
