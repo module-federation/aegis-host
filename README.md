@@ -1,6 +1,6 @@
 ![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/wiki/microlib.png)
 
-# <span style="color:#FFBF00">MicroLib</span>    <sub><sup>codename Aegis</sup></sub>
+# MicroLib  <sub><sup>codename _Aegis_</sup></sub>
 
 Microservice Libraries
 
@@ -12,7 +12,7 @@ The implicit premise behind this trade-off is expressed by [Fowler](https://mart
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems the benefits of these technologies have not been worth the effort required to implement them. At least until now...
+While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems the benefits of these technologies have not been worth the effort required to implement them. At least not until now...
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, just as if you were importing them locally, with only a few simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries running in the same process, or what might be loosely called, **microservice libraries**.
 
@@ -107,6 +107,7 @@ Service orchestration is built on the framework’s port-adapter implementation.
 
 Callbacks specified for ports in the _ModelSpec_ can process data received on a port before its output event is fired and the next port runs. If not specified, the framework nevertheless saves the port output to the model. Of course, you can implement your own event handlers or adapter logic to customize the flow.
 
+---
 ## Running the Application
 
 Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, install Kafka in the same dir as MicroLib and run the following.
@@ -139,6 +140,7 @@ mongod
 ```
 
 .env
+
 ```shell
 DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
@@ -150,6 +152,7 @@ MONGODB_URL=mongodb://localhost:27017
 ### Zero Downtime - Zero Install Deployment, API Generation
 ![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
 
+---
 ## Further Reading
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
