@@ -328,12 +328,7 @@ const Model = (() => {
     Promise.resolve(
       // Call factory with data from request payload
       modelInfo.spec.factory(...modelInfo.args)
-    ).then(model =>
-      make({
-        model,
-        spec: modelInfo.spec,
-      })
-    );
+    ).then(model => make({ model, spec: modelInfo.spec }));
 
   const validate = event => model => model[VALIDATE]({}, event);
 

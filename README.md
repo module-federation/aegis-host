@@ -112,7 +112,16 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 ---
 ## Running the Application
 
-Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, install Kafka in the same dir as MicroLib and run the following.
+Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, [download](https://kafka.apache.org/downloads) the kafka tarball and extract it to the same dir MicroLib is in. 
+
+You directory structure should look like this (your kafka version might be different):
+
+```shell
+ls -l
+drwxr-xr-x  21 tmidboe  staff  672 Mar 15 09:12 MicroLib
+drwxr-xr-x  21 tmidboe  staff  672 Mar 14 00:47 MicroLib-Example
+drwxr-xr-x   1 tmidboe  staff   19 Mar  3 17:44 kafka_2.13-2.6.0
+```
 
 ```shell
 git clone https://github.com/module-federation/MicroLib-Example.git

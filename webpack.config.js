@@ -3,7 +3,7 @@ const ModuleFederationPlugin = require("webpack").container
   .ModuleFederationPlugin;
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
-require('dotenv').config()
+require("dotenv").config();
 
 const port = process.env.PORT || 8070;
 
@@ -46,10 +46,7 @@ module.exports = () => {
               type: "commonjs-module",
             },
             remoteType: "commonjs-module",
-            remotes: {
-              ...remotes,
-              server: "./dist/remoteEntry.sh",
-            },
+            remotes,
             exposes: {
               "./server": "./src/server",
               "./models": "./src/models",
