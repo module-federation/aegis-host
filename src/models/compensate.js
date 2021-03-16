@@ -20,6 +20,7 @@ export default async function compensate(model) {
         if (ports[port].undo) {
           console.log("calling undo on port: ", port);
           const result = await async(ports[port].undo(updated));
+
           if (result.ok) {
             return arr.splice(0, index);
           }
@@ -28,18 +29,21 @@ export default async function compensate(model) {
         return arr.splice(0, index);
       }
     );
-    
+
     if (undoResult.length > 0) {
       const lastPort = portFlow[undoResult.length - 1];
       const msg = "undo incomplete, last port compensated " + lastPort;
+
       const recordPort = await updated.update({
         lastPort,
         compensateResult: "INCOMPLETE",
       });
+
       await recordPort.emit(domainEvents.undoFailed(model), msg);
       console.error(msg, updated);
       return;
     }
+
     const compensateResult = "COMPLETE";
     await updated.emit(domainEvents.undoWorked(model), compensateResult);
     await updated.update({ compensateResult });

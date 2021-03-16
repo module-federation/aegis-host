@@ -7,8 +7,8 @@ const app = express();
 const port = process.env.PORT || 8070;
 
 /**
- * Load federated server module. Call `clear` to delete non-webpack cache if 
- * hot reloading. Call `start` to import remote models, adapters, services, 
+ * Load federated server module. Call `clear` to delete non-webpack cache if
+ * hot reloading. Call `start` to import remote models, adapters, services,
  * set API routes and load persisted data from storage.
  * @param {boolean} hot `true` to hot reload
  */
