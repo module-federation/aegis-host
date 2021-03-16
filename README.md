@@ -6,7 +6,7 @@ Microservice Libraries
 
 ## Purpose
 
-Enjoy the benefits of deployment independence without the hassle of a distributed architecture. Microservice-style architectures, like any architecture, impose several trade-offs, chief among which, is the decision to support deployment independence with distributed components. While deployment independence is tantamount to agility and velocity, distribution adds significant cost and risk. Many projects get into to trouble. This barrier to entry is known as the "microservices premium."
+Enjoy deployment independence without the hassle of a distributed architecture. Microservice-style architectures impose several trade-offs, perhaps the most important of which, is the decision to support deployment independence with distributed components. While deployment independence is tantamount to agility and velocity, distribution adds significant cost and risk. Many projects get into to trouble. This barrier to entry is known as the "microservices premium."
 
 The implicit premise behind this trade-off is expressed by [Fowler](https://martinfowler.com/articles/microservices.html):
 
