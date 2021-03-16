@@ -6,7 +6,7 @@ Microservice Libraries
 
 ## Purpose
 
-Enjoy the main benfits of microservices with none of the typical drawbacks. Like any architecture, microservice-style architectures impose several trade-offs. Chief among them is the choice between monolith and deployment independence. Building an application as a set of distributed, independently deployable components might afford dev teams the freedom to deploy at your their own pace, but comes at a significant cost and risk to the business, compared to a monolith-based approach. The fact is, distributed systems are simply harder to develop and maintain. This barrier to entry is known as the "microservices premium." 
+Enjoy the main benfits of microservices with none of the typical drawbacks. Like any architecture, microservice-style architectures impose several trade-offs. Chief among them is the choice between independent deployment,   mmonolith and deployment independence.  implementing a monolith or supporting deployment independence. Building an application as a set of distributed, independently deployable components might afford dev teams the freedom to deploy at your their own pace, but at a significant cost and risk to the business. The fact is, distributed systems are simply harder to develop and maintain. This barrier to entry is known as the "microservices premium." 
 
 The implicit premise behind this trade-off is expressed by [Fowler](https://martinfowler.com/articles/microservices.html):
 
