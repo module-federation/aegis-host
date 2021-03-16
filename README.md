@@ -6,7 +6,7 @@ Microservice Libraries
 
 ## Purpose
 
-Enjoy the main benfits of microservices with none of the typical drawbacks. Like any architecture, microservice-style architectures impose several trade-offs. Chief among them is the choice between independent deployment,   mmonolith and deployment independence.  implementing a monolith or supporting deployment independence. Building an application as a set of distributed, independently deployable components might afford dev teams the freedom to deploy at your their own pace, but at a significant cost and risk to the business. The fact is, distributed systems are simply harder to develop and maintain. This barrier to entry is known as the "microservices premium." 
+Enjoy the main benfits of microservices with none of the typical drawbacks. Like any architecture, microservice-style architectures impose several key trade-offs. Chief among them is the requirement to build a distributed system in order to support deployment independence. While deployment independence is tantamount to agility and velocity, distribution adds significant cost and risk.  This barrier to entry is known as the "microservices premium." 
 
 The implicit premise behind this trade-off is expressed by [Fowler](https://martinfowler.com/articles/microservices.html):
 
@@ -16,7 +16,7 @@ While there are, and have been, technologies to deploy libraries without redeplo
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, just as if they were installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. 
 
-With MicroLib, then, you are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium that result from distributed systems by building "microservice monoliths." And although these libraries run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _"zero-install"_ deployment capability, ensure they can be deployed independently of one another, at the discretion of the responsible developement team, with no futher coordination or agreement outside that team required.
+With MicroLib, then, you are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." And although these libraries run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _"zero-install"_ deployment capability, ensure they can be deployed independently of one another, at the discretion of the responsible developement team, with no futher coordination or agreement outside that team required.
 
 ---
 
