@@ -16,7 +16,7 @@ While there are, and have been, technologies to deploy libraries without redeplo
 
 With the introduction of module federation, it is possible to dynamically import remote libraries, just as if they were installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. 
 
-With MicroLib, then, you are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." And although these libraries run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _"zero-install"_ deployment capability, ensure they can be deployed independently of one another, at the discretion of the responsible developement team, with no futher coordination or agreement outside that team required.
+With MicroLib, then, you are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." Although libraries run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install_ deployment capability, ensure they can be deployed independently of one another, at the discretion of the responsible developement team, with no futher external coordination or agreement required.
 
 ---
 
@@ -93,9 +93,11 @@ In addition to in-memory function calls and ports, services can communicate with
 
 The framework provides a common broker for inter-service events and injects pub/sub functions into each model:
 
+```js
     ModelA.listen(event, callback)
 
     ModelB.notify(event, data)
+```
 
 As for remote events, just like any external integration, ports must be configured for external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
 
