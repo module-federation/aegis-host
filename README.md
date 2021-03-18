@@ -18,9 +18,11 @@ Wouldn't it be great if microservices didn't have to be distributed? Let's consi
 
 While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), its seems the value of those technologies wasnt worth the work required to use them.
 
-If that was ever true, it isn't any longer... With the introduction of module federation, it is possible to dynamically import remote libraries, just as if they were installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries that run in the same process, call them, **microservice libraries**.
+If that was ever true, it isn't any longer...
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install_ deployment capability, ensure they can be deployed independently of one another, without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate with other teams.
+With the introduction of module federation, it is possible to dynamically and efficiently import remote libraries, just as if they were installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries that run in the same process, call them, **microservice libraries**.
+
+With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install_ deployment capability, ensure they can be deployed independently and without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate with one another.
 
 ---
 
