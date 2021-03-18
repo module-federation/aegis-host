@@ -101,7 +101,6 @@ The framework provides a common broker for inter-service events and injects pub/
 
 ```js
 ModelA.listen(event, callback);
-
 ModelB.notify(event, data);
 ```
 
