@@ -46,7 +46,7 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 - Dynamic A/B testing
 - Serverless deployment
 - Configurable serialization for network and storage I/O
-- Code reuse that works with multiple repos
+- Polyrepo code reuse (the answer to the shared code question)
 
 ---
 
