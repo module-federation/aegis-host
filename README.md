@@ -12,7 +12,7 @@ Currently, the most important factor to consider when evaluating microservices a
 
 Wouldn't it be great if microservices didn't have to be distributed? Let's consider why they are.
 
-[Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind distribution/deployment trade-off:
+[Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
