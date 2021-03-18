@@ -1,7 +1,7 @@
 "use strict";
 
 import Model from "./model";
-import Event from "./event";
+import Event from "@module-federation/aegis/esm/models/event";
 
 /**
  * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType
