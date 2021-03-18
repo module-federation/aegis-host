@@ -71,3 +71,5 @@ public/dynamic-select.html
 public/dynamic.html
 .DS_Store
 .DS_Store
+/.idea/
+/yarn.lock
