@@ -55,7 +55,7 @@ import {
 } from "./mixins";
 import makePorts from "./make-ports";
 import makeRelations from "./make-relations";
-import compensate from "./compensate";
+import compensate from "@module-federation/aegis/esm/models/compensate";
 import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
 import pipe from "../lib/pipe";
