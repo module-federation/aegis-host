@@ -1,4 +1,7 @@
+require("dotenv").config();
+
 (function () {
+  const apiRoot = process.env.API_ROOT || "/microlib/api";
   const messages = document.querySelector("#messages");
   const postButton = document.querySelector("#post");
   const patchButton = document.querySelector("#patch");
@@ -46,7 +49,7 @@
     const id = document.getElementById("modelId").value;
     const param = document.getElementById("parameter").value;
     const query = document.getElementById("query").value;
-    let url = `api/${model}`;
+    let url = `${apiRoot}/${model}`;
     if (id) url += `/${id}`;
     if (param) url += `/${param}`;
     if (query) url += `?${query}`;
