@@ -23,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@module-federation/aegis": "^0.0.1-alpha.1",
+    "core-js": "^3.9.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
