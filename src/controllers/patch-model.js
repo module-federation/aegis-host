@@ -1,6 +1,6 @@
 /**
  *
- * @param {import("../use-cases/edit-model").editModel} editModel
+ * @param {import("@module-federation/aegis/esm/models").editModel} editModel
  * @returns {import("../adapters/http-adapter").httpController}
  */
 export default function patchModelFactory(editModel, hash) {

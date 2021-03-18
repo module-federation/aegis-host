@@ -1,7 +1,7 @@
 "use strict";
 
 import addModelFactory from "./add-model";
-import editModelFactory from "./edit-model";
+import editModelFactory from "@module-federation/aegis/esm/models/edit-model";
 import listModelsFactory from "./list-models";
 import findModelFactory from "./find-model";
 import removeModelFactory from "./remove-model";
