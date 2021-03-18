@@ -6,9 +6,9 @@ Microservice Libraries
 
 ## Purpose
 
-Stop paying the "microservices premium": use MicroLib. MicroLib circumvents the main causes of failed microservice implementations. by eliminatng the worst aspects of microservices-style architecture, distribution and operational complexity, while retaining its chief virtue, deployment independence.
+Stop paying the "microservices premium": use MicroLib. MicroLib eliminates the worst aspects of microservices-style architecture, distribution and operational complexity, while retaining its chief virtue, deployment independence.
 
-Currently, the most important factor to consider when evaluating microservices as candidate architecture is the fact that the end result is a distributed application. Compared with monolithic apps, distributed apps are more difficult to develop and manage, leading to increased cost and risk. This is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, it's less clear. What is clear is that in many cases, projects fail because they don't pay the premium, leading many consultants and architects to advise against starting with microservices but instead introduce them gradually as functional scope or demand increases. That said, in cases where the implementation succeeds, organisations generally prefer microservices to monoliths because of the speed and agility that deployment independence brings.
+Currently, the most important factor to consider when evaluating microservices as candidate architecture is the fact that the end result is a distributed application. Compared with monolithic apps, distributed apps are more difficult to develop and manage, leading to increased cost and risk. This is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, it's less clear. What is clear is that in many cases, projects fail because they don't pay the premium, leading many consultants and architects to advise against starting with microservices but instead introduce them gradually as functional scope or demand increases. That said, in cases where the implementation does succeed, organisations generally prefer microservices to monoliths because of the speed and agility that deployment independence brings.
 
 Wouldn't it be great, then, if microservices didn't have to be distributed? Let's consider why they are.
 
@@ -16,7 +16,7 @@ Wouldn't it be great, then, if microservices didn't have to be distributed? Let'
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it would appear the value of those technologies wasn't understood or worth the effort required to implement.
+Example of an Order and Customer service streaming to / running in the same MicroLib host server process. Shows integration with, and orchestration of, an Address, Payment, Inventory,s Shipping, Event (Kafka, WebSockets), and Persistance service (MongoDB) via MicroLib federated ports.While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it would appear the value of those technologies wasn't understood or worth the effort required to implement.
 
 If that was ever true, it isn't any longer...
 
