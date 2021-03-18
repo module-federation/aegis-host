@@ -1,6 +1,6 @@
 "use strict";
 
-import domainEvents from "../models/domain-events";
+import domainEvents from "@module-federation/aegis/esm/models/domain-events";
 
 /**
  * @typedef {Object} dependencies injected dependencies

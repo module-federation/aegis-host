@@ -2,7 +2,7 @@
 
 import portHandler from "./port-handler";
 import async from "../lib/async-error";
-import domainEvents from "./domain-events";
+import domainEvents from "@module-federation/aegis/esm/models/domain-events";
 
 const TIMEOUT_SECONDS = 60;
 const MAX_RETRY = 5;
