@@ -1,7 +1,7 @@
 var assert = require("assert");
 import DataSourceFactory from "../../src/datasources";
 import ObserverFactory from "../../src/lib/observer";
-import ModelFactory from "../../src/models/model-factory";
+import ModelFactory from "@module-federation/aegis/esm/models/model-factory";
 import checkAcl from "../../src/lib/check-acl";
 
 const {

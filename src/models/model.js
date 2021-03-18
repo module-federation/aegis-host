@@ -53,7 +53,7 @@ import {
   fromSymbol,
   toSymbol,
 } from "./mixins";
-import makePorts from "./make-ports";
+import makePorts from "@module-federation/aegis/esm/models/make-ports";
 import makeRelations from "./make-relations";
 import compensate from "@module-federation/aegis/esm/models/compensate";
 import asyncPipe from "../lib/async-pipe";
