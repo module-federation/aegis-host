@@ -8,21 +8,21 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-Today, microservices are the components of distributed applications. Distribution is how you get deployment independence, which is the main reason to use microservices. However, distributed apps are harder to build and manage, increasing cost and risk, and causing many projects to fail. What if you could eliminate distribution while preserving deployment independence? Enter MicroLib.
+Today, microservices are the components of distributed applications. Distribution is how you get deployment independence, which is the main reason to use microservices. However, distributed apps are harder to build and manage. So much so, that many projects fail to deliver. But what if you could eliminate distribution while preserving deployment independence? Enter MicroLib.
 
-Dealing with the increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, it's less clear. What is clear is that in many cases, projects fail because they can't "pay", leading many consultants and architects to advise against starting with microservices but instead introduce them gradually as scope or demand requires. That said, in cases where the implementation does succeed, organisations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings.
+Dealing with the increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, it's less clear. What is clear is that in many cases, projects fail because they can't "pay", leading many consultants and architects to advise against starting with microservices, but instead introducing them gradually as scope or demand requires. That said, in cases where the implementation does succeed, organisations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings.
 
-Let's consider why microservices are distributed. [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
+Let's consider why microservices are distributed components. [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While there are, and have been, technologies that deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it would appear the value of those technologies wasn't understood or worth the effort required to implement.
+While there are, and have been, technologies that deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it would appear the value of those technologies wasn't considered or was considered unequal to the task, or was just not worth the effort for whatever reason.
 
-If that was ever true, it isn't any longer...
+If that was ever true, it isn't any more...
 
 With the introduction of module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries that run in the same process, call them, **microservice libraries**.
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install_ deployment capability, ensure they can be deployed independently, without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate.
+With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install_ deployment capability, ensure they can be deployed independently, without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate.
 
 ---
 
