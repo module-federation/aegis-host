@@ -8,7 +8,7 @@ Microservice Libraries
 
 Stop paying the "microservices premium": use MicroLib. Eliminate the worst aspects of microservices-style architecture, distribution and operational complexity, while still enjoying its main advantage, deployment independence.
 
-Currently, the most important factor to consider when evaluating microservices as candidate architecture is the fact that the end result is a distributed application. Compared with a monolithic architecture, distributed apps are more difficult to develop and manage, which significantly increases both cost and risk. This is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, it's less clear. What is clear is that in many cases, projects fail due to this added complexity. That said, in cases where the implementation succeeds, organisations generally prefer microservices to monoliths, because of the speed and agility that deployment independence brings.
+Currently, the most important factor to consider when evaluating microservices as candidate architecture is the fact that the end result is a distributed application. Compared with a monolithic architecture, distributed apps are more difficult to develop and manage, which significantly increases both cost and risk. This is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, it's less clear. What is clear is that in many cases, projects fail due to this added complexity, leading many consultants and architects to advise against starting with microservices. That said, in cases where the implementation succeeds, organisations generally prefer microservices to monoliths because of the speed and agility that deployment independence brings.
 
 Wouldn't it be great if microservices didn't have to be distributed? Let's consider why they are.
 
@@ -16,7 +16,7 @@ Wouldn't it be great if microservices didn't have to be distributed? Let's consi
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), its seems the value of those technologies wasnt worth the work required to use them.
+While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), its seems the value of those technologies wasn't worth the work required to use them.
 
 If that was ever true, it isn't any longer...
 
