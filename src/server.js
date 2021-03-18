@@ -15,7 +15,7 @@ import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
 const Server = (() => {
-  const apiRoot = "/api";
+  const apiRoot = process.env.API_ROOT || "/microlib/api";
   const endpoint = e => `${apiRoot}/${e}`;
   const endpointId = e => `${apiRoot}/${e}/:id`;
   const endpointCmd = e => `${apiRoot}/${e}/:id/:command`;

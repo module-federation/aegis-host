@@ -1,6 +1,6 @@
 ![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/wiki/microlib.png)
 
-# MicroLib  <sub><sup>codename _Aegis_</sup></sub>
+# MicroLib <sub><sup>codename _Aegis_</sup></sub>
 
 Microservice Libraries
 
@@ -15,9 +15,9 @@ The implicit premise behind this trade-off is expressed by [Fowler](https://mart
 
 While there are, and have been, technologies to deploy libraries without redeploying the applications they comprise (consider [OSGi](https://www.osgi.org/)), it seems the benefits of these technologies have not been worth the effort required to implement them. At least not until now...
 
-With the introduction of module federation, it is possible to dynamically import remote libraries, just as if they were installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**. 
+With the introduction of module federation, it is possible to dynamically import remote libraries, just as if they were installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, running in the same process, or what might be loosely called, **microservice libraries**.
 
-With MicroLib, then, you are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." And although these libraries run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install=_ deployment capability, ensure they can be deployed independently of one another, at the discretion of the responsible developement team, with no futher coordination or agreement outside that team required.
+With MicroLib, then, you are no longer forced to choose between mangeability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." Although libraries run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install_ deployment capability, ensure they can be deployed independently of one another, at the discretion of the responsible developement team, with no futher external coordination or agreement required.
 
 ---
 
@@ -94,9 +94,11 @@ In addition to in-memory function calls and ports, services can communicate with
 
 The framework provides a common broker for inter-service events and injects pub/sub functions into each model:
 
-    ModelA.listen(event, callback)
+```js
+ModelA.listen(event, callback);
 
-    ModelB.notify(event, data)
+ModelB.notify(event, data);
+```
 
 As for remote events, just like any external integration, ports must be configured for external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
 
@@ -111,9 +113,10 @@ Service orchestration is built on the framework’s port-adapter implementation.
 Callbacks specified for ports in the _ModelSpec_ can process data received on a port before its output event is fired and the next port runs. If not specified, the framework nevertheless saves the port output to the model. Of course, you can implement your own event handlers or adapter logic to customize the flow.
 
 ---
+
 ## Running the Application
 
-Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, [download](https://kafka.apache.org/downloads) the kafka tarball and extract it to the same dir MicroLib is in. 
+Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, [download](https://kafka.apache.org/downloads) the kafka tarball and extract it to the same dir MicroLib is in.
 
 After cloning the two MicroLib repos, your directory structure should look like this (your kafka version might be different):
 
@@ -159,12 +162,15 @@ MONGODB_URL=mongodb://localhost:27017
 ```
 
 ### Installation
+
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
 
 ### Zero Downtime - Zero Install Deployment, API Generation
+
 ![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
 
 ---
+
 ## Further Reading
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
@@ -174,5 +180,3 @@ MONGODB_URL=mongodb://localhost:27017
 [Microservice trade-offs](https://martinfowler.com/articles/microservice-trade-offs.html)
 
 <img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=MicroLIb&dp=/email/MicroLib">
-
-
