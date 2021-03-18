@@ -8,7 +8,7 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-Today, microservices are the components of distributed applications. Distribution is how you get deployment independence, is the main reason to use microservices. However, distributed apps are harder to build and manage, increasing cost and risk, and causing many projects to fail. What if you could eliminate distribution while preserdeployment independence? Enter MicroLib.
+Today, microservices are the components of distributed applications. Distribution is how you get deployment independence, which is the main reason to use microservices. However, distributed apps are harder to build and manage, increasing cost and risk, and causing many projects to fail. What if you could eliminate distribution while preserving deployment independence? Enter MicroLib.
 
 Dealing with the increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, it's less clear. What is clear is that in many cases, projects fail because they can't "pay", leading many consultants and architects to advise against starting with microservices but instead introduce them gradually as scope or demand requires. That said, in cases where the implementation does succeed, organisations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings.
 
