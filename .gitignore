@@ -10,3 +10,4 @@ coverage
 .deleteme.swp
 .DS_Store
 /.idea/
+/yarn.lock
