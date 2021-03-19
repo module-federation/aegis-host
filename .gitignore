@@ -9,3 +9,4 @@ src/.DS_Store
 coverage
 .deleteme.swp
 .DS_Store
+/.idea/
