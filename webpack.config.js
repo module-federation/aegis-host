@@ -49,7 +49,7 @@ module.exports = () => {
             remotes,
             exposes: {
               "./server": "./src/server",
-              "./models": "./src/models",
+              "./models": "@module-federation/aegis/esm/models",
             },
           }),
         ],
