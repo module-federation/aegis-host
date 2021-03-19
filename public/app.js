@@ -13,10 +13,6 @@
   const paramInput = document.querySelector("#parameter");
   const copyButton = document.querySelector("#copyButton");
 
-  if (window.location.protocol == "http:") {
-    window.location.href = window.location.href.replace("http:", "https:");
-  }
-
   function prettifyJson(json) {
     if (typeof json !== "string") {
       json = JSON.stringify(json, null, 2);

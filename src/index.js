@@ -5,12 +5,14 @@ require("dotenv").config();
 const importFresh = require("import-fresh");
 const express = require("express");
 const fs = require("fs");
+const http = require("http");
 const https = require("https");
 const app = express();
 const privateKey = fs.readFileSync("cert/server.key", "utf8");
 const certificate = fs.readFileSync("cert/domain.crt", "utf8");
 const credentials = { key: privateKey, cert: certificate };
-const sslPort = process.env.SSL_PORT || 8070;
+const port = process.env.PORT || 8070;
+const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 /**
@@ -69,10 +71,15 @@ startMicroLib().then(() => {
   app.use(express.static("public"));
   app.use(reloadPath, reload);
   const httpsServer = https.createServer(credentials, app);
+  const httpServer = http.createServer(app);
 
   httpsServer.listen(sslPort, () => {
     console.info(
       `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
     );
+  });
+
+  httpServer.listen(port, () => {
+    console.info(`\nMicroLib listening on port https://localhost:${port} 🌎\n`);
   });
 });

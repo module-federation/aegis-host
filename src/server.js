@@ -15,7 +15,8 @@ import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
 const Server = (() => {
-  const sslPort = process.env.SSL_PORT || "8070";
+  const port = process.env.PORT || "8070";
+  const sslPort = process.env.SSL_PORT || "8707";
   const apiRoot = process.env.API_ROOT || "/microlib/api";
   const modelPath = `${apiRoot}/models`;
   const endpoint = e => `${modelPath}/${e}`;
@@ -73,6 +74,7 @@ const Server = (() => {
         cache.load();
 
         console.log(`https://localhost:${sslPort}`);
+        console.log(`https://localhost:${port}`);
         process.on("SIGTERM", () => close());
       });
     });
