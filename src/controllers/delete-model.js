@@ -1,5 +1,3 @@
-import log from "../lib/logger";
-
 /**
  *
  * @param {import("../use-cases/remove-model").removeModel} removeModel
@@ -22,7 +20,7 @@ export default function deleteModelFactory(removeModel, hash) {
         body: { modelId: model.getId() },
       };
     } catch (e) {
-      log(e);
+      console.error(e);
 
       if (e.message === "no such id") {
         return {

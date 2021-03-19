@@ -89,7 +89,7 @@ function getPortCallback(cb) {
 /**
  * Are we compensating for a failed or canceled transaction?
  * @param {import(".").Model} model
- * @returns
+ * @returns {boolean}
  */
 async function isUndoRunning(model) {
   const latest = await model.find(model.getId());
@@ -115,14 +115,12 @@ function addPortListener(portName, portConf, observer, disabled) {
     observer.on(
       portConf.consumesEvent,
       async function ({ eventName, model }) {
-        // Don't call any more ports if we are backing out a transaction.
+        // Don't call any more ports if we are reversing a transaction.
         if (await isUndoRunning(model)) {
-          console.warn("undo running, canceling port opertion");
+          console.warn("undo running, canceling port operation");
           return;
         }
-
         console.info(`event ${eventName} fired: calling port ${portName}`);
-
         // invoke this port
         await async(model[portName](callback));
       },

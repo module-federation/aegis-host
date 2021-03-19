@@ -15,10 +15,12 @@ import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
 const Server = (() => {
+  const sslPort = process.env.SSL_PORT || "8070";
   const apiRoot = process.env.API_ROOT || "/microlib/api";
-  const endpoint = e => `${apiRoot}/${e}`;
-  const endpointId = e => `${apiRoot}/${e}/:id`;
-  const endpointCmd = e => `${apiRoot}/${e}/:id/:command`;
+  const modelPath = `${apiRoot}/models`;
+  const endpoint = e => `${modelPath}/${e}`;
+  const endpointId = e => `${modelPath}/${e}/:id`;
+  const endpointCmd = e => `${modelPath}/${e}/:id/:command`;
 
   const getRemoteModules = __non_webpack_require__("./remoteEntry")
     .microlib.get("./models")
@@ -27,8 +29,8 @@ const Server = (() => {
       return Module.initRemotes;
     });
 
-  function makeAdmin(path, app, adapter) {
-    app.get(path("config"), adapter(getConfig()));
+  function makeAdmin(app, adapter) {
+    app.get(`${apiRoot}/config`, adapter(getConfig()));
   }
 
   function make(path, app, method, controllers) {
@@ -67,13 +69,10 @@ const Server = (() => {
         make(endpointId, router, "delete", deleteModels);
 
         console.timeEnd(label);
-
-        makeAdmin(endpoint, router, http);
-
+        makeAdmin(router, http);
         cache.load();
 
-        console.log("http://localhost:8070");
-
+        console.log(`https://localhost:${sslPort}`);
         process.on("SIGTERM", () => close());
       });
     });

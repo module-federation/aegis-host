@@ -16,7 +16,7 @@
     "transpile": "babel src/index.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "test": "mocha --recursive -r esm",
-    "demo": "open http://localhost:8070",
+    "demo": "open https://localhost:8707",
     "clean": "rm -rf dist"
   },
   "author": "Tyson Midboe",

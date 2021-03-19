@@ -1,7 +1,6 @@
-require("dotenv").config();
-
 (function () {
-  const apiRoot = process.env.API_ROOT || "/microlib/api";
+  const apiRoot = "microlib/api";
+  const modelApiPath = apiRoot + "/models";
   const messages = document.querySelector("#messages");
   const postButton = document.querySelector("#post");
   const patchButton = document.querySelector("#patch");
@@ -13,6 +12,10 @@ require("dotenv").config();
   const queryInput = document.querySelector("#query");
   const paramInput = document.querySelector("#parameter");
   const copyButton = document.querySelector("#copyButton");
+
+  if (window.location.protocol == "http:") {
+    window.location.href = window.location.href.replace("http:", "https:");
+  }
 
   function prettifyJson(json) {
     if (typeof json !== "string") {
@@ -41,7 +44,7 @@ require("dotenv").config();
   function displayUrl(url) {
     document.getElementById(
       "url"
-    ).textContent = `http://${location.host}/${url}`;
+    ).textContent = `${location.protocol}${location.host}/${url}`;
   }
 
   function getUrl() {
@@ -49,7 +52,7 @@ require("dotenv").config();
     const id = document.getElementById("modelId").value;
     const param = document.getElementById("parameter").value;
     const query = document.getElementById("query").value;
-    let url = `${apiRoot}/${model}`;
+    let url = `${modelApiPath}/${model}`;
     if (id) url += `/${id}`;
     if (param) url += `/${param}`;
     if (query) url += `?${query}`;
@@ -149,7 +152,7 @@ require("dotenv").config();
 
   window.addEventListener("load", function () {
     const modelList = document.getElementById("modelList");
-    fetch("api/config")
+    fetch("microlib/api/config")
       .then(data => data.json())
       .then(models =>
         models.forEach(m => modelList.appendChild(new Option(m.endpoint)))

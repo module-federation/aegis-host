@@ -4,18 +4,15 @@ require("regenerator-runtime");
 require("dotenv").config();
 const importFresh = require("import-fresh");
 const express = require("express");
-const { requiresAuth } = require("express-openid-connect");
 const fs = require("fs");
-const http = require("http");
 const https = require("https");
 const app = express();
-const privateKey = fs.readFileSync("cert/key.pem", "utf8");
-const certificate = fs.readFileSync("cert/server.crt", "utf8");
+const privateKey = fs.readFileSync("cert/server.key", "utf8");
+const certificate = fs.readFileSync("cert/domain.crt", "utf8");
 const credentials = { key: privateKey, cert: certificate };
-const port = process.env.PORT || 8070;
-const sslPort = process.env.SSL_PORT || 8707;
+const sslPort = process.env.SSL_PORT || 8070;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
-
+const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 /**
  * Load federated server module. Call `clear` to delete non-webpack cache if
  * hot reloading. Call `start` to import remote models, adapters, services,
@@ -32,6 +29,7 @@ async function startMicroLib(hot = false) {
     // clear cache on hot deloy
     serverModule.default.clear();
   }
+
   serverModule.default.start(app);
 }
 
@@ -63,29 +61,14 @@ async function reload(req, res) {
   }
 }
 
-// /**
-//  * Get Auth0 user profile
-//  * @param {*} req
-//  * @param {*} res
-//  */
-// async function profile(req, res) {
-//   res.send(JSON.stringify(req.oidc.user));
-// }
-
 /**
  * startup
  */
 startMicroLib().then(() => {
   app.use(express.json());
   app.use(express.static("public"));
-  app.get("reload", reload);
-  const httpServer = http.createServer(app);
+  app.use(reloadPath, reload);
   const httpsServer = https.createServer(credentials, app);
-
-  // listen on both ports
-  httpServer.listen(port, () => {
-    console.info(`\nMicroLib listening on http://localhost:${port} 🌎\n`);
-  });
 
   httpsServer.listen(sslPort, () => {
     console.info(

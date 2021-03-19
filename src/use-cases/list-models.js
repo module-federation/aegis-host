@@ -1,7 +1,6 @@
 async function getCountByDateRange(range, repository) {
-  // TODO: implement
   return {
-    count: (await repository.list()).length,
+    count: (await repository.list(null, false)).length,
   };
 }
 
@@ -21,17 +20,15 @@ export default function listModelsFactory({ repository } = {}) {
           "today",
           "thisWeek",
           "thisMonth",
-          "thisYear",
           "yesterday",
           "lastWeek",
           "lastMonth",
-          "lastYear"
         ].includes(query.count)
       ) {
         return getCountByDateRange(query.count, repository);
       }
       return {
-        count: (await repository.list()).length,
+        count: (await repository.list(null, false)).length,
       };
     }
     return repository.list(query);

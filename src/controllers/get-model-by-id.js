@@ -6,6 +6,7 @@ export default function getModelByIdFactory(findModel) {
   return async function getModelById(httpRequest) {
     try {
       httpRequest.log(getModelById.name);
+
       const id = httpRequest.params.id;
       const query = httpRequest.query;
 
