@@ -3,7 +3,7 @@
  * @callback httpController
  * @param {{
  *  body:{key1,keyN},
- *  query:{key1,keyN},
+ *  query:{key1},
  *  params:{key1,keyN},
  *  log:(functionName)=>void
  * }} httpRequest
