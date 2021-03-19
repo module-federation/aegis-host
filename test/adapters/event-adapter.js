@@ -1,6 +1,6 @@
 
 // var assert = require('assert');
-// import Model from '../../src/models/model';
+// import Model from '@module-federation/aegis/esm/models/model';
 // import { listen } from '../../src/adapters/event-adapter';
 // import { Event } from '../services/event-service';
 
