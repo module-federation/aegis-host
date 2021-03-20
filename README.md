@@ -22,7 +22,7 @@ If that was ever true, it isn't any more...
 
 With the introduction of module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries that run in the same process, call them, **microservice libraries**.
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building, lets call them, _"polyliths"_ - a monolith running multiple (what would have been) microservices. Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ _/_ _zero-install_ deployment capability, ensure they can be deployed independently, without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate.
+With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building, lets call them, _"polyliths"_ - a monolith running multiple (what would have been) microservices. Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ _/_ _zero-install_ _/_ _hot_ _deploy_ capability, ensure they can be deployed independently, without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate.
 
 ---
 
@@ -35,6 +35,7 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 - Dynamic port generation for federated modules
 - Dynamic port-adapter binding
 - Dynamic adapter-service binding
+- [Hot reload of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
 - Common broker for locally shared events
