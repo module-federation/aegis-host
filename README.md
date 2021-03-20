@@ -56,7 +56,7 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 
 MicroLib uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. MicroLib modules fall into three categories: `model`, `adapter` and `service`.
 
-A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture terms, a component - that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
+A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
 One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An `adapter` implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added or -removed, in which case the framework automatically rebinds its adapters. Similarly an adapter can be hot-replaced and rebound.
 
