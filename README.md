@@ -22,7 +22,7 @@ If that was ever true, it isn't any more...
 
 With the introduction of module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries that run in the same process, call them, **microservice libraries**.
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building "microservice monoliths." Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ / _zero-install_ deployment capability, ensure they can be deployed independently, without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate.
+With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building, lets call them, _"polyliths"_ - a monolith running multiple (what would have been) microservices. Although "microservice libraries" run in the same process, MicroLib's port-adapter design and _zero-downtime_ _/_ _zero-install_ deployment capability, ensure they can be deployed independently, without disrupting one another; allowing development teams to deploy whenever they choose, without having to coordinate.
 
 ---
 
@@ -56,11 +56,11 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 
 MicroLib uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. MicroLib modules fall into three categories: `model`, `adapter` and `service`.
 
-A `model` is a domain entity/service that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
+A `model` is a domain entity/service--or in terms of (polylith)[https://polylith.gitbook.io/] architecture, a component--that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
-One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An `adapter` implements the port ’s interface, facilitating communication with the outside world. The framework dynamically imports and binds adapters to ports at runtime.
+One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An `adapter` implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added or -removed, in which case the framework automatically rebinds its adapters. Similarly an adapter can be hot-replaced and rebound.
 
-A `service` provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
+A `service` provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime or during a hot-deploy.
 
 ---
 
