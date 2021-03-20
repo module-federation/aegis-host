@@ -120,16 +120,11 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
-Installation of Kafka is currently required to demo the sample app. Check back soon for a simplified install. Otherwise, [download](https://kafka.apache.org/downloads) the kafka tarball and extract it to the same dir MicroLib is in.
+To demonstrate that polyrepo code sharing is a reality, you will clone two repos.
 
-After cloning the two MicroLib repos, your directory structure should look like this (your kafka version might be different):
+The first is MicroLib-Example, which shows you how youy might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote.
 
-```shell
-ls -l
-drwxr-xr-x  21 tmidboe  staff  672 Mar 15 09:12 MicroLib
-drwxr-xr-x  21 tmidboe  staff  672 Mar 14 00:47 MicroLib-Example
-drwxr-xr-x   1 tmidboe  staff   19 Mar  3 17:44 kafka_2.13-2.6.0
-```
+The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
 ```shell
 git clone https://github.com/module-federation/MicroLib-Example.git
@@ -138,7 +133,7 @@ npm ci
 echo "KAFKA_GROUP_ID=remote" > .env
 echo "ENCRYPTION_PWD=secret" >> .env
 npm run build
-npm run start-all
+
 ```
 
 ```shell
@@ -148,7 +143,7 @@ npm ci
 echo "KAFKA_GROUP_ID=host" > .env
 echo "ENCRYPTION_PWD=secret" >> .env
 echo "DATASOURCE_ADAPTER=DataSourceFile" >> .env
-npm run restart
+npm run build
 ```
 
 Optionally, install MongoDB:
@@ -156,6 +151,15 @@ Optionally, install MongoDB:
 ```shell
 brew install mongodb-community@4.4
 mongod
+```
+
+Start the services:
+
+```shell
+# on the remote MicroLib-Remote
+npm run start-all
+# on the host MicroLib
+npm run start
 ```
 
 .env
