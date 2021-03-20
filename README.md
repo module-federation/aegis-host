@@ -59,7 +59,7 @@ MicroLib uses a modified version of [Webpack Module Federation](https://webpack.
 
 A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the MicroLib `ModelSpecification` interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
-One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An `adapter` implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added or -removed, in which case the framework automatically rebinds its adapters. Similarly an adapter can be hot-replaced and rebound.
+One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An `adapter` implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added or -removed, in which case the framework automatically rebinds their adapters. Similarly an adapter can be hot-replaced and rebound.
 
 A `service` provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime or during a hot-deploy.
 
