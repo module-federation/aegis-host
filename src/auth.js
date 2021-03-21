@@ -4,7 +4,7 @@ const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
 const authEnabled = process.env.AUTH_ENABLED || false;
 
-module.exports = function (app) {
+module.exports = function (app, path) {
   if (!authEnabled) return app;
 
   const jwtCheck = jwt({
@@ -19,7 +19,7 @@ module.exports = function (app) {
     algorithms: ["RS256"],
   });
 
-  app.use("/microlib", jwtCheck);
+  app.use(path, jwtCheck);
 
   return app;
 };

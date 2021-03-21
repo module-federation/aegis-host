@@ -1,21 +1,24 @@
 "use strict";
 
-require("regenerator-runtime");
 require("dotenv").config();
+require("regenerator-runtime");
+const cluster = require("cluster");
 const importFresh = require("import-fresh");
 const express = require("express");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
-const app = require("./auth")(express());
+const app = require("./auth")(express(), "/microlib");
 const privateKey = fs.readFileSync("cert/server.key", "utf8");
 const certificate = fs.readFileSync("cert/domain.crt", "utf8");
 const credentials = { key: privateKey, cert: certificate };
+const clusterEnabled = process.env.CLUSTER_ENABLED || false;
 const port = process.env.PORT || 8070;
 const sslEnabled = process.env.SSL_ENABLED || true;
 const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
+const workers = [];
 
 /**
  * Load federated server module. Call `clear` to delete non-webpack cache if
@@ -65,25 +68,102 @@ async function reload(req, res) {
 }
 
 /**
- * startup
+ * @todo Send a message to master process to do a rolling restart
+ * @param {*} req
+ * @param {*} res
  */
-startMicroLib().then(() => {
-  app.use(express.json());
-  app.use(express.static("public"));
-  app.use(reloadPath, reload);
-  const httpsServer = https.createServer(credentials, app);
-  const httpServer = http.createServer(app);
+async function reloadCluster(req, res) {
+  res.send("<h1>starting cluster reload</h1>");
+  //process.send("request cluster reload");
+}
 
-  if (sslEnabled) {
-    httpsServer.listen(sslPort, () => {
+function startService() {
+  /**
+   * Run either http or https,
+   * see .env var SSL_ENABLED
+   */
+  startMicroLib().then(() => {
+    app.use(express.json());
+    app.use(express.static("public"));
+    app.use(reloadPath, reload);
+    const httpsServer = https.createServer(credentials, app);
+    const httpServer = http.createServer(app);
+
+    if (sslEnabled) {
+      httpsServer.listen(sslPort, () => {
+        console.info(
+          `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
+        );
+      });
+      return;
+    }
+
+    httpServer.listen(port, () => {
       console.info(
-        `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
+        `\nMicroLib listening on port https://localhost:${port} 🌎\n`
       );
     });
-    return;
+  });
+}
+
+/**
+ * Setup number of worker processes to share port which will be defined while setting up server
+ */
+function setupWorkerProcesses() {
+  // to read number of cores on system
+  let numCores = require("os").cpus().length;
+  console.log("Master cluster setting up " + numCores + " workers");
+
+  // iterate on number of cores need to be utilized by an application
+  // current example will utilize all of them
+  for (let i = 0; i < numCores; i++) {
+    // creating workers and pushing reference in an array
+    // these references can be used to receive messages from workers
+    workers.push(cluster.fork());
+
+    // to receive messages from worker process
+    workers[i].on("message", function (message) {
+      console.log(message);
+    });
   }
 
-  httpServer.listen(port, () => {
-    console.info(`\nMicroLib listening on port https://localhost:${port} 🌎\n`);
+  // process is clustered on a core and process id is assigned
+  cluster.on("online", function (worker) {
+    console.log("Worker " + worker.process.pid + " is listening");
   });
-});
+
+  // if any of the worker process dies then start a new one by simply forking another one
+  cluster.on("exit", function (worker, code, signal) {
+    console.log(
+      "Worker " +
+        worker.process.pid +
+        " died with code: " +
+        code +
+        ", and signal: " +
+        signal
+    );
+    console.log("Starting a new worker");
+    cluster.fork();
+    workers.push(cluster.fork());
+    // to receive messages from worker process
+    workers[workers.length - 1].on("message", function (message) {
+      console.log(message);
+    });
+  });
+}
+
+/**
+ * Setup server either with clustering or without it
+= * @constructor
+ */
+function setupServer() {
+  // if it is a master process then call setting up worker process
+  if (clusterEnabled && cluster.isMaster) {
+    setupWorkerProcesses();
+  } else {
+    // to setup server configurations and share port address for incoming requests
+    startService();
+  }
+}
+
+setupServer();
