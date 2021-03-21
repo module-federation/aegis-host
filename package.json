@@ -13,11 +13,12 @@
     "build": "npm run clean && webpack --config webpack.config.js && npm run transpile",
     "start": "node -r dotenv/config dist/index.js",
     "restart": "npm run build && npm run start",
-    "transpile": "babel src/index.js -d dist",
+    "transpile": "babel src/index.js src/auth.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "test": "mocha --recursive -r esm",
     "demo": "open https://localhost:8707",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "token": "./accessToken.sh"
   },
   "author": "Tyson Midboe",
   "license": "MIT",
@@ -25,8 +26,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
-    "express-openid-connect": "^2.3.0",
     "import-fresh": "^3.3.0",
+    "jwks-rsa": "^2.0.1",
     "mongodb": "^3.6.3",
     "regenerator-runtime": "^0.13.7"
   },

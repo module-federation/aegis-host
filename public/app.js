@@ -13,6 +13,10 @@
   const paramInput = document.querySelector("#parameter");
   const copyButton = document.querySelector("#copyButton");
 
+  const accessToken =
+    "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImpzTEIzNmEzZmJuS0VYb0MtWWlhNyJ9.eyJpc3MiOiJodHRwczovL2Rldi0yZmUyaWFyNi51cy5hdXRoMC5jb20vIiwic3ViIjoiRGRSSEg2dTVCc3FwclMwM3J0Z0ZEdjVwNnh6Q2RFVUtAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vbWljcm9saWIuaW8vIiwiaWF0IjoxNjE2MzEwNzIyLCJleHAiOjE2MTYzOTcxMjIsImF6cCI6IkRkUkhINnU1QnNxcHJTMDNydGdGRHY1cDZ4ekNkRVVLIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwicGVybWlzc2lvbnMiOltdfQ.QlAiBv74oXQrezbmzRlP0XiEU-_dKg2pLy2ohglYELDBmel3eDB95jgFDwUftqdNhlcD0JG8-1KDynuxixwY_G0FdJ1P2O0TuJM1bD6e3cPkpYxbAqZkHyjOYzBs6WV8U1Lmcg2b8vfbPF4wm-UVRS685b1pUit5hKNZgBsLSLvqveOCySIG1VYWsjcs3D-OilaW4tiKBbtufiQSw3TJFGBWcQrouhl24WBQC7VMu-kWMkdqZGtyV44Hy2X8DltLw48QcmpeW0PtjVC_L1JGaLd3upShSBk_IC0CJAX1S065OXmKiGUKyQg6P1qqCzSqz8Yn7ac5iKJtmw_9jB2aQw";
+  const auth = { Authorization: `bearer ${accessToken}` };
+
   function prettifyJson(json) {
     if (typeof json !== "string") {
       json = JSON.stringify(json, null, 2);
@@ -92,7 +96,7 @@
     fetch(getUrl(), {
       method: "POST",
       body: document.getElementById("payload").value,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...auth },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -106,7 +110,7 @@
     fetch(getUrl(), {
       method: "PATCH",
       body: document.getElementById("payload").value,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...auth },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -117,7 +121,7 @@
 
   getButton.onclick = function () {
     document.getElementById("parameter").value = "";
-    fetch(getUrl())
+    fetch(getUrl(), { headers: auth })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -128,7 +132,7 @@
   deleteButton.onclick = function () {
     fetch(getUrl(), {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...auth },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -148,7 +152,7 @@
 
   window.addEventListener("load", function () {
     const modelList = document.getElementById("modelList");
-    fetch("microlib/api/config")
+    fetch("microlib/api/config", { headers: auth })
       .then(data => data.json())
       .then(models =>
         models.forEach(m => modelList.appendChild(new Option(m.endpoint)))

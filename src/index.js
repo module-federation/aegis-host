@@ -7,14 +7,16 @@ const express = require("express");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
-const app = express();
+const app = require("./auth")(express());
 const privateKey = fs.readFileSync("cert/server.key", "utf8");
 const certificate = fs.readFileSync("cert/domain.crt", "utf8");
 const credentials = { key: privateKey, cert: certificate };
 const port = process.env.PORT || 8070;
+const sslEnabled = process.env.SSL_ENABLED || true;
 const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
+
 /**
  * Load federated server module. Call `clear` to delete non-webpack cache if
  * hot reloading. Call `start` to import remote models, adapters, services,
@@ -72,11 +74,14 @@ startMicroLib().then(() => {
   const httpsServer = https.createServer(credentials, app);
   const httpServer = http.createServer(app);
 
-  httpsServer.listen(sslPort, () => {
-    console.info(
-      `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
-    );
-  });
+  if (sslEnabled) {
+    httpsServer.listen(sslPort, () => {
+      console.info(
+        `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
+      );
+    });
+    return;
+  }
 
   httpServer.listen(port, () => {
     console.info(`\nMicroLib listening on port https://localhost:${port} 🌎\n`);

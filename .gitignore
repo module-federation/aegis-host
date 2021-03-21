@@ -9,3 +9,4 @@ coverage
 .deleteme.swp
 src/models/.DS_Store
 .DS_Store
+accessToken.sh
