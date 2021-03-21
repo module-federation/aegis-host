@@ -74,7 +74,7 @@ const Server = (() => {
         cache.load();
 
         console.log(`https://localhost:${sslPort}`);
-        console.log(`https://localhost:${port}`);
+        console.log(`http://localhost:${port}`);
         process.on("SIGTERM", () => close());
       });
     });

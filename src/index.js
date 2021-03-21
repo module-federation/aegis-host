@@ -31,7 +31,6 @@ async function startMicroLib(hot = false) {
     // clear cache on hot deloy
     serverModule.default.clear();
   }
-
   serverModule.default.start(app);
 }
 
