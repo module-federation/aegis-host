@@ -49,6 +49,24 @@ function clearRoutes() {
   );
 }
 
+function reloadCallback() {
+  if (clusterEnabled) {
+    return async function reloadCluster(req, res) {
+      res.send("<h1>starting cluster reload</h1>");
+      //process.send("request cluster reload");
+    };
+  }
+  return async function reload(req, res) {
+    try {
+      clearRoutes();
+      await startMicroLib(true);
+      res.send("<h1>hot reload complete</h1>");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+}
+
 /**
  * Trigger a hot reload:
  * clear routes,d
@@ -72,10 +90,6 @@ async function reload(req, res) {
  * @param {*} req
  * @param {*} res
  */
-async function reloadCluster(req, res) {
-  res.send("<h1>starting cluster reload</h1>");
-  //process.send("request cluster reload");
-}
 
 function startService() {
   /**
@@ -85,7 +99,7 @@ function startService() {
   startMicroLib().then(() => {
     app.use(express.json());
     app.use(express.static("public"));
-    app.use(reloadPath, reload);
+    app.use(reloadPath, reloadCallback());
     const httpsServer = https.createServer(credentials, app);
     const httpServer = http.createServer(app);
 
