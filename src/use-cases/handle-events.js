@@ -2,7 +2,7 @@ import publishEvent from "../services/publish-event";
 
 /**
  *
- * @param {import('../models/observer').Observer} observer
+ * @param {import('@module-federation/aegis/esm/models/observer').Observer} observer
  * @param {import('../adapters/event-adapter').EventService} eventService
  */
 export default function handleEvents(observer) {

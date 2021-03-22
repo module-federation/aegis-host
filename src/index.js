@@ -19,6 +19,7 @@ const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const workers = [];
+import "../webpack/remote-entries";
 
 /**
  * Load federated server module. Call `clear` to delete non-webpack cache if

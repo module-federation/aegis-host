@@ -3,16 +3,16 @@
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName
- * @property {import('../models').ModelFactory} models
+ * @property {import('@module-federation/aegis/esm/models').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository
- * @property {import('../models/observer').Observer} observer
+ * @property {import('@module-federation/aegis/esm/models/observer').Observer} observer
  * @property {...Function} handlers
  */
 
 /**
  * @callback removeModel
  * @param {string} id
- * @returns {Promise<import("../models").Model>}
+ * @returns {Promise<import("@module-federation/aegis/esm/models").Model>}
  */
 
 /**
