@@ -15,7 +15,7 @@
     "restart": "npm run build && npm run start",
     "transpile": "babel src/index.js src/auth.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
-    "test": "mocha --recursive -r esm",
+    "test": "mocha --recursive -r test/**/*.js",
     "demo": "open https://localhost:8707",
     "clean": "rm -rf dist",
     "token": "./accessToken.sh"
@@ -23,7 +23,8 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "@module-federation/aegis": "^0.0.1-alpha.9",
+    "@babel/register": "^7.13.8",
+    "@module-federation/aegis": "^0.0.1-alpha.10",
     "core-js": "^3.9.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

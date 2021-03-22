@@ -860,6 +860,17 @@
     pirates "^4.0.0"
     source-map-support "^0.5.16"
 
+"@babel/register@^7.13.8":
+  version "7.13.8"
+  resolved "https://registry.yarnpkg.com/@babel/register/-/register-7.13.8.tgz#d9051dc6820cb4e86375cc0e2d55a4862b31184f"
+  integrity sha512-yCVtABcmvQjRsX2elcZFUV5Q5kDDpHdtXKKku22hNDma60lYuhKmtp1ykZ/okRCPLT2bR5S+cA1kvtBdAFlDTQ==
+  dependencies:
+    find-cache-dir "^2.0.0"
+    lodash "^4.17.19"
+    make-dir "^2.1.0"
+    pirates "^4.0.0"
+    source-map-support "^0.5.16"
+
 "@babel/runtime@^7.8.4":
   version "7.11.0"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.11.0.tgz"
@@ -924,10 +935,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@module-federation/aegis@^0.0.1-alpha.9":
-  version "0.0.1-alpha.9"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.9.tgz#6d35bd65f43a45b546c6c1b13d1cd02891bf305d"
-  integrity sha512-/7Pha4CmD7UjLaInAcPbty37OrRRGzy5Cu3YYtKI5zQToiIzyG1ZgxmVhM3+63tcyyGPdHL6go4jSzFH/quyOw==
+"@module-federation/aegis@^0.0.1-alpha.10":
+  version "0.0.1-alpha.10"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.10.tgz#46a46ab6b09d6c6b14eb4c998f8006f6e6d40512"
+  integrity sha512-DYewWNpjbcsrZTh1iyKxtlzbokbF8Lr1ZpR5jr74LKU5bsVutOsEZc+R4ePTDntBUlUP99PkBtFhGOFvGSVX1A==
   dependencies:
     core-js "^3.9.1"
 
