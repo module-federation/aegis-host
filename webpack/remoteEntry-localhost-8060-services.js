@@ -4861,6 +4861,171 @@ module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.21.1\",\"descri
 
 /***/ }),
 
+/***/ "./node_modules/debug/node_modules/ms/index.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/debug/node_modules/ms/index.js ***!
+  \*****************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
+/***/ ((module) => {
+
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse(val);
+  } else if (type === 'number' && isNaN(val) === false) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  if (ms >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (ms >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (ms >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (ms >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  return plural(ms, d, 'day') ||
+    plural(ms, h, 'hour') ||
+    plural(ms, m, 'minute') ||
+    plural(ms, s, 'second') ||
+    ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) {
+    return;
+  }
+  if (ms < n * 1.5) {
+    return Math.floor(ms / n) + ' ' + name;
+  }
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/debug/src/browser.js":
 /*!*******************************************!*\
   !*** ./node_modules/debug/src/browser.js ***!
@@ -5090,7 +5255,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(/*! ms */ "./node_modules/ms/index.js");
+exports.humanize = __webpack_require__(/*! ms */ "./node_modules/debug/node_modules/ms/index.js");
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -5575,23 +5740,18 @@ exports.enable(load());
   \************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var debug;
-
-module.exports = function () {
-  if (!debug) {
-    try {
-      /* eslint global-require: off */
-      debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/index.js")("follow-redirects");
-    }
-    catch (error) {
-      debug = function () { /* */ };
-    }
-  }
-  debug.apply(null, arguments);
-};
+try {
+  /* eslint global-require: off */
+  debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/index.js")("follow-redirects");
+}
+catch (error) {
+  debug = function () { /* */ };
+}
+module.exports = debug;
 
 
 /***/ }),
@@ -5602,7 +5762,7 @@ module.exports = function () {
   \************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 524:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 497:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var url = __webpack_require__(/*! url */ "url");
@@ -5667,17 +5827,6 @@ function RedirectableRequest(options, responseCallback) {
   this._performRequest();
 }
 RedirectableRequest.prototype = Object.create(Writable.prototype);
-
-RedirectableRequest.prototype.abort = function () {
-  // Abort the internal request
-  this._currentRequest.removeAllListeners();
-  this._currentRequest.on("error", noop);
-  this._currentRequest.abort();
-
-  // Abort this request
-  this.emit("abort");
-  this.removeAllListeners();
-};
 
 // Writes buffered data to the current native request
 RedirectableRequest.prototype.write = function (data, encoding, callback) {
@@ -5758,39 +5907,18 @@ RedirectableRequest.prototype.removeHeader = function (name) {
 
 // Global timeout for all underlying requests
 RedirectableRequest.prototype.setTimeout = function (msecs, callback) {
-  var self = this;
   if (callback) {
-    this.on("timeout", callback);
+    this.once("timeout", callback);
   }
 
-  // Sets up a timer to trigger a timeout event
-  function startTimer() {
-    if (self._timeout) {
-      clearTimeout(self._timeout);
-    }
-    self._timeout = setTimeout(function () {
-      self.emit("timeout");
-      clearTimer();
-    }, msecs);
-  }
-
-  // Prevent a timeout from triggering
-  function clearTimer() {
-    clearTimeout(this._timeout);
-    if (callback) {
-      self.removeListener("timeout", callback);
-    }
-    if (!this.socket) {
-      self._currentRequest.removeListener("socket", startTimer);
-    }
-  }
-
-  // Start the timer when the socket is opened
   if (this.socket) {
-    startTimer();
+    startTimer(this, msecs);
   }
   else {
-    this._currentRequest.once("socket", startTimer);
+    var self = this;
+    this._currentRequest.once("socket", function () {
+      startTimer(self, msecs);
+    });
   }
 
   this.once("response", clearTimer);
@@ -5799,9 +5927,20 @@ RedirectableRequest.prototype.setTimeout = function (msecs, callback) {
   return this;
 };
 
+function startTimer(request, msecs) {
+  clearTimeout(request._timeout);
+  request._timeout = setTimeout(function () {
+    request.emit("timeout");
+  }, msecs);
+}
+
+function clearTimer() {
+  clearTimeout(this._timeout);
+}
+
 // Proxy all other public ClientRequest methods
 [
-  "flushHeaders", "getHeader",
+  "abort", "flushHeaders", "getHeader",
   "setNoDelay", "setSocketKeepAlive",
 ].forEach(function (method) {
   RedirectableRequest.prototype[method] = function (a, b) {
@@ -6028,7 +6167,7 @@ function wrap(protocols) {
     var wrappedProtocol = exports[scheme] = Object.create(nativeProtocol);
 
     // Executes a request, following redirects
-    function request(input, options, callback) {
+    wrappedProtocol.request = function (input, options, callback) {
       // Parse parameters
       if (typeof input === "string") {
         var urlStr = input;
@@ -6063,20 +6202,14 @@ function wrap(protocols) {
       assert.equal(options.protocol, protocol, "protocol mismatch");
       debug("options", options);
       return new RedirectableRequest(options, callback);
-    }
+    };
 
     // Executes a GET request, following redirects
-    function get(input, options, callback) {
-      var wrappedRequest = wrappedProtocol.request(input, options, callback);
-      wrappedRequest.end();
-      return wrappedRequest;
-    }
-
-    // Expose the properties on the wrapped protocol
-    Object.defineProperties(wrappedProtocol, {
-      request: { value: request, configurable: true, enumerable: true, writable: true },
-      get: { value: get, configurable: true, enumerable: true, writable: true },
-    });
+    wrappedProtocol.get = function (input, options, callback) {
+      var request = wrappedProtocol.request(input, options, callback);
+      request.end();
+      return request;
+    };
   });
   return exports;
 }
@@ -6250,7 +6383,7 @@ module.exports = function (err) {
   \***************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Kafka = __webpack_require__(/*! ./src */ "./node_modules/kafkajs/src/index.js")
@@ -6259,11 +6392,6 @@ const AssignerProtocol = __webpack_require__(/*! ./src/consumer/assignerProtocol
 const Partitioners = __webpack_require__(/*! ./src/producer/partitioners */ "./node_modules/kafkajs/src/producer/partitioners/index.js")
 const Compression = __webpack_require__(/*! ./src/protocol/message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 const ResourceTypes = __webpack_require__(/*! ./src/protocol/resourceTypes */ "./node_modules/kafkajs/src/protocol/resourceTypes.js")
-const ConfigResourceTypes = __webpack_require__(/*! ./src/protocol/configResourceTypes */ "./node_modules/kafkajs/src/protocol/configResourceTypes.js")
-const AclResourceTypes = __webpack_require__(/*! ./src/protocol/aclResourceTypes */ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js")
-const AclOperationTypes = __webpack_require__(/*! ./src/protocol/aclOperationTypes */ "./node_modules/kafkajs/src/protocol/aclOperationTypes.js")
-const AclPermissionTypes = __webpack_require__(/*! ./src/protocol/aclPermissionTypes */ "./node_modules/kafkajs/src/protocol/aclPermissionTypes.js")
-const ResourcePatternTypes = __webpack_require__(/*! ./src/protocol/resourcePatternTypes */ "./node_modules/kafkajs/src/protocol/resourcePatternTypes.js")
 const { LEVELS } = __webpack_require__(/*! ./src/loggers */ "./node_modules/kafkajs/src/loggers/index.js")
 
 module.exports = {
@@ -6274,115 +6402,9 @@ module.exports = {
   logLevel: LEVELS,
   CompressionTypes: Compression.Types,
   CompressionCodecs: Compression.Codecs,
-  /**
-   * @deprecated
-   * @see https://github.com/tulios/kafkajs/issues/649
-   *
-   * Use ConfigResourceTypes or AclResourceTypes instead.
-   */
   ResourceTypes,
-  ConfigResourceTypes,
-  AclResourceTypes,
-  AclOperationTypes,
-  AclPermissionTypes,
-  ResourcePatternTypes,
 }
 
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/package.json":
-/*!*******************************************!*\
-  !*** ./node_modules/kafkajs/package.json ***!
-  \*******************************************/
-/*! default exports */
-/*! export author [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export bugs [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export dependencies [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   exports [not provided] [no usage info] */
-/*! export description [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export @types/node [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export @typescript-eslint/typescript-estree [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint-config-prettier [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint-config-standard [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint-plugin-import [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint-plugin-node [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint-plugin-prettier [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint-plugin-promise [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export eslint-plugin-standard [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export execa [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export glob [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export husky [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export ip [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export jest [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export jest-circus [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export jest-extended [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export jest-junit [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export jsonwebtoken [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export lint-staged [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export mockdate [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export prettier [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export semver [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export typescript [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export uuid [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export engines [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export node [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export homepage [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export keywords [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 2 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export license [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export lint-staged [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export *.js [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!     other exports [not provided] [no usage info] */
-/*!   other exports [not provided] [no usage info] */
-/*! export main [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export repository [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export scripts [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export format [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export jest [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export lint [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export precommit [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:debug [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:admin [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:admin:ci [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:broker [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:broker:ci [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:consumer [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:consumer:ci [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:oauthbearer [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:oauthbearer:ci [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:others [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:others:ci [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:producer [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:group:producer:ci [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:local [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:local:watch [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test:types [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export types [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export version [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = JSON.parse("{\"name\":\"kafkajs\",\"version\":\"1.15.0\",\"description\":\"A modern Apache Kafka client for node.js\",\"author\":\"Tulio Ornelas <ornelas.tulio@gmail.com>\",\"main\":\"index.js\",\"types\":\"types/index.d.ts\",\"license\":\"MIT\",\"keywords\":[\"kafka\",\"sasl\",\"scram\"],\"engines\":{\"node\":\">=10.13.0\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/tulios/kafkajs.git\"},\"bugs\":{\"url\":\"https://github.com/tulios/kafkajs/issues\"},\"homepage\":\"https://kafka.js.org\",\"scripts\":{\"jest\":\"export KAFKA_VERSION=${KAFKA_VERSION:='2.4'} && NODE_ENV=test echo \\\"KAFKA_VERSION: ${KAFKA_VERSION}\\\" && KAFKAJS_DEBUG_PROTOCOL_BUFFERS=1 jest\",\"test:local\":\"yarn jest --detectOpenHandles\",\"test:debug\":\"NODE_ENV=test KAFKAJS_DEBUG_PROTOCOL_BUFFERS=1 node --inspect-brk $(yarn bin 2>/dev/null)/jest --detectOpenHandles --runInBand --watch\",\"test:local:watch\":\"yarn test:local --watch\",\"test\":\"yarn lint && JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh 'yarn jest --ci --maxWorkers=4 --no-watchman --forceExit'\",\"lint\":\"find . -path ./node_modules -prune -o -path ./coverage -prune -o -path ./website -prune -o -name '*.js' -print0 | xargs -0 eslint\",\"format\":\"find . -path ./node_modules -prune -o -path ./coverage -prune -o -path ./website -prune -o -name '*.js' -print0 | xargs -0 prettier --write\",\"precommit\":\"lint-staged\",\"test:group:broker\":\"yarn jest --forceExit --testPathPattern 'src/broker/.*'\",\"test:group:admin\":\"yarn jest --forceExit --testPathPattern 'src/admin/.*'\",\"test:group:producer\":\"yarn jest --forceExit --testPathPattern 'src/producer/.*'\",\"test:group:consumer\":\"yarn jest --forceExit --testPathPattern 'src/consumer/.*.spec.js'\",\"test:group:others\":\"yarn jest --forceExit --testPathPattern 'src/(?!(broker|admin|producer|consumer)/).*'\",\"test:group:oauthbearer\":\"OAUTHBEARER_ENABLED=1 yarn jest --forceExit src/producer/index.spec.js src/broker/__tests__/connect.spec.js src/consumer/__tests__/connection.spec.js src/broker/__tests__/disconnect.spec.js src/admin/__tests__/connection.spec.js\",\"test:group:broker:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:broker --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:admin:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:admin --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:producer:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:producer --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:consumer:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:consumer --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:others:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:others --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:oauthbearer:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml COMPOSE_FILE='docker-compose.2_4_oauthbearer.yml' ./scripts/testWithKafka.sh \\\"yarn test:group:oauthbearer --ci --maxWorkers=4 --no-watchman\\\"\",\"test:types\":\"tsc -p types/\"},\"devDependencies\":{\"@types/node\":\"^12.0.8\",\"@typescript-eslint/typescript-estree\":\"^1.10.2\",\"eslint\":\"^6.8.0\",\"eslint-config-prettier\":\"^6.0.0\",\"eslint-config-standard\":\"^13.0.1\",\"eslint-plugin-import\":\"^2.18.2\",\"eslint-plugin-node\":\"^11.0.0\",\"eslint-plugin-prettier\":\"^3.1.0\",\"eslint-plugin-promise\":\"^4.2.1\",\"eslint-plugin-standard\":\"^4.0.0\",\"execa\":\"^2.0.3\",\"glob\":\"^7.1.4\",\"husky\":\"^3.0.1\",\"ip\":\"^1.1.5\",\"jest\":\"^25.1.0\",\"jest-circus\":\"^25.1.0\",\"jest-extended\":\"^0.11.2\",\"jest-junit\":\"^10.0.0\",\"jsonwebtoken\":\"^8.5.1\",\"lint-staged\":\"^9.2.0\",\"mockdate\":\"^2.0.5\",\"prettier\":\"^1.18.2\",\"semver\":\"^6.2.0\",\"typescript\":\"^3.8.3\",\"uuid\":\"^3.3.2\"},\"dependencies\":{},\"lint-staged\":{\"*.js\":[\"prettier --write\",\"git add\"]}}");
 
 /***/ }),
 
@@ -6392,36 +6414,24 @@ module.exports = JSON.parse("{\"name\":\"kafkajs\",\"version\":\"1.15.0\",\"desc
   \*************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 74:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const flatten = __webpack_require__(/*! ../utils/flatten */ "./node_modules/kafkajs/src/utils/flatten.js")
 const waitFor = __webpack_require__(/*! ../utils/waitFor */ "./node_modules/kafkajs/src/utils/waitFor.js")
-const groupBy = __webpack_require__(/*! ../utils/groupBy */ "./node_modules/kafkajs/src/utils/groupBy.js")
 const createConsumer = __webpack_require__(/*! ../consumer */ "./node_modules/kafkajs/src/consumer/index.js")
 const InstrumentationEventEmitter = __webpack_require__(/*! ../instrumentation/emitter */ "./node_modules/kafkajs/src/instrumentation/emitter.js")
 const { events, wrap: wrapEvent, unwrap: unwrapEvent } = __webpack_require__(/*! ./instrumentationEvents */ "./node_modules/kafkajs/src/admin/instrumentationEvents.js")
 const { LEVELS } = __webpack_require__(/*! ../loggers */ "./node_modules/kafkajs/src/loggers/index.js")
-const {
-  KafkaJSNonRetriableError,
-  KafkaJSDeleteGroupsError,
-  KafkaJSBrokerNotFound,
-  KafkaJSDeleteTopicRecordsError,
-} = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
-const { staleMetadata } = __webpack_require__(/*! ../protocol/error */ "./node_modules/kafkajs/src/protocol/error.js")
-const CONFIG_RESOURCE_TYPES = __webpack_require__(/*! ../protocol/configResourceTypes */ "./node_modules/kafkajs/src/protocol/configResourceTypes.js")
-const ACL_RESOURCE_TYPES = __webpack_require__(/*! ../protocol/aclResourceTypes */ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js")
-const ACL_OPERATION_TYPES = __webpack_require__(/*! ../protocol/aclOperationTypes */ "./node_modules/kafkajs/src/protocol/aclOperationTypes.js")
-const ACL_PERMISSION_TYPES = __webpack_require__(/*! ../protocol/aclPermissionTypes */ "./node_modules/kafkajs/src/protocol/aclPermissionTypes.js")
-const RESOURCE_PATTERN_TYPES = __webpack_require__(/*! ../protocol/resourcePatternTypes */ "./node_modules/kafkajs/src/protocol/resourcePatternTypes.js")
-const { EARLIEST_OFFSET, LATEST_OFFSET } = __webpack_require__(/*! ../constants */ "./node_modules/kafkajs/src/constants.js")
+const { KafkaJSNonRetriableError, KafkaJSDeleteGroupsError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
+const RESOURCE_TYPES = __webpack_require__(/*! ../protocol/resourceTypes */ "./node_modules/kafkajs/src/protocol/resourceTypes.js")
 
 const { CONNECT, DISCONNECT } = events
 
 const NO_CONTROLLER_ID = -1
 
-const { values, keys, entries } = Object
+const { values, keys } = Object
 const eventNames = values(events)
 const eventKeys = keys(events)
   .map(key => `admin.events.${key}`)
@@ -6452,11 +6462,6 @@ const findTopicPartitions = async (cluster, topic) => {
     .map(({ partitionId }) => partitionId)
     .sort()
 }
-const indexByPartition = array =>
-  array.reduce(
-    (obj, { partition, ...props }) => Object.assign(obj, { [partition]: { ...props } }),
-    {}
-  )
 
 /**
  *
@@ -6767,10 +6772,9 @@ module.exports = ({
   /**
    * @param {string} groupId
    * @param {string} topic
-   * @param {boolean} [resolveOffsets=false]
    * @return {Promise}
    */
-  const fetchOffsets = async ({ groupId, topic, resolveOffsets = false }) => {
+  const fetchOffsets = async ({ groupId, topic }) => {
     if (!groupId) {
       throw new KafkaJSNonRetriableError(`Invalid groupId ${groupId}`)
     }
@@ -6783,35 +6787,12 @@ module.exports = ({
     const coordinator = await cluster.findGroupCoordinator({ groupId })
     const partitionsToFetch = partitions.map(partition => ({ partition }))
 
-    let { responses: consumerOffsets } = await coordinator.offsetFetch({
+    const { responses } = await coordinator.offsetFetch({
       groupId,
       topics: [{ topic, partitions: partitionsToFetch }],
     })
 
-    if (resolveOffsets) {
-      const indexedOffsets = indexByPartition(await fetchTopicOffsets(topic))
-      consumerOffsets = consumerOffsets.map(({ topic, partitions }) => ({
-        topic,
-        partitions: partitions.map(({ offset, partition, ...props }) => {
-          let resolvedOffset = offset
-          if (Number(offset) === EARLIEST_OFFSET) {
-            resolvedOffset = indexedOffsets[partition].low
-          }
-          if (Number(offset) === LATEST_OFFSET) {
-            resolvedOffset = indexedOffsets[partition].high
-          }
-          return {
-            partition,
-            offset: resolvedOffset,
-            ...props,
-          }
-        }),
-      }))
-      const [{ partitions }] = consumerOffsets
-      await setOffsets({ groupId, topic, partitions })
-    }
-
-    return consumerOffsets
+    return responses
       .filter(response => response.topic === topic)
       .map(({ partitions }) =>
         partitions.map(({ partition, offset, metadata }) => ({
@@ -6909,32 +6890,13 @@ module.exports = ({
     })
   }
 
-  const isBrokerConfig = type =>
-    [CONFIG_RESOURCE_TYPES.BROKER, CONFIG_RESOURCE_TYPES.BROKER_LOGGER].includes(type)
-
-  /**
-   * Broker configs can only be returned by the target broker
-   *
-   * @see
-   * https://github.com/apache/kafka/blob/821c1ac6641845aeca96a43bc2b946ecec5cba4f/clients/src/main/java/org/apache/kafka/clients/admin/KafkaAdminClient.java#L3783
-   * https://github.com/apache/kafka/blob/821c1ac6641845aeca96a43bc2b946ecec5cba4f/clients/src/main/java/org/apache/kafka/clients/admin/KafkaAdminClient.java#L2027
-   *
-   * @param {Broker} defaultBroker. Broker used in case the configuration is not a broker config
-   */
-  const groupResourcesByBroker = ({ resources, defaultBroker }) =>
-    groupBy(resources, async ({ type, name: nodeId }) => {
-      return isBrokerConfig(type)
-        ? await cluster.findBroker({ nodeId: String(nodeId) })
-        : defaultBroker
-    })
-
   /**
    * @param {Array<ResourceConfigQuery>} resources
    * @param {boolean} [includeSynonyms=false]
    * @return {Promise}
    *
    * @typedef {Object} ResourceConfigQuery
-   * @property {ConfigResourceType} type
+   * @property {ResourceType} type
    * @property {string} name
    * @property {Array<String>} [configNames=[]]
    */
@@ -6947,7 +6909,7 @@ module.exports = ({
       throw new KafkaJSNonRetriableError('Resources array cannot be empty')
     }
 
-    const validResourceTypes = Object.values(CONFIG_RESOURCE_TYPES)
+    const validResourceTypes = Object.values(RESOURCE_TYPES)
     const invalidType = resources.find(r => !validResourceTypes.includes(r.type))
 
     if (invalidType) {
@@ -6980,28 +6942,9 @@ module.exports = ({
     return retrier(async (bail, retryCount, retryTime) => {
       try {
         await cluster.refreshMetadata()
-        const controller = await cluster.findControllerBroker()
-        const resourcerByBroker = await groupResourcesByBroker({
-          resources,
-          defaultBroker: controller,
-        })
-
-        const describeConfigsAction = async broker => {
-          const targetBroker = broker || controller
-          return targetBroker.describeConfigs({
-            resources: resourcerByBroker.get(targetBroker),
-            includeSynonyms,
-          })
-        }
-
-        const brokers = Array.from(resourcerByBroker.keys())
-        const responses = await Promise.all(brokers.map(describeConfigsAction))
-        const responseResources = responses.reduce(
-          (result, { resources }) => [...result, ...resources],
-          []
-        )
-
-        return { resources: responseResources }
+        const broker = await cluster.findControllerBroker()
+        const response = await broker.describeConfigs({ resources, includeSynonyms })
+        return response
       } catch (e) {
         if (e.type === 'NOT_CONTROLLER') {
           logger.warn('Could not describe configs', { error: e.message, retryCount, retryTime })
@@ -7019,7 +6962,7 @@ module.exports = ({
    * @return {Promise}
    *
    * @typedef {Object} ResourceConfig
-   * @property {ConfigResourceType} type
+   * @property {ResourceType} type
    * @property {string} name
    * @property {Array<ResourceConfigEntry>} configEntries
    *
@@ -7036,7 +6979,7 @@ module.exports = ({
       throw new KafkaJSNonRetriableError('Resources array cannot be empty')
     }
 
-    const validResourceTypes = Object.values(CONFIG_RESOURCE_TYPES)
+    const validResourceTypes = Object.values(RESOURCE_TYPES)
     const invalidType = resources.find(r => !validResourceTypes.includes(r.type))
 
     if (invalidType) {
@@ -7077,28 +7020,9 @@ module.exports = ({
     return retrier(async (bail, retryCount, retryTime) => {
       try {
         await cluster.refreshMetadata()
-        const controller = await cluster.findControllerBroker()
-        const resourcerByBroker = await groupResourcesByBroker({
-          resources,
-          defaultBroker: controller,
-        })
-
-        const alterConfigsAction = async broker => {
-          const targetBroker = broker || controller
-          return targetBroker.alterConfigs({
-            resources: resourcerByBroker.get(targetBroker),
-            validateOnly: !!validateOnly,
-          })
-        }
-
-        const brokers = Array.from(resourcerByBroker.keys())
-        const responses = await Promise.all(brokers.map(alterConfigsAction))
-        const responseResources = responses.reduce(
-          (result, { resources }) => [...result, ...resources],
-          []
-        )
-
-        return { resources: responseResources }
+        const broker = await cluster.findControllerBroker()
+        const response = await broker.alterConfigs({ resources, validateOnly: !!validateOnly })
+        return response
       } catch (e) {
         if (e.type === 'NOT_CONTROLLER') {
           logger.warn('Could not alter configs', { error: e.message, retryCount, retryTime })
@@ -7394,431 +7318,6 @@ module.exports = ({
   }
 
   /**
-   * Delete topic records up to the selected partition offsets
-   *
-   * @param {string} topic
-   * @param {Array<SeekEntry>} partitions
-   * @return {Promise}
-   *
-   * @typedef {Object} SeekEntry
-   * @property {number} partition
-   * @property {string} offset
-   */
-  const deleteTopicRecords = async ({ topic, partitions }) => {
-    if (!topic || typeof topic !== 'string') {
-      throw new KafkaJSNonRetriableError(`Invalid topic "${topic}"`)
-    }
-
-    if (!partitions || partitions.length === 0) {
-      throw new KafkaJSNonRetriableError(`Invalid partitions`)
-    }
-
-    const partitionsByBroker = cluster.findLeaderForPartitions(
-      topic,
-      partitions.map(p => p.partition)
-    )
-
-    const partitionsFound = flatten(values(partitionsByBroker))
-    const topicOffsets = await fetchTopicOffsets(topic)
-
-    const leaderNotFoundErrors = []
-    partitions.forEach(({ partition, offset }) => {
-      // throw if no leader found for partition
-      if (!partitionsFound.includes(partition)) {
-        leaderNotFoundErrors.push({
-          partition,
-          offset,
-          error: new KafkaJSBrokerNotFound('Could not find the leader for the partition', {
-            retriable: false,
-          }),
-        })
-        return
-      }
-      const { low } = topicOffsets.find(p => p.partition === partition) || {
-        high: undefined,
-        low: undefined,
-      }
-      // warn in case of offset below low watermark
-      if (parseInt(offset) < parseInt(low)) {
-        logger.warn(
-          'The requested offset is before the earliest offset maintained on the partition - no records will be deleted from this partition',
-          {
-            topic,
-            partition,
-            offset,
-          }
-        )
-      }
-    })
-
-    if (leaderNotFoundErrors.length > 0) {
-      throw new KafkaJSDeleteTopicRecordsError({ topic, partitions: leaderNotFoundErrors })
-    }
-
-    const seekEntriesByBroker = entries(partitionsByBroker).reduce(
-      (obj, [nodeId, nodePartitions]) => {
-        obj[nodeId] = {
-          topic,
-          partitions: partitions.filter(p => nodePartitions.includes(p.partition)),
-        }
-        return obj
-      },
-      {}
-    )
-
-    const retrier = createRetry(retry)
-    return retrier(async bail => {
-      try {
-        const partitionErrors = []
-
-        const brokerRequests = entries(seekEntriesByBroker).map(
-          ([nodeId, { topic, partitions }]) => async () => {
-            const broker = await cluster.findBroker({ nodeId })
-            await broker.deleteRecords({ topics: [{ topic, partitions }] })
-            // remove successful entry so it's ignored on retry
-            delete seekEntriesByBroker[nodeId]
-          }
-        )
-
-        await Promise.all(
-          brokerRequests.map(request =>
-            request().catch(e => {
-              if (e.name === 'KafkaJSDeleteTopicRecordsError') {
-                e.partitions.forEach(({ partition, offset, error }) => {
-                  partitionErrors.push({
-                    partition,
-                    offset,
-                    error,
-                  })
-                })
-              } else {
-                // then it's an unknown error, not from the broker response
-                throw e
-              }
-            })
-          )
-        )
-
-        if (partitionErrors.length > 0) {
-          throw new KafkaJSDeleteTopicRecordsError({
-            topic,
-            partitions: partitionErrors,
-          })
-        }
-      } catch (e) {
-        if (
-          e.retriable &&
-          e.partitions.some(
-            ({ error }) => staleMetadata(error) || error.name === 'KafkaJSMetadataNotLoaded'
-          )
-        ) {
-          await cluster.refreshMetadata()
-        }
-        throw e
-      }
-    })
-  }
-
-  /**
-   * @param {Array<ACLEntry>} acl
-   * @return {Promise<void>}
-   *
-   * @typedef {Object} ACLEntry
-   */
-  const createAcls = async ({ acl }) => {
-    if (!acl || !Array.isArray(acl)) {
-      throw new KafkaJSNonRetriableError(`Invalid ACL array ${acl}`)
-    }
-    if (acl.length === 0) {
-      throw new KafkaJSNonRetriableError('Empty ACL array')
-    }
-
-    // Validate principal
-    if (acl.some(({ principal }) => typeof principal !== 'string')) {
-      throw new KafkaJSNonRetriableError(
-        'Invalid ACL array, the principals have to be a valid string'
-      )
-    }
-
-    // Validate host
-    if (acl.some(({ host }) => typeof host !== 'string')) {
-      throw new KafkaJSNonRetriableError('Invalid ACL array, the hosts have to be a valid string')
-    }
-
-    // Validate resourceName
-    if (acl.some(({ resourceName }) => typeof resourceName !== 'string')) {
-      throw new KafkaJSNonRetriableError(
-        'Invalid ACL array, the resourceNames have to be a valid string'
-      )
-    }
-
-    let invalidType
-    // Validate operation
-    const validOperationTypes = Object.values(ACL_OPERATION_TYPES)
-    invalidType = acl.find(i => !validOperationTypes.includes(i.operation))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid operation type ${invalidType.operation}: ${JSON.stringify(invalidType)}`
-      )
-    }
-
-    // Validate resourcePatternTypes
-    const validResourcePatternTypes = Object.values(RESOURCE_PATTERN_TYPES)
-    invalidType = acl.find(i => !validResourcePatternTypes.includes(i.resourcePatternType))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid resource pattern type ${invalidType.resourcePatternType}: ${JSON.stringify(
-          invalidType
-        )}`
-      )
-    }
-
-    // Validate permissionTypes
-    const validPermissionTypes = Object.values(ACL_PERMISSION_TYPES)
-    invalidType = acl.find(i => !validPermissionTypes.includes(i.permissionType))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid permission type ${invalidType.permissionType}: ${JSON.stringify(invalidType)}`
-      )
-    }
-
-    // Validate resourceTypes
-    const validResourceTypes = Object.values(ACL_RESOURCE_TYPES)
-    invalidType = acl.find(i => !validResourceTypes.includes(i.resourceType))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid resource type ${invalidType.resourceType}: ${JSON.stringify(invalidType)}`
-      )
-    }
-
-    const retrier = createRetry(retry)
-
-    return retrier(async (bail, retryCount, retryTime) => {
-      try {
-        await cluster.refreshMetadata()
-        const broker = await cluster.findControllerBroker()
-        await broker.createAcls({ acl })
-
-        return true
-      } catch (e) {
-        if (e.type === 'NOT_CONTROLLER') {
-          logger.warn('Could not create ACL', { error: e.message, retryCount, retryTime })
-          throw e
-        }
-
-        bail(e)
-      }
-    })
-  }
-
-  /**
-   * @param {ACLResourceTypes} resourceType The type of resource
-   * @param {string} resourceName The name of the resource
-   * @param {ACLResourcePatternTypes} resourcePatternType The resource pattern type filter
-   * @param {string} principal The principal name
-   * @param {string} host The hostname
-   * @param {ACLOperationTypes} operation The type of operation
-   * @param {ACLPermissionTypes} permissionType The type of permission
-   * @return {Promise<void>}
-   *
-   * @typedef {number} ACLResourceTypes
-   * @typedef {number} ACLResourcePatternTypes
-   * @typedef {number} ACLOperationTypes
-   * @typedef {number} ACLPermissionTypes
-   */
-  const describeAcls = async ({
-    resourceType,
-    resourceName,
-    resourcePatternType,
-    principal,
-    host,
-    operation,
-    permissionType,
-  }) => {
-    // Validate principal
-    if (typeof principal !== 'string' && typeof principal !== 'undefined') {
-      throw new KafkaJSNonRetriableError(
-        'Invalid principal, the principal have to be a valid string'
-      )
-    }
-
-    // Validate host
-    if (typeof host !== 'string' && typeof host !== 'undefined') {
-      throw new KafkaJSNonRetriableError('Invalid host, the host have to be a valid string')
-    }
-
-    // Validate resourceName
-    if (typeof resourceName !== 'string' && typeof resourceName !== 'undefined') {
-      throw new KafkaJSNonRetriableError(
-        'Invalid resourceName, the resourceName have to be a valid string'
-      )
-    }
-
-    // Validate operation
-    const validOperationTypes = Object.values(ACL_OPERATION_TYPES)
-    if (!validOperationTypes.includes(operation)) {
-      throw new KafkaJSNonRetriableError(`Invalid operation type ${operation}`)
-    }
-
-    // Validate resourcePatternType
-    const validResourcePatternTypes = Object.values(RESOURCE_PATTERN_TYPES)
-    if (!validResourcePatternTypes.includes(resourcePatternType)) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid resource pattern filter type ${resourcePatternType}`
-      )
-    }
-
-    // Validate permissionType
-    const validPermissionTypes = Object.values(ACL_PERMISSION_TYPES)
-    if (!validPermissionTypes.includes(permissionType)) {
-      throw new KafkaJSNonRetriableError(`Invalid permission type ${permissionType}`)
-    }
-
-    // Validate resourceType
-    const validResourceTypes = Object.values(ACL_RESOURCE_TYPES)
-    if (!validResourceTypes.includes(resourceType)) {
-      throw new KafkaJSNonRetriableError(`Invalid resource type ${resourceType}`)
-    }
-
-    const retrier = createRetry(retry)
-
-    return retrier(async (bail, retryCount, retryTime) => {
-      try {
-        await cluster.refreshMetadata()
-        const broker = await cluster.findControllerBroker()
-        const { resources } = await broker.describeAcls({
-          resourceType,
-          resourceName,
-          resourcePatternType,
-          principal,
-          host,
-          operation,
-          permissionType,
-        })
-        return { resources }
-      } catch (e) {
-        if (e.type === 'NOT_CONTROLLER') {
-          logger.warn('Could not describe ACL', { error: e.message, retryCount, retryTime })
-          throw e
-        }
-
-        bail(e)
-      }
-    })
-  }
-
-  /**
-   * @param {Array<ACLFilter>} filters
-   * @return {Promise<void>}
-   *
-   * @typedef {Object} ACLFilter
-   */
-  const deleteAcls = async ({ filters }) => {
-    if (!filters || !Array.isArray(filters)) {
-      throw new KafkaJSNonRetriableError(`Invalid ACL Filter array ${filters}`)
-    }
-
-    if (filters.length === 0) {
-      throw new KafkaJSNonRetriableError('Empty ACL Filter array')
-    }
-
-    // Validate principal
-    if (
-      filters.some(
-        ({ principal }) => typeof principal !== 'string' && typeof principal !== 'undefined'
-      )
-    ) {
-      throw new KafkaJSNonRetriableError(
-        'Invalid ACL Filter array, the principals have to be a valid string'
-      )
-    }
-
-    // Validate host
-    if (filters.some(({ host }) => typeof host !== 'string' && typeof host !== 'undefined')) {
-      throw new KafkaJSNonRetriableError(
-        'Invalid ACL Filter array, the hosts have to be a valid string'
-      )
-    }
-
-    // Validate resourceName
-    if (
-      filters.some(
-        ({ resourceName }) =>
-          typeof resourceName !== 'string' && typeof resourceName !== 'undefined'
-      )
-    ) {
-      throw new KafkaJSNonRetriableError(
-        'Invalid ACL Filter array, the resourceNames have to be a valid string'
-      )
-    }
-
-    let invalidType
-    // Validate operation
-    const validOperationTypes = Object.values(ACL_OPERATION_TYPES)
-    invalidType = filters.find(i => !validOperationTypes.includes(i.operation))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid operation type ${invalidType.operation}: ${JSON.stringify(invalidType)}`
-      )
-    }
-
-    // Validate resourcePatternTypes
-    const validResourcePatternTypes = Object.values(RESOURCE_PATTERN_TYPES)
-    invalidType = filters.find(i => !validResourcePatternTypes.includes(i.resourcePatternType))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid resource pattern type ${invalidType.resourcePatternType}: ${JSON.stringify(
-          invalidType
-        )}`
-      )
-    }
-
-    // Validate permissionTypes
-    const validPermissionTypes = Object.values(ACL_PERMISSION_TYPES)
-    invalidType = filters.find(i => !validPermissionTypes.includes(i.permissionType))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid permission type ${invalidType.permissionType}: ${JSON.stringify(invalidType)}`
-      )
-    }
-
-    // Validate resourceTypes
-    const validResourceTypes = Object.values(ACL_RESOURCE_TYPES)
-    invalidType = filters.find(i => !validResourceTypes.includes(i.resourceType))
-
-    if (invalidType) {
-      throw new KafkaJSNonRetriableError(
-        `Invalid resource type ${invalidType.resourceType}: ${JSON.stringify(invalidType)}`
-      )
-    }
-
-    const retrier = createRetry(retry)
-
-    return retrier(async (bail, retryCount, retryTime) => {
-      try {
-        await cluster.refreshMetadata()
-        const broker = await cluster.findControllerBroker()
-        const { filterResponses } = await broker.deleteAcls({ filters })
-        return { filterResponses }
-      } catch (e) {
-        if (e.type === 'NOT_CONTROLLER') {
-          logger.warn('Could not delete ACL', { error: e.message, retryCount, retryTime })
-          throw e
-        }
-
-        bail(e)
-      }
-    })
-  }
-
-  /**
    * @param {string} eventName
    * @param {Function} listener
    * @return {Function}
@@ -7867,10 +7366,6 @@ module.exports = ({
     listGroups,
     describeGroups,
     deleteGroups,
-    describeAcls,
-    deleteAcls,
-    createAcls,
-    deleteTopicRecords,
   }
 }
 
@@ -8688,109 +8183,6 @@ module.exports = class Broker {
   }
 
   /**
-   * Send request to delete records
-   * @public
-   * @param {Array<Object>} topics
-   *                          [
-   *                            {
-   *                              topic: 'my-topic-name',
-   *                              partitions: [
-   *                                { partition: 0, offset 2 },
-   *                                { partition: 1, offset 4 },
-   *                              ],
-   *                            }
-   *                          ]
-   * @returns {Promise<Array>} example:
-   *                          {
-   *                            throttleTime: 0
-   *                           [
-   *                              {
-   *                                topic: 'my-topic-name',
-   *                                partitions: [
-   *                                 { partition: 0, lowWatermark: '2n', errorCode: 0 },
-   *                                 { partition: 1, lowWatermark: '4n', errorCode: 0 },
-   *                               ],
-   *                             },
-   *                           ]
-   *                          }
-   */
-  async deleteRecords({ topics }) {
-    const deleteRecords = this.lookupRequest(apiKeys.DeleteRecords, requests.DeleteRecords)
-    return await this[PRIVATE.SEND_REQUEST](deleteRecords({ topics }))
-  }
-
-  /**
-   * @public
-   * @param {Array} ACL e.g:
-   *                 [
-   *                   {
-   *                     resourceType: AclResourceTypes.TOPIC,
-   *                     resourceName: 'topic-name',
-   *                     resourcePatternType: ResourcePatternTypes.LITERAL,
-   *                     principal: 'User:bob',
-   *                     host: '*',
-   *                     operation: AclOperationTypes.ALL,
-   *                     permissionType: AclPermissionTypes.DENY,
-   *                   }
-   *                 ]
-   * @returns {Promise<void>}
-   */
-  async createAcls({ acl }) {
-    const createAcls = this.lookupRequest(apiKeys.CreateAcls, requests.CreateAcls)
-    return await this[PRIVATE.SEND_REQUEST](createAcls({ creations: acl }))
-  }
-
-  /**
-   * @public
-   * @param {number} resourceType The type of resource
-   * @param {string} resourceName The name of the resource
-   * @param {number} resourcePatternType The resource pattern type filter
-   * @param {string} principal The principal name
-   * @param {string} host The hostname
-   * @param {number} operation The type of operation
-   * @param {number} permissionType The type of permission
-   * @returns {Promise<void>}
-   */
-  async describeAcls({
-    resourceType,
-    resourceName,
-    resourcePatternType,
-    principal,
-    host,
-    operation,
-    permissionType,
-  }) {
-    const describeAcls = this.lookupRequest(apiKeys.DescribeAcls, requests.DescribeAcls)
-    return await this[PRIVATE.SEND_REQUEST](
-      describeAcls({
-        resourceType,
-        resourceName,
-        resourcePatternType,
-        principal,
-        host,
-        operation,
-        permissionType,
-      })
-    )
-  }
-
-  /**
-   * @public
-   * @param {number} resourceType The type of resource
-   * @param {string} resourceName The name of the resource
-   * @param {number} resourcePatternType The resource pattern type filter
-   * @param {string} principal The principal name
-   * @param {string} host The hostname
-   * @param {number} operation The type of operation
-   * @param {number} permissionType The type of permission
-   * @returns {Promise<void>}
-   */
-  async deleteAcls({ filters }) {
-    const deleteAcls = this.lookupRequest(apiKeys.DeleteAcls, requests.DeleteAcls)
-    return await this[PRIVATE.SEND_REQUEST](deleteAcls({ filters }))
-  }
-
-  /***
    * @private
    */
   [PRIVATE.SHOULD_REAUTHENTICATE]() {
@@ -9482,7 +8874,7 @@ const Broker = __webpack_require__(/*! ../broker */ "./node_modules/kafkajs/src/
 const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const shuffle = __webpack_require__(/*! ../utils/shuffle */ "./node_modules/kafkajs/src/utils/shuffle.js")
 const arrayDiff = __webpack_require__(/*! ../utils/arrayDiff */ "./node_modules/kafkajs/src/utils/arrayDiff.js")
-const { KafkaJSBrokerNotFound, KafkaJSProtocolError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
+const { KafkaJSBrokerNotFound } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
 
 const { keys, assign, values } = Object
 const hasBrokerBeenReplaced = (broker, { host, port, rack }) =>
@@ -9791,15 +9183,13 @@ module.exports = class BrokerPool {
       } catch (e) {
         if (e.name === 'KafkaJSConnectionError' || e.type === 'ILLEGAL_SASL_STATE') {
           await broker.disconnect()
-        }
 
-        // To avoid reconnecting to an unavailable host, we bail on connection errors
-        // and refresh metadata on a higher level before reconnecting
-        if (e.name === 'KafkaJSConnectionError') {
-          return bail(e)
-        }
+          // Connection refused means this node is down, or the cluster is restarting,
+          // which requires metadata refresh to discover the new nodes
+          if (e.code === 'ECONNREFUSED') {
+            return bail(e)
+          }
 
-        if (e.type === 'ILLEGAL_SASL_STATE') {
           // Rebuild the connection since it can't recover from illegal SASL state
           broker.connection = await this.connectionBuilder.build({
             host: broker.connection.host,
@@ -9808,7 +9198,6 @@ module.exports = class BrokerPool {
           })
 
           this.logger.error(`Failed to connect to broker, reconnecting`, { retryCount, retryTime })
-          throw new KafkaJSProtocolError(e, { retriable: true })
         }
 
         if (e.retriable) throw e
@@ -9923,7 +9312,7 @@ module.exports = ({
   \***************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 41:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const BrokerPool = __webpack_require__(/*! ./brokerPool */ "./node_modules/kafkajs/src/cluster/brokerPool.js")
@@ -9948,26 +9337,25 @@ const mergeTopics = (obj, { topic, partitions }) => ({
   [topic]: [...(obj[topic] || []), ...partitions],
 })
 
+/**
+ * @param {Array<string>} brokers example: ['127.0.0.1:9092', '127.0.0.1:9094']
+ * @param {Object} ssl
+ * @param {Object} sasl
+ * @param {string} clientId
+ * @param {number} connectionTimeout - in milliseconds
+ * @param {number} authenticationTimeout - in milliseconds
+ * @param {number} reauthenticationThreshold - in milliseconds
+ * @param {number} [requestTimeout=30000] - in milliseconds
+ * @param {number} metadataMaxAge - in milliseconds
+ * @param {boolean} allowAutoTopicCreation
+ * @param {number} maxInFlightRequests
+ * @param {number} isolationLevel
+ * @param {Object} retry
+ * @param {Logger} logger
+ * @param {Map} offsets
+ * @param {InstrumentationEventEmitter} [instrumentationEmitter=null]
+ */
 module.exports = class Cluster {
-  /**
-   * @param {Object} options
-   * @param {Array<string>} options.brokers example: ['127.0.0.1:9092', '127.0.0.1:9094']
-   * @param {Object} options.ssl
-   * @param {Object} options.sasl
-   * @param {string} options.clientId
-   * @param {number} options.connectionTimeout - in milliseconds
-   * @param {number} options.authenticationTimeout - in milliseconds
-   * @param {number} options.reauthenticationThreshold - in milliseconds
-   * @param {number} [options.requestTimeout=30000] - in milliseconds
-   * @param {number} options.metadataMaxAge - in milliseconds
-   * @param {boolean} options.allowAutoTopicCreation
-   * @param {number} options.maxInFlightRequests
-   * @param {number} options.isolationLevel
-   * @param {Object} options.retry
-   * @param {import("../../types").Logger} options.logger
-   * @param {Map} options.offsets
-   * @param {import("../instrumentation/emitter")} [options.instrumentationEmitter=null]
-   */
   constructor({
     logger: rootLogger,
     socketFactory,
@@ -10119,7 +9507,7 @@ module.exports = class Cluster {
         try {
           await this.refreshMetadata()
         } catch (e) {
-          if (e.type === 'INVALID_TOPIC_EXCEPTION' || e.type === 'UNKNOWN_TOPIC_OR_PARTITION') {
+          if (e.type === 'INVALID_TOPIC_EXCEPTION') {
             this.targetTopics = previousTopics
           }
 
@@ -10144,7 +9532,7 @@ module.exports = class Cluster {
       if (
         e.name === 'KafkaJSBrokerNotFound' ||
         e.name === 'KafkaJSLockTimeout' ||
-        e.name === 'KafkaJSConnectionError'
+        e.code === 'ECONNREFUSED'
       ) {
         await this.refreshMetadata()
       }
@@ -10816,7 +10204,7 @@ module.exports = class Batch {
   \************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 42:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const flatten = __webpack_require__(/*! ../utils/flatten */ "./node_modules/kafkajs/src/utils/flatten.js")
@@ -10824,14 +10212,13 @@ const sleep = __webpack_require__(/*! ../utils/sleep */ "./node_modules/kafkajs/
 const BufferedAsyncIterator = __webpack_require__(/*! ../utils/bufferedAsyncIterator */ "./node_modules/kafkajs/src/utils/bufferedAsyncIterator.js")
 const websiteUrl = __webpack_require__(/*! ../utils/websiteUrl */ "./node_modules/kafkajs/src/utils/websiteUrl.js")
 const arrayDiff = __webpack_require__(/*! ../utils/arrayDiff */ "./node_modules/kafkajs/src/utils/arrayDiff.js")
-const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 
 const OffsetManager = __webpack_require__(/*! ./offsetManager */ "./node_modules/kafkajs/src/consumer/offsetManager/index.js")
 const Batch = __webpack_require__(/*! ./batch */ "./node_modules/kafkajs/src/consumer/batch.js")
 const SeekOffsets = __webpack_require__(/*! ./seekOffsets */ "./node_modules/kafkajs/src/consumer/seekOffsets.js")
 const SubscriptionState = __webpack_require__(/*! ./subscriptionState */ "./node_modules/kafkajs/src/consumer/subscriptionState.js")
 const {
-  events: { GROUP_JOIN, HEARTBEAT, CONNECT, RECEIVED_UNSUBSCRIBED_TOPICS },
+  events: { HEARTBEAT, CONNECT },
 } = __webpack_require__(/*! ./instrumentationEvents */ "./node_modules/kafkajs/src/consumer/instrumentationEvents.js")
 const { MemberAssignment } = __webpack_require__(/*! ./assignerProtocol */ "./node_modules/kafkajs/src/consumer/assignerProtocol.js")
 const {
@@ -10852,17 +10239,8 @@ const STALE_METADATA_ERRORS = [
   'UNKNOWN_TOPIC_OR_PARTITION',
 ]
 
-const isRebalancing = e =>
-  e.type === 'REBALANCE_IN_PROGRESS' || e.type === 'NOT_COORDINATOR_FOR_GROUP'
-
-const PRIVATE = {
-  JOIN: Symbol('private:ConsumerGroup:join'),
-  SYNC: Symbol('private:ConsumerGroup:sync'),
-}
-
 module.exports = class ConsumerGroup {
   constructor({
-    retry,
     cluster,
     groupId,
     topics,
@@ -10890,7 +10268,6 @@ module.exports = class ConsumerGroup {
     this.topicConfigurations = topicConfigurations
     this.logger = logger.namespace('ConsumerGroup')
     this.instrumentationEmitter = instrumentationEmitter
-    this.retrier = createRetry(Object.assign({}, retry))
     this.assigners = assigners
     this.sessionTimeout = sessionTimeout
     this.rebalanceTimeout = rebalanceTimeout
@@ -10919,7 +10296,7 @@ module.exports = class ConsumerGroup {
      * Each of the partitions tracks the preferred read replica (`nodeId`) and a timestamp
      * until when that preference is valid.
      *
-     * @type {{[topicName: string]: {[partition: number]: {nodeId: number, expireAt: number}}}}
+     * @type {{[topicName: string]: {[partition: number]: {nodeId: number, expireAt: number}}}
      */
     this.preferredReadReplicasPerTopicPartition = {}
     this.offsetManager = null
@@ -10938,7 +10315,7 @@ module.exports = class ConsumerGroup {
     await this.cluster.refreshMetadataIfNecessary()
   }
 
-  async [PRIVATE.JOIN]() {
+  async join() {
     const { groupId, sessionTimeout, rebalanceTimeout } = this
 
     this.coordinator = await this.cluster.findGroupCoordinator({ groupId })
@@ -10970,7 +10347,7 @@ module.exports = class ConsumerGroup {
     }
   }
 
-  async [PRIVATE.SYNC]() {
+  async sync() {
     let assignment = []
     const {
       groupId,
@@ -11017,7 +10394,6 @@ module.exports = class ConsumerGroup {
     const decodedMemberAssignment = MemberAssignment.decode(memberAssignment)
     const decodedAssignment =
       decodedMemberAssignment != null ? decodedMemberAssignment.assignment : {}
-
     this.logger.debug('Received assignment', {
       groupId,
       generationId,
@@ -11029,18 +10405,13 @@ module.exports = class ConsumerGroup {
     const topicsNotSubscribed = arrayDiff(assignedTopics, topicsSubscribed)
 
     if (topicsNotSubscribed.length > 0) {
-      const payload = {
+      this.logger.warn('Consumer group received unsubscribed topics', {
         groupId,
         generationId,
         memberId,
         assignedTopics,
         topicsSubscribed,
         topicsNotSubscribed,
-      }
-
-      this.instrumentationEmitter.emit(RECEIVED_UNSUBSCRIBED_TOPICS, payload)
-      this.logger.warn('Consumer group received unsubscribed topics', {
-        ...payload,
         helpUrl: websiteUrl(
           'docs/faq',
           'why-am-i-receiving-messages-for-topics-i-m-not-subscribed-to'
@@ -11101,44 +10472,6 @@ module.exports = class ConsumerGroup {
       groupId,
       generationId,
       memberId,
-    })
-  }
-
-  joinAndSync() {
-    const startJoin = Date.now()
-    return this.retrier(async bail => {
-      try {
-        await this[PRIVATE.JOIN]()
-        await this[PRIVATE.SYNC]()
-
-        const memberAssignment = this.assigned().reduce(
-          (result, { topic, partitions }) => ({ ...result, [topic]: partitions }),
-          {}
-        )
-
-        const payload = {
-          groupId: this.groupId,
-          memberId: this.memberId,
-          leaderId: this.leaderId,
-          isLeader: this.isLeader(),
-          memberAssignment,
-          groupProtocol: this.groupProtocol,
-          duration: Date.now() - startJoin,
-        }
-
-        this.instrumentationEmitter.emit(GROUP_JOIN, payload)
-        this.logger.info('Consumer has joined the group', payload)
-      } catch (e) {
-        if (isRebalancing(e)) {
-          // Rebalance in progress isn't a retriable protocol error since the consumer
-          // has to go through find coordinator and join again before it can
-          // actually retry the operation. We wrap the original error in a retriable error
-          // here instead in order to restart the join + sync sequence using the retrier.
-          throw new KafkaJSError(e)
-        }
-
-        bail(e)
-      }
     })
   }
 
@@ -11398,7 +10731,8 @@ module.exports = class ConsumerGroup {
       })
 
       await this.cluster.refreshMetadata()
-      await this.joinAndSync()
+      await this.join()
+      await this.sync()
       throw new KafkaJSError(e.message)
     }
 
@@ -11410,7 +10744,8 @@ module.exports = class ConsumerGroup {
         unknownPartitions: e.unknownPartitions,
       })
 
-      await this.joinAndSync()
+      await this.join()
+      await this.sync()
     }
 
     if (e.name === 'KafkaJSOffsetOutOfRange') {
@@ -11733,7 +11068,6 @@ module.exports = ({
       logger: rootLogger,
       topics: keys(topics),
       topicConfigurations: topics,
-      retry,
       cluster,
       groupId,
       assigners,
@@ -11904,10 +11238,14 @@ module.exports = ({
 
       await disconnect()
 
-      const isErrorRetriable = e.name === 'KafkaJSNumberOfRetriesExceeded' || e.retriable === true
-      const shouldRestart =
-        isErrorRetriable &&
-        (!retry ||
+      instrumentationEmitter.emit(CRASH, {
+        error: e,
+        groupId,
+      })
+
+      if (e.name === 'KafkaJSNumberOfRetriesExceeded' || e.retriable === true) {
+        const shouldRestart =
+          !retry ||
           !retry.restartOnFailure ||
           (await retry.restartOnFailure(e).catch(error => {
             logger.error(
@@ -11920,23 +11258,18 @@ module.exports = ({
             )
 
             return true
-          })))
+          }))
 
-      instrumentationEmitter.emit(CRASH, {
-        error: e,
-        groupId,
-        restart: shouldRestart,
-      })
+        if (shouldRestart) {
+          const retryTime = e.retryTime || (retry && retry.initialRetryTime) || initialRetryTime
+          logger.error(`Restarting the consumer in ${retryTime}ms`, {
+            retryCount: e.retryCount,
+            retryTime,
+            groupId,
+          })
 
-      if (shouldRestart) {
-        const retryTime = e.retryTime || (retry && retry.initialRetryTime) || initialRetryTime
-        logger.error(`Restarting the consumer in ${retryTime}ms`, {
-          retryCount: e.retryCount,
-          retryTime,
-          groupId,
-        })
-
-        setTimeout(() => restart(onCrash), retryTime)
+          setTimeout(() => restart(onCrash), retryTime)
+        }
       }
     }
 
@@ -12169,7 +11502,7 @@ module.exports = ({
   \********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 34:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const swapObject = __webpack_require__(/*! ../utils/swapObject */ "./node_modules/kafkajs/src/utils/swapObject.js")
@@ -12189,7 +11522,6 @@ const events = {
   DISCONNECT: consumerType('disconnect'),
   STOP: consumerType('stop'),
   CRASH: consumerType('crash'),
-  RECEIVED_UNSUBSCRIBED_TOPICS: consumerType('received_unsubscribed_topics'),
   REQUEST: consumerType(networkEvents.NETWORK_REQUEST),
   REQUEST_TIMEOUT: consumerType(networkEvents.NETWORK_REQUEST_TIMEOUT),
   REQUEST_QUEUE_SIZE: consumerType(networkEvents.NETWORK_REQUEST_QUEUE_SIZE),
@@ -12670,7 +12002,7 @@ const { KafkaJSError } = __webpack_require__(/*! ../errors */ "./node_modules/ka
 const barrier = __webpack_require__(/*! ./barrier */ "./node_modules/kafkajs/src/consumer/barrier.js")
 
 const {
-  events: { FETCH, FETCH_START, START_BATCH_PROCESS, END_BATCH_PROCESS },
+  events: { GROUP_JOIN, FETCH, FETCH_START, START_BATCH_PROCESS, END_BATCH_PROCESS },
 } = __webpack_require__(/*! ./instrumentationEvents */ "./node_modules/kafkajs/src/consumer/instrumentationEvents.js")
 
 const isRebalancing = e =>
@@ -12738,8 +12070,42 @@ module.exports = class Runner extends EventEmitter {
   }
 
   async join() {
-    await this.consumerGroup.joinAndSync()
-    this.running = true
+    const startJoin = Date.now()
+    return this.retrier(async (bail, retryCount, retryTime) => {
+      try {
+        await this.consumerGroup.join()
+        await this.consumerGroup.sync()
+
+        this.running = true
+
+        const memberAssignment = this.consumerGroup
+          .assigned()
+          .reduce((result, { topic, partitions }) => ({ ...result, [topic]: partitions }), {})
+
+        const payload = {
+          groupId: this.consumerGroup.groupId,
+          memberId: this.consumerGroup.memberId,
+          leaderId: this.consumerGroup.leaderId,
+          isLeader: this.consumerGroup.isLeader(),
+          memberAssignment,
+          groupProtocol: this.consumerGroup.groupProtocol,
+          duration: Date.now() - startJoin,
+        }
+
+        this.instrumentationEmitter.emit(GROUP_JOIN, payload)
+        this.logger.info('Consumer has joined the group', payload)
+      } catch (e) {
+        if (isRebalancing(e)) {
+          // Rebalance in progress isn't a retriable error since the consumer
+          // has to go through find coordinator and join again before it can
+          // actually retry. Throwing a retriable error to allow the retrier
+          // to keep going
+          throw new KafkaJSError('The group is rebalancing')
+        }
+
+        bail(e)
+      }
+    })
   }
 
   async scheduleJoin() {
@@ -13161,7 +12527,7 @@ module.exports = class Runner extends EventEmitter {
 
           setImmediate(() => this.scheduleJoin())
 
-          bail(new KafkaJSError(e))
+          bail(new KafkaJSError('The group is rebalancing'))
         }
 
         if (e.type === 'UNKNOWN_MEMBER_ID') {
@@ -13176,7 +12542,7 @@ module.exports = class Runner extends EventEmitter {
           this.consumerGroup.memberId = null
           setImmediate(() => this.scheduleJoin())
 
-          bail(new KafkaJSError(e))
+          bail(new KafkaJSError('The group is rebalancing'))
         }
 
         if (e.name === 'KafkaJSNotImplemented') {
@@ -13393,11 +12759,9 @@ module.exports = () => ({
   !*** ./node_modules/kafkajs/src/errors.js ***!
   \********************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 211:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const pkgJson = __webpack_require__(/*! ../package.json */ "./node_modules/kafkajs/package.json")
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 181:0-14 */
+/***/ ((module) => {
 
 class KafkaJSError extends Error {
   constructor(e, { retriable = true } = {}) {
@@ -13418,8 +12782,8 @@ class KafkaJSNonRetriableError extends KafkaJSError {
 }
 
 class KafkaJSProtocolError extends KafkaJSError {
-  constructor(e, { retriable = e.retriable } = {}) {
-    super(e, { retriable })
+  constructor(e) {
+    super(e, { retriable: e.retriable })
     this.type = e.type
     this.code = e.code
     this.name = 'KafkaJSProtocolError'
@@ -13579,34 +12943,6 @@ class KafkaJSUnsupportedMagicByteInMessageSet extends KafkaJSNonRetriableError {
   }
 }
 
-class KafkaJSDeleteTopicRecordsError extends KafkaJSError {
-  constructor({ partitions }) {
-    /*
-     * This error is retriable if all the errors were retriable
-     */
-    const retriable = partitions
-      .filter(({ error }) => error != null)
-      .every(({ error }) => error.retriable === true)
-
-    super('Error while deleting records', { retriable })
-    this.name = 'KafkaJSDeleteTopicRecordsError'
-    this.partitions = partitions
-  }
-}
-
-const issueUrl = pkgJson.bugs.url
-
-class KafkaJSInvariantViolation extends KafkaJSNonRetriableError {
-  constructor(e) {
-    const message = e.message || e
-    super(`Invariant violated: ${message}. This is likely a bug and should be reported.`)
-    this.name = 'KafkaJSInvariantViolation'
-
-    const issueTitle = encodeURIComponent(`Invariant violation: ${message}`)
-    this.helpUrl = `${issueUrl}/new?assignees=&labels=bug&template=bug_report.md&title=${issueTitle}`
-  }
-}
-
 module.exports = {
   KafkaJSError,
   KafkaJSNonRetriableError,
@@ -13630,8 +12966,6 @@ module.exports = {
   KafkaJSLockTimeout,
   KafkaJSServerDoesNotSupportApiKey,
   KafkaJSUnsupportedMagicByteInMessageSet,
-  KafkaJSDeleteTopicRecordsError,
-  KafkaJSInvariantViolation,
 }
 
 
@@ -14210,8 +13544,8 @@ module.exports = class Connection {
         })
 
         this.logError(error.message, { stack: e.stack })
-        this.rejectRequests(error)
         await this.disconnect()
+        this.rejectRequests(error)
 
         reject(error)
       }
@@ -14222,8 +13556,8 @@ module.exports = class Connection {
         })
 
         this.logError(error.message)
-        this.rejectRequests(error)
         await this.disconnect()
+        this.rejectRequests(error)
         reject(error)
       }
 
@@ -14555,13 +13889,12 @@ module.exports = {
   \****************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const EventEmitter = __webpack_require__(/*! events */ "events")
 const SocketRequest = __webpack_require__(/*! ./socketRequest */ "./node_modules/kafkajs/src/network/requestQueue/socketRequest.js")
 const events = __webpack_require__(/*! ../instrumentationEvents */ "./node_modules/kafkajs/src/network/instrumentationEvents.js")
-const { KafkaJSInvariantViolation } = __webpack_require__(/*! ../../errors */ "./node_modules/kafkajs/src/errors.js")
 
 const PRIVATE = {
   EMIT_QUEUE_SIZE_EVENT: Symbol('private:RequestQueue:emitQueueSizeEvent'),
@@ -14692,9 +14025,6 @@ module.exports = class RequestQueue extends EventEmitter {
       instrumentationEmitter: this.instrumentationEmitter,
       requestTimeout,
       send: () => {
-        if (this.inflight.has(correlationId)) {
-          throw new KafkaJSInvariantViolation('Correlation id already exists')
-        }
         this.inflight.set(correlationId, socketRequest)
         pushedRequest.sendRequest()
       },
@@ -15927,7 +15257,7 @@ module.exports = ({
     disconnect: async () => {
       connectionStatus = CONNECTION_STATUS.DISCONNECTING
       await cluster.disconnect()
-      connectionStatus = CONNECTION_STATUS.DISCONNECTED
+      connectionStatus = CONNECTION_STATUS.DISCONNECT
       instrumentationEmitter.emit(DISCONNECT)
     },
     isIdempotent: () => {
@@ -16011,7 +15341,6 @@ module.exports = ({
   const sendMessages = createSendMessages({
     logger,
     cluster,
-    retrier,
     partitioner,
     eosManager,
   })
@@ -16089,11 +15418,45 @@ module.exports = ({
       return merged
     }, [])
 
-    return await sendMessages({
-      acks,
-      timeout,
-      compression,
-      topicMessages: mergedTopicMessages,
+    return retrier(async (bail, retryCount, retryTime) => {
+      try {
+        return await sendMessages({
+          acks,
+          timeout,
+          compression,
+          topicMessages: mergedTopicMessages,
+        })
+      } catch (error) {
+        if (error.name === 'KafkaJSConnectionClosedError') {
+          cluster.removeBroker({ host: error.host, port: error.port })
+        }
+
+        if (!cluster.isConnected()) {
+          logger.debug(`Cluster has disconnected, reconnecting: ${error.message}`, {
+            retryCount,
+            retryTime,
+          })
+          await cluster.connect()
+          await cluster.refreshMetadata()
+          throw error
+        }
+
+        // This is necessary in case the metadata is stale and the number of partitions
+        // for this topic has increased in the meantime
+        if (
+          error.name === 'KafkaJSConnectionError' ||
+          error.name === 'KafkaJSConnectionClosedError' ||
+          (error.name === 'KafkaJSProtocolError' && error.retriable)
+        ) {
+          logger.error(`Failed to send messages: ${error.message}`, { retryCount, retryTime })
+          await cluster.refreshMetadata()
+          throw error
+        }
+
+        // Skip retries for errors not related to the Kafka protocol
+        logger.error(`${error.message}`, { retryCount, retryTime })
+        bail(error)
+      }
     })
   }
 
@@ -16444,21 +15807,31 @@ module.exports = ({ topics }) => {
   \***********************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
+const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const flatten = __webpack_require__(/*! ../utils/flatten */ "./node_modules/kafkajs/src/utils/flatten.js")
 const { KafkaJSMetadataNotLoaded } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
-const { staleMetadata } = __webpack_require__(/*! ../protocol/error */ "./node_modules/kafkajs/src/protocol/error.js")
 const groupMessagesPerPartition = __webpack_require__(/*! ./groupMessagesPerPartition */ "./node_modules/kafkajs/src/producer/groupMessagesPerPartition.js")
 const createTopicData = __webpack_require__(/*! ./createTopicData */ "./node_modules/kafkajs/src/producer/createTopicData.js")
 const responseSerializer = __webpack_require__(/*! ./responseSerializer */ "./node_modules/kafkajs/src/producer/responseSerializer.js")
 
 const { keys } = Object
+const TOTAL_INDIVIDUAL_ATTEMPTS = 5
+const staleMetadata = e =>
+  ['UNKNOWN_TOPIC_OR_PARTITION', 'LEADER_NOT_AVAILABLE', 'NOT_LEADER_FOR_PARTITION'].includes(
+    e.type
+  )
 
-module.exports = ({ logger, cluster, partitioner, eosManager, retrier }) => {
+module.exports = ({ logger, cluster, partitioner, eosManager }) => {
+  const retrier = createRetry({ retries: TOTAL_INDIVIDUAL_ATTEMPTS })
+
   return async ({ acks, timeout, compression, topicMessages }) => {
     const responsePerBroker = new Map()
+
+    const topics = topicMessages.map(({ topic }) => topic)
+    await cluster.addMultipleTargetTopics(topics)
 
     const createProducerRequests = async responsePerBroker => {
       const topicMetadata = new Map()
@@ -16557,247 +15930,25 @@ module.exports = ({ logger, cluster, partitioner, eosManager, retrier }) => {
       })
     }
 
-    return retrier(async (bail, retryCount, retryTime) => {
-      const topics = topicMessages.map(({ topic }) => topic)
-      await cluster.addMultipleTargetTopics(topics)
-
+    const makeRequests = async (bail, retryCount, retryTime) => {
       try {
         const requests = await createProducerRequests(responsePerBroker)
         await Promise.all(requests)
         const responses = Array.from(responsePerBroker.values())
         return flatten(responses)
       } catch (e) {
-        if (e.name === 'KafkaJSConnectionClosedError') {
-          cluster.removeBroker({ host: e.host, port: e.port })
-        }
-
-        if (!cluster.isConnected()) {
-          logger.debug(`Cluster has disconnected, reconnecting: ${e.message}`, {
-            retryCount,
-            retryTime,
-          })
-          await cluster.connect()
+        if (staleMetadata(e) || e.name === 'KafkaJSMetadataNotLoaded') {
           await cluster.refreshMetadata()
-          throw e
         }
 
-        // This is necessary in case the metadata is stale and the number of partitions
-        // for this topic has increased in the meantime
-        if (
-          staleMetadata(e) ||
-          e.name === 'KafkaJSMetadataNotLoaded' ||
-          e.name === 'KafkaJSConnectionError' ||
-          e.name === 'KafkaJSConnectionClosedError' ||
-          (e.name === 'KafkaJSProtocolError' && e.retriable)
-        ) {
-          logger.error(`Failed to send messages: ${e.message}`, { retryCount, retryTime })
-          await cluster.refreshMetadata()
-          throw e
-        }
-
-        logger.error(`${e.message}`, { retryCount, retryTime })
-        if (e.retriable) throw e
-        bail(e)
+        throw e
       }
+    }
+
+    return retrier(makeRequests).catch(e => {
+      throw e.originalError || e
     })
   }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/aclOperationTypes.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/aclOperationTypes.js ***!
-  \****************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
-/***/ ((module) => {
-
-// From:
-// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/acl/AclOperation.java#L44
-
-/**
- * @typedef {number} ACLOperationTypes
- *
- * Enum for ACL Operations Types
- * @readonly
- * @enum {ACLOperationTypes}
- */
-module.exports = {
-  /**
-   * Represents any AclOperation which this client cannot understand, perhaps because this
-   * client is too old.
-   */
-  UNKNOWN: 0,
-  /**
-   * In a filter, matches any AclOperation.
-   */
-  ANY: 1,
-  /**
-   * ALL operation.
-   */
-  ALL: 2,
-  /**
-   * READ operation.
-   */
-  READ: 3,
-  /**
-   * WRITE operation.
-   */
-  WRITE: 4,
-  /**
-   * CREATE operation.
-   */
-  CREATE: 5,
-  /**
-   * DELETE operation.
-   */
-  DELETE: 6,
-  /**
-   * ALTER operation.
-   */
-  ALTER: 7,
-  /**
-   * DESCRIBE operation.
-   */
-  DESCRIBE: 8,
-  /**
-   * CLUSTER_ACTION operation.
-   */
-  CLUSTER_ACTION: 9,
-  /**
-   * DESCRIBE_CONFIGS operation.
-   */
-  DESCRIBE_CONFIGS: 10,
-  /**
-   * ALTER_CONFIGS operation.
-   */
-  ALTER_CONFIGS: 11,
-  /**
-   * IDEMPOTENT_WRITE operation.
-   */
-  IDEMPOTENT_WRITE: 12,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/aclPermissionTypes.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/aclPermissionTypes.js ***!
-  \*****************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
-/***/ ((module) => {
-
-// From:
-// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/acl/AclPermissionType.java/#L31
-
-/**
- * @typedef {number} ACLPermissionTypes
- *
- * Enum for Permission Types
- * @readonly
- * @enum {ACLPermissionTypes}
- */
-module.exports = {
-  /**
-   * Represents any AclPermissionType which this client cannot understand,
-   * perhaps because this client is too old.
-   */
-  UNKNOWN: 0,
-  /**
-   * In a filter, matches any AclPermissionType.
-   */
-  ANY: 1,
-  /**
-   * Disallows access.
-   */
-  DENY: 2,
-  /**
-   * Grants access.
-   */
-  ALLOW: 3,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/aclResourceTypes.js ***!
-  \***************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
-/***/ ((module) => {
-
-/**
- * @see https://github.com/apache/kafka/blob/a15387f34d142684859c2a57fcbef25edcdce25a/clients/src/main/java/org/apache/kafka/common/resource/ResourceType.java#L25-L31
- * @typedef {number} ACLResourceTypes
- *
- * Enum for ACL Resource Types
- * @readonly
- * @enum {ACLResourceTypes}
- */
-
-module.exports = {
-  /**
-   * Represents any ResourceType which this client cannot understand,
-   * perhaps because this client is too old.
-   */
-  UNKNOWN: 0,
-  /**
-   * In a filter, matches any ResourceType.
-   */
-  ANY: 1,
-  /**
-   * A Kafka topic.
-   * @see http://kafka.apache.org/documentation/#topicconfigs
-   */
-  TOPIC: 2,
-  /**
-   * A consumer group.
-   * @see http://kafka.apache.org/documentation/#consumerconfigs
-   */
-  GROUP: 3,
-  /**
-   * The cluster as a whole.
-   */
-  CLUSTER: 4,
-  /**
-   * A transactional ID.
-   */
-  TRANSACTIONAL_ID: 5,
-  /**
-   * A token ID.
-   */
-  DELEGATION_TOKEN: 6,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/configResourceTypes.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/configResourceTypes.js ***!
-  \******************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 4:0-14 */
-/***/ ((module) => {
-
-/**
- * @see https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/config/ConfigResource.java
- */
-module.exports = {
-  UNKNOWN: 0,
-  TOPIC: 2,
-  BROKER: 4,
-  BROKER_LOGGER: 8,
 }
 
 
@@ -17708,7 +16859,7 @@ module.exports = class Encoder {
   \****************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 595:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 590:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const { KafkaJSProtocolError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
@@ -18300,17 +17451,11 @@ const failIfVersionNotSupported = code => {
   }
 }
 
-const staleMetadata = e =>
-  ['UNKNOWN_TOPIC_OR_PARTITION', 'LEADER_NOT_AVAILABLE', 'NOT_LEADER_FOR_PARTITION'].includes(
-    e.type
-  )
-
 module.exports = {
   failure,
   errorCodes,
   createErrorFromCode,
   failIfVersionNotSupported,
-  staleMetadata,
 }
 
 
@@ -18386,12 +17531,13 @@ module.exports = {
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 32:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 37:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const { KafkaJSNotImplemented } = __webpack_require__(/*! ../../../errors */ "./node_modules/kafkajs/src/errors.js")
 
-const COMPRESSION_CODEC_MASK = 0x07
+const MESSAGE_CODEC_MASK = 0x3
+const RECORD_BATCH_CODEC_MASK = 0x07
 
 const Types = {
   None: 0,
@@ -18416,7 +17562,11 @@ const Codecs = {
 
 const lookupCodec = type => (Codecs[type] ? Codecs[type]() : null)
 const lookupCodecByAttributes = attributes => {
-  const codec = Codecs[attributes & COMPRESSION_CODEC_MASK]
+  const codec = Codecs[attributes & MESSAGE_CODEC_MASK]
+  return codec ? codec() : null
+}
+const lookupCodecByRecordBatchAttributes = attributes => {
+  const codec = Codecs[attributes & RECORD_BATCH_CODEC_MASK]
   return codec ? codec() : null
 }
 
@@ -18425,7 +17575,7 @@ module.exports = {
   Codecs,
   lookupCodec,
   lookupCodecByAttributes,
-  COMPRESSION_CODEC_MASK,
+  lookupCodecByRecordBatchAttributes,
 }
 
 
@@ -18529,7 +17679,7 @@ module.exports = decoder => ({
 
 const Encoder = __webpack_require__(/*! ../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
 const crc32 = __webpack_require__(/*! ../../crc32 */ "./node_modules/kafkajs/src/protocol/crc32.js")
-const { Types: Compression, COMPRESSION_CODEC_MASK } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const { Types: Compression } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 
 /**
  * v0
@@ -18544,7 +17694,7 @@ const { Types: Compression, COMPRESSION_CODEC_MASK } = __webpack_require__(/*! .
 module.exports = ({ compression = Compression.None, key, value }) => {
   const content = new Encoder()
     .writeInt8(0) // magicByte
-    .writeInt8(compression & COMPRESSION_CODEC_MASK)
+    .writeInt8(compression & 0x3)
     .writeBytes(key)
     .writeBytes(value)
 
@@ -18585,7 +17735,7 @@ module.exports = decoder => ({
 
 const Encoder = __webpack_require__(/*! ../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
 const crc32 = __webpack_require__(/*! ../../crc32 */ "./node_modules/kafkajs/src/protocol/crc32.js")
-const { Types: Compression, COMPRESSION_CODEC_MASK } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const { Types: Compression } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 
 /**
  * v1 (supported since 0.10.0)
@@ -18601,7 +17751,7 @@ const { Types: Compression, COMPRESSION_CODEC_MASK } = __webpack_require__(/*! .
 module.exports = ({ compression = Compression.None, timestamp = Date.now(), key, value }) => {
   const content = new Encoder()
     .writeInt8(1) // magicByte
-    .writeInt8(compression & COMPRESSION_CODEC_MASK)
+    .writeInt8(compression & 0x3)
     .writeInt64(timestamp)
     .writeBytes(key)
     .writeBytes(value)
@@ -19091,7 +18241,7 @@ const sizeOfHeaders = headersArray => {
 
 const Decoder = __webpack_require__(/*! ../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
 const { KafkaJSPartialMessageError } = __webpack_require__(/*! ../../../errors */ "./node_modules/kafkajs/src/errors.js")
-const { lookupCodecByAttributes } = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const { lookupCodecByRecordBatchAttributes } = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 const RecordDecoder = __webpack_require__(/*! ../record/v0/decoder */ "./node_modules/kafkajs/src/protocol/recordBatch/record/v0/decoder.js")
 const TimestampTypes = __webpack_require__(/*! ../../timestampTypes */ "./node_modules/kafkajs/src/protocol/timestampTypes.js")
 
@@ -19156,7 +18306,7 @@ module.exports = async fetchDecoder => {
       ? TimestampTypes.LOG_APPEND_TIME
       : TimestampTypes.CREATE_TIME
 
-  const codec = lookupCodecByAttributes(attributes)
+  const codec = lookupCodecByRecordBatchAttributes(attributes)
 
   const recordContext = {
     firstOffset,
@@ -19217,19 +18367,16 @@ const decodeRecord = (decoder, recordContext) => {
   \*******************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 90:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 87:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Long = __webpack_require__(/*! ../../../utils/long */ "./node_modules/kafkajs/src/utils/long.js")
 const Encoder = __webpack_require__(/*! ../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
 const crc32C = __webpack_require__(/*! ../crc32C */ "./node_modules/kafkajs/src/protocol/recordBatch/crc32C/index.js")
-const {
-  Types: Compression,
-  lookupCodec,
-  COMPRESSION_CODEC_MASK,
-} = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const { Types: Compression, lookupCodec } = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 
 const MAGIC_BYTE = 2
+const COMPRESSION_MASK = 3 // The lowest 3 bits
 const TIMESTAMP_MASK = 0 // The fourth lowest bit, always set this bit to 0 (since 0.10.0)
 const TRANSACTIONAL_MASK = 16 // The fifth lowest bit
 
@@ -19264,7 +18411,7 @@ const RecordBatch = async ({
   firstSequence = 0, // for idempotent messages
   records = [],
 }) => {
-  const COMPRESSION_CODEC = compression & COMPRESSION_CODEC_MASK
+  const COMPRESSION_CODEC = compression & COMPRESSION_MASK
   const IN_TRANSACTION = transactional ? TRANSACTIONAL_MASK : 0
   const attributes = COMPRESSION_CODEC | TIMESTAMP_MASK | IN_TRANSACTION
 
@@ -19349,18 +18496,13 @@ module.exports = async ({ correlationId, clientId, request: { apiKey, apiVersion
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, producerId, producerEpoch, groupId }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/response.js")
-    return { request: request({ transactionalId, producerId, producerEpoch, groupId }), response }
-  },
-  1: ({ transactionalId, producerId, producerEpoch, groupId }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/response.js")
     return { request: request({ transactionalId, producerId, producerEpoch, groupId }), response }
   },
 }
@@ -19455,94 +18597,19 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/request.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/request.js ***!
-  \**********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/request.js")
-
-/**
- * AddOffsetsToTxn Request (Version: 1) => transactional_id producer_id producer_epoch group_id
- *   transactional_id => STRING
- *   producer_id => INT64
- *   producer_epoch => INT16
- *   group_id => STRING
- */
-
-module.exports = ({ transactionalId, producerId, producerEpoch, groupId }) =>
-  Object.assign(
-    requestV0({
-      transactionalId,
-      producerId,
-      producerEpoch,
-      groupId,
-    }),
-    { apiVersion: 1 }
-  )
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/response.js":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/response.js ***!
-  \***********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * AddOffsetsToTxn Response (Version: 1) => throttle_time_ms error_code
- *   throttle_time_ms => INT32
- *   error_code => INT16
- */
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/index.js":
 /*!********************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/index.js ***!
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, producerId, producerEpoch, topics }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/response.js")
-    return { request: request({ transactionalId, producerId, producerEpoch, topics }), response }
-  },
-  1: ({ transactionalId, producerId, producerEpoch, topics }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/response.js")
     return { request: request({ transactionalId, producerId, producerEpoch, topics }), response }
   },
 }
@@ -19665,100 +18732,19 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/request.js":
-/*!*************************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/request.js ***!
-  \*************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/request.js")
-
-/**
- * AddPartitionsToTxn Request (Version: 1) => transactional_id producer_id producer_epoch [topics]
- *   transactional_id => STRING
- *   producer_id => INT64
- *   producer_epoch => INT16
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => INT32
- */
-
-module.exports = ({ transactionalId, producerId, producerEpoch, topics }) =>
-  Object.assign(
-    requestV0({
-      transactionalId,
-      producerId,
-      producerEpoch,
-      topics,
-    }),
-    { apiVersion: 1 }
-  )
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/response.js":
-/*!**************************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/response.js ***!
-  \**************************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * AddPartitionsToTxn Response (Version: 1) => throttle_time_ms [errors]
- *   throttle_time_ms => INT32
- *   errors => topic [partition_errors]
- *     topic => STRING
- *     partition_errors => partition error_code
- *       partition => INT32
- *       error_code => INT16
- */
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/index.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/alterConfigs/index.js ***!
   \**************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ resources, validateOnly }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/response.js")
-    return { request: request({ resources, validateOnly }), response }
-  },
-  1: ({ resources, validateOnly }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/response.js")
     return { request: request({ resources, validateOnly }), response }
   },
 }
@@ -19868,86 +18854,6 @@ const parse = async data => {
   }
 
   return data
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/request.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/request.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/request.js")
-
-/**
- * AlterConfigs Request (Version: 1) => [resources] validate_only
- *   resources => resource_type resource_name [config_entries]
- *     resource_type => INT8
- *     resource_name => STRING
- *     config_entries => config_name config_value
- *       config_name => STRING
- *       config_value => NULLABLE_STRING
- *   validate_only => BOOLEAN
- */
-
-/**
- * @param {Array} resources An array of resources to change
- * @param {boolean} [validateOnly=false]
- */
-module.exports = ({ resources, validateOnly }) =>
-  Object.assign(
-    requestV0({
-      resources,
-      validateOnly,
-    }),
-    { apiVersion: 1 }
-  )
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/response.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/response.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * AlterConfigs Response (Version: 1) => throttle_time_ms [resources]
- *   throttle_time_ms => INT32
- *   resources => error_code error_message resource_type resource_name
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- *     resource_type => INT8
- *     resource_name => STRING
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
 }
 
 module.exports = {
@@ -20240,15 +19146,12 @@ module.exports = () => ({ ...requestV0(), apiVersion: 2 })
   \*******************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/apiVersions/v1/response.js")
+const { parse: parseV1, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/apiVersions/v1/response.js")
 
 /**
- * Starting in version 2, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
  * ApiVersions Response (Version: 2) => error_code [api_versions] throttle_time_ms
  *   error_code => INT16
  *   api_versions => api_key min_version max_version
@@ -20258,252 +19161,9 @@ const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ ".
  *   throttle_time_ms => INT32
  */
 
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
 module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/index.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/index.js ***!
-  \************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const versions = {
-  0: ({ creations }) => {
-    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/request.js")
-    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js")
-    return { request: request({ creations }), response }
-  },
-  1: ({ creations }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/response.js")
-    return { request: request({ creations }), response }
-  },
-}
-
-module.exports = {
-  versions: Object.keys(versions),
-  protocol: ({ version }) => versions[version],
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/request.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v0/request.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 32:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { CreateAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * CreateAcls Request (Version: 0) => [creations]
- *   creations => resource_type resource_name principal host operation permission_type
- *     resource_type => INT8
- *     resource_name => STRING
- *     principal => STRING
- *     host => STRING
- *     operation => INT8
- *     permission_type => INT8
- */
-
-const encodeCreations = ({
-  resourceType,
-  resourceName,
-  principal,
-  host,
-  operation,
-  permissionType,
-}) => {
-  return new Encoder()
-    .writeInt8(resourceType)
-    .writeString(resourceName)
-    .writeString(principal)
-    .writeString(host)
-    .writeInt8(operation)
-    .writeInt8(permissionType)
-}
-
-module.exports = ({ creations }) => ({
-  apiKey,
-  apiVersion: 0,
-  apiName: 'CreateAcls',
-  encode: async () => {
-    return new Encoder().writeArray(creations.map(encodeCreations))
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 40:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
-
-/**
- * CreateAcls Response (Version: 0) => throttle_time_ms [creation_responses]
- *   throttle_time_ms => INT32
- *   creation_responses => error_code error_message
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- */
-
-const decodeCreationResponse = decoder => ({
-  errorCode: decoder.readInt16(),
-  errorMessage: decoder.readString(),
-})
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-  const creationResponses = decoder.readArray(decodeCreationResponse)
-
-  return {
-    throttleTime,
-    creationResponses,
-  }
-}
-
-const parse = async data => {
-  const creationResponsesWithError = data.creationResponses.filter(({ errorCode }) =>
-    failure(errorCode)
-  )
-
-  if (creationResponsesWithError.length > 0) {
-    throw createErrorFromCode(creationResponsesWithError[0].errorCode)
-  }
-
-  return data
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/request.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v1/request.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { CreateAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * CreateAcls Request (Version: 1) => [creations]
- *   creations => resource_type resource_name resource_pattern_type principal host operation permission_type
- *     resource_type => INT8
- *     resource_name => STRING
- *     resource_pattern_type => INT8
- *     principal => STRING
- *     host => STRING
- *     operation => INT8
- *     permission_type => INT8
- */
-
-const encodeCreations = ({
-  resourceType,
-  resourceName,
-  resourcePatternType,
-  principal,
-  host,
-  operation,
-  permissionType,
-}) => {
-  return new Encoder()
-    .writeInt8(resourceType)
-    .writeString(resourceName)
-    .writeInt8(resourcePatternType)
-    .writeString(principal)
-    .writeString(host)
-    .writeInt8(operation)
-    .writeInt8(permissionType)
-}
-
-module.exports = ({ creations }) => ({
-  apiKey,
-  apiVersion: 1,
-  apiName: 'CreateAcls',
-  encode: async () => {
-    return new Encoder().writeArray(creations.map(encodeCreations))
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/response.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v1/response.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * CreateAcls Response (Version: 1) => throttle_time_ms [creation_responses]
- *   throttle_time_ms => INT32
- *   creation_responses => error_code error_message
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
+  parse: parseV1,
+  decode: decodeV1,
 }
 
 
@@ -20675,39 +19335,12 @@ module.exports = ({ topicPartitions, validateOnly, timeout }) =>
 /*!************************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/createPartitions/v1/response.js ***!
   \************************************************************************************/
-/*! unknown exports (runtime-defined) */
+/*! dynamic exports */
+/*! exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/kafkajs/src/protocol/requests/createPartitions/v0/response.js */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/createPartitions/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * CreatePartitions Response (Version: 0) => throttle_time_ms [topic_errors]
- *   throttle_time_ms => INT32
- *   topic_errors => topic error_code error_message
- *     topic => STRING
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
+module.exports = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/createPartitions/v0/response.js")
 
 
 /***/ }),
@@ -20718,7 +19351,7 @@ module.exports = {
   \**************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -20735,11 +19368,6 @@ const versions = {
   2: ({ topics, validateOnly, timeout }) => {
     const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/request.js")
     const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/response.js")
-    return { request: request({ topics, validateOnly, timeout }), response }
-  },
-  3: ({ topics, validateOnly, timeout }) => {
-    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/request.js")
-    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/response.js")
     return { request: request({ topics, validateOnly, timeout }), response }
   },
 }
@@ -21060,378 +19688,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/request.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/createTopics/v3/request.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV2 = __webpack_require__(/*! ../v2/request */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/request.js")
-
-/**
- * CreateTopics Request (Version: 3) => [create_topic_requests] timeout validate_only
- *   create_topic_requests => topic num_partitions replication_factor [replica_assignment] [config_entries]
- *     topic => STRING
- *     num_partitions => INT32
- *     replication_factor => INT16
- *     replica_assignment => partition [replicas]
- *       partition => INT32
- *       replicas => INT32
- *     config_entries => config_name config_value
- *       config_name => STRING
- *       config_value => NULLABLE_STRING
- *   timeout => INT32
- *   validate_only => BOOLEAN
- */
-
-module.exports = ({ topics, validateOnly, timeout }) =>
-  Object.assign(requestV2({ topics, validateOnly, timeout }), { apiVersion: 3 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/response.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/createTopics/v3/response.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/response.js")
-
-/**
- * Starting in version 3, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * CreateTopics Response (Version: 3) => throttle_time_ms [topic_errors]
- *   throttle_time_ms => INT32
- *   topic_errors => topic error_code error_message
- *     topic => STRING
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV2(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/index.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/index.js ***!
-  \************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const versions = {
-  0: ({ filters }) => {
-    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/request.js")
-    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js")
-    return { request: request({ filters }), response }
-  },
-  1: ({ filters }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/response.js")
-    return { request: request({ filters }), response }
-  },
-}
-
-module.exports = {
-  versions: Object.keys(versions),
-  protocol: ({ version }) => versions[version],
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/request.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/request.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 32:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { DeleteAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * DeleteAcls Request (Version: 0) => [filters]
- *   filters => resource_type resource_name principal host operation permission_type
- *     resource_type => INT8
- *     resource_name => NULLABLE_STRING
- *     principal => NULLABLE_STRING
- *     host => NULLABLE_STRING
- *     operation => INT8
- *     permission_type => INT8
- */
-
-const encodeFilters = ({
-  resourceType,
-  resourceName,
-  principal,
-  host,
-  operation,
-  permissionType,
-}) => {
-  return new Encoder()
-    .writeInt8(resourceType)
-    .writeString(resourceName)
-    .writeString(principal)
-    .writeString(host)
-    .writeInt8(operation)
-    .writeInt8(permissionType)
-}
-
-module.exports = ({ filters }) => ({
-  apiKey,
-  apiVersion: 0,
-  apiName: 'DeleteAcls',
-  encode: async () => {
-    return new Encoder().writeArray(filters.map(encodeFilters))
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 70:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
-
-/**
- * DeleteAcls Response (Version: 0) => throttle_time_ms [filter_responses]
- *   throttle_time_ms => INT32
- *   filter_responses => error_code error_message [matching_acls]
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- *     matching_acls => error_code error_message resource_type resource_name principal host operation permission_type
- *       error_code => INT16
- *       error_message => NULLABLE_STRING
- *       resource_type => INT8
- *       resource_name => STRING
- *       principal => STRING
- *       host => STRING
- *       operation => INT8
- *       permission_type => INT8
- */
-
-const decodeMatchingAcls = decoder => ({
-  errorCode: decoder.readInt16(),
-  errorMessage: decoder.readString(),
-  resourceType: decoder.readInt8(),
-  resourceName: decoder.readString(),
-  principal: decoder.readString(),
-  host: decoder.readString(),
-  operation: decoder.readInt8(),
-  permissionType: decoder.readInt8(),
-})
-
-const decodeFilterResponse = decoder => ({
-  errorCode: decoder.readInt16(),
-  errorMessage: decoder.readString(),
-  matchingAcls: decoder.readArray(decodeMatchingAcls),
-})
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-  const filterResponses = decoder.readArray(decodeFilterResponse)
-
-  return {
-    throttleTime,
-    filterResponses,
-  }
-}
-
-const parse = async data => {
-  const filterResponsesWithError = data.filterResponses.filter(({ errorCode }) =>
-    failure(errorCode)
-  )
-
-  if (filterResponsesWithError.length > 0) {
-    throw createErrorFromCode(filterResponsesWithError[0].errorCode)
-  }
-
-  for (const filterResponse of data.filterResponses) {
-    const matchingAcls = filterResponse.matchingAcls
-    const matchingAclsWithError = matchingAcls.filter(({ errorCode }) => failure(errorCode))
-
-    if (matchingAclsWithError.length > 0) {
-      throw createErrorFromCode(matchingAclsWithError[0].errorCode)
-    }
-  }
-
-  return data
-}
-
-module.exports = {
-  decodeMatchingAcls,
-  decodeFilterResponse,
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/request.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/request.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { DeleteAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * DeleteAcls Request (Version: 1) => [filters]
- *   filters => resource_type resource_name resource_pattern_type_filter principal host operation permission_type
- *     resource_type => INT8
- *     resource_name => NULLABLE_STRING
- *     resource_pattern_type_filter => INT8
- *     principal => NULLABLE_STRING
- *     host => NULLABLE_STRING
- *     operation => INT8
- *     permission_type => INT8
- */
-
-const encodeFilters = ({
-  resourceType,
-  resourceName,
-  resourcePatternType,
-  principal,
-  host,
-  operation,
-  permissionType,
-}) => {
-  return new Encoder()
-    .writeInt8(resourceType)
-    .writeString(resourceName)
-    .writeInt8(resourcePatternType)
-    .writeString(principal)
-    .writeString(host)
-    .writeInt8(operation)
-    .writeInt8(permissionType)
-}
-
-module.exports = ({ filters }) => ({
-  apiKey,
-  apiVersion: 1,
-  apiName: 'DeleteAcls',
-  encode: async () => {
-    return new Encoder().writeArray(filters.map(encodeFilters))
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/response.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/response.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- * Version 1 also introduces a new resource pattern type field.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-290%3A+Support+for+Prefixed+ACLs
- *
- * DeleteAcls Response (Version: 1) => throttle_time_ms [filter_responses]
- *   throttle_time_ms => INT32
- *   filter_responses => error_code error_message [matching_acls]
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- *     matching_acls => error_code error_message resource_type resource_name resource_pattern_type principal host operation permission_type
- *       error_code => INT16
- *       error_message => NULLABLE_STRING
- *       resource_type => INT8
- *       resource_name => STRING
- *       resource_pattern_type => INT8
- *       principal => STRING
- *       host => STRING
- *       operation => INT8
- *       permission_type => INT8
- */
-
-const decodeMatchingAcls = decoder => ({
-  errorCode: decoder.readInt16(),
-  errorMessage: decoder.readString(),
-  resourceType: decoder.readInt8(),
-  resourceName: decoder.readString(),
-  resourcePatternType: decoder.readInt8(),
-  principal: decoder.readString(),
-  host: decoder.readString(),
-  operation: decoder.readInt8(),
-  permissionType: decoder.readInt8(),
-})
-
-const decodeFilterResponse = decoder => ({
-  errorCode: decoder.readInt16(),
-  errorMessage: decoder.readString(),
-  matchingAcls: decoder.readArray(decodeMatchingAcls),
-})
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-  const filterResponses = decoder.readArray(decodeFilterResponse)
-
-  return {
-    throttleTime: 0,
-    clientSideThrottleTime: throttleTime,
-    filterResponses,
-  }
-}
-
-module.exports = {
-  decode,
-  parse: parseV0,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/deleteGroups/index.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/deleteGroups/index.js ***!
@@ -21575,260 +19831,12 @@ module.exports = groupIds => Object.assign(requestV0(groupIds), { apiVersion: 1 
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteGroups/v0/response.js")
+const responseV0 = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteGroups/v0/response.js")
 
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * DeleteGroups Response (Version: 1) => throttle_time_ms [results]
- *  throttle_time_ms => INT32
- *  results => group_id error_code
- *    group_id => STRING
- *    error_code => INT16
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/index.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/index.js ***!
-  \***************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const versions = {
-  0: ({ topics, timeout }) => {
-    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js")
-    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js")
-    return { request: request({ topics, timeout }), response: response({ topics }) }
-  },
-  1: ({ topics, timeout }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/response.js")
-    return { request: request({ topics, timeout }), response: response({ topics }) }
-  },
-}
-
-module.exports = {
-  versions: Object.keys(versions),
-  protocol: ({ version }) => versions[version],
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { DeleteRecords: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * DeleteRecords Request (Version: 0) => [topics] timeout_ms
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition offset
- *       partition => INT32
- *       offset => INT64
- *   timeout => INT32
- */
-module.exports = ({ topics, timeout = 5000 }) => ({
-  apiKey,
-  apiVersion: 0,
-  apiName: 'DeleteRecords',
-  encode: async () => {
-    return new Encoder()
-      .writeArray(
-        topics.map(({ topic, partitions }) => {
-          return new Encoder().writeString(topic).writeArray(
-            partitions.map(({ partition, offset }) => {
-              return new Encoder().writeInt32(partition).writeInt64(offset)
-            })
-          )
-        })
-      )
-      .writeInt32(timeout)
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js ***!
-  \*********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 62:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { KafkaJSDeleteTopicRecordsError } = __webpack_require__(/*! ../../../../errors */ "./node_modules/kafkajs/src/errors.js")
-const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
-
-/**
- * DeleteRecords Response (Version: 0) => throttle_time_ms [topics]
- *  throttle_time_ms => INT32
- *  topics => name [partitions]
- *    name => STRING
- *    partitions => partition low_watermark error_code
- *      partition => INT32
- *      low_watermark => INT64
- *      error_code => INT16
- */
-
-const topicNameComparator = (a, b) => a.topic.localeCompare(b.topic)
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  return {
-    throttleTime: decoder.readInt32(),
-    topics: decoder
-      .readArray(decoder => ({
-        topic: decoder.readString(),
-        partitions: decoder.readArray(decoder => ({
-          partition: decoder.readInt32(),
-          lowWatermark: decoder.readInt64(),
-          errorCode: decoder.readInt16(),
-        })),
-      }))
-      .sort(topicNameComparator),
-  }
-}
-
-const parse = requestTopics => async data => {
-  const topicsWithErrors = data.topics
-    .map(({ partitions }) => ({
-      partitionsWithErrors: partitions.filter(({ errorCode }) => failure(errorCode)),
-    }))
-    .filter(({ partitionsWithErrors }) => partitionsWithErrors.length)
-
-  if (topicsWithErrors.length > 0) {
-    // at present we only ever request one topic at a time, so can destructure the arrays
-    const [{ topic }] = data.topics // topic name
-    const [{ partitions: requestPartitions }] = requestTopics // requested offset(s)
-    const [{ partitionsWithErrors }] = topicsWithErrors // partition(s) + error(s)
-
-    throw new KafkaJSDeleteTopicRecordsError({
-      topic,
-      partitions: partitionsWithErrors.map(({ partition, errorCode }) => ({
-        partition,
-        error: createErrorFromCode(errorCode),
-        // attach the original offset from the request, onto the error response
-        offset: requestPartitions.find(p => p.partition === partition).offset,
-      })),
-    })
-  }
-
-  return data
-}
-
-module.exports = ({ topics }) => ({
-  decode,
-  parse: parse(topics),
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/request.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/request.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js")
-
-/**
- * DeleteRecords Request (Version: 1) => [topics] timeout_ms
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition offset
- *       partition => INT32
- *       offset => INT64
- *   timeout => INT32
- */
-module.exports = ({ topics, timeout }) =>
-  Object.assign(requestV0({ topics, timeout }), { apiVersion: 1 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/response.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/response.js ***!
-  \*********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const responseV0 = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * DeleteRecords Response (Version: 1) => throttle_time_ms [topics]
- *  throttle_time_ms => INT32
- *  topics => name [partitions]
- *    name => STRING
- *    partitions => partition_index low_watermark error_code
- *      partition_index => INT32
- *      low_watermark => INT64
- *      error_code => INT16
- */
-
-module.exports = ({ topics }) => {
-  const { parse, decode: decodeV0 } = responseV0({ topics })
-
-  const decode = async rawData => {
-    const decoded = await decodeV0(rawData)
-
-    return {
-      ...decoded,
-      throttleTime: 0,
-      clientSideThrottleTime: decoded.throttleTime,
-    }
-  }
-
-  return {
-    decode,
-    parse,
-  }
-}
+module.exports = responseV0
 
 
 /***/ }),
@@ -21971,16 +19979,13 @@ module.exports = ({ topics, timeout }) =>
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
 const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteTopics/v0/response.js")
 
 /**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
  * DeleteTopics Response (Version: 1) => throttle_time_ms [topic_error_codes]
  *   throttle_time_ms => INT32
  *   topic_error_codes => topic error_code
@@ -21997,11 +20002,8 @@ const topicErrors = decoder => ({
 
 const decode = async rawData => {
   const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-
   return {
-    throttleTime: 0,
-    clientSideThrottleTime: throttleTime,
+    throttleTime: decoder.readInt32(),
     topicErrors: decoder.readArray(topicErrors).sort(topicNameComparator),
   }
 }
@@ -22014,296 +20016,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/index.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/index.js ***!
-  \**************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const versions = {
-  0: ({ resourceType, resourceName, principal, host, operation, permissionType }) => {
-    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/request.js")
-    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js")
-    return {
-      request: request({ resourceType, resourceName, principal, host, operation, permissionType }),
-      response,
-    }
-  },
-  1: ({
-    resourceType,
-    resourceName,
-    resourcePatternType,
-    principal,
-    host,
-    operation,
-    permissionType,
-  }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/response.js")
-    return {
-      request: request({
-        resourceType,
-        resourceName,
-        resourcePatternType,
-        principal,
-        host,
-        operation,
-        permissionType,
-      }),
-      response,
-    }
-  },
-}
-
-module.exports = {
-  versions: Object.keys(versions),
-  protocol: ({ version }) => versions[version],
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/request.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/request.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { DescribeAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * DescribeAcls Request (Version: 0) => resource_type resource_name principal host operation permission_type
- *   resource_type => INT8
- *   resource_name => NULLABLE_STRING
- *   principal => NULLABLE_STRING
- *   host => NULLABLE_STRING
- *   operation => INT8
- *   permission_type => INT8
- */
-
-module.exports = ({ resourceType, resourceName, principal, host, operation, permissionType }) => ({
-  apiKey,
-  apiVersion: 0,
-  apiName: 'DescribeAcls',
-  encode: async () => {
-    return new Encoder()
-      .writeInt8(resourceType)
-      .writeString(resourceName)
-      .writeString(principal)
-      .writeString(host)
-      .writeInt8(operation)
-      .writeInt8(permissionType)
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 55:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
-
-/**
- * DescribeAcls Response (Version: 0) => throttle_time_ms error_code error_message [resources]
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   error_message => NULLABLE_STRING
- *   resources => resource_type resource_name [acls]
- *     resource_type => INT8
- *     resource_name => STRING
- *     acls => principal host operation permission_type
- *       principal => STRING
- *       host => STRING
- *       operation => INT8
- *       permission_type => INT8
- */
-
-const decodeAcls = decoder => ({
-  principal: decoder.readString(),
-  host: decoder.readString(),
-  operation: decoder.readInt8(),
-  permissionType: decoder.readInt8(),
-})
-
-const decodeResources = decoder => ({
-  resourceType: decoder.readInt8(),
-  resourceName: decoder.readString(),
-  acls: decoder.readArray(decodeAcls),
-})
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-  const errorCode = decoder.readInt16()
-  const errorMessage = decoder.readString()
-  const resources = decoder.readArray(decodeResources)
-
-  return {
-    throttleTime,
-    errorCode,
-    errorMessage,
-    resources,
-  }
-}
-
-const parse = async data => {
-  if (failure(data.errorCode)) {
-    throw createErrorFromCode(data.errorCode)
-  }
-
-  return data
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/request.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/request.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { DescribeAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * DescribeAcls Request (Version: 1) => resource_type resource_name resource_pattern_type_filter principal host operation permission_type
- *   resource_type => INT8
- *   resource_name => NULLABLE_STRING
- *   resource_pattern_type_filter => INT8
- *   principal => NULLABLE_STRING
- *   host => NULLABLE_STRING
- *   operation => INT8
- *   permission_type => INT8
- */
-
-module.exports = ({
-  resourceType,
-  resourceName,
-  resourcePatternType,
-  principal,
-  host,
-  operation,
-  permissionType,
-}) => ({
-  apiKey,
-  apiVersion: 1,
-  apiName: 'DescribeAcls',
-  encode: async () => {
-    return new Encoder()
-      .writeInt8(resourceType)
-      .writeString(resourceName)
-      .writeInt8(resourcePatternType)
-      .writeString(principal)
-      .writeString(host)
-      .writeInt8(operation)
-      .writeInt8(permissionType)
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/response.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/response.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 54:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js")
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- * Version 1 also introduces a new resource pattern type field.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-290%3A+Support+for+Prefixed+ACLs
- *
- * DescribeAcls Response (Version: 1) => throttle_time_ms error_code error_message [resources]
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   error_message => NULLABLE_STRING
- *   resources => resource_type resource_name resource_pattern_type [acls]
- *     resource_type => INT8
- *     resource_name => STRING
- *     resource_pattern_type => INT8
- *     acls => principal host operation permission_type
- *       principal => STRING
- *       host => STRING
- *       operation => INT8
- *       permission_type => INT8
- */
-const decodeAcls = decoder => ({
-  principal: decoder.readString(),
-  host: decoder.readString(),
-  operation: decoder.readInt8(),
-  permissionType: decoder.readInt8(),
-})
-
-const decodeResources = decoder => ({
-  resourceType: decoder.readInt8(),
-  resourceName: decoder.readString(),
-  resourcePatternType: decoder.readInt8(),
-  acls: decoder.readArray(decodeAcls),
-})
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-  const errorCode = decoder.readInt16()
-  const errorMessage = decoder.readString()
-  const resources = decoder.readArray(decodeResources)
-
-  return {
-    throttleTime: 0,
-    clientSideThrottleTime: throttleTime,
-    errorCode,
-    errorMessage,
-    resources,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/index.js":
 /*!*****************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/describeConfigs/index.js ***!
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -22315,11 +20034,6 @@ const versions = {
   1: ({ resources, includeSynonyms }) => {
     const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/request.js")
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/response.js")
-    return { request: request({ resources, includeSynonyms }), response }
-  },
-  2: ({ resources, includeSynonyms }) => {
-    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/request.js")
-    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/response.js")
     return { request: request({ resources, includeSynonyms }), response }
   },
 }
@@ -22564,95 +20278,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/request.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/request.js ***!
-  \**********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/request.js")
-
-/**
- * DescribeConfigs Request (Version: 1) => [resources] include_synonyms
- *   resources => resource_type resource_name [config_names]
- *     resource_type => INT8
- *     resource_name => STRING
- *     config_names => STRING
- *   include_synonyms => BOOLEAN
- */
-
-/**
- * @param {Array} resources An array of config resources to be returned
- * @param [includeSynonyms=false]
- */
-module.exports = ({ resources, includeSynonyms }) =>
-  Object.assign(requestV1({ resources, includeSynonyms }), { apiVersion: 2 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/response.js":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/response.js ***!
-  \***********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/response.js")
-
-/**
- * Starting in version 2, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * DescribeConfigs Response (Version: 2) => throttle_time_ms [resources]
- *   throttle_time_ms => INT32
- *   resources => error_code error_message resource_type resource_name [config_entries]
- *     error_code => INT16
- *     error_message => NULLABLE_STRING
- *     resource_type => INT8
- *     resource_name => STRING
- *     config_entries => config_name config_value read_only config_source is_sensitive [config_synonyms]
- *       config_name => STRING
- *       config_value => NULLABLE_STRING
- *       read_only => BOOLEAN
- *       config_source => INT8
- *       is_sensitive => BOOLEAN
- *       config_synonyms => config_name config_value config_source
- *         config_name => STRING
- *         config_value => NULLABLE_STRING
- *         config_source => INT8
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/describeGroups/index.js":
 /*!****************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/describeGroups/index.js ***!
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -22664,11 +20296,6 @@ const versions = {
   1: ({ groupIds }) => {
     const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/request.js")
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/response.js")
-    return { request: request({ groupIds }), response }
-  },
-  2: ({ groupIds }) => {
-    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/request.js")
-    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/response.js")
     return { request: request({ groupIds }), response }
   },
 }
@@ -22870,97 +20497,19 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/request.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/request.js ***!
-  \*********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 8:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/request.js")
-
-/**
- * DescribeGroups Request (Version: 2) => [group_ids]
- *   group_ids => STRING
- */
-
-module.exports = ({ groupIds }) => Object.assign(requestV1({ groupIds }), { apiVersion: 2 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/response.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/response.js ***!
-  \**********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/response.js")
-
-/**
- * Starting in version 2, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * DescribeGroups Response (Version: 2) => throttle_time_ms [groups]
- *   throttle_time_ms => INT32
- *   groups => error_code group_id state protocol_type protocol [members]
- *     error_code => INT16
- *     group_id => STRING
- *     state => STRING
- *     protocol_type => STRING
- *     protocol => STRING
- *     members => member_id client_id client_host member_metadata member_assignment
- *       member_id => STRING
- *       client_id => STRING
- *       client_host => STRING
- *       member_metadata => BYTES
- *       member_assignment => BYTES
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/endTxn/index.js":
 /*!********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/endTxn/index.js ***!
   \********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, producerId, producerEpoch, transactionResult }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/response.js")
-    return {
-      request: request({ transactionalId, producerId, producerEpoch, transactionResult }),
-      response,
-    }
-  },
-  1: ({ transactionalId, producerId, producerEpoch, transactionResult }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/response.js")
     return {
       request: request({ transactionalId, producerId, producerEpoch, transactionResult }),
       response,
@@ -23048,71 +20597,6 @@ const parse = async data => {
   }
 
   return data
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/request.js":
-/*!*************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/endTxn/v1/request.js ***!
-  \*************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/request.js")
-
-/**
- * EndTxn Request (Version: 1) => transactional_id producer_id producer_epoch transaction_result
- *   transactional_id => STRING
- *   producer_id => INT64
- *   producer_epoch => INT16
- *   transaction_result => BOOLEAN
- */
-
-module.exports = ({ transactionalId, producerId, producerEpoch, transactionResult }) =>
-  Object.assign(requestV0({ transactionalId, producerId, producerEpoch, transactionResult }), {
-    apiVersion: 1,
-  })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/response.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/endTxn/v1/response.js ***!
-  \**************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 22:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * EndTxn Response (Version: 1) => throttle_time_ms error_code
- *   throttle_time_ms => INT32
- *   error_code => INT16
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
 }
 
 module.exports = {
@@ -24918,7 +22402,7 @@ module.exports = {
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const COORDINATOR_TYPES = __webpack_require__(/*! ../../coordinatorTypes */ "./node_modules/kafkajs/src/protocol/coordinatorTypes.js")
@@ -24932,11 +22416,6 @@ const versions = {
   1: ({ groupId, coordinatorType = COORDINATOR_TYPES.GROUP }) => {
     const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/request.js")
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/response.js")
-    return { request: request({ coordinatorKey: groupId, coordinatorType }), response }
-  },
-  2: ({ groupId, coordinatorType = COORDINATOR_TYPES.GROUP }) => {
-    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/request.js")
-    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/response.js")
     return { request: request({ coordinatorKey: groupId, coordinatorType }), response }
   },
 }
@@ -25124,79 +22603,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/request.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/request.js ***!
-  \**********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/request.js")
-
-/**
- * FindCoordinator Request (Version: 2) => coordinator_key coordinator_type
- *   coordinator_key => STRING
- *   coordinator_type => INT8
- */
-
-module.exports = ({ coordinatorKey, coordinatorType }) =>
-  Object.assign(requestV1({ coordinatorKey, coordinatorType }), { apiVersion: 2 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/response.js":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/response.js ***!
-  \***********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/response.js")
-
-/**
- * Starting in version 2, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * FindCoordinator Response (Version: 1) => throttle_time_ms error_code error_message coordinator
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   error_message => NULLABLE_STRING
- *   coordinator => node_id host port
- *     node_id => INT32
- *     host => STRING
- *     port => INT32
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/index.js":
 /*!***********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/index.js ***!
   \***********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -25213,22 +22626,6 @@ const versions = {
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v1/response.js")
     return {
       request: request({ groupId, groupGenerationId, memberId }),
-      response,
-    }
-  },
-  2: ({ groupId, groupGenerationId, memberId }) => {
-    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/request.js")
-    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js")
-    return {
-      request: request({ groupId, groupGenerationId, memberId }),
-      response,
-    }
-  },
-  3: ({ groupId, groupGenerationId, memberId, groupInstanceId }) => {
-    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/request.js")
-    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/response.js")
-    return {
-      request: request({ groupId, groupGenerationId, memberId, groupInstanceId }),
       response,
     }
   },
@@ -25379,130 +22776,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/request.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/request.js ***!
-  \****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v1/request.js")
-
-/**
- * Heartbeat Request (Version: 2) => group_id generation_id member_id
- *   group_id => STRING
- *   generation_id => INT32
- *   member_id => STRING
- */
-
-module.exports = ({ groupId, groupGenerationId, memberId }) =>
-  Object.assign(requestV1({ groupId, groupGenerationId, memberId }), { apiVersion: 2 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v1/response.js")
-
-/**
- * In version 2 on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * Heartbeat Response (Version: 2) => throttle_time_ms error_code
- *   throttle_time_ms => INT32
- *   error_code => INT16
- */
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/request.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/request.js ***!
-  \****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { Heartbeat: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * Version 3 adds group_instance_id to indicate member identity across restarts.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
- *
- * Heartbeat Request (Version: 3) => group_id generation_id member_id group_instance_id
- *   group_id => STRING
- *   generation_id => INT32
- *   member_id => STRING
- *   group_instance_id => NULLABLE_STRING
- */
-
-module.exports = ({ groupId, groupGenerationId, memberId, groupInstanceId }) => ({
-  apiKey,
-  apiVersion: 3,
-  apiName: 'Heartbeat',
-  encode: async () => {
-    return new Encoder()
-      .writeString(groupId)
-      .writeInt32(groupGenerationId)
-      .writeString(memberId)
-      .writeString(groupInstanceId)
-  },
-})
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/response.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/response.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 8:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js")
-
-/**
- * Heartbeat Response (Version: 3) => throttle_time_ms error_code
- *   throttle_time_ms => INT32
- *   error_code => INT16
- */
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/index.js":
 /*!*************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/index.js ***!
@@ -25538,7 +22811,7 @@ const requests = {
   ApiVersions: __webpack_require__(/*! ./apiVersions */ "./node_modules/kafkajs/src/protocol/requests/apiVersions/index.js"),
   CreateTopics: __webpack_require__(/*! ./createTopics */ "./node_modules/kafkajs/src/protocol/requests/createTopics/index.js"),
   DeleteTopics: __webpack_require__(/*! ./deleteTopics */ "./node_modules/kafkajs/src/protocol/requests/deleteTopics/index.js"),
-  DeleteRecords: __webpack_require__(/*! ./deleteRecords */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/index.js"),
+  DeleteRecords: {},
   InitProducerId: __webpack_require__(/*! ./initProducerId */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/index.js"),
   OffsetForLeaderEpoch: {},
   AddPartitionsToTxn: __webpack_require__(/*! ./addPartitionsToTxn */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/index.js"),
@@ -25546,9 +22819,9 @@ const requests = {
   EndTxn: __webpack_require__(/*! ./endTxn */ "./node_modules/kafkajs/src/protocol/requests/endTxn/index.js"),
   WriteTxnMarkers: {},
   TxnOffsetCommit: __webpack_require__(/*! ./txnOffsetCommit */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/index.js"),
-  DescribeAcls: __webpack_require__(/*! ./describeAcls */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/index.js"),
-  CreateAcls: __webpack_require__(/*! ./createAcls */ "./node_modules/kafkajs/src/protocol/requests/createAcls/index.js"),
-  DeleteAcls: __webpack_require__(/*! ./deleteAcls */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/index.js"),
+  DescribeAcls: {},
+  CreateAcls: {},
+  DeleteAcls: {},
   DescribeConfigs: __webpack_require__(/*! ./describeConfigs */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/index.js"),
   AlterConfigs: __webpack_require__(/*! ./alterConfigs */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/index.js"),
   AlterReplicaLogDirs: {},
@@ -25596,18 +22869,13 @@ module.exports = {
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, transactionTimeout = 5000 }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/response.js")
-    return { request: request({ transactionalId, transactionTimeout }), response }
-  },
-  1: ({ transactionalId, transactionTimeout = 5000 }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/response.js")
     return { request: request({ transactionalId, transactionTimeout }), response }
   },
 }
@@ -25700,76 +22968,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/request.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/request.js ***!
-  \*********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/request.js")
-
-/**
- * InitProducerId Request (Version: 1) => transactional_id transaction_timeout_ms
- *   transactional_id => NULLABLE_STRING
- *   transaction_timeout_ms => INT32
- */
-
-module.exports = ({ transactionalId, transactionTimeout }) =>
-  Object.assign(requestV0({ transactionalId, transactionTimeout }), { apiVersion: 1 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/response.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/response.js ***!
-  \**********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/response.js")
-
-/**
- * Starting in version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * InitProducerId Response (Version: 0) => throttle_time_ms error_code producer_id producer_epoch
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   producer_id => INT64
- *   producer_epoch => INT16
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV0(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/joinGroup/index.js":
 /*!***********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/joinGroup/index.js ***!
   \***********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 132:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 105:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const NETWORK_DELAY = 5000
@@ -25866,33 +23071,6 @@ const versions = {
         sessionTimeout,
         rebalanceTimeout,
         memberId,
-        protocolType,
-        groupProtocols,
-      }),
-      response,
-      requestTimeout: requestTimeout({ rebalanceTimeout, sessionTimeout }),
-      logResponseError: logResponseError(memberId),
-    }
-  },
-  5: ({
-    groupId,
-    sessionTimeout,
-    rebalanceTimeout,
-    memberId,
-    groupInstanceId,
-    protocolType,
-    groupProtocols,
-  }) => {
-    const request = __webpack_require__(/*! ./v5/request */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/request.js")
-    const response = __webpack_require__(/*! ./v5/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/response.js")
-
-    return {
-      request: request({
-        groupId,
-        sessionTimeout,
-        rebalanceTimeout,
-        memberId,
-        groupInstanceId,
         protocolType,
         groupProtocols,
       }),
@@ -26251,16 +23429,13 @@ module.exports = ({
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse, decode: decodeV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v2/response.js")
+const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v0/response.js")
+const { decode } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v2/response.js")
 
 /**
- * Starting in version 3, on quota violation, brokers send out responses
- * before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
  * JoinGroup Response (Version: 3) => throttle_time_ms error_code generation_id group_protocol leader_id member_id [members]
  *   throttle_time_ms => INT32
  *   error_code => INT16
@@ -26272,19 +23447,10 @@ const { parse, decode: decodeV2 } = __webpack_require__(/*! ../v2/response */ ".
  *     member_id => STRING
  *     member_metadata => BYTES
  */
-const decode = async rawData => {
-  const decoded = await decodeV2(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
 
 module.exports = {
   decode,
-  parse,
+  parse: parseV0,
 }
 
 
@@ -26296,15 +23462,12 @@ module.exports = {
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const requestV3 = __webpack_require__(/*! ../v3/request */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v3/request.js")
 
 /**
- * Starting in version 4, the client needs to issue a second request to join group
- * with assigned id.
- *
  * JoinGroup Request (Version: 4) => group_id session_timeout rebalance_timeout member_id protocol_type [group_protocols]
  *   group_id => STRING
  *   session_timeout => INT32
@@ -26391,152 +23554,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/request.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/request.js ***!
-  \****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { JoinGroup: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * Version 5 adds group_instance_id to identify members across restarts.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
- *
- * JoinGroup Request (Version: 5) => group_id session_timeout rebalance_timeout member_id group_instance_id protocol_type [group_protocols]
- *   group_id => STRING
- *   session_timeout => INT32
- *   rebalance_timeout => INT32
- *   member_id => STRING
- *   group_instance_id => NULLABLE_STRING
- *   protocol_type => STRING
- *   group_protocols => protocol_name protocol_metadata
- *     protocol_name => STRING
- *     protocol_metadata => BYTES
- */
-
-module.exports = ({
-  groupId,
-  sessionTimeout,
-  rebalanceTimeout,
-  memberId,
-  groupInstanceId = null,
-  protocolType,
-  groupProtocols,
-}) => ({
-  apiKey,
-  apiVersion: 5,
-  apiName: 'JoinGroup',
-  encode: async () => {
-    return new Encoder()
-      .writeString(groupId)
-      .writeInt32(sessionTimeout)
-      .writeInt32(rebalanceTimeout)
-      .writeString(memberId)
-      .writeString(groupInstanceId)
-      .writeString(protocolType)
-      .writeArray(groupProtocols.map(encodeGroupProtocols))
-  },
-})
-
-const encodeGroupProtocols = ({ name, metadata = Buffer.alloc(0) }) => {
-  return new Encoder().writeString(name).writeBytes(metadata)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/response.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/response.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 64:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { KafkaJSMemberIdRequired } = __webpack_require__(/*! ../../../../errors */ "./node_modules/kafkajs/src/errors.js")
-const {
-  failure,
-  createErrorFromCode,
-  errorCodes,
-  failIfVersionNotSupported,
-} = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
-
-/**
- * JoinGroup Response (Version: 5) => throttle_time_ms error_code generation_id group_protocol leader_id member_id [members]
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   generation_id => INT32
- *   group_protocol => STRING
- *   leader_id => STRING
- *   member_id => STRING
- *   members => member_id group_instance_id metadata
- *     member_id => STRING
- *     group_instance_id => NULLABLE_STRING
- *     member_metadata => BYTES
- */
-const { code: MEMBER_ID_REQUIRED_ERROR_CODE } = errorCodes.find(
-  e => e.type === 'MEMBER_ID_REQUIRED'
-)
-
-const parse = async data => {
-  if (failure(data.errorCode)) {
-    if (data.errorCode === MEMBER_ID_REQUIRED_ERROR_CODE) {
-      throw new KafkaJSMemberIdRequired(createErrorFromCode(data.errorCode), {
-        memberId: data.memberId,
-      })
-    }
-
-    throw createErrorFromCode(data.errorCode)
-  }
-
-  return data
-}
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-  const errorCode = decoder.readInt16()
-
-  failIfVersionNotSupported(errorCode)
-
-  return {
-    throttleTime: 0,
-    clientSideThrottleTime: throttleTime,
-    errorCode,
-    generationId: decoder.readInt32(),
-    groupProtocol: decoder.readString(),
-    leaderId: decoder.readString(),
-    memberId: decoder.readString(),
-    members: decoder.readArray(decoder => ({
-      memberId: decoder.readString(),
-      groupInstanceId: decoder.readString(),
-      memberMetadata: decoder.readBytes(),
-    })),
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/index.js":
 /*!************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/index.js ***!
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -26553,22 +23577,6 @@ const versions = {
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v1/response.js")
     return {
       request: request({ groupId, memberId }),
-      response,
-    }
-  },
-  2: ({ groupId, memberId }) => {
-    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/request.js")
-    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js")
-    return {
-      request: request({ groupId, memberId }),
-      response,
-    }
-  },
-  3: ({ groupId, memberId, groupInstanceId }) => {
-    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/request.js")
-    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/response.js")
-    return {
-      request: request({ groupId, members: [{ memberId, groupInstanceId }] }),
       response,
     }
   },
@@ -26709,167 +23717,6 @@ const decode = async rawData => {
 module.exports = {
   decode,
   parse: parseV0,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/request.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/request.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v1/request.js")
-
-/**
- * LeaveGroup Request (Version: 2) => group_id member_id
- *   group_id => STRING
- *   member_id => STRING
- */
-
-module.exports = ({ groupId, memberId }) =>
-  Object.assign(requestV1({ groupId, memberId }), { apiVersion: 2 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v1/response.js")
-
-/**
- * In version 2 on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * LeaveGroup Response (Version: 2) => throttle_time_ms error_code
- *   throttle_time_ms => INT32
- *   error_code => INT16
- */
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/request.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/request.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { LeaveGroup: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * Version 3 changes leavegroup to operate on a batch of members
- * and adds group_instance_id to identify members across restarts.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
- *
- * LeaveGroup Request (Version: 3) => group_id [members]
- *   group_id => STRING
- *   members => member_id group_instance_id
- *     member_id => STRING
- *     group_instance_id => NULLABLE_STRING
- */
-
-module.exports = ({ groupId, members }) => ({
-  apiKey,
-  apiVersion: 3,
-  apiName: 'LeaveGroup',
-  encode: async () => {
-    return new Encoder()
-      .writeString(groupId)
-      .writeArray(members.map(member => encodeMember(member)))
-  },
-})
-
-const encodeMember = ({ memberId, groupInstanceId = null }) => {
-  return new Encoder().writeString(memberId).writeString(groupInstanceId)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/response.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/response.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 43:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { failIfVersionNotSupported, failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
-const { parse: parseV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js")
-
-/**
- * LeaveGroup Response (Version: 3) => throttle_time_ms error_code [members]
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   members => member_id group_instance_id error_code
- *     member_id => STRING
- *     group_instance_id => NULLABLE_STRING
- *     error_code => INT16
- */
-
-const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const throttleTime = decoder.readInt32()
-  const errorCode = decoder.readInt16()
-  const members = decoder.readArray(decodeMembers)
-
-  failIfVersionNotSupported(errorCode)
-
-  return { throttleTime: 0, clientSideThrottleTime: throttleTime, errorCode, members }
-}
-
-const decodeMembers = decoder => ({
-  memberId: decoder.readString(),
-  groupInstanceId: decoder.readString(),
-  errorCode: decoder.readInt16(),
-})
-
-const parse = async data => {
-  const parsed = parseV2(data)
-
-  const memberWithError = data.members.find(member => failure(member.errorCode))
-  if (memberWithError) {
-    throw createErrorFromCode(memberWithError.errorCode)
-  }
-
-  return parsed
-}
-
-module.exports = {
-  decode,
-  parse,
 }
 
 
@@ -27082,15 +23929,12 @@ module.exports = () => Object.assign(requestV1(), { apiVersion: 2 })
   \******************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/listGroups/v1/response.js")
+const responseV1 = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/listGroups/v1/response.js")
 
 /**
- * In version 2 on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
  * ListGroups Response (Version: 2) => error_code [groups]
  *   throttle_time_ms => INT32
  *   error_code => INT16
@@ -27098,20 +23942,8 @@ const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ ".
  *     group_id => STRING
  *     protocol_type => STRING
  */
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
 
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
+module.exports = responseV1
 
 
 /***/ }),
@@ -27122,7 +23954,7 @@ module.exports = {
   \*************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const ISOLATION_LEVEL = __webpack_require__(/*! ../../isolationLevel */ "./node_modules/kafkajs/src/protocol/isolationLevel.js")
@@ -27144,11 +23976,6 @@ const versions = {
   2: ({ replicaId = REPLICA_ID, isolationLevel = ISOLATION_LEVEL.READ_COMMITTED, topics }) => {
     const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/request.js")
     const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/response.js")
-    return { request: request({ replicaId, isolationLevel, topics }), response }
-  },
-  3: ({ replicaId = REPLICA_ID, isolationLevel = ISOLATION_LEVEL.READ_COMMITTED, topics }) => {
-    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/request.js")
-    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/response.js")
     return { request: request({ replicaId, isolationLevel, topics }), response }
   },
 }
@@ -27497,83 +24324,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/request.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/request.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV2 = __webpack_require__(/*! ../v2/request */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/request.js")
-
-/**
- * ListOffsets Request (Version: 3) => replica_id isolation_level [topics]
- *   replica_id => INT32
- *   isolation_level => INT8
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition timestamp
- *       partition => INT32
- *       timestamp => INT64
- */
-module.exports = ({ replicaId, isolationLevel, topics }) =>
-  Object.assign(requestV2({ replicaId, isolationLevel, topics }), { apiVersion: 3 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/response.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/response.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/response.js")
-
-/**
- * In version 3 on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * ListOffsets Response (Version: 3) => throttle_time_ms [responses]
- *   throttle_time_ms => INT32
- *   responses => topic [partition_responses]
- *     topic => STRING
- *     partition_responses => partition error_code timestamp offset
- *       partition => INT32
- *       error_code => INT16
- *       timestamp => INT64
- *       offset => INT64
- */
-const decode = async rawData => {
-  const decoded = await decodeV2(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/metadata/index.js":
 /*!**********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/metadata/index.js ***!
   \**********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 39:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 34:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -27605,11 +24362,6 @@ const versions = {
   5: ({ topics, allowAutoTopicCreation }) => {
     const request = __webpack_require__(/*! ./v5/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/request.js")
     const response = __webpack_require__(/*! ./v5/response */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/response.js")
-    return { request: request({ topics, allowAutoTopicCreation }), response }
-  },
-  6: ({ topics, allowAutoTopicCreation }) => {
-    const request = __webpack_require__(/*! ./v6/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/request.js")
-    const response = __webpack_require__(/*! ./v6/response */ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/response.js")
     return { request: request({ topics, allowAutoTopicCreation }), response }
   },
 }
@@ -28192,90 +24944,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/request.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/metadata/v6/request.js ***!
-  \***************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV5 = __webpack_require__(/*! ../v5/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/request.js")
-
-/**
- * Metadata Request (Version: 6) => [topics] allow_auto_topic_creation
- *   topics => STRING
- *   allow_auto_topic_creation => BOOLEAN
- */
-
-module.exports = ({ topics, allowAutoTopicCreation = true }) =>
-  Object.assign(requestV5({ topics, allowAutoTopicCreation }), { apiVersion: 6 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/response.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/metadata/v6/response.js ***!
-  \****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 38:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v5/response */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/response.js")
-
-/**
- * In version 6 on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * Metadata Response (Version: 6) => throttle_time_ms [brokers] cluster_id controller_id [topic_metadata]
- *   throttle_time_ms => INT32
- *   brokers => node_id host port rack
- *     node_id => INT32
- *     host => STRING
- *     port => INT32
- *     rack => NULLABLE_STRING
- *   cluster_id => NULLABLE_STRING
- *   controller_id => INT32
- *   topic_metadata => error_code topic is_internal [partition_metadata]
- *     error_code => INT16
- *     topic => STRING
- *     is_internal => BOOLEAN
- *     partition_metadata => error_code partition leader [replicas] [isr] [offline_replicas]
- *       error_code => INT16
- *       partition => INT32
- *       leader => INT32
- *       replicas => INT32
- *       isr => INT32
- *       offline_replicas => INT32
- */
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/index.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/index.js ***!
   \**************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 72:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 45:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 // This value signals to the broker that its default configuration should be used.
@@ -28315,33 +24990,6 @@ const versions = {
         groupGenerationId,
         memberId,
         retentionTime,
-        topics,
-      }),
-      response,
-    }
-  },
-  4: ({ groupId, groupGenerationId, memberId, retentionTime = RETENTION_TIME, topics }) => {
-    const request = __webpack_require__(/*! ./v4/request */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/request.js")
-    const response = __webpack_require__(/*! ./v4/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js")
-    return {
-      request: request({
-        groupId,
-        groupGenerationId,
-        memberId,
-        retentionTime,
-        topics,
-      }),
-      response,
-    }
-  },
-  5: ({ groupId, groupGenerationId, memberId, topics }) => {
-    const request = __webpack_require__(/*! ./v5/request */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/request.js")
-    const response = __webpack_require__(/*! ./v5/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/response.js")
-    return {
-      request: request({
-        groupId,
-        groupGenerationId,
-        memberId,
         topics,
       }),
       response,
@@ -28707,170 +25355,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/request.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/request.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV3 = __webpack_require__(/*! ../v3/request */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v3/request.js")
-
-/**
- * OffsetCommit Request (Version: 4) => group_id generation_id member_id retention_time [topics]
- *   group_id => STRING
- *   generation_id => INT32
- *   member_id => STRING
- *   retention_time => INT64
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition offset metadata
- *       partition => INT32
- *       offset => INT64
- *       metadata => NULLABLE_STRING
- */
-
-module.exports = ({ groupId, groupGenerationId, memberId, retentionTime, topics }) =>
-  Object.assign(requestV3({ groupId, groupGenerationId, memberId, retentionTime, topics }), {
-    apiVersion: 4,
-  })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV3 } = __webpack_require__(/*! ../v3/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v3/response.js")
-
-/**
- * Starting in version 4, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * OffsetCommit Response (Version: 4) => throttle_time_ms [responses]
- *   throttle_time_ms => INT32
- *   responses => topic [partition_responses]
- *     topic => STRING
- *     partition_responses => partition error_code
- *       partition => INT32
- *       error_code => INT16
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV3(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/request.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/request.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { OffsetCommit: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * Version 5 removes retention_time, as this is controlled by a broker setting
- *
- * OffsetCommit Request (Version: 4) => group_id generation_id member_id [topics]
- *   group_id => STRING
- *   generation_id => INT32
- *   member_id => STRING
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition offset metadata
- *       partition => INT32
- *       offset => INT64
- *       metadata => NULLABLE_STRING
- */
-
-module.exports = ({ groupId, groupGenerationId, memberId, topics }) => ({
-  apiKey,
-  apiVersion: 5,
-  apiName: 'OffsetCommit',
-  encode: async () => {
-    return new Encoder()
-      .writeString(groupId)
-      .writeInt32(groupGenerationId)
-      .writeString(memberId)
-      .writeArray(topics.map(encodeTopic))
-  },
-})
-
-const encodeTopic = ({ topic, partitions }) => {
-  return new Encoder().writeString(topic).writeArray(partitions.map(encodePartition))
-}
-
-const encodePartition = ({ partition, offset, metadata = null }) => {
-  return new Encoder()
-    .writeInt32(partition)
-    .writeInt64(offset)
-    .writeString(metadata)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/response.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/response.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode } = __webpack_require__(/*! ../v4/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js")
-
-/**
- * OffsetCommit Response (Version: 5) => throttle_time_ms [responses]
- *   throttle_time_ms => INT32
- *   responses => topic [partition_responses]
- *     topic => STRING
- *     partition_responses => partition error_code
- *       partition => INT32
- *       error_code => INT16
- */
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/index.js":
 /*!*************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/offsetFetch/index.js ***!
   \*************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -28887,11 +25378,6 @@ const versions = {
   3: ({ groupId, topics }) => {
     const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/request.js")
     const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/response.js")
-    return { request: request({ groupId, topics }), response }
-  },
-  4: ({ groupId, topics }) => {
-    const request = __webpack_require__(/*! ./v4/request */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/request.js")
-    const response = __webpack_require__(/*! ./v4/response */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/response.js")
     return { request: request({ groupId, topics }), response }
   },
 }
@@ -29193,77 +25679,6 @@ const decodePartitions = decoder => ({
 module.exports = {
   decode,
   parse: parseV2,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/request.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/request.js ***!
-  \******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV3 = __webpack_require__(/*! ../v3/request */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/request.js")
-
-/**
- * OffsetFetch Request (Version: 4) => group_id [topics]
- *   group_id => STRING
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition
- *       partition => INT32
- */
-
-module.exports = ({ groupId, topics }) =>
-  Object.assign(requestV3({ groupId, topics }), { apiVersion: 4 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/response.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/response.js ***!
-  \*******************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV3 } = __webpack_require__(/*! ../v3/response */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/response.js")
-
-/**
- * Starting in version 4, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * OffsetFetch Response (Version: 4) => throttle_time_ms [responses] error_code
- *   throttle_time_ms => INT32
- *   responses => topic [partition_responses]
- *     topic => STRING
- *     partition_responses => partition offset metadata error_code
- *       partition => INT32
- *       offset => INT64
- *       metadata => NULLABLE_STRING
- *       error_code => INT16
- *   error_code => INT16
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV3(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
 }
 
 
@@ -30190,10 +26605,11 @@ module.exports = ({
   \***************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 48:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse, decode: decodeV5 } = __webpack_require__(/*! ../v5/response */ "./node_modules/kafkajs/src/protocol/requests/produce/v5/response.js")
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { parse: parseV5 } = __webpack_require__(/*! ../v5/response */ "./node_modules/kafkajs/src/protocol/requests/produce/v5/response.js")
 
 /**
  * The version number is bumped to indicate that on quota violation brokers send out responses before throttling.
@@ -30211,19 +26627,37 @@ const { parse, decode: decodeV5 } = __webpack_require__(/*! ../v5/response */ ".
  *   throttle_time_ms => INT32
  */
 
+const partition = decoder => ({
+  partition: decoder.readInt32(),
+  errorCode: decoder.readInt16(),
+  baseOffset: decoder.readInt64().toString(),
+  logAppendTime: decoder.readInt64().toString(),
+  logStartOffset: decoder.readInt64().toString(),
+})
+
 const decode = async rawData => {
-  const decoded = await decodeV5(rawData)
+  const decoder = new Decoder(rawData)
+  const topics = decoder.readArray(decoder => ({
+    topicName: decoder.readString(),
+    partitions: decoder.readArray(partition),
+  }))
+
+  const throttleTime = decoder.readInt32()
+
+  // Report a `throttleTime` of 0: The broker will not have throttled
+  // this request, but if the `clientSideThrottleTime` is >0 then it
+  // expects us to do that -- and it will ignore requests.
 
   return {
-    ...decoded,
+    topics,
     throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
+    clientSideThrottleTime: throttleTime,
   }
 }
 
 module.exports = {
   decode,
-  parse,
+  parse: parseV5,
 }
 
 
@@ -30667,7 +27101,7 @@ module.exports = {
   \***********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -30684,22 +27118,6 @@ const versions = {
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v1/response.js")
     return {
       request: request({ groupId, generationId, memberId, groupAssignment }),
-      response,
-    }
-  },
-  2: ({ groupId, generationId, memberId, groupAssignment }) => {
-    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/request.js")
-    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js")
-    return {
-      request: request({ groupId, generationId, memberId, groupAssignment }),
-      response,
-    }
-  },
-  3: ({ groupId, generationId, memberId, groupInstanceId, groupAssignment }) => {
-    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/request.js")
-    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/response.js")
-    return {
-      request: request({ groupId, generationId, memberId, groupInstanceId, groupAssignment }),
       response,
     }
   },
@@ -30870,171 +27288,19 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/request.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/request.js ***!
-  \****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v1/request.js")
-
-/**
- * SyncGroup Request (Version: 2) => group_id generation_id member_id [group_assignment]
- *   group_id => STRING
- *   generation_id => INT32
- *   member_id => STRING
- *   group_assignment => member_id member_assignment
- *     member_id => STRING
- *     member_assignment => BYTES
- */
-
-module.exports = ({ groupId, generationId, memberId, groupAssignment }) =>
-  Object.assign(requestV1({ groupId, generationId, memberId, groupAssignment }), { apiVersion: 2 })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v1/response.js")
-
-/**
- * In version 2, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * SyncGroup Response (Version: 2) => throttle_time_ms error_code member_assignment
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   member_assignment => BYTES
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/request.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/request.js ***!
-  \****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
-const { SyncGroup: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-
-/**
- * Version 3 adds group_instance_id to indicate member identity across restarts.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
- *
- * SyncGroup Request (Version: 3) => group_id generation_id member_id group_instance_id [group_assignment]
- *   group_id => STRING
- *   generation_id => INT32
- *   member_id => STRING
- *   group_instance_id => NULLABLE_STRING
- *   group_assignment => member_id member_assignment
- *     member_id => STRING
- *     member_assignment => BYTES
- */
-
-module.exports = ({
-  groupId,
-  generationId,
-  memberId,
-  groupInstanceId = null,
-  groupAssignment,
-}) => ({
-  apiKey,
-  apiVersion: 3,
-  apiName: 'SyncGroup',
-  encode: async () => {
-    return new Encoder()
-      .writeString(groupId)
-      .writeInt32(generationId)
-      .writeString(memberId)
-      .writeString(groupInstanceId)
-      .writeArray(groupAssignment.map(encodeGroupAssignment))
-  },
-})
-
-const encodeGroupAssignment = ({ memberId, memberAssignment }) => {
-  return new Encoder().writeString(memberId).writeBytes(memberAssignment)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/response.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/response.js ***!
-  \*****************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { decode, parse } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js")
-
-/**
- * SyncGroup Response (Version: 2) => throttle_time_ms error_code member_assignment
- *   throttle_time_ms => INT32
- *   error_code => INT16
- *   member_assignment => BYTES
- */
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/index.js":
 /*!*****************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/index.js ***!
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, groupId, producerId, producerEpoch, topics }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/response.js")
-    return {
-      request: request({ transactionalId, groupId, producerId, producerEpoch, topics }),
-      response,
-    }
-  },
-  1: ({ transactionalId, groupId, producerId, producerEpoch, topics }) => {
-    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/request.js")
-    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/response.js")
     return {
       request: request({ transactionalId, groupId, producerId, producerEpoch, topics }),
       response,
@@ -31168,158 +27434,51 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/request.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/request.js ***!
-  \**********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/request.js")
-
-/**
- * TxnOffsetCommit Request (Version: 1) => transactional_id group_id producer_id producer_epoch [topics]
- *   transactional_id => STRING
- *   group_id => STRING
- *   producer_id => INT64
- *   producer_epoch => INT16
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition offset metadata
- *       partition => INT32
- *       offset => INT64
- *       metadata => NULLABLE_STRING
- */
-
-module.exports = ({ transactionalId, groupId, producerId, producerEpoch, topics }) =>
-  Object.assign(requestV0({ transactionalId, groupId, producerId, producerEpoch, topics }), {
-    apiVersion: 1,
-  })
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/response.js":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/response.js ***!
-  \***********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/response.js")
-
-/**
- * In version 1, on quota violation, brokers send out responses before throttling.
- * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
- *
- * TxnOffsetCommit Response (Version: 1) => throttle_time_ms [topics]
- *   throttle_time_ms => INT32
- *   topics => topic [partitions]
- *     topic => STRING
- *     partitions => partition error_code
- *       partition => INT32
- *       error_code => INT16
- */
-
-const decode = async rawData => {
-  const decoded = await decodeV1(rawData)
-
-  return {
-    ...decoded,
-    throttleTime: 0,
-    clientSideThrottleTime: decoded.throttleTime,
-  }
-}
-
-module.exports = {
-  decode,
-  parse,
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/kafkajs/src/protocol/resourcePatternTypes.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/kafkajs/src/protocol/resourcePatternTypes.js ***!
-  \*******************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
-/***/ ((module) => {
-
-// From:
-// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/resource/PatternType.java#L32
-
-/**
- * @typedef {number} ACLResourcePatternTypes
- *
- * Enum for ACL Resource Pattern Type
- * @readonly
- * @enum {ACLResourcePatternTypes}
- */
-module.exports = {
-  /**
-   * Represents any PatternType which this client cannot understand, perhaps because this client is too old.
-   */
-  UNKNOWN: 0,
-  /**
-   * In a filter, matches any resource pattern type.
-   */
-  ANY: 1,
-  /**
-   * In a filter, will perform pattern matching.
-   *
-   * e.g. Given a filter of {@code ResourcePatternFilter(TOPIC, "payments.received", MATCH)`}, the filter match
-   * any {@link ResourcePattern} that matches topic 'payments.received'. This might include:
-   * <ul>
-   *     <li>A Literal pattern with the same type and name, e.g. {@code ResourcePattern(TOPIC, "payments.received", LITERAL)}</li>
-   *     <li>A Wildcard pattern with the same type, e.g. {@code ResourcePattern(TOPIC, "*", LITERAL)}</li>
-   *     <li>A Prefixed pattern with the same type and where the name is a matching prefix, e.g. {@code ResourcePattern(TOPIC, "payments.", PREFIXED)}</li>
-   * </ul>
-   */
-  MATCH: 2,
-  /**
-   * A literal resource name.
-   *
-   * A literal name defines the full name of a resource, e.g. topic with name 'foo', or group with name 'bob'.
-   *
-   * The special wildcard character {@code *} can be used to represent a resource with any name.
-   */
-  LITERAL: 3,
-  /**
-   * A prefixed resource name.
-   *
-   * A prefixed name defines a prefix for a resource, e.g. topics with names that start with 'foo'.
-   */
-  PREFIXED: 4,
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/protocol/resourceTypes.js":
 /*!************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/resourceTypes.js ***!
   \************************************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 4:0-14 */
+/***/ ((module) => {
 
-const ACLResourceTypes = __webpack_require__(/*! ./aclResourceTypes */ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js")
+// From:
+// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/resource/ResourceType.java#L31
 
-/**
- * @deprecated
- * @see https://github.com/tulios/kafkajs/issues/649
- *
- * Use ConfigResourceTypes or AclResourceTypes instead.
- */
-module.exports = ACLResourceTypes
+module.exports = {
+  /**
+   * Represents any ResourceType which this client cannot understand,
+   * perhaps because this client is too old.
+   */
+  UNKNOWN: 0,
+  /**
+   * In a filter, matches any ResourceType.
+   */
+  ANY: 1,
+  /**
+   * A Kafka topic.
+   * @see http://kafka.apache.org/documentation/#topicconfigs
+   */
+  TOPIC: 2,
+  /**
+   * A consumer group.
+   * @see http://kafka.apache.org/documentation/#consumerconfigs
+   */
+  GROUP: 3,
+  /**
+   * The cluster as a whole.
+   */
+  CLUSTER: 4,
+  /**
+   * A transactional ID.
+   */
+  TRANSACTIONAL_ID: 5,
+  /**
+   * A token ID.
+   */
+  DELEGATION_TOKEN: 6,
+}
 
 
 /***/ }),
@@ -32036,29 +28195,6 @@ module.exports = flatten
 
 /***/ }),
 
-/***/ "./node_modules/kafkajs/src/utils/groupBy.js":
-/*!***************************************************!*\
-  !*** ./node_modules/kafkajs/src/utils/groupBy.js ***!
-  \***************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 1:0-14 */
-/***/ ((module) => {
-
-module.exports = async (array, groupFn) => {
-  const result = new Map()
-
-  for (const item of array) {
-    const group = await Promise.resolve(groupFn(item))
-    result.set(group, result.has(group) ? [...result.get(group), item] : [item])
-  }
-
-  return result
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/kafkajs/src/utils/lock.js":
 /*!************************************************!*\
   !*** ./node_modules/kafkajs/src/utils/lock.js ***!
@@ -32618,181 +28754,6 @@ module.exports = (
 const BASE_URL = 'https://kafka.js.org'
 
 module.exports = (path, hash) => `${BASE_URL}/${path}${hash ? '#' + hash : ''}`
-
-
-/***/ }),
-
-/***/ "./node_modules/ms/index.js":
-/*!**********************************!*\
-  !*** ./node_modules/ms/index.js ***!
-  \**********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
-/***/ ((module) => {
-
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function (val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-  return ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
-}
 
 
 /***/ }),
@@ -33516,9 +29477,6 @@ module.exports = {
 		Lookup: __webpack_require__(/*! ./src/international_street/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/international_street/Lookup.js"),
 		Candidate: __webpack_require__(/*! ./src/international_street/Candidate */ "./node_modules/smartystreets-javascript-sdk/src/international_street/Candidate.js")
 	},
-	usReverseGeo: {
-		Lookup: __webpack_require__(/*! ./src/us_reverse_geo/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Lookup.js")
-	},
 };
 
 /***/ }),
@@ -33582,7 +29540,7 @@ module.exports = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"version\":\"1.6.3\",\"description\":\"Quick and easy SmartyStreets address validation.\",\"keywords\":[\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"main\":\"index.js\",\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"author\":\"SmartyStreets SDK Team <support@smartystreets.com> (https://www.smartystreets.com)\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"github:smartystreets/smartystreets-javascript-sdk\"},\"devDependencies\":{\"aws-sdk\":\"^2.803.0\",\"babel-core\":\"^6.26.0\",\"babel-preset-env\":\"^1.6.1\",\"babelify\":\"^8.0.0\",\"browserify\":\"^16.5.2\",\"chai\":\"^4.2.0\",\"chai-as-promised\":\"^7.1.1\",\"mocha\":\"^8.2.1\",\"s3-upload-stream\":\"^1.0.7\",\"tinyify\":\"^2.5.2\",\"zlib\":\"^1.0.5\"},\"dependencies\":{\"axios-proxy-fix\":\"^0.16.3\",\"axios-retry\":\"^3.1.9\",\"promise\":\"^8.1.0\"}}");
+module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"version\":\"1.6.0\",\"description\":\"Quick and easy SmartyStreets address validation.\",\"keywords\":[\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"main\":\"index.js\",\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"author\":\"SmartyStreets SDK Team <support@smartystreets.com> (https://www.smartystreets.com)\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"github:smartystreets/smartystreets-javascript-sdk\"},\"devDependencies\":{\"aws-sdk\":\"^2.412.0\",\"babel-core\":\"^6.26.0\",\"babel-preset-env\":\"^1.6.1\",\"babelify\":\"^8.0.0\",\"browserify\":\"^16.2.3\",\"chai\":\"^4.1.2\",\"chai-as-promised\":\"^7.1.1\",\"mocha\":\"^8.0.1\",\"s3-upload-stream\":\"^1.0.7\",\"tinyify\":\"^2.5.2\",\"zlib\":\"^1.0.5\"},\"dependencies\":{\"axios-proxy-fix\":\"^0.16.3\",\"axios-retry\":\"^3.0.1\",\"promise\":\"^8.0.1\"}}");
 
 /***/ }),
 
@@ -33715,7 +29673,7 @@ module.exports = Batch;
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 199:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 201:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const HttpSender = __webpack_require__(/*! ./HttpSender */ "./node_modules/smartystreets-javascript-sdk/src/HttpSender.js");
@@ -33859,7 +29817,9 @@ class ClientBuilder {
 	 * @returns Returns <b>this</b> to accommodate method chaining.
 	 */
 	withLicenses(licenses) {
-		this.licenses = licenses;
+		for (const license in licenses) {
+			this.licenses.push(license);
+		}
 
 		return this;
 	}
@@ -35150,11 +31110,10 @@ module.exports = Result;
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 40:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 39:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
-const Response = __webpack_require__(/*! ./Response */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js");
 const buildInputData = __webpack_require__(/*! ../util/buildInputData */ "./node_modules/smartystreets-javascript-sdk/src/util/buildInputData.js");
 const keyTranslationFormat = __webpack_require__(/*! ../util/apiToSDKKeyMap */ "./node_modules/smartystreets-javascript-sdk/src/util/apiToSDKKeyMap.js").usReverseGeo;
 const {UndefinedLookupError} = __webpack_require__(/*! ../Errors.js */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
@@ -35185,7 +31144,7 @@ class Client {
 		});
 
 		function attachLookupResults(response, lookup) {
-			lookup.response = new Response(response.payload);
+			lookup.response = response.payload;
 
 			return lookup;
 		}
@@ -35194,112 +31153,6 @@ class Client {
 
 module.exports = Client;
 
-
-/***/ }),
-
-/***/ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Lookup.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Lookup.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Response = __webpack_require__(/*! ./Response */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js");
-
-/**
- * In addition to holding all of the input data for this lookup, this class also<br>
- *     will contain the result of the lookup after it comes back from the API.
- *     @see "https://smartystreets.com/docs/cloud/us-street-api#input-fields"
- */
-class Lookup {
-	constructor(latitude, longitude) {
-		this.latitude = latitude.toFixed(8);
-		this.longitude = longitude.toFixed(8);
-		this.response = new Response();
-	}
-}
-
-module.exports = Lookup;
-
-
-/***/ }),
-
-/***/ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js ***!
-  \**********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Result = __webpack_require__(/*! ./Result */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Result.js");
-
-/**
- * The SmartyResponse contains the response from a call to the US Reverse Geo API.
- */
-class Response {
-	constructor(responseData) {
-		this.results = [];
-
-		if (responseData)
-			responseData.results.map(rawResult => {
-				this.results.push(new Result(rawResult));
-			});
-	}
-}
-
-module.exports = Response;
-
-
-/***/ }),
-
-/***/ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Result.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Result.js ***!
-  \********************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
-/***/ ((module) => {
-
-/**
- * A candidate is a possible match for an address that was submitted.<br>
- *     A lookup can have multiple candidates if the address was ambiguous.
- *
- * @see "https://smartystreets.com/docs/cloud/us-reverse-geo-api#result"
- */
-class Result {
-	constructor(responseData) {
-		this.distance = responseData.distance;
-
-		this.address = {};
-		if (responseData.address) {
-			this.address.street = responseData.address.street;
-			this.address.city = responseData.address.city;
-			this.address.state_abbreviation = responseData.address.state_abbreviation;
-			this.address.zipcode = responseData.address.zipcode;
-		}
-
-		this.coordinate = {};
-		if (responseData.coordinate) {
-			this.coordinate.latitude = responseData.coordinate.latitude;
-			this.coordinate.longitude = responseData.coordinate.longitude;
-			this.coordinate.accuracy = responseData.coordinate.accuracy;
-			switch (responseData.coordinate.license) {
-				case 1:
-					this.coordinate.license = "SmartyStreets Proprietary";
-					break;
-				default:
-					this.coordinate.license = "SmartyStreets";
-			}
-		}
-	}
-}
-
-module.exports = Result;
 
 /***/ }),
 
@@ -36165,8 +32018,8 @@ module.exports = require("zlib");
 /******/ 			switch(name) {
 /******/ 				case "default": {
 /******/ 					register("axios", "0.21.1", () => () => __webpack_require__(/*! ./node_modules/axios/index.js */ "./node_modules/axios/index.js"));
-/******/ 					register("kafkajs", "1.15.0", () => () => __webpack_require__(/*! ./node_modules/kafkajs/index.js */ "./node_modules/kafkajs/index.js"));
-/******/ 					register("smartystreets-javascript-sdk", "1.6.3", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
+/******/ 					register("kafkajs", "1.14.0", () => () => __webpack_require__(/*! ./node_modules/kafkajs/index.js */ "./node_modules/kafkajs/index.js"));
+/******/ 					register("smartystreets-javascript-sdk", "1.6.0", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
 /******/ 				}
 /******/ 				break;
 /******/ 			}

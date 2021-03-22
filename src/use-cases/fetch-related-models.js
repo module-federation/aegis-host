@@ -3,8 +3,8 @@
 import async from "../lib/async-error";
 
 /**
- * @param {import("../models/model").Model} model
- * @param {import("../models".relations)} relation
+ * @param {import("@module-federation/aegis/esm/models/model").Model} model
+ * @param {import("@module-federation/aegis/esm/models".relations)} relation
  */
 export default async function fetchRelatedModels(model, relation) {
   const spec = model.getSpec();

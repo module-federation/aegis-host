@@ -7,7 +7,7 @@ import fetchRelatedModels from "./fetch-related-models";
  * @typedef {Object} ModelParam
  * @property {String} modelName
  * @property {import('../datasources/datasource').default} repository
- * @property {import('../models/observer').Observer} observer
+ * @property {import('@module-federation/aegis/esm/models/observer').Observer} observer
  * @property {import('../models/index').ModelFactory} models
  * @property {...Function} handlers
  */
@@ -16,7 +16,7 @@ import fetchRelatedModels from "./fetch-related-models";
  * @callback findModel
  * @param {string} id
  * @param {{key1:string,keyN:string}} query
- * @returns {Promise<import("../models/model").Model>}
+ * @returns {Promise<import("@module-federation/aegis/esm/models/model").Model>}
  *
  * @param {ModelParam} param0
  * @returns {findModel}

@@ -10,8 +10,8 @@ function portAuthorized(spec, port, permission) {
 }
 /**
  *
- * @param {import("../models/model-factory").ModelFactory} models
- * @param {import("../models/model").Model} model
+ * @param {import("@module-federation/aegis/esm/models/model-factory").ModelFactory} models
+ * @param {import("@module-federation/aegis/esm/models/model").Model} model
  * @param {{port:string}} query
  */
 export default async function invokePort(model, port, permission) {
