@@ -4,8 +4,8 @@ import Serializer from "../lib/serializer";
 import resumeWorkflow from "./resume-workflow";
 
 /**
- * @param {function(import("../models").Model)} loadModel
- * @param {import("../models/observer").Observer} observer
+ * @param {function(import("@module-federation/aegis/esm/models").Model)} loadModel
+ * @param {import("@module-federation/aegis/esm/models/observer").Observer} observer
  * @param {import("../datasources/datasource").default} repository
  * @returns {function(Map<string,Model>|Model)}
  */
@@ -39,10 +39,10 @@ function handleRestart(repository) {
 
 /**
  * Factory returns function to unmarshal deserialized models
- * @typedef {import('../models').Model} Model
+ * @typedef {import('@module-federation/aegis/esm/models').Model} Model
  * @param {{
- *  models:import('../models/model-factory').ModelFactory,
- *  observer:import('../models/observer').Observer,
+ *  models:import('@module-federation/aegis/esm/models/model-factory').ModelFactory,
+ *  observer:import('@module-federation/aegis/esm/models/observer').Observer,
  *  repository:import('../datasources/datasource').default,
  *  modelName:string
  * }} options

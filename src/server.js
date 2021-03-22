@@ -59,6 +59,7 @@ const Server = (() => {
     const overrides = { save, find, Persistence };
 
     getRemoteModules.then(initRemotes => {
+      console.log(initRemotes)
       initRemotes(overrides).then(() => {
         const cache = initCache();
 

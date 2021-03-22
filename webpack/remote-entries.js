@@ -1,4 +1,4 @@
-module.exports = [
+module.exports = global.remoteEntries = [
   {
     name: "orderService",
     url: "http://localhost:8060/remoteEntry.js",

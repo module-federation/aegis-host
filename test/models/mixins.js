@@ -7,7 +7,7 @@ const {
   fromTimestamp,
   withSerializers,
   withDeserializers,
-} = require("../../src/models/mixins");
+} = require("@module-federation/aegis/cjs/models/mixins");
 
 describe("Mixins", function () {
   it("should return strings in place of symbols", function () {

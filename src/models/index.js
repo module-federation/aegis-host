@@ -1,8 +1,8 @@
 "use strict";
 
 /**
- * @typedef {import("./model").Model} Model
- * @typedef {import('./event').Event} Event
+ * @typedef {import("@module-federation/aegis/esm/models/model").Model} Model
+ * @typedef {import('@module-federation/aegis/esm/models/event').Event} Event
  * @typedef {string} eventName
  * @typedef {string} service - name of the service object to inject in adapter
  * @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds
@@ -120,7 +120,7 @@
  * @property {string} endpoint URI reference (e.g. plural of `modelName`)
  * @property {function(...args): any} factory factory function that creates model insetance
  * @property {object} [dependencies] injected into the model for control inversion
- * @property {Array<import("./mixins").functionalMixin>} [mixins] - use mixins
+ * @property {Array<import("@module-federation/aegis/esm/models/mixins").functionalMixin>} [mixins] - use mixins
  * to implement domain logic, like input validation.
  * @property {onUpdate} [onUpdate] - Function called to handle update requests. Called
  * before save.
@@ -137,8 +137,8 @@
  * @property {accessControlList} [accessControlList] - configure authorization
  */
 
-import ModelFactory from "./model-factory";
-import makeAdapters from "./make-adapters";
+import ModelFactory from "@module-federation/aegis/esm/models/model-factory";
+import makeAdapters from "@module-federation/aegis/esm/models/make-adapters";
 
 import {
   importRemoteModels,
