@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 
-import Model from '@module-federation/aegis/esm/models/model'
+import Model from '@module-federation/aegis/lib/models/model'
 
 
 describe('Model', function () {

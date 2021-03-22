@@ -1,6 +1,6 @@
 "use strict";
 
-import Serializer from "../lib/serializer";
+import Serializer from "@module-federation/aegis/esm/lib/serializer";
 import resumeWorkflow from "./resume-workflow";
 
 /**

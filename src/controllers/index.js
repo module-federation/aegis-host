@@ -15,7 +15,7 @@ import getModelFactory from "./get-model";
 import getModelByIdFactory from "./get-model-by-id";
 import deleteModelFactory from "./delete-model";
 import getConfigFactory from "./get-config";
-import hash from "../lib/hash";
+import hash from "@module-federation/aegis/esm/lib/hash";
 
 function make(useCases, controllerFactory) {
   return useCases().map(uc => ({

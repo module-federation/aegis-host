@@ -1,8 +1,8 @@
 var assert = require("assert");
 import DataSourceFactory from "../../src/datasources";
 import ObserverFactory from "../../src/lib/observer";
-import ModelFactory from "../../src/models/model-factory";
-import checkAcl from "../../src/lib/check-acl";
+import ModelFactory from "@module-federation/aegis/lib/models/model-factory";
+import checkAcl from "@module-federation/aegis/lib/lib/check-acl";
 
 const {
   default: executeCommand,
