@@ -49,6 +49,9 @@ function clearRoutes() {
   );
 }
 
+/**
+ *
+ */
 function reloadCallback() {
   if (clusterEnabled) {
     return async function reloadCluster(req, res) {
@@ -56,6 +59,7 @@ function reloadCallback() {
       //process.send("request cluster reload");
     };
   }
+
   return async function reload(req, res) {
     try {
       clearRoutes();
@@ -86,11 +90,8 @@ async function reload(req, res) {
 }
 
 /**
- * @todo Send a message to master process to do a rolling restart
- * @param {*} req
- * @param {*} res
+ *
  */
-
 function startService() {
   /**
    * Run either http or https,
@@ -126,7 +127,7 @@ function startService() {
 function setupWorkerProcesses() {
   // to read number of cores on system
   let numCores = require("os").cpus().length;
-  console.log("Master cluster setting up " + numCores + " workers");
+  console.log(`Master cluster setting up ${numCores} workers`);
 
   // iterate on number of cores need to be utilized by an application
   // current example will utilize all of them
@@ -143,18 +144,13 @@ function setupWorkerProcesses() {
 
   // process is clustered on a core and process id is assigned
   cluster.on("online", function (worker) {
-    console.log("Worker " + worker.process.pid + " is listening");
+    console.log(`Worker ${worker.process.pid} is listening`);
   });
 
   // if any of the worker process dies then start a new one by simply forking another one
   cluster.on("exit", function (worker, code, signal) {
     console.log(
-      "Worker " +
-        worker.process.pid +
-        " died with code: " +
-        code +
-        ", and signal: " +
-        signal
+      `Worker ${worker.process.pid} died with code: ${code} and signal: signal`
     );
     console.log("Starting a new worker");
     cluster.fork();
@@ -168,8 +164,7 @@ function setupWorkerProcesses() {
 
 /**
  * Setup server either with clustering or without it
-= * @constructor
- */
+\*/
 function setupServer() {
   // if it is a master process then call setting up worker process
   if (clusterEnabled && cluster.isMaster) {
