@@ -2,7 +2,7 @@
 
 import executeCommand from "./execute-command";
 import invokePort from "./invoke-port";
-import async from "../lib/async-error";
+import async from "@module-federation/aegis/esm/lib/async-error";
 import domainEvents from "@module-federation/aegis/esm/models/domain-events";
 
 /**

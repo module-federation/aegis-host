@@ -17,7 +17,7 @@ export class DataSourceFile extends DataSourceMemory {
    *
    * @param {{
    *  hydrate:function(Map<string,import("@module-federation/aegis/esm/models/model").Model>),
-   *  serializer:import("../../lib/serializer").Serializer,
+   *  serializer:import("@module-federation/aegis/esm/lib/serializer").Serializer,
    *  directory:string,
    * }} param0
    */

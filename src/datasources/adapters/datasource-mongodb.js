@@ -19,8 +19,8 @@ export class DataSourceMongoDb extends DataSourceMemory {
   /**
    * @override
    * @param {{
-   *  hydrate:function(Map<string,import("../../models").Model>),
-   *  serializer:import("../../lib/serializer").Serializer
+   *  hydrate:function(Map<string,import("@module-federation/aegis/esm/models").Model>),
+   *  serializer:import(@module-federation/aegis/esm/lib/serializer").Serializer
    * }} options
    */
   load({ hydrate, serializer }) {
