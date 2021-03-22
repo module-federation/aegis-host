@@ -924,10 +924,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@module-federation/aegis@^0.0.1-alpha.8":
-  version "0.0.1-alpha.8"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.8.tgz#d4abe56531aee66394b8dacf2cde8caf4cbf00a9"
-  integrity sha512-brnsKnPkAZKRwkYZJYdCoiWBkr1yZgosZCvhdmqTxB1gOnI5z7B+GCw5w9YF664ojOJivQ/JRS5ZRziJfiQzVg==
+"@module-federation/aegis@^0.0.1-alpha.9":
+  version "0.0.1-alpha.9"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.9.tgz#6d35bd65f43a45b546c6c1b13d1cd02891bf305d"
+  integrity sha512-/7Pha4CmD7UjLaInAcPbty37OrRRGzy5Cu3YYtKI5zQToiIzyG1ZgxmVhM3+63tcyyGPdHL6go4jSzFH/quyOw==
   dependencies:
     core-js "^3.9.1"
 
