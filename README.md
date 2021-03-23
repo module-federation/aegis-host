@@ -8,7 +8,7 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-When evaluating microservices as a candidate archicture for your project, the most import aspect to consider is the fact that the end result is a distributed application.  Microservices are the components of distributed applications. Distribution is how you achieve deployment independence, which is the chief virtue of microservices. The trade-off is, relative to monoliths, distributed apps are much harder to build and manage. So much so, that many implementations fail. But what if you could eliminate distribution while preserving deployment independence?
+When evaluating microservices as a candidate archicture for your project, the most import aspect to consider is the fact that the end result is a distributed application.  Microservices are the components of distributed applications - and distribution is how you achieve the chief virtue of microservices, deployment independence. The trade-off is, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail. But what if you could eliminate the need for distribution and still allow for independent deployment?
 
 Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it results in failed projects, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
