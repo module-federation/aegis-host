@@ -8,9 +8,9 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-Microservices are the components of distributed applications. Component distribution is how you get deployment independence, which is the chief virtue of microservices. However, relative to monoliths, distributed apps are much harder to build and manage. So much so, that many projects struggle or fail. But what if you could eliminate distribution while preserving deployment independence?
+When evaluating microservices as a candidate archicture for your project, the most import aspect to consider is the fact that the end result is a distributed application.  Microservices are the components of distributed applications. Distribution is how you achieve deployment independence, which is the chief virtue of microservices. The trade-off is, relative to monoliths, distributed apps are much harder to build and manage. So much so, that many implementations fail. But what if you could eliminate distribution while preserving deployment independence?
 
-Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, not so much. While there are other factors (decomposition), what is clear in many cases, projects fail because they can't "pay", leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
+Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it results in failed projects, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
 That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make an argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
 
@@ -51,6 +51,7 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 - Dynamic A/B testing
 - Serverless deployment
 - Configurable serialization for network and storage I/O
+- Clustering for availability and scalibilty (1 process per core)
 - Polyrepo code reuse (the answer to the shared code question)
 
 ---
@@ -108,7 +109,7 @@ ModelA.listen(event, callback);
 ModelB.notify(event, data);
 ```
 
-As for remote events, just like any external integration, ports must be configured for external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
+As for remote events, local events can be forwared to remote event sinks, just like any external integration, ports must be configured for external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
 
 ---
 
@@ -126,7 +127,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 To demonstrate that polyrepo code sharing is a reality, you will clone two repos.
 
-The first is MicroLib-Example, which shows you how youy might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote.
+The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote.
 
 The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
