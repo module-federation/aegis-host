@@ -238,7 +238,6 @@ export async function initRemotes(overrides, remoteEntries) {
   });
 
   await initModels(
-    remoteEntries,
     {
       ...services,
       ...overrides,
@@ -246,7 +245,8 @@ export async function initRemotes(overrides, remoteEntries) {
     {
       ...adapters,
       ...overrides,
-    }
+    },
+    remoteEntries
   );
 }
 

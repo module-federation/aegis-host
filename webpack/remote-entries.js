@@ -6,7 +6,7 @@ module.exports = [
     type: "model",
     importRemote: async () => {
       const models = await import("orderService/models");
-      return models;
+      return models.models;
     },
   },
   {

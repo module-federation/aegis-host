@@ -6,6 +6,9 @@ const remoteEntries = require("./webpack/remote-entries");
 require("dotenv").config();
 
 const port = process.env.PORT || 8070;
+const sslPort = process.env.SSL_PORT || 8707;
+const sslEnabled = process.env.SSL_ENABLED || true;
+const publicPort = sslEnabled ? sslPort : port;
 
 module.exports = () => {
   return new Promise(resolve => {
@@ -16,7 +19,7 @@ module.exports = () => {
         devtool: "source-map",
         entry: ["@babel/polyfill", path.resolve(__dirname, "src/server.js")],
         output: {
-          publicPath: `http://localhost:${port}`,
+          publicPath: `http://localhost:${publicPort}`,
           path: path.resolve(__dirname, "dist"),
           libraryTarget: "commonjs2",
         },

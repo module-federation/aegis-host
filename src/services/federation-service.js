@@ -7,19 +7,22 @@ export async function importRemoteModels(remoteEntries) {
   const label = "\ntime to import remote models";
   console.time(label);
 
-  console.log(remoteEntries);
-
-  let remoteModels = [];
-  for (const entry of remoteEntries) {
-    console.log(entry);
-    if (entry.type === "model") {
-      console.log(entry);
-      const models = await entry.importRemote();
-      remoteModels.push(models);
+  const remoteModels = [];
+  try {
+    for (const entry of remoteEntries) {
+      if (entry.type === "model") {
+        const models = await entry.importRemote();
+        console.debug(models);
+        remoteModels.push(models);
+      }
     }
+  } catch (e) {
+    console.error(e);
   }
 
   console.timeEnd(label);
+
+  if (remoteModels.length === 0) return {};
 
   return remoteModels.reduce((p, c) => ({ ...p, ...c }));
 }
@@ -30,12 +33,12 @@ export async function importRemoteModels(remoteEntries) {
 export async function importRemoteServices(remoteEntries) {
   const label = "\ntime to import remote services";
   console.time(label);
-  console.log(remoteEntries);
+
   let services = [];
   for (const entry of remoteEntries) {
-    console.log(entry);
     if (entry.type === "service") {
       const service = await entry.importRemote();
+      console.debug(service);
       services.push(service);
     }
   }
@@ -55,6 +58,7 @@ export async function importRemoteAdapters(remoteEntries) {
   for (const entry of remoteEntries) {
     if (entry.type === "adapter") {
       const adapter = await entry.importRemote();
+      console.info(adapter);
       adapters.push(adapter);
     }
   }
@@ -62,6 +66,8 @@ export async function importRemoteAdapters(remoteEntries) {
   console.timeEnd(label);
 
   if (adapters.length === 0) return {};
+
+  console.log(adapters);
 
   return adapters.reduce((p, c) => ({ ...p, ...c }));
 }
