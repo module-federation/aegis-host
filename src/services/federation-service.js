@@ -12,7 +12,6 @@ export async function importRemoteModels(remoteEntries) {
     for (const entry of remoteEntries) {
       if (entry.type === "model") {
         const models = await entry.importRemote();
-        console.debug(models);
         remoteModels.push(models);
       }
     }
@@ -38,7 +37,6 @@ export async function importRemoteServices(remoteEntries) {
   for (const entry of remoteEntries) {
     if (entry.type === "service") {
       const service = await entry.importRemote();
-      console.debug(service);
       services.push(service);
     }
   }
@@ -58,7 +56,6 @@ export async function importRemoteAdapters(remoteEntries) {
   for (const entry of remoteEntries) {
     if (entry.type === "adapter") {
       const adapter = await entry.importRemote();
-      console.info(adapter);
       adapters.push(adapter);
     }
   }
@@ -66,8 +63,6 @@ export async function importRemoteAdapters(remoteEntries) {
   console.timeEnd(label);
 
   if (adapters.length === 0) return {};
-
-  console.log(adapters);
 
   return adapters.reduce((p, c) => ({ ...p, ...c }));
 }

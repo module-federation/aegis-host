@@ -2,6 +2,7 @@
 
 require("dotenv").config();
 require("regenerator-runtime");
+const enabled = v => v === "true";
 const importFresh = require("import-fresh");
 const fs = require("fs");
 const http = require("http");
@@ -14,8 +15,8 @@ const port = process.env.PORT || 8070;
 const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
-const sslEnabled = Boolean(process.env.SSL_ENABLED) || true;
-const clusterEnabled = process.env.CLUSTER_ENABLED || false;
+const sslEnabled = enabled(process.env.SSL_ENABLED);
+const clusterEnabled = enabled(process.env.CLUSTER_ENABLED);
 
 // Optionally enable authorization
 const app = require("./auth")(express(), "/microlib");
@@ -78,7 +79,7 @@ function reloadCallback() {
  * clustered (1 process per core) or single process,
  * hot reload via rolling restart or deleting cache
  */
-function startService() {
+function startService(app) {
   startMicroLib().then(() => {
     app.use(express.json());
     app.use(express.static("public"));
@@ -103,12 +104,8 @@ function startService() {
   });
 }
 
-// console.log("clusterEnabled= ", clusterEnabled);
-// if (clusterEnabled) {
-//   eval(process.env.RUN_CLUSTER);
-//   console.log("clusterEnabled=", clusterEnabled);
-// } else {
-//   startService();
-// }
-
-startService();
+if (clusterEnabled) {
+  require("./cluster").startCluster(startService, app);
+} else {
+  startService(app);
+}

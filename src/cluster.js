@@ -1,9 +1,12 @@
+"use strict";
+
+require("dotenv").config();
+const cluster = require("cluster");
 const workers = [];
 /**
  * Setup number of worker processes to share port which will be defined while setting up server
  */
-function setupWorkerProcesses() {
-  const cluster = require("cluster");
+function startWorkers() {
   // to read number of cores on system
   const numCores = require("os").cpus().length;
   console.log(`Master cluster setting up ${numCores} workers`);
@@ -13,7 +16,7 @@ function setupWorkerProcesses() {
   for (let i = 0; i < numCores; i++) {
     // creating workers and pushing reference in an array
     // these references can be used to receive messages from workers
-    workers.push(require("cluster").fork());
+    workers.push(cluster.fork());
 
     // to receive messages from worker process
     workers[i].on("message", function (message) {
@@ -42,12 +45,13 @@ function setupWorkerProcesses() {
   });
 }
 
-const statefulCluster = workload => {
-  if (require("cluster").isMaster) setupWorkerProcesses();
-  else workload();
-};
-
 /**
  * Setup server either with clustering or without it
  */
-module.exports.startCluster = workload => statefulCluster(workload);
+module.exports.startCluster = function (workload, shared) {
+  if (cluster.isMaster) {
+    startWorkers();
+  } else {
+    workload(shared);
+  }
+};
