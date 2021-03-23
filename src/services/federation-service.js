@@ -1,17 +1,19 @@
 "use strict";
 
-import remoteEntries from "../../webpack/remote-entries";
-
 /**
  * @returns {Promise<import('../models').ModelSpecification[]>}
  */
-export async function importRemoteModels() {
+export async function importRemoteModels(remoteEntries) {
   const label = "\ntime to import remote models";
   console.time(label);
 
+  console.log(remoteEntries);
+
   let remoteModels = [];
   for (const entry of remoteEntries) {
+    console.log(entry);
     if (entry.type === "model") {
+      console.log(entry);
       const models = await entry.importRemote();
       remoteModels.push(models);
     }
@@ -25,12 +27,13 @@ export async function importRemoteModels() {
 /**
  * Imports remote service modules.
  */
-export async function importRemoteServices() {
+export async function importRemoteServices(remoteEntries) {
   const label = "\ntime to import remote services";
   console.time(label);
-
+  console.log(remoteEntries);
   let services = [];
   for (const entry of remoteEntries) {
+    console.log(entry);
     if (entry.type === "service") {
       const service = await entry.importRemote();
       services.push(service);
@@ -44,7 +47,7 @@ export async function importRemoteServices() {
   return services.reduce((p, c) => ({ ...p, ...c }));
 }
 
-export async function importRemoteAdapters() {
+export async function importRemoteAdapters(remoteEntries) {
   const label = "\ntime to import remote adapters";
   console.time(label);
 

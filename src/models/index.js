@@ -175,8 +175,8 @@ const deleteEvent = model => ({
  * @param {*} services - services on which the model depends
  * @param {*} adapters - adapters for talking to the services
  */
-async function initModels(services, adapters) {
-  const models = await importRemoteModels();
+async function initModels(services, adapters, remoteEntries) {
+  const models = await importRemoteModels(remoteEntries);
 
   console.log("models", models);
 
@@ -227,9 +227,9 @@ async function initModels(services, adapters) {
  *
  * @param {*} overrides - override or add services and adapters
  */
-export async function initRemotes(overrides) {
-  const services = await importRemoteServices();
-  const adapters = await importRemoteAdapters();
+export async function initRemotes(overrides, remoteEntries) {
+  const services = await importRemoteServices(remoteEntries);
+  const adapters = await importRemoteAdapters(remoteEntries);
 
   console.log({
     services,
@@ -238,6 +238,7 @@ export async function initRemotes(overrides) {
   });
 
   await initModels(
+    remoteEntries,
     {
       ...services,
       ...overrides,

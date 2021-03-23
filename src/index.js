@@ -2,23 +2,25 @@
 
 require("dotenv").config();
 require("regenerator-runtime");
-const cluster = require("cluster");
 const importFresh = require("import-fresh");
-const express = require("express");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
-const app = require("./auth")(express(), "/microlib");
+const express = require("express");
 const privateKey = fs.readFileSync("cert/server.key", "utf8");
 const certificate = fs.readFileSync("cert/domain.crt", "utf8");
 const credentials = { key: privateKey, cert: certificate };
-const clusterEnabled = process.env.CLUSTER_ENABLED || false;
 const port = process.env.PORT || 8070;
-const sslEnabled = process.env.SSL_ENABLED || true;
 const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
+const sslEnabled = Boolean(process.env.SSL_ENABLED) || true;
+const clusterEnabled = Boolean(process.env.CLUSTER_ENABLED) || false;
+const cluster = require("cluster");
 const workers = [];
+
+// Optionally enable authorization
+const app = require("./auth")(express(), "/microlib");
 
 /**
  * Load federated server module. Call `clear` to delete non-webpack cache if
@@ -33,7 +35,7 @@ async function startMicroLib(hot = false) {
   const serverModule = factory();
 
   if (hot) {
-    // clear cache on hot deloy
+    // clear cache on hot reload
     serverModule.default.clear();
   }
   serverModule.default.start(app);
@@ -49,11 +51,14 @@ function clearRoutes() {
   );
 }
 
+/**
+ * Control hot reload differently depending on cluster mode.
+ * @returns {function(req,res)} cluster or single proc reload
+ */
 function reloadCallback() {
   if (clusterEnabled) {
     return async function reloadCluster(req, res) {
       res.send("<h1>starting cluster reload</h1>");
-      //process.send("request cluster reload");
     };
   }
   return async function reload(req, res) {
@@ -68,42 +73,21 @@ function reloadCallback() {
 }
 
 /**
- * Trigger a hot reload:
- * clear routes,d
- * reimport server & remotes
- * clear non-webpack cache.
- * @param {*} req
- * @param {*} res
+ * Handle options and start the server.
+ * Options:
+ * https or http,
+ * clustered (1 process per core) or single process,
+ * Hot reload via rolling restart or deleting cache
  */
-async function reload(req, res) {
-  try {
-    clearRoutes();
-    await startMicroLib(true);
-    res.send("<h1>hot reload complete</h1>");
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-/**
- * @todo Send a message to master process to do a rolling restart
- * @param {*} req
- * @param {*} res
- */
-
 function startService() {
-  /**
-   * Run either http or https,
-   * see .env var SSL_ENABLED
-   */
+  //
   startMicroLib().then(() => {
     app.use(express.json());
     app.use(express.static("public"));
     app.use(reloadPath, reloadCallback());
-    const httpsServer = https.createServer(credentials, app);
-    const httpServer = http.createServer(app);
 
     if (sslEnabled) {
+      const httpsServer = https.createServer(credentials, app);
       httpsServer.listen(sslPort, () => {
         console.info(
           `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
@@ -112,6 +96,7 @@ function startService() {
       return;
     }
 
+    const httpServer = http.createServer(app);
     httpServer.listen(port, () => {
       console.info(
         `\nMicroLib listening on port https://localhost:${port} 🌎\n`
@@ -126,7 +111,7 @@ function startService() {
 function setupWorkerProcesses() {
   // to read number of cores on system
   let numCores = require("os").cpus().length;
-  console.log("Master cluster setting up " + numCores + " workers");
+  console.log(`Master cluster setting up ${numCores} workers`);
 
   // iterate on number of cores need to be utilized by an application
   // current example will utilize all of them
@@ -149,16 +134,12 @@ function setupWorkerProcesses() {
   // if any of the worker process dies then start a new one by simply forking another one
   cluster.on("exit", function (worker, code, signal) {
     console.log(
-      "Worker " +
-        worker.process.pid +
-        " died with code: " +
-        code +
-        ", and signal: " +
-        signal
+      `Worker ${worker.process.pid} died with code: ${code} and signal: ${signal}`
     );
     console.log("Starting a new worker");
     cluster.fork();
     workers.push(cluster.fork());
+
     // to receive messages from worker process
     workers[workers.length - 1].on("message", function (message) {
       console.log(message);
@@ -168,7 +149,6 @@ function setupWorkerProcesses() {
 
 /**
  * Setup server either with clustering or without it
-= * @constructor
  */
 function setupServer() {
   // if it is a master process then call setting up worker process

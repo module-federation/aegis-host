@@ -1,3 +1,5 @@
+require("regenerator-runtime");
+
 module.exports = [
   {
     name: "orderService",

@@ -13,9 +13,12 @@
   const paramInput = document.querySelector("#parameter");
   const copyButton = document.querySelector("#copyButton");
 
-  const accessToken =
-    "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImpzTEIzNmEzZmJuS0VYb0MtWWlhNyJ9.eyJpc3MiOiJodHRwczovL2Rldi0yZmUyaWFyNi51cy5hdXRoMC5jb20vIiwic3ViIjoiRGRSSEg2dTVCc3FwclMwM3J0Z0ZEdjVwNnh6Q2RFVUtAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vbWljcm9saWIuaW8vIiwiaWF0IjoxNjE2MzEwNzIyLCJleHAiOjE2MTYzOTcxMjIsImF6cCI6IkRkUkhINnU1QnNxcHJTMDNydGdGRHY1cDZ4ekNkRVVLIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwicGVybWlzc2lvbnMiOltdfQ.QlAiBv74oXQrezbmzRlP0XiEU-_dKg2pLy2ohglYELDBmel3eDB95jgFDwUftqdNhlcD0JG8-1KDynuxixwY_G0FdJ1P2O0TuJM1bD6e3cPkpYxbAqZkHyjOYzBs6WV8U1Lmcg2b8vfbPF4wm-UVRS685b1pUit5hKNZgBsLSLvqveOCySIG1VYWsjcs3D-OilaW4tiKBbtufiQSw3TJFGBWcQrouhl24WBQC7VMu-kWMkdqZGtyV44Hy2X8DltLw48QcmpeW0PtjVC_L1JGaLd3upShSBk_IC0CJAX1S065OXmKiGUKyQg6P1qqCzSqz8Yn7ac5iKJtmw_9jB2aQw";
-  const auth = { Authorization: `bearer ${accessToken}` };
+  //  const reader = new FileReader();
+  //const token = reader.readAsText(file);
+
+  //const accessToken =
+  //   "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImpzTEIzNmEzZmJuS0VYb0MtWWlhNyJ9.eyJpc3MiOiJodHRwczovL2Rldi0yZmUyaWFyNi51cy5hdXRoMC5jb20vIiwic3ViIjoiRGRSSEg2dTVCc3FwclMwM3J0Z0ZEdjVwNnh6Q2RFVUtAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vbWljcm9saWIuaW8vIiwiaWF0IjoxNjE2Mzk4MTcyLCJleHAiOjE2MTY0ODQ1NzIsImF6cCI6IkRkUkhINnU1QnNxcHJTMDNydGdGRHY1cDZ4ekNkRVVLIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwicGVybWlzc2lvbnMiOltdfQ.b8JnCrMVrw8IcCpsiimLciWxld9uzsankmTrfagi7VKoHF2Tj7hbnkeYg4RZ_4jeKjiG0zlRVTPKvdFbI61FeFcu2w7suGNlsYfnfR7X9XK1998oQpXHp_D3IxOKECxn7yOL2UuJ3ytt4wUo2SSnGAPjkNYV315vJ0aB4gNvQFw7NNPZjF79sVMc2JTVBSWGob2Hl0Ucd7P01abmW1D1IJ-tLo45vIv_ouz6LDVhlRoPyQbnJGCROq-RCuo_xXepj6dNIoyhWD1HK8yx2hFW2Md0vcePHNmciaScvamd7sEgVF3xoEBCzevwEnhsrB-coDndWyRMowGLKrgjBbqGVA";
+  let authHeader;
 
   function prettifyJson(json) {
     if (typeof json !== "string") {
@@ -96,7 +99,7 @@
     fetch(getUrl(), {
       method: "POST",
       body: document.getElementById("payload").value,
-      headers: { "Content-Type": "application/json", ...auth },
+      headers: { "Content-Type": "application/json", ...authHeader },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -110,7 +113,7 @@
     fetch(getUrl(), {
       method: "PATCH",
       body: document.getElementById("payload").value,
-      headers: { "Content-Type": "application/json", ...auth },
+      headers: { "Content-Type": "application/json", ...authHeader },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -121,7 +124,7 @@
 
   getButton.onclick = function () {
     document.getElementById("parameter").value = "";
-    fetch(getUrl(), { headers: auth })
+    fetch(getUrl(), { headers: authHeader })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -132,7 +135,7 @@
   deleteButton.onclick = function () {
     fetch(getUrl(), {
       method: "DELETE",
-      headers: { "Content-Type": "application/json", ...auth },
+      headers: { "Content-Type": "application/json", ...authHeader },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -150,13 +153,17 @@
     document.execCommand("copy");
   });
 
-  window.addEventListener("load", function () {
-    const modelList = document.getElementById("modelList");
-    fetch("microlib/api/config", { headers: auth })
-      .then(data => data.json())
-      .then(models =>
-        models.forEach(m => modelList.appendChild(new Option(m.endpoint)))
-      )
-      .catch(e => alert(e));
+  window.addEventListener("load", async function () {
+    // `npm run token` to refresh token
+    // writes new token.json file to /public
+    const file = await fetch("token.json");
+    const text = await file.text();
+    const token = JSON.parse(text);
+    // add json web token to authentication header
+    authHeader = { Authorization: `bearer ${token.access_token}` };
+    // get list of all models and add to datalist for model input control
+    const data = await fetch("microlib/api/config", { headers: authHeader });
+    const models = await data.json();
+    models.forEach(m => modelList.appendChild(new Option(m.endpoint)));
   });
 })();

@@ -10,10 +10,10 @@
     "url": "https://github.com/module-federation/microlib"
   },
   "scripts": {
-    "build": "npm run clean && webpack --config webpack.config.js && npm run transpile",
+    "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "start": "node -r dotenv/config dist/index.js",
     "restart": "npm run build && npm run start",
-    "transpile": "babel src/index.js src/auth.js -d dist",
+    "transpile": "babel src/index.js src/auth.js src/remote-entries.js src/fetch-remotes.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "test": "mocha --recursive -r esm",
     "demo": "open https://localhost:8707",

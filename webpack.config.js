@@ -50,6 +50,7 @@ module.exports = () => {
             exposes: {
               "./server": "./src/server",
               "./models": "./src/models",
+              "./remoteEntries": "./webpack/remote-entries",
             },
           }),
         ],

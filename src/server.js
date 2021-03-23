@@ -1,5 +1,7 @@
 "use strict";
 
+require("regenerator-runtime");
+
 import {
   postModels,
   patchModels,
@@ -23,12 +25,18 @@ const Server = (() => {
   const endpointId = e => `${modelPath}/${e}/:id`;
   const endpointCmd = e => `${modelPath}/${e}/:id/:command`;
 
-  const getRemoteModules = __non_webpack_require__("./remoteEntry")
-    .microlib.get("./models")
+  const remoteEntry = __non_webpack_require__("./remoteEntry");
+
+  const getRemoteModules = remoteEntry.microlib
+    .get("./models")
     .then(factory => {
       const Module = factory();
       return Module.initRemotes;
     });
+
+  const getRemoteEntries = remoteEntry.microlib
+    .get("./remoteEntries")
+    .then(factory => factory());
 
   function makeAdmin(app, adapter) {
     app.get(`${apiRoot}/config`, adapter(getConfig()));
@@ -58,24 +66,26 @@ const Server = (() => {
 
     const overrides = { save, find, Persistence };
 
-    getRemoteModules.then(initRemotes => {
-      initRemotes(overrides).then(() => {
-        const cache = initCache();
+    getRemoteEntries.then(remotes => {
+      getRemoteModules.then(initRemotes => {
+        initRemotes(overrides, remotes).then(() => {
+          const cache = initCache();
 
-        make(endpoint, router, "post", postModels);
-        make(endpoint, router, "get", getModels);
-        make(endpointId, router, "get", getModelsById);
-        make(endpointId, router, "patch", patchModels);
-        make(endpointCmd, router, "patch", patchModels);
-        make(endpointId, router, "delete", deleteModels);
+          make(endpoint, router, "post", postModels);
+          make(endpoint, router, "get", getModels);
+          make(endpointId, router, "get", getModelsById);
+          make(endpointId, router, "patch", patchModels);
+          make(endpointCmd, router, "patch", patchModels);
+          make(endpointId, router, "delete", deleteModels);
 
-        console.timeEnd(label);
-        makeAdmin(router, http);
-        cache.load();
+          console.timeEnd(label);
+          makeAdmin(router, http);
+          cache.load();
 
-        console.log(`https://localhost:${sslPort}`);
-        console.log(`http://localhost:${port}`);
-        process.on("SIGTERM", () => close());
+          console.log(`http://localhost:${port}`);
+          console.log(`https://localhost:${sslPort}`);
+          process.on("SIGTERM", () => close());
+        });
       });
     });
   }
