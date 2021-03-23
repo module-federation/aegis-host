@@ -10,7 +10,7 @@ Stop paying the "microservices premium".
 
 Microservices are the components of distributed applications. Component distribution is how you get deployment independence, which is the chief virtue of microservices. However, relative to monoliths, distributed apps are much harder to build and manage. So much so, that many projects struggle or fail. But what if you could eliminate distribution while preserving deployment independence?
 
-Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, not so much. While there are other factors (decomposition), what is clear in many cases, projects fail because they can't "pay", leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
+Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. In other cases, not so much. While there are other factors (decomposition), what is clear in many cases, projects fail because they can't "pay" the premium; this has lead experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
 That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make an argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
 
@@ -24,7 +24,7 @@ If that was ever true, it isn't any more...
 
 With the introduction of module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
-Using code streaming, MicroLib supports hot deployment of federated modules, allowing development teams to deploy whenever they choose, without having to coordinate with one another. To simply the integration architecture and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules are integrated. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module.
+Using code streaming, MicroLib supports hot deployment of federated modules, allowing development teams to deploy whenever they choose, without having to coordinate with one another. To simplify the integration architecture and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules are integrated. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module.
 
 With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building, call them, _"polyliths"_ - a monolith running multiple (what would have been) microservices.
 
