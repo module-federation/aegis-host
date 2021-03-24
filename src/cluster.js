@@ -3,6 +3,26 @@
 const cluster = require("cluster");
 const workers = [];
 
+const clusterActions = {
+  reload: async () => {
+    workers.forEach(w => {});
+  },
+  resetCacheLimit (increase) {
+    
+  }
+
+};
+
+function messageHandler(message) {
+  if (clusterActions[message]) {
+    try {
+      await clusterActions[message]();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+
 /**
  * Setup number of worker processes to share port which will be defined while setting up server
  */
@@ -19,9 +39,7 @@ function startWorkers() {
     workers.push(cluster.fork());
 
     // to receive messages from worker process
-    workers[i].on("message", function (message) {
-      console.log(message);
-    });
+    workers[i].on("message", messageHandler);
   }
 
   // process is clustered on a core and process id is assigned
