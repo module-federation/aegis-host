@@ -2,7 +2,7 @@
 
 const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
-const authEnabled = process.env.AUTH_ENABLED || false;
+const authEnabled = process.env.AUTH_ENABLED === "true" || false;
 
 module.exports = function (app, path) {
   if (!authEnabled) return app;

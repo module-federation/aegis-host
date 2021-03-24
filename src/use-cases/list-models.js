@@ -23,6 +23,12 @@ const DateFunctions = {
     ).length,
 };
 
+/**
+ *
+ * @param {*} query
+ * @param {import("../datasources/datasource").default} repository
+ * @returns
+ */
 async function parseQuery(query, repository) {
   if (query?.count) {
     const dateFunc = DateFunctions[query.count];
@@ -47,7 +53,9 @@ async function parseQuery(query, repository) {
     }
 
     return {
-      count: (await repository.list(null, false)).length,
+      total: (await repository.list(null, false)).length,
+      cached: repository.getCacheSize(),
+      bytes: repository.getCacheSizeBytes(),
     };
   }
   return repository.list(query);

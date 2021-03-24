@@ -1,8 +1,8 @@
 "use strict";
 
-require("dotenv").config();
 const cluster = require("cluster");
 const workers = [];
+
 /**
  * Setup number of worker processes to share port which will be defined while setting up server
  */
@@ -48,10 +48,10 @@ function startWorkers() {
 /**
  * Setup server either with clustering or without it
  */
-module.exports.startCluster = function (workload, shared) {
+module.exports.startCluster = function (startServer, app) {
   if (cluster.isMaster) {
     startWorkers();
   } else {
-    workload(shared);
+    startServer(app);
   }
 };

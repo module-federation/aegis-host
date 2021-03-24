@@ -8,9 +8,11 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-When evaluating microservices as a candidate archicture for your project, the most import aspect to consider is the fact that the end result is a distributed application.  Microservices are the components of distributed applications - and distribution is how you accomplish the main goal of microservices, deployment independence. The trade-off is, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail. 
+When evaluating microservices as a candidate architecture, the most import aspect to consider is the fact that the end result is a distributed application. Microservices are the components of distributed applications - and distribution is how you accomplish the main goal of microservices, deployment independence. The trade-off is, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
 
-Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases. That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make an argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
+Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
+
+That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
 
 **Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**
 
@@ -18,7 +20,7 @@ So why are microservices distributed? [Fowler](https://martinfowler.com/articles
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear the value of these technologies hasn't been considered, or was thought to be unequal to the task, or not worth the effort (complexity, labor intensity, skills scarcity).
+While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear the value of those technologies hasn't been considered, or was thought to be unequal to the task, or not worth the effort (complexity, labor intensity, skills scarcity).
 
 Whatever the reason, with the advent of module federation, its no longer valid.
 
@@ -86,13 +88,11 @@ A common datasource factory manages adapters and provides access to each service
 
 ### Ports & Adapters
 
-When ports are configured in the _ModelSpecification_, the framework dynamically generates methods on the domain model to invoke them. Each port is assigned an adapter, which either invokes the port (inbound) or is invoked by it (outbound).
+When ports are configured in the `ModelSpecification`, the framework dynamically generates methods on the domain model to invoke them. Each port is assigned an adapter, which either invokes the port (inbound) or is invoked by it (outbound).
 
-Ports can be instrumented for exceptions and timeouts to extend the framework’s retry and compensation logic.
-They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
+Ports can be instrumented for exceptions and timeouts to extend the framework’s retry and compensation logic. They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
 
-An adapter either implements an external interface or exposes an interface for external clients to consume.
-On the port side, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to external or environmental aspects, like I/O protocols.
+An adapter either implements an external interface or exposes an interface for external clients to consume. On the port side, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to external or environmental aspects, like I/O protocols.
 
 Ports optionally specify a callback to process data received on the port before control is returned to the caller. The callback is passed as an argument to the port function. Ports can be configured to run on receipt of an event, API request, or called directly from code.
 
@@ -102,14 +102,15 @@ Ports also have an undo callback for implementing compensating logic. The framew
 
 In addition to in-memory function calls and ports, services can communicate with one another locally the same way they do remotely: by publishing and subscribing to events. Using locally shared events, microservice libraries are virtually as decoupled as they would be running remotely.
 
-The framework provides a common broker for inter-service events and injects pub/sub functions into each model:
+The framework provides a common broker for local service events and injects pub/sub functions into each model:
 
 ```js
 ModelA.listen(event, callback);
+
 ModelB.notify(event, data);
 ```
 
-As for remote events, local events can be forwared to remote event sinks, just like any external integration, ports must be configured for external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
+Local events can also be forwarded to remote event targets. Like any external integration remote ports must be configured for external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
 
 ---
 

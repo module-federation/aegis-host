@@ -1,15 +1,15 @@
 "use strict";
 
 require("dotenv").config();
-require("regenerator-runtime");
+import "regenerator-runtime";
 const enabled = v => v === "true";
-const importFresh = require("import-fresh");
-const fs = require("fs");
-const http = require("http");
-const https = require("https");
-const express = require("express");
-const privateKey = fs.readFileSync("cert/server.key", "utf8");
-const certificate = fs.readFileSync("cert/domain.crt", "utf8");
+import importFresh from "import-fresh";
+import { readFileSync } from "fs";
+import { createServer } from "http";
+import { createServer as _createServer } from "https";
+import express, { json, static } from "express";
+const privateKey = readFileSync("cert/server.key", "utf8");
+const certificate = readFileSync("cert/domain.crt", "utf8");
 const credentials = { key: privateKey, cert: certificate };
 const port = process.env.PORT || 8070;
 const sslPort = process.env.SSL_PORT || 8707;
@@ -81,12 +81,12 @@ function reloadCallback() {
  */
 function startService(app) {
   startMicroLib().then(() => {
-    app.use(express.json());
-    app.use(express.static("public"));
+    app.use(json());
+    app.use(static("public"));
     app.use(reloadPath, reloadCallback());
 
     if (sslEnabled) {
-      const httpsServer = https.createServer(credentials, app);
+      const httpsServer = _createServer(credentials, app);
       httpsServer.listen(sslPort, () => {
         console.info(
           `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
@@ -95,7 +95,7 @@ function startService(app) {
       return;
     }
 
-    const httpServer = http.createServer(app);
+    const httpServer = createServer(app);
     httpServer.listen(port, () => {
       console.info(
         `\nMicroLib listening on port https://localhost:${port} 🌎\n`
