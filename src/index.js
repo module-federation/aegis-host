@@ -1,22 +1,20 @@
 "use strict";
 
 require("dotenv").config();
-import "regenerator-runtime";
-const enabled = v => v === "true";
-import importFresh from "import-fresh";
-import { readFileSync } from "fs";
-import { createServer } from "http";
-import { createServer as _createServer } from "https";
-import express, { json, static } from "express";
-const privateKey = readFileSync("cert/server.key", "utf8");
-const certificate = readFileSync("cert/domain.crt", "utf8");
-const credentials = { key: privateKey, cert: certificate };
+require("regenerator-runtime");
+const importFresh = require("import-fresh");
+const fs = require("fs");
+const http = require("http");
+const https = require("https");
+const express = require("express");
+const shutdown = require("express-graceful-shutdown");
+
 const port = process.env.PORT || 8070;
 const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
-const sslEnabled = enabled(process.env.SSL_ENABLED);
-const clusterEnabled = enabled(process.env.CLUSTER_ENABLED);
+const sslEnabled = /true|yes/i.test(process.env.SSL_ENABLED);
+const clusterEnabled = /true|yes/i.test(process.env.CLUSTER_ENABLED);
 
 // Optionally enable authorization
 const app = require("./auth")(express(), "/microlib");
@@ -28,7 +26,7 @@ const app = require("./auth")(express(), "/microlib");
  *
  * @param {boolean} hot `true` to hot reload
  */
-async function startMicroLib(hot = false) {
+async function startMicroLib({ hot = false } = {}) {
   const remoteEntry = importFresh("./remoteEntry");
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
@@ -57,18 +55,48 @@ function clearRoutes() {
 function reloadCallback() {
   if (clusterEnabled) {
     return async function reloadCluster(req, res) {
-      res.send("<h1>starting cluster reload</h1>");
+      // tell the master to perform a rolling restart
+      process.send({ cmd: "reload" });
+      res.send("<h1>cluster is reloading...</h1>");
     };
   }
+  // Running non-cluster, single process
   return async function reload(req, res) {
     try {
       clearRoutes();
-      await startMicroLib(true);
+      await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");
     } catch (error) {
       console.error(error);
     }
   };
+}
+
+/**
+ * Start web server, optionally require secure socket.
+ * @param {express} app - cluster workers use same app instance
+ */
+function startWebServer(app) {
+  if (sslEnabled) {
+    const privateKey = fs.readFileSync("cert/server.key", "utf8");
+    const certificate = fs.readFileSync("cert/domain.crt", "utf8");
+    const credentials = { key: privateKey, cert: certificate };
+    const httpsServer = https.createServer(credentials, app);
+    app.use(shutdown(httpsServer, { logger: console, forceTimeout: 30000 }));
+
+    httpsServer.listen(sslPort, () =>
+      console.info(
+        `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
+      )
+    );
+    return;
+  }
+  const httpServer = http.createServer(app);
+
+  httpServer.listen(port, () =>
+    console.info(`\nMicroLib listening on https://localhost:${port} 🌎\n`)
+  );
+  app.use(shutdown(httpServer, { logger: console, forceTimeout: 30000 }));
 }
 
 /**
@@ -81,26 +109,10 @@ function reloadCallback() {
  */
 function startService(app) {
   startMicroLib().then(() => {
-    app.use(json());
-    app.use(static("public"));
+    app.use(express.json());
+    app.use(express.static("public"));
     app.use(reloadPath, reloadCallback());
-
-    if (sslEnabled) {
-      const httpsServer = _createServer(credentials, app);
-      httpsServer.listen(sslPort, () => {
-        console.info(
-          `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
-        );
-      });
-      return;
-    }
-
-    const httpServer = createServer(app);
-    httpServer.listen(port, () => {
-      console.info(
-        `\nMicroLib listening on port https://localhost:${port} 🌎\n`
-      );
-    });
+    startWebServer(app);
   });
 }
 

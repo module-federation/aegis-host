@@ -20,15 +20,15 @@ So why are microservices distributed? [Fowler](https://martinfowler.com/articles
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear the value of those technologies hasn't been considered, or was thought to be unequal to the task, or not worth the effort (complexity, labor intensity, skills scarcity).
+While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (difficulty, labor intensitity, d scarcity, etc).
 
-Whatever the reason, with the advent of module federation, its no longer valid.
+Whatever the reason, with the advent of module federation, it is no longer valid.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
-Using code streaming, MicroLib supports hot deployment of federated modules, allowing development teams to deploy whenever they choose, without having to coordinate. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules integrate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module.
+Using webpack's dependency graph and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules integrate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module.
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building, call them, _"polyliths"_ - a monolith running multiple (what would have been) microservices.
+With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building truly modular component libraries that run together in same process or cluster of processes - a _"polyliths"_ - a monolith running multiple (what would have been) microservices.
 
 ---
 
