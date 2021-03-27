@@ -61,7 +61,7 @@ function reloadCallback(app) {
   app.use(reloadPath, async function reload(req, res) {
     try {
       clearRoutes();
-      await startMicroLib(true);
+      await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");
     } catch (error) {
       console.error(error);
@@ -91,6 +91,33 @@ function startWebServer(app) {
   httpServer.listen(port, function () {
     console.info(`\n🌎 https://localhost:${port} 🌎\n`);
   });
+}
+
+/**
+ * Start web server, optionally require secure socket.
+ * @param {express} app - cluster workers use same app instance
+ */
+function startWebServer(app) {
+  if (sslEnabled) {
+    const privateKey = fs.readFileSync("cert/server.key", "utf8");
+    const certificate = fs.readFileSync("cert/domain.crt", "utf8");
+    const credentials = { key: privateKey, cert: certificate };
+    const httpsServer = https.createServer(credentials, app);
+    app.use(shutdown(httpsServer, { logger: console, forceTimeout: 30000 }));
+
+    httpsServer.listen(sslPort, () =>
+      console.info(
+        `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
+      )
+    );
+    return;
+  }
+  const httpServer = http.createServer(app);
+
+  httpServer.listen(port, () =>
+    console.info(`\nMicroLib listening on https://localhost:${port} 🌎\n`)
+  );
+  app.use(shutdown(httpServer, { logger: console, forceTimeout: 30000 }));
 }
 
 /**

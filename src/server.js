@@ -23,7 +23,7 @@ const Server = (() => {
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;
   const endpointCmd = e => `${modelPath}/${e}/:id/:command`;
-
+                                                               
   const remoteEntry = __non_webpack_require__("./remoteEntry");
 
   const getRemoteModules = remoteEntry.microlib
