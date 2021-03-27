@@ -145,7 +145,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
   async list(filter = null, cached = true) {
     try {
       if (cached) {
-        console.log("cache size", this.dataSource.size);
+        //console.log("cache size", this.dataSource.size);
         return super.list(filter);
       }
       return await this.collection.find().toArray();

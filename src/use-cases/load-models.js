@@ -32,11 +32,11 @@ function handleError(e) {
   console.error(e);
 }
 /**
- * 
- * @param {import("../datasources/datasource").default} repository 
+ *
+ * @param {import("../datasources/datasource").default} repository
  */
 function handleRestart(repository) {
-  console.log("resuming workflow", repository.name);
+  // console.log("resuming workflow", repository.name);
   repository.list().then(resumeWorkflow).catch(handleError);
 }
 

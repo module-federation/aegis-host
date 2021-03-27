@@ -176,7 +176,7 @@ const deleteEvent = model => ({
 async function initModels(remoteEntries, services, adapters) {
   const models = await importRemoteModels(remoteEntries);
 
-  console.log("models", models);
+  //console.log("models", models);
 
   Object.values(models).forEach(model => {
     if (
@@ -229,11 +229,11 @@ export async function initRemotes(remoteEntries, overrides = {}) {
   const services = await importRemoteServices(remoteEntries);
   const adapters = await importRemoteAdapters(remoteEntries);
 
-  console.log({
-    services,
-    adapters,
-    overrides,
-  });
+  // console.log({
+  //   services,
+  //   adapters,
+  //   overrides,
+  // });
 
   await initModels(
     remoteEntries,

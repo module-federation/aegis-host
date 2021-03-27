@@ -1,7 +1,5 @@
 "use strict";
 
-require("regenerator-runtime");
-
 import {
   postModels,
   patchModels,
@@ -20,11 +18,12 @@ const Server = (() => {
   const port = process.env.PORT || "8070";
   const sslPort = process.env.SSL_PORT || "8707";
   const apiRoot = process.env.API_ROOT || "/microlib/api";
+  const sslEnabled = /true|yes/i.test(process.env.SSL_ENABLED);
   const modelPath = `${apiRoot}/models`;
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;
   const endpointCmd = e => `${modelPath}/${e}/:id/:command`;
-                                                               
+
   const remoteEntry = __non_webpack_require__("./remoteEntry");
 
   const getRemoteModules = remoteEntry.microlib
@@ -82,8 +81,8 @@ const Server = (() => {
           makeAdmin(router, http);
           cache.load();
 
-          console.log(`http://localhost:${port}`);
-          console.log(`https://localhost:${sslPort}`);
+          if (sslEnabled) console.log(`https://localhost:${sslPort}`);
+          else console.log(`http://localhost:${port}`);
           process.on("SIGTERM", () => close());
         });
       });
