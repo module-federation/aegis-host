@@ -3,10 +3,10 @@
  * @param {import("../use-cases/list-models").listModels} listModels
  * @returns {import("../adapters/http-adapter").httpController}
  */
-export default function getModelFactory(listModels) {
-  return async function getModel(httpRequest) {
+export default function getModelsFactory(listModels) {
+  return async function getModels(httpRequest) {
     try {
-      httpRequest.log(getModel.name);
+      httpRequest.log(getModels.name);
 
       const models = await listModels(httpRequest.query);
 

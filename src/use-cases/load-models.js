@@ -31,9 +31,12 @@ function hydrateModels(loadModel, observer, repository) {
 function handleError(e) {
   console.error(e);
 }
-
+/**
+ * 
+ * @param {import("../datasources/datasource").default} repository 
+ */
 function handleRestart(repository) {
-  console.log("resuming workflow");
+  console.log("resuming workflow", repository.name);
   repository.list().then(resumeWorkflow).catch(handleError);
 }
 

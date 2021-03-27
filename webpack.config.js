@@ -7,7 +7,7 @@ require("dotenv").config();
 
 const port = process.env.PORT || 8070;
 const sslPort = process.env.SSL_PORT || 8707;
-const sslEnabled = process.env.SSL_ENABLED || true;
+const sslEnabled = process.env.SSL_ENABLED === "true" || true;
 const publicPort = sslEnabled ? sslPort : port;
 
 module.exports = () => {

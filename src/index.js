@@ -1,22 +1,20 @@
 "use strict";
 
 require("dotenv").config();
-import "regenerator-runtime";
-const enabled = v => v === "true";
-import importFresh from "import-fresh";
-import { readFileSync } from "fs";
-import { createServer } from "http";
-import { createServer as _createServer } from "https";
-import express, { json, static } from "express";
-const privateKey = readFileSync("cert/server.key", "utf8");
-const certificate = readFileSync("cert/domain.crt", "utf8");
-const credentials = { key: privateKey, cert: certificate };
+require("regenerator-runtime");
+const importFresh = require("import-fresh");
+const fs = require("fs");
+const http = require("http");
+const https = require("https");
+const express = require("express");
+const shutdown = require("express-graceful-shutdown");
+
 const port = process.env.PORT || 8070;
 const sslPort = process.env.SSL_PORT || 8707;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
-const sslEnabled = enabled(process.env.SSL_ENABLED);
-const clusterEnabled = enabled(process.env.CLUSTER_ENABLED);
+const sslEnabled = /true|yes/i.test(process.env.SSL_ENABLED);
+const clusterEnabled = /true|yes/i.test(process.env.CLUSTER_ENABLED);
 
 // Optionally enable authorization
 const app = require("./auth")(express(), "/microlib");
@@ -28,11 +26,10 @@ const app = require("./auth")(express(), "/microlib");
  *
  * @param {boolean} hot `true` to hot reload
  */
-async function startMicroLib(hot = false) {
+async function startMicroLib({ hot = false } = {}) {
   const remoteEntry = importFresh("./remoteEntry");
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
-
   if (hot) {
     // clear cache on hot reload
     serverModule.default.clear();
@@ -54,13 +51,14 @@ function clearRoutes() {
  * Control hot reload differently depending on cluster mode.
  * @returns {function(req,res)} cluster or single proc reload
  */
-function reloadCallback() {
+function reloadCallback(app) {
   if (clusterEnabled) {
-    return async function reloadCluster(req, res) {
+    app.use(reloadPath, async function reloadCluster(req, res) {
       res.send("<h1>starting cluster reload</h1>");
-    };
+      process.send({ cmd: "reload" });
+    });
   }
-  return async function reload(req, res) {
+  app.use(reloadPath, async function reload(req, res) {
     try {
       clearRoutes();
       await startMicroLib(true);
@@ -68,7 +66,31 @@ function reloadCallback() {
     } catch (error) {
       console.error(error);
     }
-  };
+  });
+}
+
+/**
+ * Start web server, optionally require secure socket.
+ * @param {express} app - cluster workers use same app instance
+ */
+function startWebServer(app) {
+  if (sslEnabled) {
+    const key = fs.readFileSync("cert/server.key", "utf8");
+    const cert = fs.readFileSync("cert/domain.crt", "utf8");
+    const httpsServer = https.createServer({ key, cert }, app);
+    app.use(shutdown(httpsServer, { logger: console, forceTimeout: 30000 }));
+
+    httpsServer.listen(sslPort, function () {
+      console.info(`\n🌎 https://localhost:${sslPort} 🌎\n`);
+    });
+    return;
+  }
+  const httpServer = http.createServer(app);
+  app.use(shutdown(httpServer, { logger: console, forceTimeout: 30000 }));
+
+  httpServer.listen(port, function () {
+    console.info(`\n🌎 https://localhost:${port} 🌎\n`);
+  });
 }
 
 /**
@@ -79,28 +101,13 @@ function reloadCallback() {
  * clustered (1 process per core) or single process,
  * hot reload via rolling restart or deleting cache
  */
-function startService(app) {
+function startService(app, cluster) {
+  console.log("startService");
   startMicroLib().then(() => {
-    app.use(json());
-    app.use(static("public"));
-    app.use(reloadPath, reloadCallback());
-
-    if (sslEnabled) {
-      const httpsServer = _createServer(credentials, app);
-      httpsServer.listen(sslPort, () => {
-        console.info(
-          `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
-        );
-      });
-      return;
-    }
-
-    const httpServer = createServer(app);
-    httpServer.listen(port, () => {
-      console.info(
-        `\nMicroLib listening on port https://localhost:${port} 🌎\n`
-      );
-    });
+    app.use(express.json());
+    app.use(express.static("public"));
+    reloadCallback(app);
+    startWebServer(app);
   });
 }
 

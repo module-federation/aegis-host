@@ -1,75 +1,62 @@
 "use strict";
 
 const cluster = require("cluster");
-const workers = [];
+const numCores = require("os").cpus().length;
+let reloading = false;
+let reloadList = [];
 
-const clusterActions = {
-  reload: async () => {
-    workers.forEach(w => {});
-  },
-  resetCacheLimit (increase) {
-    
-  }
+function startWorker() {
+  const worker = cluster.fork();
 
-};
-
-function messageHandler(message) {
-  if (clusterActions[message]) {
-    try {
-      await clusterActions[message]();
-    } catch (e) {
-      console.error(e);
+  worker.on("message", function (message) {
+    if (message?.cmd && message.cmd === "reload") {
+      console.log("reload requested");
+      if (reloading) {
+        console.log("reload already in progress");
+        return;
+      }
+      reloading = true;
+      reloadList = Object.values(cluster.workers);
+      worker.send({ cmd: "shutdown" });
     }
-  }
-}
-
-/**
- * Setup number of worker processes to share port which will be defined while setting up server
- */
-function startWorkers() {
-  // to read number of cores on system
-  const numCores = require("os").cpus().length;
-  console.log(`Master cluster setting up ${numCores} workers`);
-
-  // iterate on number of cores need to be utilized by an application
-  // current example will utilize all of them
-  for (let i = 0; i < numCores; i++) {
-    // creating workers and pushing reference in an array
-    // these references can be used to receive messages from workers
-    workers.push(cluster.fork());
-
-    // to receive messages from worker process
-    workers[i].on("message", messageHandler);
-  }
-
-  // process is clustered on a core and process id is assigned
-  cluster.on("online", function (worker) {
-    console.log("Worker " + worker.process.pid + " is listening");
   });
 
-  // if any of the worker process dies then start a new one by simply forking another one
-  cluster.on("exit", function (worker, code, signal) {
-    console.log(
-      `Worker ${worker.process.pid} died with code: ${code} and signal: ${signal}`
-    );
-    console.log("Starting a new worker");
-    //  cluster.fork();
-    //workers.push(cluster.fork());
+  worker.on("exit", function () {
+    console.log("worker down");
+    if (reloading) {
+      reloadList.pop();
+      if (reloadList.length > 0) {
+        startWorker();
+        return;
+      }
+      reloading = false;
+    }
+  });
 
-    // to receive messages from worker process
-    workers[workers.length - 1].on("message", function (message) {
-      console.log(message);
-    });
+  worker.on("online", function () {
+    console.log("worker up");
+    if (reloading) {
+      if (reloadList.length > 0) {
+        worker.send({ cmd: "shutdown" });
+      }
+    }
   });
 }
 
-/**
- * Setup server either with clustering or without it
- */
-module.exports.startCluster = function (startServer, app) {
+module.exports.startCluster = function (startService, app) {
   if (cluster.isMaster) {
-    startWorkers();
+    console.log(`master starting ${numCores} workers`);
+    for (let i = 0; i < numCores; i++) {
+      startWorker();
+    }
   } else {
-    startServer(app);
+    process.on("message", function (message) {
+      if (message?.cmd && message.cmd === "shutdown") {
+        console.log("stopping", cluster.worker.process.pid);
+        cluster.worker.kill("SIGTERM");
+      }
+    });
+
+    startService(app);
   }
 };

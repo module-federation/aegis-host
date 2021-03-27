@@ -1,12 +1,10 @@
 "use strict";
 
-/**
- * @typedef {import("./model").Model} Model
- * @typedef {import('./event').Event} Event
- * @typedef {string} eventName
- * @typedef {string} service - name of the service object to inject in adapter
- * @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds
- */
+/** @typedef {import("./model").Model} Model */
+/** @typedef {import('./event').Event} Event */
+/** @typedef {string} eventName */
+/** @typedef {string} service - name of the service object to inject in adapter */
+/** @typedef {number} timeout - call to adapter will timeout after `timeout` milliseconds */
 
 /**
  * @callback onUpdate
@@ -60,10 +58,8 @@
  * }} relations - define related domain entities
  */
 
-/**
- * @typedef {any} value
- * @typedef {any} key
- */
+/** @typedef {any} value*/
+/** @typedef {any} key */
 
 /**
  * @typedef {{
@@ -72,6 +68,7 @@
  *  type: (function(key,value):boolean) | "string" | "object" | "number" | "function" | "any" | RegExp
  *  value: function(key,value):any
  * }} serializer
+ */
 
 /**
  * @typedef {Array<function({
@@ -172,10 +169,11 @@ const deleteEvent = model => ({
 /**
  * Imports remote models and overrides their service adapters
  * with those specified by the host config.
+ * @param {*} remoteEntries -
  * @param {*} services - services on which the model depends
  * @param {*} adapters - adapters for talking to the services
  */
-async function initModels(services, adapters, remoteEntries) {
+async function initModels(remoteEntries, services, adapters) {
   const models = await importRemoteModels(remoteEntries);
 
   console.log("models", models);
@@ -227,7 +225,7 @@ async function initModels(services, adapters, remoteEntries) {
  *
  * @param {*} overrides - override or add services and adapters
  */
-export async function initRemotes(overrides, remoteEntries) {
+export async function initRemotes(remoteEntries, overrides = {}) {
   const services = await importRemoteServices(remoteEntries);
   const adapters = await importRemoteAdapters(remoteEntries);
 
@@ -238,6 +236,7 @@ export async function initRemotes(overrides, remoteEntries) {
   });
 
   await initModels(
+    remoteEntries,
     {
       ...services,
       ...overrides,
@@ -245,8 +244,7 @@ export async function initRemotes(overrides, remoteEntries) {
     {
       ...adapters,
       ...overrides,
-    },
-    remoteEntries
+    }
   );
 }
 
