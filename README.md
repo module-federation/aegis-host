@@ -12,7 +12,7 @@ When evaluating microservices as a candidate architecture, the most import aspec
 
 Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
-That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
+That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
 
 **Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**
 
@@ -20,9 +20,9 @@ So why are microservices distributed? [Fowler](https://martinfowler.com/articles
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (difficulty, labor intensitity, d scarcity, etc).
+While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they have not been considered a viable option (difficulty, labor intensitity, skills scarcity, etc).
 
-Whatever the reason, with the advent of module federation, it is no longer valid.
+Whatever the reason, with the advent of module federation, this is no longer the case.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
