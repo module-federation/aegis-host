@@ -12,7 +12,7 @@ When evaluating microservices as a candidate architecture, the most import aspec
 
 Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
-That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
+That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
 
 _**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
