@@ -126,11 +126,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
-To demonstrate that polyrepo code sharing is a reality, you will clone two repos.
-
-The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote.
-
-The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
+To demonstrate that polyrepo code sharing is a reality, you will clone two repos. The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote. The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
 ```shell
 git clone https://github.com/module-federation/MicroLib-Example.git
@@ -152,7 +148,17 @@ echo "DATASOURCE_ADAPTER=DataSourceFile" >> .env
 npm run build
 ```
 
-Optionally, install MongoDB:
+Start the services:
+
+```shell
+# in MicroLib-Example dir
+npm run start-all
+# in MicroLib dir
+npm run start
+```
+
+### Datasource
+Optionally, install MongoDB and update the .env accordingly:
 
 ```shell
 brew install mongodb-community
@@ -164,16 +170,6 @@ mongod
 DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
 ```
-
-Start the services:
-
-```shell
-# on the remote MicroLib-Example
-npm run start-all
-# on the host MicroLib
-npm run start
-```
-
 ### Clustering
 MicroLib supports clustering with rolling restart for zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
 
