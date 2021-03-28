@@ -20,9 +20,7 @@ So why are microservices distributed? [Fowler](https://martinfowler.com/articles
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (difficulty, labor intensity, skills scarcity, etc).
-
-Whatever the reason, with the advent of module federation, it is no longer valid.
+While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (complexity, labor intensity, skills scarcity, etc). Whatever the reason, with the advent of module federation, this is no longer the case.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
