@@ -7,10 +7,10 @@ const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const express = require("express");
-const shutdown = require("express-graceful-shutdown");
+const graceful = require("express-graceful-shutdown");
 
-const port = process.env.PORT || 8070;
-const sslPort = process.env.SSL_PORT || 8707;
+const port = process.env.PORT || 8707;
+const sslPort = process.env.SSL_PORT || 8070;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const sslEnabled = /true|yes/i.test(process.env.SSL_ENABLED);
@@ -53,12 +53,12 @@ function clearRoutes() {
  */
 function reloadCallback(app) {
   if (clusterEnabled) {
-    app.use(reloadPath, async function reloadCluster(req, res) {
+    app.use(reloadPath, async function (req, res) {
       res.send("<h1>starting cluster reload</h1>");
       process.send({ cmd: "reload" });
     });
   }
-  app.use(reloadPath, async function reload(req, res) {
+  app.use(reloadPath, async function (req, res) {
     try {
       clearRoutes();
       await startMicroLib({ hot: true });
@@ -78,7 +78,7 @@ function startWebServer(app) {
     const key = fs.readFileSync("cert/server.key", "utf8");
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
     const httpsServer = https.createServer({ key, cert }, app);
-    app.use(shutdown(httpsServer, { logger: console, forceTimeout: 30000 }));
+    app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
 
     httpsServer.listen(sslPort, function () {
       console.info(`\n🌎 https://localhost:${sslPort} 🌎\n`);
@@ -86,7 +86,7 @@ function startWebServer(app) {
     return;
   }
   const httpServer = http.createServer(app);
-  app.use(shutdown(httpServer, { logger: console, forceTimeout: 30000 }));
+  app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
 
   httpServer.listen(port, function () {
     console.info(`\n🌎 https://localhost:${port} 🌎\n`);
@@ -102,7 +102,6 @@ function startWebServer(app) {
  * hot reload via rolling restart or deleting cache
  */
 function startService(app) {
-  console.log("startService");
   startMicroLib().then(() => {
     app.use(express.json());
     app.use(express.static("public"));

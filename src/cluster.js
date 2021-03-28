@@ -6,6 +6,10 @@ let reloading = false;
 let reloadList = [];
 let loadedList = [];
 
+/**
+ * 
+ * @param {object[]} list workers
+ */
 function startWorker(list) {
   const worker = cluster.fork();
   list.push(worker);
@@ -28,6 +32,9 @@ function startWorker(list) {
   });
 }
 
+/**
+ * 
+ */
 function checkReloadStatus() {
   try {
     if (reloading) {
@@ -43,6 +50,9 @@ function checkReloadStatus() {
 
 module.exports.startCluster = function (startService, app) {
   if (cluster.isMaster) {
+    /**
+     * Worker stopped. If reloading, start a new one.
+     */
     cluster.on("exit", function () {
       try {
         console.log("worker down");
@@ -58,6 +68,9 @@ module.exports.startCluster = function (startService, app) {
       }
     });
 
+    /**
+     * Worker started. If reloading, stop the next one.
+     */
     cluster.on("online", function () {
       console.log("worker up");
       try {
@@ -72,6 +85,9 @@ module.exports.startCluster = function (startService, app) {
       }
     });
 
+    /**
+     * Intermmitent errors when IPC channel closes. Resume reload.
+     */
     process.on("uncaughtException", error => {
       console.error(error);
       checkReloadStatus();
