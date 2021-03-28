@@ -14,7 +14,6 @@
     "start": "node -r dotenv/config dist/index.js",
     "restart": "npm run build && npm run start",
     "transpile": "babel src/index.js src/auth.js src/cluster.js -d dist",
-    "transpile2": "babel src/index.js src/auth.js src/cluster-orig.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "test": "mocha --recursive -r esm",
     "demo": "open https://localhost:8070",
