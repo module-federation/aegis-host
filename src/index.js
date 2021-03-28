@@ -94,33 +94,6 @@ function startWebServer(app) {
 }
 
 /**
- * Start web server, optionally require secure socket.
- * @param {express} app - cluster workers use same app instance
- */
-function startWebServer(app) {
-  if (sslEnabled) {
-    const privateKey = fs.readFileSync("cert/server.key", "utf8");
-    const certificate = fs.readFileSync("cert/domain.crt", "utf8");
-    const credentials = { key: privateKey, cert: certificate };
-    const httpsServer = https.createServer(credentials, app);
-    app.use(shutdown(httpsServer, { logger: console, forceTimeout: 30000 }));
-
-    httpsServer.listen(sslPort, () =>
-      console.info(
-        `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
-      )
-    );
-    return;
-  }
-  const httpServer = http.createServer(app);
-
-  httpServer.listen(port, () =>
-    console.info(`\nMicroLib listening on https://localhost:${port} 🌎\n`)
-  );
-  app.use(shutdown(httpServer, { logger: console, forceTimeout: 30000 }));
-}
-
-/**
  * Handle options and start the server.
  * Options:
  * https or http,
@@ -128,7 +101,7 @@ function startWebServer(app) {
  * clustered (1 process per core) or single process,
  * hot reload via rolling restart or deleting cache
  */
-function startService(app, cluster) {
+function startService(app) {
   console.log("startService");
   startMicroLib().then(() => {
     app.use(express.json());
