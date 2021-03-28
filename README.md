@@ -14,13 +14,13 @@ Dealing with increased scope, cost and risk that stems from distribution is call
 
 That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
 
-**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**
+_**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
 So why are microservices distributed? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (difficulty, labor intensitity, d scarcity, etc).
+While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (difficulty, labor intensity, skills scarcity, etc).
 
 Whatever the reason, with the advent of module federation, it is no longer valid.
 
@@ -157,7 +157,7 @@ npm run build
 Optionally, install MongoDB:
 
 ```shell
-brew install mongodb-community@4.4
+brew install mongodb-community
 mongod
 ```
 .env 
