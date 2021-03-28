@@ -177,6 +177,19 @@ DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
 ```
 
+### Clustering
+MicroLib supports clustering with rolling restart for zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
+
+.env
+
+```
+CLUSTER_ENABLED=true
+```
+
+### Authorization
+
+MicroLib supports JSON Web Tokens for authorization of protected routes.
+
 ### Installation
 
 ![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
