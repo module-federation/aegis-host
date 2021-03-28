@@ -160,6 +160,12 @@ Optionally, install MongoDB:
 brew install mongodb-community@4.4
 mongod
 ```
+.env 
+
+```shell
+DATASOURCE_ADAPTER=DataSourceMongoDb
+MONGODB_URL=mongodb://localhost:27017
+```
 
 Start the services:
 
@@ -168,13 +174,6 @@ Start the services:
 npm run start-all
 # on the host MicroLib
 npm run start
-```
-
-.env
-
-```shell
-DATASOURCE_ADAPTER=DataSourceMongoDb
-MONGODB_URL=mongodb://localhost:27017
 ```
 
 ### Clustering
