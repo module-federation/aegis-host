@@ -207,10 +207,8 @@ HTTPS
 
 To enable Transport Layer Security, you'll need to import and trust the certificate in the `cert` directory or provide your own cert and private key. Then update .env.
 
+cert
 ```shell
-ls
- ls -l
-total 24
 -rw-r--r--  1 tmidboeus.ibm.com  staff  1090 Mar 19 06:55 csr.pem
 -rw-r--r--  1 tmidboeus.ibm.com  staff  1314 Mar 19 06:30 domain.crt
 -rw-r--r--  1 tmidboeus.ibm.com  staff  1679 Mar 19 06:54 server.key
