@@ -204,7 +204,7 @@ AUTH_ENABLED=true
 
 HTTPS
 
-To enable secure Transport Layer Security, you'll need to import and trust the certificate in the `cert` directory or provide your own. Then update .env.
+To enable Transport Layer Security, you'll need to import and trust the certificate in the `cert` directory or provide your own cert and private key. Then update .env.
 
 .env
 ```shell
