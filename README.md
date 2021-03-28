@@ -183,7 +183,7 @@ CLUSTER_ENABLED=true
 
 MicroLib supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the `auth` directory.
 
-key-set.json
+auth/key-set.json
 ```json
 {
     "cache": true,
@@ -206,6 +206,15 @@ AUTH_ENABLED=true
 HTTPS
 
 To enable Transport Layer Security, you'll need to import and trust the certificate in the `cert` directory or provide your own cert and private key. Then update .env.
+
+```shell
+ls
+ ls -l
+total 24
+-rw-r--r--  1 tmidboeus.ibm.com  staff  1090 Mar 19 06:55 csr.pem
+-rw-r--r--  1 tmidboeus.ibm.com  staff  1314 Mar 19 06:30 domain.crt
+-rw-r--r--  1 tmidboeus.ibm.com  staff  1679 Mar 19 06:54 server.key
+```
 
 .env
 ```shell
