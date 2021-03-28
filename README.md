@@ -181,7 +181,12 @@ CLUSTER_ENABLED=true
 
 ### Authorization
 
-MicroLib supports JSON Web Tokens for authorization of protected routes.
+MicroLib supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the auth directory. By default, auth is disabled. See the .env:
+
+.env
+```shell
+AUTH_ENABLED=false
+```
 
 ### Installation
 
