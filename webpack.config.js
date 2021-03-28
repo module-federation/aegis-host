@@ -5,8 +5,8 @@ const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
 require("dotenv").config();
 
-const port = process.env.PORT || 8070;
-const sslPort = process.env.SSL_PORT || 8707;
+const port = process.env.PORT || 8707;
+const sslPort = process.env.SSL_PORT || 8070;
 const sslEnabled = process.env.SSL_ENABLED === "true" || true;
 const publicPort = sslEnabled ? sslPort : port;
 
