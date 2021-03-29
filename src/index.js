@@ -57,6 +57,7 @@ function reloadCallback(app) {
       res.send("<h1>starting cluster reload</h1>");
       process.send({ cmd: "reload" });
     });
+    return;
   }
   app.use(reloadPath, async function (req, res) {
     try {
