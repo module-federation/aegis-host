@@ -160,7 +160,7 @@
     const text = await file.text();
     const token = JSON.parse(text);
     // add json web token to authentication header
-    const authHeader = { Authorization: `bearer ${token.access_token}` };
+    authHeader = { Authorization: `bearer ${token.access_token}` };
     // get list of all models and add to datalist for model input control
     const data = await fetch("microlib/api/config", { headers: authHeader });
     const models = await data.json();
