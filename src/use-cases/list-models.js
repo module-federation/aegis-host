@@ -1,26 +1,24 @@
 "use strict";
 
+function parseDate(dateStr) {
+  return new Date(Date.parse(dateStr)).getDate();
+}
+
+function parseMonth(dateStr) {
+  return new Date(Date.parse(dateStr)).getMonth();
+}
+
 const DateFunctions = {
   today: list =>
-    list.filter(
-      m => new Date(Date.parse(m.createTime)).getDate() == new Date().getDate()
-    ).length,
+    list.filter(m => parseDate(m.createTime) == new Date().getDate()).length,
   yesterday: list =>
-    list.filter(
-      m =>
-        new Date(Date.parse(m.createTime)).getDate() == new Date().getDate() - 1
-    ).length,
+    list.filter(m => parseDate(m.createTime) == new Date().getDate() - 1)
+      .length,
   thisMonth: list =>
-    list.filter(
-      m =>
-        new Date(Date.parse(m.createTime)).getMonth() == new Date().getMonth()
-    ).length,
+    list.filter(m => parseMonth(m.createTime) == new Date().getMonth()).length,
   lastMonth: list =>
-    list.filter(
-      m =>
-        new Date(Date.parse(m.createTime)).getMonth() ==
-        new Date().getMonth() - 1
-    ).length,
+    list.filter(m => parseMonth(m.createTime) == new Date().getMonth() - 1)
+      .length,
 };
 
 /**

@@ -99,6 +99,7 @@
     fetch(getUrl(), {
       method: "POST",
       body: document.getElementById("payload").value,
+      headers: { "Content-Type": "application/json", ...authHeader },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -112,7 +113,7 @@
     fetch(getUrl(), {
       method: "PATCH",
       body: document.getElementById("payload").value,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeader },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -123,7 +124,7 @@
 
   getButton.onclick = function () {
     document.getElementById("parameter").value = "";
-    fetch(getUrl())
+    fetch(getUrl(), { headers: authHeader })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -134,7 +135,7 @@
   deleteButton.onclick = function () {
     fetch(getUrl(), {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeader },
     })
       .then(handleResponse)
       .then(showMessage)
@@ -153,8 +154,15 @@
   });
 
   window.addEventListener("load", async function () {
+    // `npm run token` to refresh token
+    // writes new token.json file to /public
+    const file = await fetch("token.json");
+    const text = await file.text();
+    const token = JSON.parse(text);
+    // add json web token to authentication header
+    const authHeader = { Authorization: `bearer ${token.access_token}` };
     // get list of all models and add to datalist for model input control
-    const data = await fetch("microlib/api/config");
+    const data = await fetch("microlib/api/config", { headers: authHeader });
     const models = await data.json();
     models.forEach(m => modelList.appendChild(new Option(m.endpoint)));
   });

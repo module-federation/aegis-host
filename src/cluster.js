@@ -7,10 +7,11 @@ let reloadList = [];
 let workerList = [];
 
 /**
- * Start a new work and listern
- * @param {object[]} list workers
+ * Start a new worker,
+ * listen for a reload request from it,
+ * add it to `workerList` which is used during the rolling restart.
  */
-function startWorker(list) {
+function startWorker() {
   const worker = cluster.fork();
 
   worker.on("message", function (message) {
@@ -51,9 +52,7 @@ function continueReload() {
 
 module.exports.startCluster = function (startService, app) {
   if (cluster.isMaster) {
-    /**
-     * Worker stopped. If reloading, start a new one.
-     */
+    // Worker stopped. If reloading, start a new one.
     cluster.on("exit", function () {
       console.log("worker down");
       if (continueReload()) {
@@ -61,9 +60,7 @@ module.exports.startCluster = function (startService, app) {
       }
     });
 
-    /**
-     * Worker started. If reloading, stop the next one.
-     */
+    // Worker started. If reloading, stop the next one.
     cluster.on("online", function () {
       console.log("worker up");
       if (continueReload()) {
@@ -71,22 +68,13 @@ module.exports.startCluster = function (startService, app) {
       }
     });
 
-    /**
-     * In case of IPC channel closes. Resume reload.
-     */
-    process.on("uncaughtException", error => {
-      console.error(error);
-      if (continueReload()) {
-        startWorker();
-      }
-    });
-
     console.log(`master starting ${numCores} workers`);
-
+    // Run a copy of this program on each core
     for (let i = 0; i < numCores; i++) {
       startWorker();
     }
   } else {
+    // this is a worker, run the service.
     startService(app);
   }
 };
