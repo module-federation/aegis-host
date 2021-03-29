@@ -12,21 +12,19 @@ When evaluating microservices as a candidate architecture, the most import aspec
 
 Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
-That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices (if we still want to call them that) would be appropriate for a much wider audience.
+That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
 
-**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**
+_**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
 So why are microservices distributed? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (difficulty, labor intensitity, d scarcity, etc).
-
-Whatever the reason, with the advent of module federation, it is no longer valid.
+While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (complexity, labor intensity, skills scarcity, etc). Whatever the reason, with the advent of module federation, this is no longer the case.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
-Using webpack's dependency graph and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules integrate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module.
+Using webpack's dependency graph and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules integrate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
 
 With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building truly modular and independently deployable component libraries that run together in same process (or cluster of processes): what you might call a _"polylith"_ - a monolith running multiple (what would have been) microservices.
 
@@ -128,11 +126,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
-To demonstrate that polyrepo code sharing is a reality, you will clone two repos.
-
-The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote.
-
-The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
+To demonstrate that polyrepo code sharing is a reality, you will clone two repos. The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote. The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
 ```shell
 git clone https://github.com/module-federation/MicroLib-Example.git
@@ -154,27 +148,75 @@ echo "DATASOURCE_ADAPTER=DataSourceFile" >> .env
 npm run build
 ```
 
-Optionally, install MongoDB:
-
-```shell
-brew install mongodb-community@4.4
-mongod
-```
-
 Start the services:
 
 ```shell
-# on the remote MicroLib-Example
+# in MicroLib-Example dir
 npm run start-all
-# on the host MicroLib
+# in MicroLib dir
 npm run start
 ```
 
-.env
+### Datasource
+Optionally, install MongoDB and update the .env accordingly:
+
+```shell
+brew install mongodb-community
+mongod
+```
+.env 
 
 ```shell
 DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
+```
+### Clustering
+MicroLib supports clustering with rolling restart for zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
+
+.env
+
+```
+CLUSTER_ENABLED=true
+```
+
+### Authorization
+
+MicroLib supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the `auth` directory.
+
+auth/key-set.json
+```json
+{
+    "cache": true,
+    "rateLimit": true,
+    "jwksRequestsPerMinute": 5,
+    "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
+    "audience": "https://microlib.io/",
+    "issuer": "https://dev-2fe2iar6.us.auth0.com/",
+    "algorithms": [
+        "RS256"
+    ]
+}
+```
+
+.env
+```shell
+AUTH_ENABLED=true
+```
+
+HTTPS
+
+To enable Transport Layer Security, you'll need to import and trust the certificate in the `cert` directory or provide your own cert and private key. Then update .env.
+
+cert
+```shell
+-rw-r--r--  1 tmidboeus.ibm.com  staff  1090 Mar 19 06:55 csr.pem
+-rw-r--r--  1 tmidboeus.ibm.com  staff  1314 Mar 19 06:30 domain.crt
+-rw-r--r--  1 tmidboeus.ibm.com  staff  1679 Mar 19 06:54 server.key
+```
+
+.env
+```shell
+SSL_ENABLED=true
 ```
 
 ### Installation
