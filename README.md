@@ -154,23 +154,27 @@ Start the services:
 # in MicroLib-Example dir
 npm run start-all
 # in MicroLib dir
-npm run start
+npm start
 ```
 
 ### Datasource
+
 Optionally, install MongoDB and update the .env accordingly:
 
 ```shell
 brew install mongodb-community
 mongod
 ```
-.env 
+
+.env
 
 ```shell
 DATASOURCE_ADAPTER=DataSourceMongoDb
 MONGODB_URL=mongodb://localhost:27017
 ```
+
 ### Clustering
+
 MicroLib supports clustering with rolling restart for zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
 
 .env
@@ -184,21 +188,21 @@ CLUSTER_ENABLED=true
 MicroLib supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the `auth` directory.
 
 auth/key-set.json
+
 ```json
 {
-    "cache": true,
-    "rateLimit": true,
-    "jwksRequestsPerMinute": 5,
-    "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
-    "audience": "https://microlib.io/",
-    "issuer": "https://dev-2fe2iar6.us.auth0.com/",
-    "algorithms": [
-        "RS256"
-    ]
+  "cache": true,
+  "rateLimit": true,
+  "jwksRequestsPerMinute": 5,
+  "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
+  "audience": "https://microlib.io/",
+  "issuer": "https://dev-2fe2iar6.us.auth0.com/",
+  "algorithms": ["RS256"]
 }
 ```
 
 .env
+
 ```shell
 AUTH_ENABLED=true
 ```
@@ -208,13 +212,15 @@ HTTPS
 To enable Transport Layer Security, you'll need to import and trust the certificate in the `cert` directory or provide your own cert and private key. Then update .env.
 
 cert
+
 ```shell
--rw-r--r--  1 tmidboeus.ibm.com  staff  1090 Mar 19 06:55 csr.pem
--rw-r--r--  1 tmidboeus.ibm.com  staff  1314 Mar 19 06:30 domain.crt
--rw-r--r--  1 tmidboeus.ibm.com  staff  1679 Mar 19 06:54 server.key
+-rw-r--r--  1 tysonrm  staff  1090 Mar 19 06:55 csr.pem
+-rw-r--r--  1 tysonrm  staff  1314 Mar 19 06:30 domain.crt
+-rw-r--r--  1 tysonrm  staff  1679 Mar 19 06:54 server.key
 ```
 
 .env
+
 ```shell
 SSL_ENABLED=true
 ```
