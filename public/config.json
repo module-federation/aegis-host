@@ -1,8 +1,8 @@
 {
     "authEnabled": true,
     "jwksUri": "https://dev-2fe2iar6.us.auth0.com/oauth/token",
-    "client_id": "DdRHH6u5BsqprS03rtgFDv5p6xzCdEUK",
-    "client_secret": "0_c4fZKFG7Wyiu1u4YQWsRvBF3a68F6K-beqRLCNuBnQrGH8k0sFqRFmpwpI2ijX",
+    "client_id": "client1",
+    "client_secret": "secret",
     "audience": "https://microlib.io/",
     "grant_type": "client_credentials"
 }
