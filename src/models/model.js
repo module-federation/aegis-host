@@ -174,6 +174,18 @@ const Model = (() => {
       },
 
       /**
+       * Return the `eventMask` key name of the value of `event`.
+       * Could potentially return multiple key names. See `eventMask`.
+       * @param {number} event
+       * @returns {string|string[]} key name: update, change, onload
+       */
+      getEventName(event) {
+        if (typeof event !== "number") return;
+        const keys = Object.keys(eventMask).filter(k => eventMask[k] & event);
+        return keys;
+      },
+
+      /**
        * Back out port transactions
        */
       async undo() {
@@ -254,6 +266,22 @@ const Model = (() => {
       },
 
       /**
+       * Original request passed in by caller
+       * @returns arguments passed by caller
+       */
+      getArgs() {
+        return modelInfo.args ? modelInfo.args : [];
+      },
+
+      /**
+       * Identify events types.
+       * @returns {eventMask}
+       */
+      getEventMask() {
+        return eventMask;
+      },
+
+      /**
        * Returns the `ModelSpecification` for this model.
        *
        * @returns {import(".").ModelSpecification}
@@ -292,7 +320,7 @@ const Model = (() => {
       /**
        * Return a list of ports invoked by this model instance, in LIFO order.
        *
-       * @returns {string[]}
+       * @returns {string[]} history of ports called by this model instance
        */
       getPortFlow() {
         return this[PORTFLOW];
@@ -328,7 +356,13 @@ const Model = (() => {
     Promise.resolve(
       // Call factory with data from request payload
       modelInfo.spec.factory(...modelInfo.args)
-    ).then(model => make({ model, spec: modelInfo.spec }));
+    ).then(model =>
+      make({
+        model,
+        args: modelInfo.args,
+        spec: modelInfo.spec,
+      })
+    );
 
   const validate = event => model => model[VALIDATE]({}, event);
 
