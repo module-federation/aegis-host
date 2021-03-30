@@ -77,8 +77,8 @@ const Server = (() => {
           make(endpointCmd, router, "patch", patchModels);
           make(endpointId, router, "delete", deleteModels);
 
-          console.timeEnd(label);
           makeAdmin(router, http);
+          console.timeEnd(label);
           cache.load();
 
           if (sslEnabled) console.log(`https://localhost:${sslPort} 🌎`);

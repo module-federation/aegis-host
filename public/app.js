@@ -13,12 +13,50 @@
   const paramInput = document.querySelector("#parameter");
   const copyButton = document.querySelector("#copyButton");
 
-  //  const reader = new FileReader();
-  //const token = reader.readAsText(file);
+  // Include JWT access token in header for auth check
+  let authHeader = {};
 
-  //const accessToken =
-  //   "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImpzTEIzNmEzZmJuS0VYb0MtWWlhNyJ9.eyJpc3MiOiJodHRwczovL2Rldi0yZmUyaWFyNi51cy5hdXRoMC5jb20vIiwic3ViIjoiRGRSSEg2dTVCc3FwclMwM3J0Z0ZEdjVwNnh6Q2RFVUtAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vbWljcm9saWIuaW8vIiwiaWF0IjoxNjE2Mzk4MTcyLCJleHAiOjE2MTY0ODQ1NzIsImF6cCI6IkRkUkhINnU1QnNxcHJTMDNydGdGRHY1cDZ4ekNkRVVLIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwicGVybWlzc2lvbnMiOltdfQ.b8JnCrMVrw8IcCpsiimLciWxld9uzsankmTrfagi7VKoHF2Tj7hbnkeYg4RZ_4jeKjiG0zlRVTPKvdFbI61FeFcu2w7suGNlsYfnfR7X9XK1998oQpXHp_D3IxOKECxn7yOL2UuJ3ytt4wUo2SSnGAPjkNYV315vJ0aB4gNvQFw7NNPZjF79sVMc2JTVBSWGob2Hl0Ucd7P01abmW1D1IJ-tLo45vIv_ouz6LDVhlRoPyQbnJGCROq-RCuo_xXepj6dNIoyhWD1HK8yx2hFW2Md0vcePHNmciaScvamd7sEgVF3xoEBCzevwEnhsrB-coDndWyRMowGLKrgjBbqGVA";
-  let authHeader;
+  /**
+   * Returns headers, including auth header if auth is enabled.
+   * @returns {{
+   * "Content-Type":"application/json",
+   * "Authorization": "bearer <token>"
+   * }}
+   */
+  function getHeaders() {
+    const content = { "Content-Type": "application/json" };
+    return {
+      ...content,
+      ...authHeader,
+    };
+  }
+
+  /**
+   * Get config file. If auth is enabled, request new
+   * JSON Web Token and set `authHeader` accordingly.
+   * Need CORS for this.
+   */
+  async function refreshAccessToken() {
+    const file = await fetch("config.json");
+    const text = await file.text();
+    const config = JSON.parse(text);
+    let token = { access_token: "" };
+    if (config.authEnabled) {
+      const data = await fetch(config.oauthUri, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          client_id: config.client_id,
+          client_secret: config.client_secret,
+          audience: config.audience,
+          grant_type: config.grant_type,
+        }),
+      });
+      token = await data.json();
+      // add json web token to authentication header
+      authHeader = { Authorization: `bearer ${token.access_token}` };
+    }
+  }
 
   function prettifyJson(json) {
     if (typeof json !== "string") {
@@ -99,6 +137,7 @@
     fetch(getUrl(), {
       method: "POST",
       body: document.getElementById("payload").value,
+      headers: getHeaders(),
     })
       .then(handleResponse)
       .then(showMessage)
@@ -112,7 +151,7 @@
     fetch(getUrl(), {
       method: "PATCH",
       body: document.getElementById("payload").value,
-      headers: { "Content-Type": "application/json" },
+      headers: getHeaders(),
     })
       .then(handleResponse)
       .then(showMessage)
@@ -123,7 +162,7 @@
 
   getButton.onclick = function () {
     document.getElementById("parameter").value = "";
-    fetch(getUrl())
+    fetch(getUrl(), { headers: getHeaders() })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -132,10 +171,7 @@
   };
 
   deleteButton.onclick = function () {
-    fetch(getUrl(), {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    })
+    fetch(getUrl(), { method: "DELETE", headers: getHeaders() })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -153,8 +189,10 @@
   });
 
   window.addEventListener("load", async function () {
+    // if enabled, request fresh access token and store in auth header
+    await refreshAccessToken();
     // get list of all models and add to datalist for model input control
-    const data = await fetch("microlib/api/config");
+    const data = await fetch("microlib/api/config", { headers: getHeaders() });
     const models = await data.json();
     models.forEach(m => modelList.appendChild(new Option(m.endpoint)));
   });

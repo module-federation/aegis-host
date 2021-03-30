@@ -1,6 +1,7 @@
-export default function listConfigsFactory({ models } = {}, clear = false) {
+"use strict";
+
+export default function listConfigsFactory({ models } = {}) {
   return async function listConfigs() {
-    const list = models.getRemoteModels();
-    return list;
+    return models.getRemoteModels();
   };
 }
