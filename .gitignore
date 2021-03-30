@@ -11,3 +11,4 @@ src/models/.DS_Store
 accessToken.sh
 public/token.json
 public/config.json
+public/config.json
