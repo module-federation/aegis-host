@@ -1724,10 +1724,10 @@
   dependencies:
     "mimic-response" "^1.0.0"
 
-"cluster-rolling-restart@^1.0.5":
-  "integrity" "sha512-rb27wsdw1hbnd6Fzcd/u2OlXfgpR7JoR6pNtZQjZCESdhfMXGEQw+UCzUri1c8t719XeCTMSZqqJ1xtBPR8n7Q=="
-  "resolved" "https://registry.npmjs.org/cluster-rolling-restart/-/cluster-rolling-restart-1.0.5.tgz"
-  "version" "1.0.5"
+"cluster-rolling-restart@^1.0.8":
+  "integrity" "sha512-UNAJKPGYzl7HgnPsmwjaK6hwj0rtHK8B8i+B02qK9M2wQeJ4yXsz85czxbWET4Z0vRC2BrHOUygZ2ONJw7/Scg=="
+  "resolved" "https://registry.npmjs.org/cluster-rolling-restart/-/cluster-rolling-restart-1.0.8.tgz"
+  "version" "1.0.8"
 
 "collection-visit@^1.0.0":
   "integrity" "sha1-S8A3PBZLwykbTTaMgpzxqApZ3KA="

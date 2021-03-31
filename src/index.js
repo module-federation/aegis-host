@@ -3,11 +3,11 @@
 require("dotenv").config();
 require("regenerator-runtime");
 const importFresh = require("import-fresh");
-const cluster = require("cluster-rolling-restart");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const express = require("express");
+const cluster = require("cluster-rolling-restart");
 const graceful = require("express-graceful-shutdown");
 
 const port = process.env.PORT || 8707;
@@ -52,7 +52,7 @@ function clearRoutes() {
  * Control hot reload differently depending on cluster mode.
  * @returns {function(req,res)} cluster or single proc reload
  */
-function reloadCallback(app) {
+function reloadCallback() {
   if (clusterEnabled) {
     app.use(reloadPath, async function (req, res) {
       res.send("<h1>starting cluster reload</h1>");
@@ -73,9 +73,8 @@ function reloadCallback(app) {
 
 /**
  * Start web server, optionally require secure socket.
- * @param {express} app - cluster workers use same app instance
  */
-function startWebServer(app) {
+function startWebServer() {
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
@@ -100,20 +99,20 @@ function startWebServer(app) {
  * Options:
  * https or http,
  * authorization (via jwt and auth0) enabled or disabled
- * clustered (1 process per core) or single process,
+ * clustered or single process,
  * hot reload via rolling restart or deleting cache
  */
-function startService(app) {
+function startService() {
   startMicroLib().then(() => {
     app.use(express.json());
     app.use(express.static("public"));
-    reloadCallback(app);
-    startWebServer(app);
+    reloadCallback();
+    startWebServer();
   });
 }
 
 if (clusterEnabled) {
-  cluster.startCluster(startService, app);
+  cluster.startCluster(startService);
 } else {
-  startService(app);
+  startService();
 }

@@ -25,7 +25,7 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "cluster-rolling-restart": "^1.0.5",
+    "cluster-rolling-restart": "^1.0.8",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-graceful-shutdown": "^1.1.3",
