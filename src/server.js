@@ -8,6 +8,7 @@ import {
   deleteModels,
   initCache,
   getConfig,
+  authCallback,
 } from "./controllers";
 
 import { Persistence } from "./services/persistence-service";
@@ -81,8 +82,8 @@ const Server = (() => {
           console.timeEnd(label);
           cache.load();
 
-          if (sslEnabled) console.log(`https://localhost:${sslPort} 🌎`);
-          else console.log(`http://localhost:${port} 🌎`);
+          if (sslEnabled) console.log(`\nhttps://localhost:${sslPort} 🌎`);
+          else console.log(`\nhttp://localhost:${port} 🌎`);
           process.on("SIGTERM", () => close());
         });
       });

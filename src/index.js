@@ -3,6 +3,7 @@
 require("dotenv").config();
 require("regenerator-runtime");
 const importFresh = require("import-fresh");
+const cluster = require("cluster-rolling-restart");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
@@ -112,7 +113,7 @@ function startService(app) {
 }
 
 if (clusterEnabled) {
-  require("./cluster").startCluster(startService, app);
+  cluster.startCluster(startService, app);
 } else {
   startService(app);
 }

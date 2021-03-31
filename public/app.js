@@ -24,9 +24,9 @@
    * }}
    */
   function getHeaders() {
-    const content = { "Content-Type": "application/json" };
+    const contentHeader = { "Content-Type": "application/json" };
     return {
-      ...content,
+      ...contentHeader,
       ...authHeader,
     };
   }
