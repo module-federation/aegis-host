@@ -381,7 +381,7 @@ const Model = (() => {
 
   // Recreate model from deserialized object
   const loadModel = pipe(
-    make,
+    make, 
     withSerializers(
       fromSymbol(keyMap),
       fromTimestamp(["createTime", "updateTime"])

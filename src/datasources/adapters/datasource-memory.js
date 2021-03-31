@@ -1,4 +1,7 @@
+"use strict";
+
 import DataSource from "../datasource";
+const clusterEnabled = /true|yes/i.test(process.env.CLUSTER_ENABLED);
 
 /**
  * Temporary in-memory storage
@@ -12,6 +15,19 @@ export class DataSourceMemory extends DataSource {
    * @override
    */
   async save(id, data) {
+    if (clusterEnabled) {
+      process.send({
+        cmd: "saveBroadcast",
+        pid: process.pid,
+        id,
+        data,
+        name: this.name,
+      });
+    }
+    return this.dataSource.set(id, data).get(id);
+  }
+
+  async clusterSave(id, data) {
     return this.dataSource.set(id, data).get(id);
   }
 
@@ -53,6 +69,14 @@ export class DataSourceMemory extends DataSource {
    * @override
    */
   async delete(id) {
+    if (clusterEnabled) {
+      process.send({
+        cmd: "deleteBroadcast",
+        pid: process.pid,
+        id,
+        name: this.name,
+      });
+    }
     this.dataSource.delete(id);
   }
 }

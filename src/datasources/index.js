@@ -3,6 +3,8 @@
 /**
  * @typedef {import('../models').Model} Model
  */
+
+import ModelFactory from "../models";
 import * as adapters from "./adapters";
 
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
@@ -10,6 +12,20 @@ const DataSource = adapters[adapter];
 
 const DataSourceFactory = (() => {
   let dataSources;
+
+  function getCustomDataSource(ds, factory, name) {
+    const spec = ModelFactory.getModelSpec(name);
+
+    if (spec?.datasource) {
+      try {
+        return new spec.datasource(ds, factory, name);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    // use default datasource
+    return new DataSource(ds, factory, name);
+  }
 
   /**
    * Get the datasource for each model. Optionally inject logic
@@ -27,7 +43,8 @@ const DataSourceFactory = (() => {
       return dataSources.get(name);
     }
 
-    const newDs = new DataSource(new Map(), this, name);
+    const newDs = getCustomDataSource(new Map(), this, name);
+    //new DataSource(new Map(), this, name);
     dataSources.set(name, newDs);
     return newDs;
   }

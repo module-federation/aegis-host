@@ -29,6 +29,30 @@ function startWorker() {
     }
   });
 
+  // Go through all workers
+  function eachWorker(callback) {
+    for (const id in cluster.workers) {
+      callback(cluster.workers[id]);
+    }
+  }
+
+  worker.on("message", function (message) {
+    console.log({ ...message, data: "..." });
+    if (message.pid === process.pid) return;
+
+    if (["saveBroadcast", "deleteBroadcast"].includes(message.cmd)) {
+      for (const id in cluster.workers) {
+        if (cluster.workers[id].process.pid !== message.pid) {
+          cluster.workers[id].send({
+            ...message,
+            pid: process.pid,
+            cmd: message.cmd.replace("Broadcast", "Command"),
+          });
+        }
+      }
+    }
+  });
+
   workerList.push(worker);
 }
 

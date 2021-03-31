@@ -35801,7 +35801,7 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 /***/ }),
 
-/***/ "webpack/container/entry/orderService":
+/***/ "webpack/container/entry/microservices":
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -35822,6 +35822,9 @@ var moduleMap = {
 	},
 	"./services-mock": () => {
 		return Promise.all([__webpack_require__.e("src_services-mock_index_js"), __webpack_require__.e("src_services_event-service_js")]).then(() => () => (__webpack_require__(/*! ./src/services-mock */ "./src/services-mock/index.js")));
+	},
+	"./datasources": () => {
+		return __webpack_require__.e("src_datasources_index_js").then(() => () => (__webpack_require__(/*! ./src/datasources */ "./src/datasources/index.js")));
 	},
 	"./validations": () => {
 		return Promise.all([__webpack_require__.e("src_models_mixins_js"), __webpack_require__.e("src_lib_utils_js")]).then(() => () => (__webpack_require__(/*! ./src/models/mixins */ "./src/models/mixins.js")));
@@ -36373,7 +36376,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			"orderService": 0
+/******/ 			"microservices": 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -36436,7 +36439,7 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__("webpack/container/entry/orderService");
+/******/ 	return __webpack_require__("webpack/container/entry/microservices");
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map

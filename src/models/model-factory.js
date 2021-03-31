@@ -3,21 +3,10 @@
 import Model from "./model";
 import Event from "./event";
 
-/**
- * @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType
- */
-
-/**
- * @typedef {import('./index').ModelSpecification} ModelSpecification
- */
-
-/**
- * @typedef {import('./observer').Observer} Observer
- */
-
-/**
- * @typedef {import('../datasources/datasource').default} Datasource
- */
+/** @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType */
+/** @typedef {import('./index').ModelSpecification} ModelSpecification */
+/** @typedef {import('./observer').Observer} Observer */
+/** @typedef {import('../datasources/datasource').default} Datasource */
 
 /**
  * @typedef {Object} ModelFactory Creates new model instances.

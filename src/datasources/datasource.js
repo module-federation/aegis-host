@@ -51,6 +51,8 @@ export default class DataSource {
     throw new Error("abstract method not implemented");
   }
 
+  async clusterSave() {}
+
   /**
    * Find model instance by ID
    * @param {*} id record id

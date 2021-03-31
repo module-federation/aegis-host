@@ -1,11 +1,11 @@
 module.exports = [
   {
-    name: "orderService",
+    name: "microservices",
     url: "http://localhost:8060/remoteEntry.js",
     path: __dirname,
     type: "model",
     importRemote: async () => {
-      const models = await import("orderService/models");
+      const models = await import("microservices/models");
       return models.models;
     },
   },
@@ -15,7 +15,7 @@ module.exports = [
     path: __dirname,
     type: "adapter",
     importRemote: async () => {
-      const adapters = await import("orderService/adapters");
+      const adapters = await import("microservices/adapters");
       return adapters;
     },
   },
@@ -25,7 +25,7 @@ module.exports = [
     path: __dirname,
     type: "service",
     importRemote: async () => {
-      const services = await import("orderService/services");
+      const services = await import("microservices/services");
       return services;
     },
   },

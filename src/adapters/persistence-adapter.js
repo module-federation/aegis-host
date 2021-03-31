@@ -12,6 +12,16 @@ export function save(service) {
   };
 }
 
+export function remove(service) {
+  return async function ({ model }) {
+    const result = await async(service.delete(model));
+    if (result.ok) {
+      return result.data;
+    }
+    throw new Error(result.error);
+  };
+}
+
 export function find(service) {
   return async function ({ model }) {
     const result = await async(service.find(model));
