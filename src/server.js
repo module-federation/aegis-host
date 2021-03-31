@@ -8,7 +8,6 @@ import {
   deleteModels,
   initCache,
   getConfig,
-  authCallback,
 } from "./controllers";
 
 import { Persistence } from "./services/persistence-service";

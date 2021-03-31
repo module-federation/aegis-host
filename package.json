@@ -14,7 +14,7 @@
     "hot-reload": "curl https://localhost:8070/microlib/reload",
     "start": "node -r dotenv/config dist/index.js",
     "restart": "npm run build && npm run start",
-    "transpile": "babel src/index.js src/auth.js -d dist",
+    "transpile": "babel src/index.js src/auth.js src/cluster.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test": "mocha --recursive -r esm",
@@ -25,7 +25,6 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "cluster-rolling-restart": "^1.0.8",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-graceful-shutdown": "^1.1.3",

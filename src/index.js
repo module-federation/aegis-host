@@ -7,7 +7,7 @@ const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const express = require("express");
-const cluster = require("cluster-rolling-restart");
+const cluster = require("./cluster");
 const graceful = require("express-graceful-shutdown");
 
 const port = process.env.PORT || 8707;
