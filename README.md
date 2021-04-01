@@ -8,15 +8,15 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-When evaluating microservices as a candidate architecture, the most import aspect to consider is the fact that the end result is a distributed application. Microservices are the components of distributed applications - and distribution is how you accomplish the main goal of microservices, deployment independence. The trade-off is, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
+When evaluating microservices as a candidate architecture, the most important fact to consider is that you are building a distributed application. Microservices are the components of distributed applications - and distribution is how you accomplish the main goal of microservices, deployment independence. Unfortunately, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
 
-Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
+This trade-off, dealing with increased scope, cost and risk that stems from distribution, is called paying the "microservices premium". Sometimes the premium is well worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
 That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
 
 _**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
-So why are microservices distributed? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
+So is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
