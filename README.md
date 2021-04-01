@@ -51,7 +51,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Serverless (ever warm) deployment
+- Serverless "everwarm" deployment
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
