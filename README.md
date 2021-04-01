@@ -160,7 +160,7 @@ npm start
 
 ### Datasource
 
-Optionally, install MongoDB and update the .env accordingly:
+In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change to database default persistence. You can also update an individual model's datasource in the ModelSpec. 
 
 ```shell
 brew install mongodb-community
@@ -176,7 +176,7 @@ MONGODB_URL=mongodb://localhost:27017
 
 ### Clustering
 
-MicroLib supports clustering with rolling restart for zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
+MicroLib supports clustering with automatic cache synchronization and rolling restart for increased stability, scalality and efficiency with zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
 
 .env
 
