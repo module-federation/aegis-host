@@ -26,7 +26,7 @@ Using module federation, it is possible to dynamically and efficiently import re
 
 Using webpack dependency graphs, code splitting and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building truly modular and independently deployable component libraries that run together in same process (or cluster of processes), in what you might call a _"polylith"_ - a monolith comprised of multiple (what would have been) microservices.
+With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building truly modular and independently deployable component libraries that run together in same process (or cluster of processes), in what you might call a _"polylith"_ - a monolith comprised of multiple (what would otherwise be) microservices.
 
 ---
 
