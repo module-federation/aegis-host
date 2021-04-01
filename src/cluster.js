@@ -37,7 +37,7 @@ function startWorker() {
   }
 
   worker.on("message", function (message) {
-    console.log({ ...message, data: "..." });
+    // console.log({ ...message, data: "..." });
     if (message.pid === process.pid) return;
 
     if (["saveBroadcast", "deleteBroadcast"].includes(message.cmd)) {

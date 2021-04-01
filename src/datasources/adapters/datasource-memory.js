@@ -79,4 +79,8 @@ export class DataSourceMemory extends DataSource {
     }
     this.dataSource.delete(id);
   }
+
+  async clusterDelete(id) {
+    this.dataSource.delete(id);
+  }
 }
