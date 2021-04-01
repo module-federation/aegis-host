@@ -53,7 +53,8 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Dynamic A/B testing
 - Serverless (ever warm) deployment
 - Configurable serialization for network and storage I/O
-- Clustering for availability and scalibilty (1 process per core)
+- Clustering for availability and scalibilty
+- Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 
 ---
