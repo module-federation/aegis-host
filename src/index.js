@@ -14,8 +14,8 @@ const port = process.env.PORT || 8707;
 const sslPort = process.env.SSL_PORT || 8070;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
-const sslEnabled = /true|yes/i.test(process.env.SSL_ENABLED);
-const clusterEnabled = /true|yes/i.test(process.env.CLUSTER_ENABLED);
+const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
+const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 
 // Optionally enable authorization
 const app = require("./auth")(express(), "/microlib");
@@ -53,6 +53,12 @@ function clearRoutes() {
  * @returns {function(req,res)} cluster or single proc reload
  */
 function reloadCallback() {
+  // Manual reset if left in wrong stated
+  app.use(`${reloadPath}-reset`, function () {
+    process.send({ cmd: "reload-reset" });
+    res.send("reload status reset...try again");
+  });
+
   if (clusterEnabled) {
     app.use(reloadPath, async function (req, res) {
       res.send("<h1>starting cluster reload</h1>");
@@ -60,6 +66,7 @@ function reloadCallback() {
     });
     return;
   }
+
   app.use(reloadPath, async function (req, res) {
     try {
       clearRoutes();

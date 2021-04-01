@@ -18,7 +18,7 @@ const Server = (() => {
   const port = process.env.PORT || "8070";
   const sslPort = process.env.SSL_PORT || "8707";
   const apiRoot = process.env.API_ROOT || "/microlib/api";
-  const sslEnabled = /true|yes/i.test(process.env.SSL_ENABLED);
+  const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
   const modelPath = `${apiRoot}/models`;
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;

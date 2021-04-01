@@ -3,7 +3,7 @@
 const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
 const keySet = require("../auth/key-set.json");
-const authEnabled = /true|yes/i.test(process.env.AUTH_ENABLED);
+const authEnabled = /true/i.test(process.env.AUTH_ENABLED);
 
 module.exports = function (app, path) {
   if (!authEnabled) return app;

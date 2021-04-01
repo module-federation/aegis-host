@@ -1,7 +1,7 @@
 "use strict";
 
 import DataSource from "../datasource";
-const clusterEnabled = /true|yes/i.test(process.env.CLUSTER_ENABLED);
+const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 
 /**
  * Temporary in-memory storage
