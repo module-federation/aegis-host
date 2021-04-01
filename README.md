@@ -16,7 +16,7 @@ That said, in cases where the implementation does succeed, organizations general
 
 _**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
-So is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
+Is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
