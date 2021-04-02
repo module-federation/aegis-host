@@ -8,25 +8,25 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-When evaluating microservices as a candidate architecture, the most import aspect to consider is the fact that the end result is a distributed application. Microservices are the components of distributed applications - and distribution is how you accomplish the main goal of microservices, deployment independence. The trade-off is, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
+When evaluating microservices as a candidate architecture, the most important fact to consider is that you are building a distributed application. Microservices are the components of distributed applications - and distribution is what enables their chief virtue, deployment independence. Unfortunately, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
 
-Dealing with increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
+This trade-off, dealing with the increased scope, cost and risk that stems from distribution, is called paying the "microservices premium". Sometimes the premium is well worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
 That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
 
 _**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
-So why are microservices distributed? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
+Is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they weren't considered a viable solution (complexity, labor intensity, skills scarcity, etc). Whatever the reason, with the advent of module federation, this is no longer the case.
+While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this is no longer the case.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
-Using webpack's dependency graph and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules integrate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
+Using webpack dependency graphs, code splitting and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium by building truly modular and independently deployable component libraries that run together in same process (or cluster of processes): what you might call a _"polylith"_ - a monolith running multiple (what would have been) microservices.
+With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium altogether by building truly modular and independently deployable component libraries that run together in same process (or cluster of processes), in what you might call a _"polylith"_ - a monolith comprised of multiple (what would otherwise be) microservices.
 
 ---
 
@@ -51,7 +51,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Serverless (ever warm) deployment
+- Serverless "everwarm" deployment
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
@@ -67,9 +67,9 @@ MicroLib uses a modified version of [Webpack Module Federation](https://webpack.
 
 A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the MicroLib [ModelSpecification](https://github.com/module-federation/MicroLib-Example/blob/master/src/config/order.js) interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
-One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An [adapter](https://github.com/module-federation/MicroLib-Example/blob/master/src/adapters/event-adapter.js) implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added or -removed, in which case the framework automatically rebinds their adapters. Similarly an adapter can be hot-replaced and rebound.
+One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An [adapter](https://github.com/module-federation/MicroLib-Example/blob/master/src/adapters/event-adapter.js) implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added, -replaced or -removed, in which case the framework automatically rebinds their adapters as needed. Adapters by themselves can also be hot-replaced and rebound.
 
-A [service](https://github.com/module-federation/MicroLib-Example/blob/master/src/services/event-service.js) provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime or during a hot-deploy.
+A [service](https://github.com/module-federation/MicroLib-Example/blob/master/src/services/event-service.js) provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern, binding to the outside-facing end of the adapter. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
 
 ---
 
@@ -160,7 +160,7 @@ npm start
 
 ### Datasource
 
-Optionally, install MongoDB and update the .env accordingly:
+In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change to database default persistence. You can also update an individual model's datasource in the ModelSpec. 
 
 ```shell
 brew install mongodb-community
@@ -176,7 +176,7 @@ MONGODB_URL=mongodb://localhost:27017
 
 ### Clustering
 
-MicroLib supports clustering with rolling restart for zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
+MicroLib supports clustering with automatic cache synchronization and rolling restart for increased stability, scalality and efficiency with zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
 
 .env
 
