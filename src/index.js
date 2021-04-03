@@ -54,7 +54,7 @@ function clearRoutes() {
  */
 function reloadCallback() {
   // Manual reset if left in wrong stated
-  app.use(`${reloadPath}-reset`, function () {
+  app.use(`${reloadPath}-reset`, function (req, res) {
     process.send({ cmd: "reload-reset" });
     res.send("reload status reset...try again");
   });
@@ -76,6 +76,9 @@ function reloadCallback() {
       console.error(error);
     }
   });
+
+
+  ``
 }
 
 /**

@@ -6,6 +6,7 @@
 
 import ModelFactory from "../models";
 import * as adapters from "./adapters";
+import { DataSourceMemory } from "./adapters";
 
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
 const DataSource = adapters[adapter];
@@ -17,8 +18,13 @@ const DataSourceFactory = (() => {
     const spec = ModelFactory.getModelSpec(name);
 
     if (spec?.datasource) {
+      const url = spec.datasource.url;
+      const cacheSize = spec.datasource.cacheSize;
+      const adapterFactory = spec.datasource.factory;
+
       try {
-        return new spec.datasource(ds, factory, name);
+        const adapter = adapterFactory(url, DataSourceMemory, cacheSize);
+        return new adapter(ds, factory, name);
       } catch (error) {
         console.error(error);
       }
@@ -44,7 +50,6 @@ const DataSourceFactory = (() => {
     }
 
     const newDs = getCustomDataSource(new Map(), this, name);
-    //new DataSource(new Map(), this, name);
     dataSources.set(name, newDs);
     return newDs;
   }

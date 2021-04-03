@@ -12,6 +12,7 @@
   "scripts": {
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "hot-reload": "curl https://localhost:8070/microlib/reload",
+    "hot-reload-reset": "curl https://localhost:8070/microlib/reload-reset",
     "start": "node -r dotenv/config dist/index.js",
     "restart": "npm run build && npm run start",
     "transpile": "babel src/index.js src/auth.js src/cluster.js -d dist",
