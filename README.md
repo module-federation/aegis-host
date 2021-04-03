@@ -93,7 +93,7 @@ When ports are configured in the `ModelSpecification`, the framework dynamically
 
 Ports can be instrumented for exceptions and timeouts to extend the framework’s retry and compensation logic. They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
 
-An adapter either implements an external interface or exposes an interface for external clients to consume. On the port side, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to external or environmental aspects, like I/O protocols.
+An adapter either implements an external interface or exposes an interface for external clients to consume. On the port end, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to environmental concerns.
 
 Ports optionally specify a callback to process data received on the port before control is returned to the caller. The callback is passed as an argument to the port function. Ports can be configured to run on receipt of an event, API request, or called directly from code.
 
