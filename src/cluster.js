@@ -69,21 +69,25 @@ function stopWorker() {
 
 /**
  * Control execution of stop/start request
- * @returns {boolean} true to continue, otherwise stop
+ * @param {function()} callback - a callback that starts your app
+ * @param {number} waitms - Delay execution by `waitms`
+ * milliseconds so your app has time to start
  */
 function continueReload(callback, waitms) {
-  if (
-    reloading ||
-    (workerList.length < numCores && callback.name.includes("start"))
-  ) {
-    setTimeout(() => callback(), waitms);
+  const failedWorker =
+    !reloading &&
+    workerList.length < numCores &&
+    callback.name.includes("start");
+
+  if (reloading || failedWorker) {
+    setTimeout(callback, failedWorker ? 60000 : waitms);
   }
 }
 
 /**
  * Runs a copy of `startService` on each core of the machine.
- * Processes share file descriptors (including sockets) and take turns
- * handling requests from the server port in round-robin fashion.
+ * Processes share file descriptors (including sockets) and listen
+ * on the same server port. Work is distributed in round-robin fashion.
  * ```js
  * const cluster = require("cluster-rolling-restart");
  * const express = require("express");
@@ -103,14 +107,16 @@ module.exports.startCluster = function (startService, waitms = 2000) {
     // Worker stopped. If reloading, start a new one.
     cluster.on("exit", function (worker) {
       console.log("worker down", worker.process.pid);
-      continueReload(startWorker, waitms);
+      continueReload(startWorker, 0);
     });
 
     // Worker started. If reloading, stop the next one.
     cluster.on("online", function (worker) {
       console.log("worker up", worker.process.pid);
-      continueReload(stopWorker, 0);
+      continueReload(stopWorker, waitms);
     });
+
+    setInterval(continueReload, 60000, startWorker);
 
     console.log(`master starting ${numCores} workers 🌎`);
     // Run a copy of this program on each core
