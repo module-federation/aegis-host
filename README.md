@@ -20,7 +20,7 @@ Is there such an alternative? [Fowler](https://martinfowler.com/articles/microse
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-# While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this is no longer the case.
+While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this is no longer the case.
 
 So is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
