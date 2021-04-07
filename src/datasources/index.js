@@ -6,10 +6,24 @@
 
 import ModelFactory from "../models";
 import * as adapters from "./adapters";
-import { DataSourceMemory } from "./adapters";
+import {
+  DataSourceFile,
+  DataSourceMemory,
+  DataSourceMongoDb,
+} from "./adapters";
 
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
 const DataSource = adapters[adapter];
+
+function getBaseClass(name) {
+  if (name === "DataSourceMemory") {
+    return DataSourceMemory;
+  }
+  if (name === "DataSourceMongoDb") {
+    return DataSourceMongoDb;
+  }
+  return DataSourceFile;
+}
 
 const DataSourceFactory = (() => {
   let dataSources;
@@ -21,9 +35,11 @@ const DataSourceFactory = (() => {
       const url = spec.datasource.url;
       const cacheSize = spec.datasource.cacheSize;
       const adapterFactory = spec.datasource.factory;
+      // Can't use property key to select from adapters.
+      const baseClass = getBaseClass(spec.datasource.baseClass);
 
       try {
-        const adapter = adapterFactory(url, DataSourceMemory, cacheSize);
+        const adapter = adapterFactory(url, cacheSize, baseClass);
         return new adapter(ds, factory, name);
       } catch (error) {
         console.error(error);

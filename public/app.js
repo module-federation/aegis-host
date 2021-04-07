@@ -115,7 +115,7 @@
 
   function updateModelId(id) {
     if (id) modelIdInput.value = id;
-  }
+  } 
 
   function handleResponse(response) {
     try {

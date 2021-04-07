@@ -14,7 +14,8 @@ const cacheSize = Number(process.env.CACHE_SIZE) || 300;
 export class DataSourceMongoDb extends DataSourceMemory {
   constructor(datasource, factory, name) {
     super(datasource, factory, name);
-    this.loading = true;
+    this.url = url;
+    this.cacheSize = cacheSize;
   }
 
   /**
@@ -31,15 +32,12 @@ export class DataSourceMongoDb extends DataSourceMemory {
     this.connectDb()
       .then(() => this.setCollection())
       .then(() => this.loadModels())
-      .then(() => {
-        this.loading = false;
-      })
       .catch(e => console.error(e));
   }
 
   async connectDb() {
     if (!this.client) {
-      this.client = await MongoClient.connect(url, {
+      this.client = await MongoClient.connect(this.url, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
@@ -60,7 +58,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
 
   async loadModels() {
     try {
-      const cursor = this.collection.find().limit(cacheSize);
+      const cursor = this.collection.find().limit(this.cacheSize);
       cursor.forEach(model => super.save(model.id, this.hydrate(model)));
     } catch (error) {
       console.error(error);
