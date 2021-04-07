@@ -1,6 +1,6 @@
 {
     "authEnabled": false,
-    "oauthUri": "https://dev-2fe2iar6.us.auth0.com/oauth/token",
+    "oauthUri": "https://server.us.auth0.com/oauth/token",
     "client_id": "client1",
     "client_secret": "notell",
     "audience": "https://microlib.io/",
