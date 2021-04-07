@@ -22,14 +22,6 @@ Is there such an alternative? [Fowler](https://martinfowler.com/articles/microse
 
 While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this is no longer the case.
 
-So is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
-
-> "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
-
-While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they have not been considered a viable option (difficulty, labor intensitity, skills scarcity, etc). Whatever the reason, with the advent of module federation, this is no longer the case.
-
-> > > > > > > 374e5b4684b68a6a8326db5b9a255df655854939
-
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
 Using webpack dependency graphs, code splitting and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
