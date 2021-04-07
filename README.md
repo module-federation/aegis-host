@@ -8,19 +8,19 @@ Microservice Libraries
 
 Stop paying the "microservices premium".
 
-When evaluating microservices as a candidate architecture, the most important fact to consider is that you are building a distributed application. Microservices are the components of distributed applications - and distribution is what enables their chief virtue, deployment independence. Unfortunately, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
+When evaluating microservices as a candidate architecture, the most important fact to consider is that you are building a distributed application. Microservices are the components of distributed applications - and distribution is how you accomplish the main goal of microservices, deployment independence. Relative to the traditional alternative, monoliths, the trade-off is that distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
 
-This trade-off, dealing with the increased scope, cost and risk that stems from distribution, is called paying the "microservices premium". Sometimes the premium is well worth it. But in many cases it does more harm than good, leading many experts to advise against starting with microservices, but to instead introduce them gradually as scope or demand increases.
+Dealing with the increased scope, cost and risk that stems from distribution is called paying the "microservices premium". Sometimes the premium is well worth it. But in many cases it does more harm than good, leading experts to advise against starting with microservices, but instead introducing them gradually as scope or demand increases.
 
 That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
 
 _**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
-Is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
+So is there such an alternative? [Fowler](https://martinfowler.com/articles/microservices.html) describes the implicit premise behind the distribution/deployment trade-off:
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this is no longer the case.
+While technologies that support hot deployment have been around for some time (think [OSGi](https://www.osgi.org/)), it would appear they have not been considered a viable option (difficulty, labor intensitity, skills scarcity, etc). Whatever the reason, with the advent of module federation, this is no longer the case.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
@@ -160,7 +160,7 @@ npm start
 
 ### Datasource
 
-In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change to database default persistence. You can also update an individual model's datasource in the ModelSpec. 
+In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change to database default persistence. You can also update an individual model's datasource in the ModelSpec.
 
 ```shell
 brew install mongodb-community
