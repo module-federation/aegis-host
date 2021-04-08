@@ -76,9 +76,6 @@ function reloadCallback() {
       console.error(error);
     }
   });
-
-
-  ``
 }
 
 /**
