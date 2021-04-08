@@ -80,7 +80,7 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only is data federated, **but related objects can also be retrieved** and their methods invoked. Access to data and objects requires explicit permissions, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only is data federated, **but related objects can also be retrieved** and their methods invoked. Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
 
 ---
 
@@ -102,7 +102,7 @@ Ports also have an undo callback for implementing compensating logic. The framew
 
 ### Local & Remote Events
 
-In addition to in-memory function calls and ports, services can communicate with one another locally the same way they do remotely: by publishing and subscribing to events. Using locally shared events, microservice libraries are virtually as decoupled as they would be running remotely.
+In addition to in-memory function calls, federated objects and ports, services can communicate with one another locally the same way they do remotely: by publishing and subscribing to events. Using local events, microservice libraries are virtually as decoupled as they would be running remotely.
 
 The framework provides a common broker for local service events and injects pub/sub functions into each model:
 
