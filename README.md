@@ -47,11 +47,12 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Common broker for locally shared events
 - Persistence API for cached datasources
 - Datasource relations for federated schemas
+- Object broker for retrieving external model instances
 - Dependency/control inversion (IoC)
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Serverless "everwarm" deployment
+- Serverless "deployless" upgrade
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
