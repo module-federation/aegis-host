@@ -3,7 +3,7 @@
 /**
  * @typedef {import('../models').Model} Model
  */
-
+import Transaction from ".";
 import ModelFactory from "../models";
 import * as adapters from "./adapters";
 import {
@@ -74,12 +74,25 @@ const DataSourceFactory = (() => {
     dataSources.forEach(ds => ds.close());
   }
 
+  /**
+   * Manage transaction across models
+   * @param {import("../models/index").ports} ports
+   */
+  async function executeTransaction(models, updates) {
+    const transx = Transaction(models, updates);
+    transx
+      .update()
+      .then(tx => tx.commit())
+      .catch(e => console.log(e));
+  }
+
   return Object.freeze({
     /**
      * Get `DataSource` singleton
      * @returns {import('./datasource').default} DataSource singleton
      */
     getDataSource,
+    executeTransaction,
     close,
   });
 })();

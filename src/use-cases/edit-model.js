@@ -32,6 +32,16 @@ export default function editModelFactory({
 
   // Add an event that can be used to edit this model
   observer.on(domainEvents.editModel(eventName), editModelHandler);
+  // Add listener that broadcasts this edit to the master if running in cluster mode.
+  observer.on(eventName, eventData =>
+    process.send({
+      cmd: "saveBroadcast",
+      pid: process.pid,
+      id: eventData.model.getId(),
+      data: eventData.model,
+      name: modelName,
+    })
+  );
 
   async function editModel(id, changes, command) {
     const model = await repository.find(id);
