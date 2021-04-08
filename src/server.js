@@ -18,17 +18,24 @@ const Server = (() => {
   const port = process.env.PORT || "8070";
   const sslPort = process.env.SSL_PORT || "8707";
   const apiRoot = process.env.API_ROOT || "/microlib/api";
+  const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
   const modelPath = `${apiRoot}/models`;
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;
   const endpointCmd = e => `${modelPath}/${e}/:id/:command`;
 
-  const getRemoteModules = __non_webpack_require__("./remoteEntry")
-    .microlib.get("./models")
+  const remoteEntry = __non_webpack_require__("./remoteEntry");
+
+  const getRemoteModules = remoteEntry.microlib
+    .get("./models")
     .then(factory => {
       const Module = factory();
       return Module.initRemotes;
     });
+
+  const getRemoteEntries = remoteEntry.microlib
+    .get("./remoteEntries")
+    .then(factory => factory());
 
   function makeAdmin(app, adapter) {
     app.get(`${apiRoot}/config`, adapter(getConfig()));
@@ -58,25 +65,26 @@ const Server = (() => {
 
     const overrides = { save, find, Persistence };
 
-    getRemoteModules.then(initRemotes => {
-      console.log(initRemotes)
-      initRemotes(overrides).then(() => {
-        const cache = initCache();
+    getRemoteEntries.then(remotes => {
+      getRemoteModules.then(initRemotes => {
+        initRemotes(remotes, overrides).then(() => {
+          const cache = initCache();
 
-        make(endpoint, router, "post", postModels);
-        make(endpoint, router, "get", getModels);
-        make(endpointId, router, "get", getModelsById);
-        make(endpointId, router, "patch", patchModels);
-        make(endpointCmd, router, "patch", patchModels);
-        make(endpointId, router, "delete", deleteModels);
+          make(endpoint, router, "post", postModels);
+          make(endpoint, router, "get", getModels);
+          make(endpointId, router, "get", getModelsById);
+          make(endpointId, router, "patch", patchModels);
+          make(endpointCmd, router, "patch", patchModels);
+          make(endpointId, router, "delete", deleteModels);
 
-        console.timeEnd(label);
-        makeAdmin(router, http);
-        cache.load();
+          makeAdmin(router, http);
+          console.timeEnd(label);
+          cache.load();
 
-        console.log(`https://localhost:${sslPort}`);
-        console.log(`http://localhost:${port}`);
-        process.on("SIGTERM", () => close());
+          if (sslEnabled) console.log(`\nhttps://localhost:${sslPort} 🌎`);
+          else console.log(`\nhttp://localhost:${port} 🌎`);
+          process.on("SIGTERM", () => close());
+        });
       });
     });
   }

@@ -2,22 +2,22 @@
 
 import executeCommand from "./execute-command";
 import invokePort from "./invoke-port";
-import async from "@module-federation/aegis/esm/lib/async-error";
-import domainEvents from "@module-federation/aegis/esm/models/domain-events";
+import async from "../lib/async-error";
+import domainEvents from "../models/domain-events";
 
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName
- * @property {import('@module-federation/aegis/esm/models/model-factory').ModelFactory} models
+ * @property {import('../models/model-factory').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository
- * @property {import('@module-federation/aegis/esm/models/observer').Observer} observer
+ * @property {import('../models/observer').Observer} observer
  * @property {Function[]} handlers
  */
 
 /**
- * @typedef {function(ModelParam):Promise<import("@module-federation/aegis/esm/models").Model>} editModel
+ * @typedef {function(ModelParam):Promise<import("../models").Model>} editModel
  * @param {ModelParam} param0
- * @returns {function():Promise<import("@module-federation/aegis/esm/models/model").Model>}
+ * @returns {function():Promise<import("../models/model").Model>}
  */
 export default function editModelFactory({
   modelName,
@@ -32,6 +32,16 @@ export default function editModelFactory({
 
   // Add an event that can be used to edit this model
   observer.on(domainEvents.editModel(eventName), editModelHandler);
+  // Add listener that broadcasts this edit to the master if running in cluster mode.
+  observer.on(eventName, eventData =>
+    process.send({
+      cmd: "saveBroadcast",
+      pid: process.pid,
+      id: eventData.model.getId(),
+      data: eventData.model,
+      name: modelName,
+    })
+  );
 
   async function editModel(id, changes, command) {
     const model = await repository.find(id);

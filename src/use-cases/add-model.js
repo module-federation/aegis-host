@@ -1,20 +1,20 @@
 "use strict";
 
-import domainEvents from "@module-federation/aegis/esm/models/domain-events";
+import domainEvents from "../models/domain-events";
 
 /**
  * @typedef {Object} dependencies injected dependencies
  * @property {String} modelName - name of the domain model
- * @property {import('@module-federation/aegis/esm/models/model-factory').ModelFactory} models - model factory
+ * @property {import('../models/model-factory').ModelFactory} models - model factory
  * @property {import('../datasources/datasource').default} repository - persistence service
- * @property {import('@module-federation/aegis/esm/models/observer').Observer} observer - application events, propagated to domain
+ * @property {import('../models/observer').Observer} observer - application events, propagated to domain
  * @property {...Function} handlers - event handlers can be registered by the domain
  */
 
 /**
- * @typedef {function(ModelParam):Promise<import("@module-federation/aegis/esm/models").Model>} addModel
+ * @typedef {function(ModelParam):Promise<import("../models").Model>} addModel
  * @param {dependencies} param0
- * @returns {function():Promise<import('@module-federation/aegis/esm/models').Model>}
+ * @returns {function():Promise<import('../models').Model>}
  */
 export default function addModelFactory({
   modelName,
@@ -29,6 +29,16 @@ export default function addModelFactory({
 
   // Add an event whose callback invokes this factory.
   observer.on(domainEvents.addModel(eventName), addModel, false);
+  // Add listener that broadcasts the save to the cluster
+  observer.on(eventName, eventData =>
+    process.send({
+      cmd: "saveBroadcast",
+      pid: process.pid,
+      id: eventData.model.getId(),
+      data: eventData.model,
+      name: modelName,
+    })
+  );
 
   async function addModel(input) {
     const model = await models.createModel(

@@ -1,7 +1,7 @@
 "use strict";
 
-import async from "@module-federation/aegis/esm/lib/async-error";
-import checkAcl from "@module-federation/aegis/esm/lib/check-acl";
+import async from "../lib/async-error";
+import checkAcl from "../lib/check-acl";
 
 function portAuthorized(spec, port, permission) {
   return (
@@ -10,8 +10,8 @@ function portAuthorized(spec, port, permission) {
 }
 /**
  *
- * @param {import("@module-federation/aegis/esm/models/model-factory").ModelFactory} models
- * @param {import("@module-federation/aegis/esm/models/model").Model} model
+ * @param {import("../models/model-factory").ModelFactory} models
+ * @param {import("../models/model").Model} model
  * @param {{port:string}} query
  */
 export default async function invokePort(model, port, permission) {

@@ -1,11 +1,11 @@
 "use strict";
 
-import Serializer from "@module-federation/aegis/esm/lib/serializer";
+import Serializer from "../lib/serializer";
 import resumeWorkflow from "./resume-workflow";
 
 /**
- * @param {function(import("@module-federation/aegis/esm/models").Model)} loadModel
- * @param {import("@module-federation/aegis/esm/models/observer").Observer} observer
+ * @param {function(import("../models").Model)} loadModel
+ * @param {import("../models/observer").Observer} observer
  * @param {import("../datasources/datasource").default} repository
  * @returns {function(Map<string,Model>|Model)}
  */
@@ -31,18 +31,21 @@ function hydrateModels(loadModel, observer, repository) {
 function handleError(e) {
   console.error(e);
 }
-
+/**
+ *
+ * @param {import("../datasources/datasource").default} repository
+ */
 function handleRestart(repository) {
-  console.log("resuming workflow");
+  // console.log("resuming workflow", repository.name);
   repository.list().then(resumeWorkflow).catch(handleError);
 }
 
 /**
  * Factory returns function to unmarshal deserialized models
- * @typedef {import('@module-federation/aegis/esm/models').Model} Model
+ * @typedef {import('../models').Model} Model
  * @param {{
- *  models:import('@module-federation/aegis/esm/models/model-factory').ModelFactory,
- *  observer:import('@module-federation/aegis/esm/models/observer').Observer,
+ *  models:import('../models/model-factory').ModelFactory,
+ *  observer:import('../models/observer').Observer,
  *  repository:import('../datasources/datasource').default,
  *  modelName:string
  * }} options

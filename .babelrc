@@ -3,36 +3,10 @@
     [
       "@babel/preset-env",
       {
-        "modules": false,
-        "useBuiltIns": "usage",
-        "corejs": 3
+        "targets": {
+          "node": true
+        }
       }
-    ],
-  ],
-  "plugins": [
-    "@babel/plugin-proposal-optional-chaining"
-  ],
-  "env": {
-    "cjs": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "targets": {
-              "node": 12,
-              "browsers": [
-                ">0.23%",
-                "iOS >= 9",
-                "Chrome >= 63",
-                "safari >= 9",
-                "IE >= 11"
-              ]
-            },
-            "useBuiltIns": "usage",
-            "corejs": 3
-          }
-        ]
-      ]
-    }
-  }
+    ]
+  ]
 }

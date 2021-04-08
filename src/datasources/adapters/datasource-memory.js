@@ -1,4 +1,7 @@
+"use strict";
+
 import DataSource from "../datasource";
+const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 
 /**
  * Temporary in-memory storage
@@ -53,6 +56,10 @@ export class DataSourceMemory extends DataSource {
    * @override
    */
   async delete(id) {
+    this.dataSource.delete(id);
+  }
+
+  async clusterDelete(id) {
     this.dataSource.delete(id);
   }
 }

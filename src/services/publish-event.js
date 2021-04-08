@@ -1,10 +1,8 @@
-import log from "@module-federation/aegis/esm/lib/logger";
-
 export default async (event, observer) => {
   try {
-    const publishEvent = (await import("orderService/services")).publishEvent;
+    const publishEvent = (await import("microservices/services")).publishEvent;
     publishEvent(event, observer);
   } catch (error) {
-    log(error);
+    console.error(error);
   }
 };

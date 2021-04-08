@@ -1,10 +1,20 @@
 "use strict";
 
-import async from "@module-federation/aegis/esm/lib/async-error";
+import async from "../lib/async-error";
 
 export function save(service) {
   return async function ({ model }) {
     const result = await async(service.save(model));
+    if (result.ok) {
+      return result.data;
+    }
+    throw new Error(result.error);
+  };
+}
+
+export function remove(service) {
+  return async function ({ model }) {
+    const result = await async(service.delete(model));
     if (result.ok) {
       return result.data;
     }

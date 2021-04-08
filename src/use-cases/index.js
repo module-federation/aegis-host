@@ -8,8 +8,8 @@ import removeModelFactory from "./remove-model";
 import loadModelsFactory from "./load-models";
 import listConfigFactory from "./list-configs";
 import DataSourceFactory from "../datasources";
-import ObserverFactory from "@module-federation/aegis/esm/models/observer";
-import ModelFactory from "@module-federation/aegis/esm/models";
+import ObserverFactory from "../models/observer";
+import ModelFactory from "../models";
 import handleEvents from "./handle-events";
 
 handleEvents(ObserverFactory.getInstance());

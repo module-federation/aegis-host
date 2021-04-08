@@ -1,26 +1,28 @@
 'use strict'
 
 var assert = require('assert');
-const addModelFactory = require('../../src/use-cases/add-model')
-const postModelFactory = require('../../src/controllers/post-model')
-const DataSourceFactory = require('../../src/datasources')
-const ModelFactory = require('../../src/models');
-const ObserverFactory = require('../../src/lib/observer');
-const hash = require('@module-federation/aegis/lib/lib/hash')
+
+import addModelFactory from '../../src/use-cases/add-model'
+import postModelFactory from '../../src/controllers/post-model'
+
+import DataSourceFactory from '../../src/datasources'
+import ModelFactory from '../../src/models';
+import ObserverFactory from '../../src/lib/observer';
+import hash from '../../src/lib/hash'
 
 describe('Controllers', function () {
   describe('postModel()', function () {
     it('should add new model', async function () {
       ModelFactory.registerModel({
         modelName: 'ABC',
-        factory: ({a}) => ({a, b: 'c'}),
+        factory: ({ a }) => ({ a, b: 'c' }),
         endpoint: 'abcs',
         dependencies: {}
       });
       ModelFactory.registerEvent(
         ModelFactory.EventTypes.CREATE,
         'ABC',
-        (model) => ({model})
+        (model) => ({ model })
       );
       const addModel = await addModelFactory({
         modelName: 'ABC',
@@ -32,7 +34,7 @@ describe('Controllers', function () {
         addModel,
         ModelFactory.getModelId,
         hash
-      )({body: {a: 'a'}, headers: {'User-Agent': 'test'}, ip: '127.0.0.1'});
+      )({ body: { a: 'a' }, headers: { 'User-Agent': 'test' }, ip: '127.0.0.1' });
       assert.strictEqual(resp.statusCode, 201);
     });
   });

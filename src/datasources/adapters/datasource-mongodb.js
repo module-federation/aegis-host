@@ -14,13 +14,15 @@ const cacheSize = Number(process.env.CACHE_SIZE) || 300;
 export class DataSourceMongoDb extends DataSourceMemory {
   constructor(datasource, factory, name) {
     super(datasource, factory, name);
+    this.url = url;
+    this.cacheSize = cacheSize;
   }
 
   /**
    * @override
    * @param {{
-   *  hydrate:function(Map<string,import("@module-federation/aegis/esm/models").Model>),
-   *  serializer:import(@module-federation/aegis/esm/lib/serializer").Serializer
+   *  hydrate:function(Map<string,import("../../models").Model>),
+   *  serializer:import("../../lib/serializer").Serializer
    * }} options
    */
   load({ hydrate, serializer }) {
@@ -35,7 +37,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
 
   async connectDb() {
     if (!this.client) {
-      this.client = await MongoClient.connect(url, {
+      this.client = await MongoClient.connect(this.url, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
@@ -56,7 +58,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
 
   async loadModels() {
     try {
-      const cursor = this.collection.find().limit(cacheSize);
+      const cursor = this.collection.find().limit(this.cacheSize);
       cursor.forEach(model => super.save(model.id, this.hydrate(model)));
     } catch (error) {
       console.error(error);
@@ -145,7 +147,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
   async list(filter = null, cached = true) {
     try {
       if (cached) {
-        console.log("cache size", this.dataSource.size);
+        //console.log("cache size", this.dataSource.size);
         return super.list(filter);
       }
       return await this.collection.find().toArray();

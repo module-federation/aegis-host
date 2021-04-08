@@ -1,0 +1,8 @@
+{
+    "authEnabled": false,
+    "oauthUri": "https://server.us.auth0.com/oauth/token",
+    "client_id": "client1",
+    "client_secret": "notell",
+    "audience": "https://microlib.io/",
+    "grant_type": "client_credentials"
+}

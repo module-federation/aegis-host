@@ -1,20 +1,20 @@
 "use strict";
 
-import checkAcl from "@module-federation/aegis/esm/lib/check-acl";
-import async from "@module-federation/aegis/esm/lib/async-error";
-import domainEvents from "@module-federation/aegis/esm/models/domain-events";
+import checkAcl from "../lib/check-acl";
+import async from "../lib/async-error";
+import domainEvents from "../models/domain-events";
 
 const commandType = {
   /**
    *
-   * @param {function(import("@module-federation/aegis/esm/models/model").Model)} command
-   * @param {import("@module-federation/aegis/esm/models/model").Model} model
+   * @param {function(import("../models/model").Model)} command
+   * @param {import("../models/model").Model} model
    */
   function: async (command, model) => command(model),
   /**
    *
    * @param {string} command
-   * @param {import("@module-federation/aegis/esm/models/model").Model} model
+   * @param {import("../models/model").Model} model
    */
   string: async (command, model) => model[command](),
 };
@@ -30,7 +30,7 @@ function commandAuthorized(spec, command, permission) {
 
 /**
  *
- * @param {import("@module-federation/aegis/esm/models/model").Model} model
+ * @param {import("../models/model").Model} model
  * @param {command:string} command - name of command
  * @param {string} permission - permission of caller
  */

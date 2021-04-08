@@ -2,24 +2,23 @@
 
 require("dotenv").config();
 require("regenerator-runtime");
-const cluster = require("cluster");
 const importFresh = require("import-fresh");
-const express = require("express");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
-const app = require("./auth")(express(), "/microlib");
-const privateKey = fs.readFileSync("cert/server.key", "utf8");
-const certificate = fs.readFileSync("cert/domain.crt", "utf8");
-const credentials = { key: privateKey, cert: certificate };
-const clusterEnabled = process.env.CLUSTER_ENABLED || false;
-const port = process.env.PORT || 8070;
-const sslEnabled = process.env.SSL_ENABLED || true;
-const sslPort = process.env.SSL_PORT || 8707;
+const express = require("express");
+const cluster = require("./cluster");
+const graceful = require("express-graceful-shutdown");
+
+const port = process.env.PORT || 8707;
+const sslPort = process.env.SSL_PORT || 8070;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
-const workers = [];
-import "../webpack/remote-entries";
+const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
+const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
+
+// Optionally enable authorization
+const app = require("./auth")(express(), "/microlib");
 
 /**
  * Load federated server module. Call `clear` to delete non-webpack cache if
@@ -28,13 +27,12 @@ import "../webpack/remote-entries";
  *
  * @param {boolean} hot `true` to hot reload
  */
-async function startMicroLib(hot = false) {
+async function startMicroLib({ hot = false } = {}) {
   const remoteEntry = importFresh("./remoteEntry");
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
-
   if (hot) {
-    // clear cache on hot deloy
+    // clear cache on hot reload
     serverModule.default.clear();
   }
   serverModule.default.start(app);
@@ -51,129 +49,76 @@ function clearRoutes() {
 }
 
 /**
- *
+ * Control hot reload differently depending on cluster mode.
  */
 function reloadCallback() {
+  // Manual reset if left in wrong stated
+  app.use(`${reloadPath}-reset`, function (req, res) {
+    process.send({ cmd: "reload-reset" });
+    res.send("reload status reset...try again");
+  });
+
   if (clusterEnabled) {
-    return async function reloadCluster(req, res) {
+    app.use(reloadPath, async function (req, res) {
       res.send("<h1>starting cluster reload</h1>");
-      //process.send("request cluster reload");
-    };
+      process.send({ cmd: "reload" });
+    });
+    return;
   }
 
-  return async function reload(req, res) {
+  app.use(reloadPath, async function (req, res) {
     try {
       clearRoutes();
-      await startMicroLib(true);
+      await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");
     } catch (error) {
       console.error(error);
     }
-  };
+  });
 }
 
 /**
- * Trigger a hot reload:
- * clear routes,d
- * reimport server & remotes
- * clear non-webpack cache.
- * @param {*} req
- * @param {*} res
+ * Start web server, optionally require secure socket.
  */
-async function reload(req, res) {
-  try {
-    clearRoutes();
-    await startMicroLib(true);
-    res.send("<h1>hot reload complete</h1>");
-  } catch (error) {
-    console.error(error);
+function startWebServer() {
+  if (sslEnabled) {
+    const key = fs.readFileSync("cert/server.key", "utf8");
+    const cert = fs.readFileSync("cert/domain.crt", "utf8");
+    const httpsServer = https.createServer({ key, cert }, app);
+    app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
+
+    httpsServer.listen(sslPort, function () {
+      console.info(`\n🌎 https://localhost:${sslPort} 🌎\n`);
+    });
+    return;
   }
+  const httpServer = http.createServer(app);
+  app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
+
+  httpServer.listen(port, function () {
+    console.info(`\n🌎 https://localhost:${port} 🌎\n`);
+  });
 }
 
 /**
- *
+ * Handle options and start the server.
+ * Options:
+ * https or http,
+ * authorization (via jwt and auth0) enabled or disabled
+ * clustered or single process,
+ * hot reload via rolling restart or deleting cache
  */
 function startService() {
-  /**
-   * Run either http or https,
-   * see .env var SSL_ENABLED
-   */
   startMicroLib().then(() => {
     app.use(express.json());
     app.use(express.static("public"));
-    app.use(reloadPath, reloadCallback());
-    const httpsServer = https.createServer(credentials, app);
-    const httpServer = http.createServer(app);
-
-    if (sslEnabled) {
-      httpsServer.listen(sslPort, () => {
-        console.info(
-          `\nMicroLib listening on secure port https://localhost:${sslPort} 🌎\n`
-        );
-      });
-      return;
-    }
-
-    httpServer.listen(port, () => {
-      console.info(
-        `\nMicroLib listening on port https://localhost:${port} 🌎\n`
-      );
-    });
+    reloadCallback();
+    startWebServer();
   });
 }
 
-/**
- * Setup number of worker processes to share port which will be defined while setting up server
- */
-function setupWorkerProcesses() {
-  // to read number of cores on system
-  let numCores = require("os").cpus().length;
-  console.log(`Master cluster setting up ${numCores} workers`);
-
-  // iterate on number of cores need to be utilized by an application
-  // current example will utilize all of them
-  for (let i = 0; i < numCores; i++) {
-    // creating workers and pushing reference in an array
-    // these references can be used to receive messages from workers
-    workers.push(cluster.fork());
-
-    // to receive messages from worker process
-    workers[i].on("message", function (message) {
-      console.log(message);
-    });
-  }
-
-  // process is clustered on a core and process id is assigned
-  cluster.on("online", function (worker) {
-    console.log(`Worker ${worker.process.pid} is listening`);
-  });
-
-  // if any of the worker process dies then start a new one by simply forking another one
-  cluster.on("exit", function (worker, code, signal) {
-    console.log(
-      `Worker ${worker.process.pid} died with code: ${code} and signal: signal`
-    );
-    console.log("Starting a new worker");
-    cluster.fork();
-    workers.push(cluster.fork());
-    // to receive messages from worker process
-    workers[workers.length - 1].on("message", function (message) {
-      console.log(message);
-    });
-  });
+if (clusterEnabled) {
+  cluster.startCluster(startService);
+} else {
+  startService();
 }
-
-/**
- * Setup server either with clustering or without it
-\*/
-function setupServer() {
-  // if it is a master process then call setting up worker process
-  if (clusterEnabled && cluster.isMaster) {
-    setupWorkerProcesses();
-  } else {
-    // to setup server configurations and share port address for incoming requests
-    startService();
-  }
-}
-
-setupServer();

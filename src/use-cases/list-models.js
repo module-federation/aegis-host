@@ -1,28 +1,32 @@
 "use strict";
 
+function parseDate(dateStr) {
+  return new Date(Date.parse(dateStr)).getDate();
+}
+
+function parseMonth(dateStr) {
+  return new Date(Date.parse(dateStr)).getMonth();
+}
+
 const DateFunctions = {
   today: list =>
-    list.filter(
-      m => new Date(Date.parse(m.createTime)).getDate() == new Date().getDate()
-    ).length,
+    list.filter(m => parseDate(m.createTime) == new Date().getDate()).length,
   yesterday: list =>
-    list.filter(
-      m =>
-        new Date(Date.parse(m.createTime)).getDate() == new Date().getDate() - 1
-    ).length,
+    list.filter(m => parseDate(m.createTime) == new Date().getDate() - 1)
+      .length,
   thisMonth: list =>
-    list.filter(
-      m =>
-        new Date(Date.parse(m.createTime)).getMonth() == new Date().getMonth()
-    ).length,
+    list.filter(m => parseMonth(m.createTime) == new Date().getMonth()).length,
   lastMonth: list =>
-    list.filter(
-      m =>
-        new Date(Date.parse(m.createTime)).getMonth() ==
-        new Date().getMonth() - 1
-    ).length,
+    list.filter(m => parseMonth(m.createTime) == new Date().getMonth() - 1)
+      .length,
 };
 
+/**
+ *
+ * @param {*} query
+ * @param {import("../datasources/datasource").default} repository
+ * @returns
+ */
 async function parseQuery(query, repository) {
   if (query?.count) {
     const dateFunc = DateFunctions[query.count];
@@ -47,7 +51,9 @@ async function parseQuery(query, repository) {
     }
 
     return {
-      count: (await repository.list(null, false)).length,
+      total: (await repository.list(null, false)).length,
+      cached: repository.getCacheSize(),
+      bytes: repository.getCacheSizeBytes(),
     };
   }
   return repository.list(query);
