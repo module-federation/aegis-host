@@ -1,2 +1,2 @@
-export * from "./http-adapter";
-export * from "./persistence-adapter";
+export * from "@module-federation/aegis/esm/adapters/http-adapter";
+export * from "@module-federation/aegis/esm/adapters/persistence-adapter";

@@ -1,6 +1,6 @@
 "use strict";
 
-import DataSource from "../datasource";
+import DataSource from "@module-federation/aegis/esm/datasources/datasource";
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 
 /**

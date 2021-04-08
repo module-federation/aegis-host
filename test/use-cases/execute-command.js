@@ -6,7 +6,7 @@ import checkAcl from "@module-federation/aegis/esm/lib/check-acl";
 
 const {
   default: executeCommand,
-} = require("../../src/use-cases/execute-command");
+} = require("@module-federation/aegis/lib/use-cases/execute-command");
 
 describe("executeCommand()", function () {
   it("should add new model", async function () {
