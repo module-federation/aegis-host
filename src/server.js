@@ -10,7 +10,7 @@ import {
   getConfig,
 } from "./controllers";
 
-import { Persistence } from "./services/persistence-service";
+import { Persistence } from "@module-federation/aegis/esm/services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 

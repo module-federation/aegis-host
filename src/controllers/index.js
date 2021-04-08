@@ -8,14 +8,14 @@ import {
   removeModels,
   loadModels,
   listConfigs,
-} from "../use-cases";
+} from "@module-federation/aegis/esm/use-cases";
 import postModelFactory from "./post-model";
 import patchModelFactory from "./patch-model";
 import getModelsFactory from "./get-models";
-import getModelByIdFactory from "./get-model-by-id";
-import deleteModelFactory from "./delete-model";
-import getConfigFactory from "./get-config";
-import hash from "../lib/hash";
+import getModelByIdFactory from "@module-federation/aegis/esm/controllers/get-model-by-id";
+import deleteModelFactory from "@module-federation/aegis/esm/controllers/delete-model";
+import getConfigFactory from "@module-federation/aegis/esm/controllers/get-config";
+import hash from "@module-federation/aegis/esm/lib/hash";
 
 function make(useCases, controllerFactory) {
   return useCases().map(uc => ({

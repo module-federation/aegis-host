@@ -134,14 +134,14 @@
  * @property {accessControlList} [accessControlList] - configure authorization
  */
 
-import ModelFactory from "./model-factory";
-import makeAdapters from "./make-adapters";
+import ModelFactory from "@module-federation/aegis/esm/models/model-factory";
+import makeAdapters from "@module-federation/aegis/esm/models/make-adapters";
 
 import {
   importRemoteModels,
   importRemoteServices,
   importRemoteAdapters,
-} from "../services/federation-service";
+} from "@module-federation/aegis/esm/services/federation-service";
 
 /**
  *
