@@ -4,7 +4,7 @@
  * @typedef {import('../models').Model} Model
  */
 import Transaction from ".";
-import ModelFactory from "../models";
+import ModelFactory from "@module-federation/aegis/esm/models";
 import * as adapters from "./adapters";
 import {
   DataSourceFile,

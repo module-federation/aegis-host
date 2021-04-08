@@ -4,7 +4,7 @@ var assert = require('assert');
 
 import addModelFactory from '../../src/use-cases/add-model'
 import DataSourceFactory from '../../src/datasources'
-import ModelFactory from '../../src/models';
+import ModelFactory from '@module-federation/aegis/lib/models';
 import ObserverFactory from '../../src/lib/observer';
 
 describe('Use-Cases', function () {

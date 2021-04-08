@@ -1,3 +1,0 @@
-/**
- * Manage transaction across ports.
- */

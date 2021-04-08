@@ -2,7 +2,8 @@
 
 var assert = require('assert');
 
-import ModelFactory from '../../src/models'
+import ModelFactory from '@module-federation/aegis/lib/models';
+
 
 describe('ModelFactory', function () {
   describe('#createModel()', function () {
