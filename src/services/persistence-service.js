@@ -12,6 +12,6 @@ export const Persistence = {
   },
 
   close() {
-    DataSource.close();
+    DataSource.getFactory().close();
   },
 };

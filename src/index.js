@@ -50,7 +50,6 @@ function clearRoutes() {
 
 /**
  * Control hot reload differently depending on cluster mode.
- * @returns {function(req,res)} cluster or single proc reload
  */
 function reloadCallback() {
   // Manual reset if left in wrong stated
