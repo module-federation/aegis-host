@@ -83,7 +83,7 @@ The framework automatically persists domain models as JSON documents using the d
 A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only is data federated, **but related objects can also be retrieved** and their methods invoked. 
 ```js
 const customer = order.customer(); // relation defined in ModelSpec
-const mobileNumber = customer.decrypt().mobile;
+const creditCard = customer.decrypt().creditCardNumber;
 ```
 Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
 
