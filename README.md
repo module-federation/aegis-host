@@ -80,7 +80,7 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only is data federated, **but related objects can also be retrieved** and their methods invoked. 
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only is data federated, **but so are the domain models and their inbound ports**. 
 ```js
 const customer = order.customer(); // relation defined in ModelSpec
 const creditCard = customer.decrypt().creditCardNumber;
