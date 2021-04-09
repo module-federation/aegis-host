@@ -10,7 +10,6 @@ Stop paying the "microservices premium".
 
 When evaluating microservices as a candidate architecture, the most important fact to consider is that you are building a distributed application. Microservices are the components of distributed applications - and distribution is what enables their chief virtue, deployment independence. Unfortunately, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
 
-
 This trade-off, dealing with the increased scope, cost and risk that stems from distribution, is called paying the "microservices premium". Sometimes the premium is well worth it. But in many cases it does more harm than good, leading many experts to advise against starting with microservices, but to instead introduce them gradually as scope or demand increases.
 
 That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
@@ -24,7 +23,6 @@ Is there such an alternative? [Fowler](https://martinfowler.com/articles/microse
 While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this is no longer the case.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
-
 
 Using webpack dependency graphs, code splitting and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration, promote composability and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate, so intra- and interprocess communication is transparent. E.g. whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
 
@@ -82,12 +80,14 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only are data federated, **but so are related domain models**. 
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only are data federated, **but so are related domain models**.
+
 ```js
 const customer = order.customer(); // relation `customer` defined in ModelSpec
 
 const creditCard = customer.decrypt().creditCardNumber;
 ```
+
 Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
 
 ---
@@ -243,7 +243,9 @@ SSL_ENABLED=true
 
 ![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
 
----
+### Reference Architecture
+
+## ![refarch](https://github.com/module-federation/MicroLib/blob/master/wiki/MicroLib.gif)
 
 ## Further Reading
 
