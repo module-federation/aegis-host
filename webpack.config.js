@@ -1,6 +1,8 @@
 const path = require("path");
 const ModuleFederationPlugin = require("webpack").container
   .ModuleFederationPlugin;
+const CopyPlugin = require("copy-webpack-plugin");
+
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
 require("dotenv").config();
@@ -41,6 +43,13 @@ module.exports = () => {
           ],
         },
         plugins: [
+            new CopyPlugin({
+                patterns: [
+                    {from: require.resolve('@module-federation/aegis/src/cluster.js'), to: "."},
+                    {from: require.resolve('@module-federation/aegis/src/index.js'), to: "."},
+                    {from: require.resolve('@module-federation/aegis/src/auth.js'), to: "."},
+                ],
+            }),
           new ModuleFederationPlugin({
             name: "microlib",
             filename: "remoteEntry.js",
