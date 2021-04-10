@@ -20,7 +20,7 @@
     "demo": "open http://localhost:8707",
     "demo-ssl": "open https://localhost:8070",
     "refresh-token": "./accessToken.sh",
-    "hot-reload-reset": "curl https://localhost:8070/microlib/reload-reset"
+    "hot-reload-reset": "curl http://localhost:8707/microlib/reload-reset"
   },
   "author": "Tyson Midboe",
   "license": "MIT",
