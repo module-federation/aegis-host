@@ -24,7 +24,7 @@ While technologies that support hot deployment have been around for some time (s
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
-Using webpack dependency graphs, code splitting and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate. Whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
+Using webpack dependency graphs, code splitting and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration, promote composability and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate, so intra- and interprocess communication is transparent. E.g. whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
 
 With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium altogether by building truly modular and independently deployable component libraries that run together in the same process (or cluster of processes), in what you might call a _"polylith"_ - a monolith comprised of multiple (what would otherwise be) microservices.
 
@@ -80,12 +80,14 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
 
-A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only are data federated, **but so are related domain models**. 
+A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only are data federated, **but so are related domain models**.
+
 ```js
 const customer = order.customer(); // relation `customer` defined in ModelSpec
 
 const creditCard = customer.decrypt().creditCardNumber;
 ```
+
 Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
 
 ---
@@ -154,6 +156,22 @@ echo "KAFKA_GROUP_ID=host" > .env
 echo "ENCRYPTION_PWD=secret" >> .env
 echo "DATASOURCE_ADAPTER=DataSourceFile" >> .env
 npm run build
+```
+
+### Example Env File
+```
+NODE_ENV=dev
+CLUSTER_ENABLED=true
+AUTH_ENABLED=disable
+SSL_ENABLED=false
+SSL_PORT=8070
+PORT=8707
+API_ROOT=/microlib/api
+CACHE_SIZE=2000
+KAFKA_GROUP_ID=microlib-host
+ENCRYPTION_PWD=aegis
+DATASOURCE_ADAPTER=DataSourceFile
+MONGODB_URL=mongodb://localhost:27017
 ```
 
 Start the services:
@@ -241,7 +259,9 @@ SSL_ENABLED=true
 
 ![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
 
----
+### Reference Architecture
+
+## ![refarch](https://github.com/module-federation/MicroLib/blob/master/wiki/MicroLib.gif)
 
 ## Further Reading
 
