@@ -158,6 +158,22 @@ echo "DATASOURCE_ADAPTER=DataSourceFile" >> .env
 npm run build
 ```
 
+### Example Env File
+```
+NODE_ENV=dev
+CLUSTER_ENABLED=true
+AUTH_ENABLED=disable
+SSL_ENABLED=false
+SSL_PORT=8070
+PORT=8707
+API_ROOT=/microlib/api
+CACHE_SIZE=2000
+KAFKA_GROUP_ID=microlib-host
+ENCRYPTION_PWD=aegis
+DATASOURCE_ADAPTER=DataSourceFile
+MONGODB_URL=mongodb://localhost:27017
+```
+
 Start the services:
 
 ```shell
