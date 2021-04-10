@@ -2,13 +2,13 @@
 
 var assert = require('assert');
 
-import addModelFactory from '@module-federation/aegis/esm/use-cases/add-model'
-import postModelFactory from '@module-federation/aegis/esm/controllers/post-model'
+import addModelFactory from '@module-federation/aegis/lib/use-cases/add-model'
+import postModelFactory from '@module-federation/aegis/lib/controllers/post-model'
 
 import DataSourceFactory from '@module-federation/aegis/lib/datasources'
 import ModelFactory from '@module-federation/aegis/lib/models';
 import ObserverFactory from '@module-federation/aegis/lib/models/observer';
-import hash from '@module-federation/aegis/esm/lib/hash'
+import hash from '@module-federation/aegis/lib/lib/hash'
 
 describe('Controllers', function () {
   describe('postModel()', function () {

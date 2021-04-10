@@ -2,10 +2,10 @@
 
 var assert = require('assert');
 
-import addModelFactory from '@module-federation/aegis/esm/use-cases/add-model'
-import DataSourceFactory from '@module-federation/aegis/esm/datasources'
+import addModelFactory from '@module-federation/aegis/lib/use-cases/add-model'
+import DataSourceFactory from '@module-federation/aegis/lib/datasources'
 import ModelFactory from '@module-federation/aegis/lib/models';
-import ObserverFactory from '@module-federation/aegis/esm/models/observer';
+import ObserverFactory from '@module-federation/aegis/lib/models/observer';
 
 describe('Use-Cases', function () {
   describe('addModel()', function () {
