@@ -3,7 +3,7 @@ const ModuleFederationPlugin = require("webpack").container
   .ModuleFederationPlugin;
 const CopyPlugin = require("copy-webpack-plugin");
 
-const fetchRemotes = require("./webpack/fetch-remotes");
+const fetchRemotes = require("@module-federation/aegis/webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
 require("dotenv").config();
 
@@ -45,9 +45,9 @@ module.exports = () => {
         plugins: [
             new CopyPlugin({
                 patterns: [
-                    {from: require.resolve('@module-federation/aegis/src/cluster.js'), to: "."},
-                    {from: require.resolve('@module-federation/aegis/src/index.js'), to: "."},
-                    {from: require.resolve('@module-federation/aegis/src/auth.js'), to: "."},
+                    {from: require.resolve('@module-federation/aegis/lib/cluster.js'), to: "."},
+                    {from: require.resolve('@module-federation/aegis/lib/index.js'), to: "."},
+                    {from: require.resolve('@module-federation/aegis/lib/auth.js'), to: "."},
                 ],
             }),
           new ModuleFederationPlugin({
