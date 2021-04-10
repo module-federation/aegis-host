@@ -1,12 +1,12 @@
 var assert = require("assert");
-import DataSourceFactory from "../../src/datasources";
-import ObserverFactory from "../../src/lib/observer";
-import ModelFactory from "../../src/models/model-factory";
-import checkAcl from "../../src/lib/check-acl";
+import DataSourceFactory from "@module-federation/aegis/esm/datasources";
+import ObserverFactory from "@module-federation/aegis/esm/models/observer";
+import ModelFactory from "@module-federation/aegis/esm/models/model-factory";
+import checkAcl from "@module-federation/aegis/esm/lib/check-acl";
 
 const {
   default: executeCommand,
-} = require("../../src/use-cases/execute-command");
+} = require("@module-federation/aegis/lib/use-cases/execute-command");
 
 describe("executeCommand()", function () {
   it("should add new model", async function () {

@@ -8,11 +8,11 @@ import {
   deleteModels,
   initCache,
   getConfig,
-} from "./controllers";
+} from "@module-federation/aegis/esm/controllers";
 
-import { Persistence } from "./services/persistence-service";
-import { save, find, close } from "./adapters/persistence-adapter";
-import http from "./adapters/http-adapter";
+import { Persistence } from "@module-federation/aegis/esm/services/persistence-service";
+import { save, find, close } from "@module-federation/aegis/esm//adapters/persistence-adapter";
+import http from "@module-federation/aegis/esm/adapters/http-adapter";
 
 const Server = (() => {
   const port = process.env.PORT || "8070";
