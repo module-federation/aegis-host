@@ -36,13 +36,13 @@
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
-    "copy-webpack-plugin": "^8.1.1",
     "@babel/cli": "^7.11.6",
     "@babel/core": "^7.11.0",
     "@babel/node": "^7.10.5",
     "@babel/polyfill": "^7.11.5",
     "@babel/preset-env": "^7.11.0",
     "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^8.1.1",
     "esm": "^3.2.25",
     "express-cli": "0.0.1",
     "mocha": "^8.2.0",
