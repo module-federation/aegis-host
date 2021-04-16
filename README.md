@@ -41,7 +41,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Dynamic port generation for federated modules
 - Dynamic port-adapter binding
 - Dynamic adapter-service binding
-- [Hot reload of federated modules](#zero-downtime---zero-install-deployment-api-generation)
+- [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
 - Built-in error handling (circuit breaker, undo)
@@ -53,7 +53,8 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Serverless "deployless" fast spinup
+- Vendor-agnostic serverless deployment (no vendor lock-in)
+- Faster serverless deployment
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
