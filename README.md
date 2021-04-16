@@ -44,6 +44,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Hot reload of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
+- Built-in error handling (circuit breaker, undo)
 - Common broker for locally shared events
 - Persistence API for cached datasources
 - Datasource relations for federated schemas and objects
