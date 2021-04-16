@@ -62,7 +62,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 
 ---
 
-![Components](https://github.com/tysonrm/MicroLib/blob/master/doc/port-adapter.png)
+![Components](doc/port-adapter.png)
 
 ## Components
 
@@ -76,7 +76,7 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 ---
 
-![Persistence](https://github.com/tysonrm/MicroLib/blob/master/doc/persistence.png)
+![Persistence](doc/persistence.png)
 
 ## Persistence
 
@@ -94,7 +94,7 @@ Access to data and objects requires explicit permission, otherwise services cann
 
 ---
 
-![Eventing](https://github.com/tysonrm/MicroLib/blob/master/doc/eventing.png)
+![Eventing](doc/eventing.png)
 
 ## Integration
 
@@ -126,7 +126,7 @@ Local events can also be forwarded to remote event targets. Like any external in
 
 ---
 
-![Workflow](https://github.com/tysonrm/MicroLib/blob/master/doc/workflow.png)
+![Workflow](doc/workflow.png)
 
 ## Orchestration
 
@@ -239,16 +239,16 @@ SSL_ENABLED=true
 
 ### Installation
 
-![install](https://github.com/module-federation/MicroLib/blob/master/doc/microlib-install-4k.gif)
+![install](doc/microlib-install-4k.gif)
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
-![hotreload](https://github.com/module-federation/MicroLib/blob/master/doc/hot-reload.gif)
+![hotreload](doc/hot-reload.gif)
 
 ### Reference Architecture
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
-## ![refarch](https://github.com/module-federation/MicroLib/blob/master/doc/MicroLib.gif)
+## ![refarch](doc/MicroLib.gif)
 
 ## Further Reading
 
