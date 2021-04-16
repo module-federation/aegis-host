@@ -1,4 +1,4 @@
-![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/doc/microlib.png)
+![MicroLib](doc/microlib.png)
 
 # MicroLib <sub><sup>codename _Aegis_</sup></sub>
 
