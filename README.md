@@ -1,4 +1,4 @@
-![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/wiki/microlib.png)
+![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/doc/microlib.png)
 
 # MicroLib <sub><sup>codename _Aegis_</sup></sub>
 
@@ -60,7 +60,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 
 ---
 
-![Components](https://github.com/tysonrm/MicroLib/blob/master/wiki/port-adapter.png)
+![Components](https://github.com/tysonrm/MicroLib/blob/master/doc/port-adapter.png)
 
 ## Components
 
@@ -74,7 +74,7 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 ---
 
-![Persistence](https://github.com/tysonrm/MicroLib/blob/master/wiki/persistence.png)
+![Persistence](https://github.com/tysonrm/MicroLib/blob/master/doc/persistence.png)
 
 ## Persistence
 
@@ -92,7 +92,7 @@ Access to data and objects requires explicit permission, otherwise services cann
 
 ---
 
-![Eventing](https://github.com/tysonrm/MicroLib/blob/master/wiki/eventing.png)
+![Eventing](https://github.com/tysonrm/MicroLib/blob/master/doc/eventing.png)
 
 ## Integration
 
@@ -124,7 +124,7 @@ Local events can also be forwarded to remote event targets. Like any external in
 
 ---
 
-![Workflow](https://github.com/tysonrm/MicroLib/blob/master/wiki/workflow.png)
+![Workflow](https://github.com/tysonrm/MicroLib/blob/master/doc/workflow.png)
 
 ## Orchestration
 
@@ -237,15 +237,15 @@ SSL_ENABLED=true
 
 ### Installation
 
-![install](https://github.com/module-federation/MicroLib/blob/master/wiki/microlib-install-4k.gif)
+![install](https://github.com/module-federation/MicroLib/blob/master/doc/microlib-install-4k.gif)
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
-![hotreload](https://github.com/module-federation/MicroLib/blob/master/wiki/hot-reload.gif)
+![hotreload](https://github.com/module-federation/MicroLib/blob/master/doc/hot-reload.gif)
 
 ### Reference Architecture
 
-## ![refarch](https://github.com/module-federation/MicroLib/blob/master/wiki/MicroLib.gif)
+## ![refarch](https://github.com/module-federation/MicroLib/blob/master/doc/MicroLib.gif)
 
 ## Further Reading
 

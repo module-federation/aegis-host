@@ -138,7 +138,7 @@ const Model = (() => {
       // User mixins
       ...compose(...mixins)(model),
 
-      // Generate functions to fetch related objects
+      // Generate functions to fetch related models
       ...makeRelations(relations, datasource),
 
       // Generate port functions to handle domain I/O
@@ -381,7 +381,7 @@ const Model = (() => {
 
   // Recreate model from deserialized object
   const loadModel = pipe(
-    make, 
+    make,
     withSerializers(
       fromSymbol(keyMap),
       fromTimestamp(["createTime", "updateTime"])

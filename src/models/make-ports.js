@@ -3,9 +3,10 @@
 import portHandler from "./port-handler";
 import async from "../lib/async-error";
 import domainEvents from "./domain-events";
+import CircuitBreaker from "./circuit-breaker";
 
-const TIMEOUT_SECONDS = 60;
-const MAX_RETRY = 5;
+const TIMEOUTSECONDS = 60;
+const MAXRETRY = 5;
 
 function getTimerArgs(args) {
   const timerArg = { calledByTimer: new Date().toUTCString() };
@@ -14,7 +15,9 @@ function getTimerArgs(args) {
 }
 
 /**
- * Add member to tracking array
+ *
+ * @param {*} args
+ * @returns
  */
 function getRetries(args) {
   const timerArgs = getTimerArgs(args);
@@ -36,8 +39,8 @@ function setPortTimeout(options) {
   const { portConf, portName, model, args } = options;
   const handler = portConf.timeoutCallback;
   const noTimer = portConf.timeout === 0;
-  const timeout = (portConf.timeout || TIMEOUT_SECONDS) * 1000;
-  const maxRetry = portConf.maxRetry || MAX_RETRY;
+  const timeout = (portConf.timeout || TIMEOUTSECONDS) * 1000;
+  const maxRetry = portConf.maxRetry || MAXRETRY;
   const timerArgs = getRetries(args);
 
   const noOp = {
@@ -62,7 +65,7 @@ function setPortTimeout(options) {
     // Invoke optional custom handler
     if (handler) handler(options);
 
-    // Count retries by adding to an array passed on the stack 
+    // Count retries by adding to an array passed on the stack
     await model[portName](...timerArgs.nextArg);
 
     // Retry worked
@@ -182,47 +185,68 @@ export default function makePorts(ports, adapters, observer) {
         disabled
       );
 
-      return {
-        // The port function
-        async [port](...args) {
-          // Don't run if port is disabled
-          if (disabled) {
+      /**
+       *
+       * @param  {...any} args
+       * @returns
+       */
+      async function portFn(...args) {
+        // Don't run if port is disabled
+        if (disabled) {
+          return;
+        }
+
+        // Handle port timeouts
+        const timer = setPortTimeout({
+          portName,
+          portConf,
+          model: this,
+          args,
+        });
+
+        try {
+          // Call the adapter and wait
+          const model = await adapters[port]({ model: this, port, args });
+
+          // Stop the timer
+          timer.stopTimer();
+
+          // Remember what ports we called for undo and restart
+          const saved = await updatePortFlow(model, port, rememberPort);
+
+          // Signal the next port to run.
+          if (rememberPort) {
+            await saved.emit(portConf.producesEvent, portName);
+          }
+
+          return saved;
+        } catch (error) {
+          console.error({ file: __filename, func: port, args, error });
+
+          // Is the timer still running?
+          if (timer.expired()) {
+            // Try to back out previous transactions.
+            await async(this.undo());
             return;
           }
 
-          // Handle port timeouts
-          const timer = setPortTimeout({
-            portName,
-            portConf,
-            model: this,
-            args,
-          });
+          throw new Error("error calling port", error, port);
+        }
+      }
 
-          try {
-            // Call the adapter and wait
-            const model = await adapters[port]({ model: this, port, args });
-
-            // Stop the timer
-            timer.stopTimer();
-
-            // Remember what ports we called for undo and restart
-            const updated = await updatePortFlow(model, port, rememberPort);
-
-            // Signal the next port to run.
-            if (rememberPort) {
-              await updated.emit(portConf.producesEvent, portName);
-            }
-
-            return updated;
-          } catch (error) {
-            console.error({ file: __filename, func: port, args, error });
-
-            // Is the timer still running?
-            if (timer.expired()) {
-              // Try to back out previous transactions.
-              const result = await async(this.undo());
-            }
+      return {
+        // The port function
+        async [port](...args) {
+          const config = portConf.circuitBreaker;
+          // check if the port requires a breaker
+          if (config) {
+            // wrap port call in circuit breaker
+            const breaker = CircuitBreaker(port, portFn, config);
+            // invoke port with circuit breaker failsafe
+            return breaker.invoke.apply(this, args);
           }
+          // no breaker
+          return portFn.apply(this, args);
         },
       };
     })

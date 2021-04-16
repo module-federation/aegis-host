@@ -30,6 +30,18 @@
  */
 
 /**
+ * @typedef threshold
+ * @property {number} errorRate
+ * @property {number} callVolume
+ */
+
+/**
+ * @typedef {{
+ *  [x: string]: threshold
+ * }} circuitBreaker
+ */
+
+/**
  * @typedef {{
  *  [x: string]: {
  *    service?: service,
@@ -40,10 +52,11 @@
  *    errorCallback?: function({model: Model, port: string, error:Error}),
  *    timeoutCallback?: function({model: Model, port: string}),
  *    type?:'inbound'|'outbound',
- *    disabled?: boolean
+ *    disabled?: boolean,
  *    adapter?: string,
- *    retries?: number
- *    undo: function(Model, port)
+ *    retries?: number,
+ *    undo: function(Model, port),
+ *    circuitBreaker: circuitBreaker
  *  }
  * }} ports - input/output ports for the domain
  */
