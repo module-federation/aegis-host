@@ -54,6 +54,7 @@ function setPortTimeout(options) {
 
   if (timerArgs.count > maxRetry) {
     console.warn("max retries reached", timerArgs);
+    model.emit(domainEvents.portRetryFailed(model), options);
     return noOp;
   }
 

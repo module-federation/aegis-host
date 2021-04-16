@@ -70,9 +70,15 @@ const CircuitBreaker = function (id, protectedCall, options) {
     return State.Closed;
   }
 
-  function appendLog(error) {
+  function appendLog(state, error = null, testDelay = 30000) {
     const log = fetchLog();
-    log.push({ time: Date.now(), name: id, error });
+    log.push({ name: id, time: Date.now(), state, error, testDelay });
+  }
+
+  function testTime() {
+    const log = fetchLog();
+    const lastEntry = log[log.length - 1];
+    return Date.now() - lastEntry.time > lastEntry.testDelay;
   }
 
   /**
@@ -120,7 +126,7 @@ const CircuitBreaker = function (id, protectedCall, options) {
     async invoke(...args) {
       const breaker = Switch();
 
-      appendLog();
+      appendLog(breaker.state);
 
       // check breaker status
       if (breaker.closed()) {
@@ -130,7 +136,16 @@ const CircuitBreaker = function (id, protectedCall, options) {
           if (thresholdBreached(error)) {
             breaker.trip();
           }
-          appendLog(error);
+          appendLog(breaker.state, error);
+          return this;
+        }
+      }
+
+      if (breaker.open()) {
+        if (testTime()) {
+          breaker.test();
+        } else {
+          console.warn("circuit open, call aborted", protectedCall.name);
           return this;
         }
       }
@@ -140,13 +155,8 @@ const CircuitBreaker = function (id, protectedCall, options) {
           return await protectedCall.apply(this, args);
         } catch (error) {
           breaker.trip();
-          appendLog(error);
+          appendLog(breaker.state, error);
         }
-      }
-
-      if (breaker.open()) {
-        console.warn("circuit open, call aborted", protectedCall.name);
-        return this;
       }
     },
   };

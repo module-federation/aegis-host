@@ -2,6 +2,7 @@
 
 const domainEvents = {
   portTimeout: model => `portTimeout:${model.getName()}`,
+  portRetryFailed: model => `portRetryFailed:${model.getName()}`,
   portRetryWorked: model => `portRetryWorked:${model.getName()}`,
   undoStarted: model => `undoStart:${model.getName()}`,
   undoFailed: model => `undoFailed:${model.getName()}`,
