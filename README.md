@@ -44,6 +44,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Hot reload of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
+- Built-in error handling (circuit breaker, undo)
 - Common broker for locally shared events
 - Persistence API for cached datasources
 - Datasource relations for federated schemas and objects
@@ -100,7 +101,7 @@ Access to data and objects requires explicit permission, otherwise services cann
 
 When ports are configured in the `ModelSpecification`, the framework dynamically generates methods on the domain model to invoke them. Each port is assigned an adapter, which either invokes the port (inbound) or is invoked by it (outbound).
 
-Ports can be instrumented for exceptions and timeouts to extend the framework’s retry and compensation logic. They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
+Ports can be instrumented for exceptions and timeouts to extend the framework’s circuit breaker, retry and compensation logic. They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
 
 An adapter either implements an external interface or exposes an interface for external clients to consume. On the port end, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to environmental concerns.
 
@@ -244,6 +245,7 @@ SSL_ENABLED=true
 ![hotreload](https://github.com/module-federation/MicroLib/blob/master/doc/hot-reload.gif)
 
 ### Reference Architecture
+MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
 ## ![refarch](https://github.com/module-federation/MicroLib/blob/master/doc/MicroLib.gif)
 
