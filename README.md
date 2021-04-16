@@ -169,9 +169,9 @@ npm run start-all
 npm start
 ```
 
-### Datasource
+### Datasources
 
-In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change to database default persistence. You can also update an individual model's datasource in the ModelSpec.
+In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change the default to Mongo. You can also update an individual model's datasource in the ModelSpec.
 
 ```shell
 brew install mongodb-community
