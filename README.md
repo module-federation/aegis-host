@@ -101,7 +101,7 @@ Access to data and objects requires explicit permission, otherwise services cann
 
 When ports are configured in the `ModelSpecification`, the framework dynamically generates methods on the domain model to invoke them. Each port is assigned an adapter, which either invokes the port (inbound) or is invoked by it (outbound).
 
-Ports can be instrumented for exceptions and timeouts to extend the framework’s retry and compensation logic. They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
+Ports can be instrumented for exceptions and timeouts to extend the framework’s circuit breaker, retry and compensation logic. They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
 
 An adapter either implements an external interface or exposes an interface for external clients to consume. On the port end, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to environmental concerns.
 
