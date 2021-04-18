@@ -1,4 +1,4 @@
-![MicroLib](https://github.com/tysonrm/MicroLib/blob/master/doc/microlib.png)
+![MicroLib](doc/microlib.png)
 
 # MicroLib <sub><sup>codename _Aegis_</sup></sub>
 
@@ -41,7 +41,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Dynamic port generation for federated modules
 - Dynamic port-adapter binding
 - Dynamic adapter-service binding
-- [Hot reload of federated modules](#zero-downtime---zero-install-deployment-api-generation)
+- [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
 - Built-in error handling (circuit breaker, undo)
@@ -53,7 +53,8 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Serverless "deployless" fast spinup
+- Vendor-agnostic serverless deployment (no vendor lock-in)
+- Faster serverless deployment
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
@@ -61,7 +62,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 
 ---
 
-![Components](https://github.com/tysonrm/MicroLib/blob/master/doc/port-adapter.png)
+![Components](doc/port-adapter.png)
 
 ## Components
 
@@ -75,7 +76,7 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 ---
 
-![Persistence](https://github.com/tysonrm/MicroLib/blob/master/doc/persistence.png)
+![Persistence](doc/persistence.png)
 
 ## Persistence
 
@@ -93,7 +94,7 @@ Access to data and objects requires explicit permission, otherwise services cann
 
 ---
 
-![Eventing](https://github.com/tysonrm/MicroLib/blob/master/doc/eventing.png)
+![Eventing](doc/eventing.png)
 
 ## Integration
 
@@ -125,7 +126,7 @@ Local events can also be forwarded to remote event targets. Like any external in
 
 ---
 
-![Workflow](https://github.com/tysonrm/MicroLib/blob/master/doc/workflow.png)
+![Workflow](doc/workflow.png)
 
 ## Orchestration
 
@@ -168,9 +169,9 @@ npm run start-all
 npm start
 ```
 
-### Datasource
+### Datasources
 
-In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change to database default persistence. You can also update an individual model's datasource in the ModelSpec.
+In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change the default to Mongo. You can also update an individual model's datasource in the ModelSpec.
 
 ```shell
 brew install mongodb-community
@@ -238,16 +239,16 @@ SSL_ENABLED=true
 
 ### Installation
 
-![install](https://github.com/module-federation/MicroLib/blob/master/doc/microlib-install-4k.gif)
+![install](doc/microlib-install-4k.gif)
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
-![hotreload](https://github.com/module-federation/MicroLib/blob/master/doc/hot-reload.gif)
+![hotreload](doc/hot-reload.gif)
 
 ### Reference Architecture
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
-## ![refarch](https://github.com/module-federation/MicroLib/blob/master/doc/MicroLib.gif)
+## ![refarch](doc/MicroLib.gif)
 
 ## Further Reading
 
