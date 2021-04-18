@@ -1068,6 +1068,11 @@
   "resolved" "https://registry.npmjs.org/@ungap/promise-all-settled/-/promise-all-settled-1.1.2.tgz"
   "version" "1.1.2"
 
+"@vendia/serverless-express@^4.3.4":
+  "integrity" "sha512-CAZ9/CheqSWIPptDNIae2CsgDnog6UZ/lgT7vWFcpmLG4qy+w4CWlzccxAwH8p5fwQNvNkEnA0Og5g2PXBDLYg=="
+  "resolved" "https://registry.npmjs.org/@vendia/serverless-express/-/serverless-express-4.3.4.tgz"
+  "version" "4.3.4"
+
 "@webassemblyjs/ast@1.9.0":
   "integrity" "sha512-C6wW5L+b7ogSDVqymbkkvuW9kruN//YisMED04xzeBBqjHa2FYnmvOlS6Xj68xWQRgWvI9cIglsjFowH/RJyEA=="
   "resolved" "https://registry.npmjs.org/@webassemblyjs/ast/-/ast-1.9.0.tgz"

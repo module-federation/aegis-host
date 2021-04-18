@@ -39,7 +39,7 @@ function startWorker() {
   worker.on("message", function (message) {
     // console.log({ ...message, data: "..." });
     if (message.pid === process.pid) return;
-    if (["saveBroadcast", "deleteBroadcast"].includes(message.cmd)) {
+    if (/.*Broadcast$/.test(message.cmd)) {
       for (const id in cluster.workers) {
         if (cluster.workers[id].process.pid !== message.pid) {
           cluster.workers[id].send({

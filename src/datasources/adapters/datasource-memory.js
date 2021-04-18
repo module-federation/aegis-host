@@ -15,6 +15,15 @@ export class DataSourceMemory extends DataSource {
    * @override
    */
   async save(id, data) {
+    if (process.send === "function") {
+      process.send({
+        cmd: "saveBroadcast",
+        pid: process.pid,
+        name: this.name,
+        data,
+        id,
+      });
+    }
     return this.dataSource.set(id, data).get(id);
   }
 
@@ -56,6 +65,14 @@ export class DataSourceMemory extends DataSource {
    * @override
    */
   async delete(id) {
+    if (process.send === "function") {
+      process.send({
+        cmd: "deleteBroadcast",
+        pid: process.pid,
+        name: this.name,
+        id,
+      });
+    }
     this.dataSource.delete(id);
   }
 

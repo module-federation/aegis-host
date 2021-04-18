@@ -16,6 +16,7 @@ const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
+const envLambda = /true/i.test(process.env.ENV_LAMBDA);
 
 // Optionally enable authorization
 const app = require("./auth")(express(), "/microlib");
@@ -113,6 +114,7 @@ function startService() {
     app.use(express.json());
     app.use(express.static("public"));
     reloadCallback();
+    if (envLambda) return;
     startWebServer();
   });
 }
@@ -122,3 +124,5 @@ if (clusterEnabled) {
 } else {
   startService();
 }
+
+module.exports = app;

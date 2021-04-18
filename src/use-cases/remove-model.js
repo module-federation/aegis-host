@@ -31,14 +31,16 @@ export default function removeModelFactory({
   handlers.forEach(handler => observer.on(eventName, handler));
 
   // Add listener that broadcasts the delete to the cluster
-  observer.on(eventName, eventData =>
-    process.send({
-      cmd: "deleteBroadcast",
-      pid: process.pid,
-      id: eventData.modelId,
-      name: modelName,
-    })
-  );
+  observer.on(eventName, eventData => {
+    if (typeof process.send === "function") {
+      process.send({
+        cmd: "deleteBroadcast",
+        pid: process.pid,
+        id: eventData.modelId,
+        name: modelName,
+      });
+    }
+  });
 
   return async function removeModel(id) {
     const model = await repository.find(id);

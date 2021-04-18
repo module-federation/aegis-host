@@ -210,7 +210,7 @@ const Model = (() => {
 
         // by default merge the incoming model with the last one saved
         const merge = overwrite ? model : { ...saved, ...model };
-
+        
         return datasource.save(model[ID], {
           ...merge,
           [UPDATETIME]: new Date().getTime(),

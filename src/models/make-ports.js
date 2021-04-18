@@ -3,7 +3,7 @@
 import portHandler from "./port-handler";
 import async from "../lib/async-error";
 import domainEvents from "./domain-events";
-import CircuitBreaker from "./circuit-breaker";
+import CircuitBreaker, { logError } from "./circuit-breaker";
 
 const TIMEOUTSECONDS = 60;
 const MAXRETRY = 5;
@@ -42,20 +42,24 @@ function setPortTimeout(options) {
   const timeout = (portConf.timeout || TIMEOUTSECONDS) * 1000;
   const maxRetry = portConf.maxRetry || MAXRETRY;
   const timerArgs = getRetries(args);
+  const expired = () => timerArgs.count > maxRetry;
 
   const noOp = {
+    enabled: false,
     stopTimer: () => void 0,
-    expired: () => true,
+    expired,
   };
 
   if (noTimer) {
     return noOp;
   }
 
-  if (timerArgs.count > maxRetry) {
-    console.warn("max retries reached", timerArgs);
+  if (expired()) {
     model.emit(domainEvents.portRetryFailed(model), options);
-    return noOp;
+    return {
+      ...noOp,
+      enabled: true
+    }
   }
 
   // Retry the port on timeout
@@ -67,15 +71,16 @@ function setPortTimeout(options) {
     if (handler) handler(options);
 
     // Count retries by adding to an array passed on the stack
-    await model[portName](...timerArgs.nextArg);
+    await async(model[portName](...timerArgs.nextArg));
 
     // Retry worked
     model.emit(domainEvents.portRetryWorked(model), options);
   }, timeout);
 
   return {
+    ...noOp,
+    enabled: true,
     stopTimer: () => clearTimeout(timerId),
-    expired: () => timerArgs.count > maxRetry,
   };
 }
 
@@ -194,7 +199,7 @@ export default function makePorts(ports, adapters, observer) {
       async function portFn(...args) {
         // Don't run if port is disabled
         if (disabled) {
-          return;
+          return this;
         }
 
         // Handle port timeouts
@@ -204,6 +209,16 @@ export default function makePorts(ports, adapters, observer) {
           model: this,
           args,
         });
+
+        if (timer.enabled && timer.expired()) {
+          // This means we hit max retries, update circuit breaker
+          logError(
+            portName,
+            domainEvents.portRetryFailed(this),
+            portConf.circuitBreaker
+          );
+          return this;
+        }
 
         try {
           // Call the adapter and wait
@@ -228,7 +243,7 @@ export default function makePorts(ports, adapters, observer) {
           if (timer.expired()) {
             // Try to back out previous transactions.
             await async(this.undo());
-            return;
+            return this;
           }
 
           throw new Error("error calling port", error, port);

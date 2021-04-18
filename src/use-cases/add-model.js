@@ -29,16 +29,6 @@ export default function addModelFactory({
 
   // Add an event whose callback invokes this factory.
   observer.on(domainEvents.addModel(eventName), addModel, false);
-  // Add listener that broadcasts the save to the cluster
-  observer.on(eventName, eventData =>
-    process.send({
-      cmd: "saveBroadcast",
-      pid: process.pid,
-      id: eventData.model.getId(),
-      data: eventData.model,
-      name: modelName,
-    })
-  );
 
   async function addModel(input) {
     const model = await models.createModel(
