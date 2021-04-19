@@ -116,7 +116,7 @@ module.exports.startCluster = function (startService, waitms = 2000) {
       continueReload(stopWorker, waitms);
     });
 
-    setInterval(continueReload, 60000, startWorker);
+    setInterval(continueReload, 60000, startWorker, waitms);
 
     console.log(`master starting ${numCores} workers 🌎`);
     // Run a copy of this program on each core
