@@ -51,6 +51,8 @@ export default class DataSource {
     throw new Error("abstract method not implemented");
   }
 
+  async clusterSave(id, data) {}
+
   /**
    * Find model instance by ID
    * @param {*} id record id
@@ -75,6 +77,7 @@ export default class DataSource {
     throw new Error("abstract method not implemented");
   }
 
+  async clusterDelete(id) {}
   /**
    *
    * @param {*} options

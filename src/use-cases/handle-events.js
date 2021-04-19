@@ -20,21 +20,14 @@ export default function handleEvents(observer) {
     if (cmd && id && data && process.pid !== pid) {
       if (cmd === "saveCommand") {
         const ds = DataSourceFactory.getDataSource(name);
-        ds.save(id, ModelFactory.loadModel(observer, ds, data, name));
+        ds.clusterSave(id, ModelFactory.loadModel(observer, ds, data, name));
         return;
       }
       if (cmd === "deleteCommand") {
         const ds = DataSourceFactory.getDataSource(name);
-        ds.save(id);
+        ds.clusterDelete(id);
         return;
       }
     }
   });
-  // console.debug({
-  //   cmd,
-  //   desc: "rehydrate and save",
-  //   id,
-  //   from: pid,
-  //   to: process.pid,
-  // });
 }

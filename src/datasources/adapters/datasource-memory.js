@@ -1,7 +1,6 @@
 "use strict";
 
 import DataSource from "../datasource";
-const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 
 /**
  * Temporary in-memory storage
@@ -24,6 +23,10 @@ export class DataSourceMemory extends DataSource {
         id,
       });
     }
+    return this.dataSource.set(id, data).get(id);
+  }
+
+  async clusterSave(id, data) {
     return this.dataSource.set(id, data).get(id);
   }
 

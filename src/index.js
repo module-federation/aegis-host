@@ -82,6 +82,9 @@ function reloadCallback() {
  * Start web server, optionally require secure socket.
  */
 function startWebServer() {
+  // let lamdba handle server
+  if (envLambda) return; 
+
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
@@ -114,7 +117,6 @@ function startService() {
     app.use(express.json());
     app.use(express.static("public"));
     reloadCallback();
-    if (envLambda) return;
     startWebServer();
   });
 }

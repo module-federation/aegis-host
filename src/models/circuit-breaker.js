@@ -19,12 +19,6 @@ const DefaultThreshold = {
   retryDelay: 30000,
 };
 
-class Log extends Array {
-  push(data) {
-    console.debug("log entry:", data);
-    return [...this, data];
-  }
-}
 /**
  * Circuit history
  */
@@ -67,11 +61,11 @@ function getThreshold(error, options) {
 function thresholdBreached(log, error, options) {
   if (log.length < 1) return false;
   const threshold = getThreshold(error, options);
-  const logsInScope = log.filter(
+  const entriesInScope = log.filter(
     entry => entry.time > Date.now() - threshold.intervalMs
   );
-  const errors = logsInScope.filter(e => e.error);
-  const callVolume = logsInScope.length - errors.length;
+  const errors = entriesInScope.filter(e => e.error);
+  const callVolume = entriesInScope.length - errors.length;
   const errorRate = (errors.length / callVolume) * 100;
   return callVolume > threshold.callVolume && errorRate > threshold.errorRate;
 }
@@ -95,8 +89,7 @@ function setStateOnError(log, error, options) {
 export function logError(id, error, options) {
   const log = fetchLog(id);
   let state = setStateOnError(log, error, options);
-  const threshold = getThreshold(error, options);
-  const testDelay = threshold.retryDelay;
+  const testDelay = getThreshold(error, options).retryDelay;
   log.push({ name: id, time: Date.now(), state, error, testDelay });
 }
 
@@ -155,17 +148,13 @@ const Switch = function (id, options) {
     readyToTest() {
       return readyToTest(log);
     },
-    appendLog(error = null, options = null) {
-      // let testDelay = null;
-      // if (error) {
-      //   testDelay = getThreshold(error, options).retryDelay;
-      // }
+    appendLog(error = null) {
       log.push({
         name: id,
         time: Date.now(),
         state: this.state,
+        testDelay: getThreshold(error, options).retryDelay,
         error,
-        testDelay: 30000,
       });
     },
   };
