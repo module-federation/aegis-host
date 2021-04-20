@@ -83,7 +83,7 @@ function reloadCallback() {
  */
 function startWebServer() {
   // let lamdba handle server
-  if (envLambda) return; 
+  if (envLambda) return;
 
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
@@ -127,4 +127,4 @@ if (clusterEnabled) {
   startService();
 }
 
-module.exports = app;
+//module.exports = app;

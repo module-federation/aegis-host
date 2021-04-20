@@ -1,6 +1,8 @@
 const { URL } = require("url");
 const http = require("http");
 const fs = require("fs");
+const https = require("https");
+https.globalAgent.rejectUnauthorized = false;
 
 /**
  * Download remote container bundles
@@ -36,9 +38,10 @@ module.exports = async remoteEntry => {
       return new Promise(resolve => {
         const rslv = () => resolve({ [entry.name]: path });
 
-        const req = http.request(entry.url, res => {
+        const req = https.request(options, res => {
           res.on("error", rslv);
           if (res.statusCode < 200 || res.statusCode >= 300) {
+            console.error(res.statusMessage);
             return rslv();
           }
           res.pipe(fs.createWriteStream(path));
