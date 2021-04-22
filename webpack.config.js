@@ -12,7 +12,8 @@ const publicPort = sslEnabled ? sslPort : port;
 
 module.exports = () => {
   return new Promise(resolve => {
-    fetchRemotes(remoteEntries).then(remotes =>
+    fetchRemotes(remoteEntries).then(remotes => {
+      console.log(remotes);
       resolve({
         target: "async-node",
         mode: "development",
@@ -57,7 +58,7 @@ module.exports = () => {
             },
           }),
         ],
-      })
-    );
+      });
+    });
   });
 };
