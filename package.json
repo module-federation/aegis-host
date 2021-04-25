@@ -7,7 +7,7 @@
   },
   "main": "lambda.js",
   "config": {
-    "s3BucketName": "sls-xpress-edge1",
+    "s3BucketName": "aegisserverless2",
     "region": "us-east-1",
     "cloudFormationStackName": "ServerlessExpressHttpApiStack",
     "functionName": "",
@@ -21,8 +21,9 @@
     "hot-reload": "curl https://localhost:8070/microlib/reload",
     "rebuild": "npm run build && npm run hot-reload",
     "start": "node -r dotenv/config dist/index.js",
+    "start-aws": "node -r dotenv/config dist/lambda.js",
     "restart": "npm run build && npm run start",
-    "transpile": "babel src/index.js src/auth.js src/cluster.js -d dist",
+    "transpile": "babel src/index.js src/auth.js src/cluster.js src/lambda.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test": "mocha --recursive -r esm",
@@ -53,7 +54,8 @@
     "jwks-rsa": "^2.0.1",
     "mongodb": "^3.6.3",
     "node-fetch": "^2.6.1",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",

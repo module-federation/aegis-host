@@ -117,7 +117,7 @@ function startService() {
     app.use(express.json());
     app.use(express.static("public"));
     reloadCallback();
-    startWebServer();
+    //startWebServer();
   });
 }
 
@@ -127,4 +127,4 @@ if (clusterEnabled) {
   startService();
 }
 
-//module.exports = app;
+module.exports = app;

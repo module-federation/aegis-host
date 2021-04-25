@@ -23,7 +23,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./dist
-      Handler: main.handler
+      Handler: lambda.handler
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 30
