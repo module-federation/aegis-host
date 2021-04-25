@@ -2,6 +2,17 @@ const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
 const path = require("path");
 
+function getOptions(entry) {
+  const url = new URL(entry.url);
+  return {
+    hostname: url.hostname,
+    pathname: url.pathname,
+    port: url.port,
+    protocol: url.protocol,
+    rejectUnauthorized: false,
+  };
+}
+
 const octokit = new Octokit();
 
 function githubFetch(entry) {
@@ -12,9 +23,7 @@ function githubFetch(entry) {
       path: "dist",
     })
     .then(function (rest) {
-      console.log(rest);
       const file = rest.data.find(d => d.name === "remoteEntry.js");
-      console.log(file);
       return file.sha;
     })
     .then(function (sha) {
@@ -26,7 +35,6 @@ function githubFetch(entry) {
       });
     })
     .then(function (rest) {
-      console.log(rest);
       fs.writeFileSync(
         path.resolve(entry.path, "remoteEntry.js"),
         Buffer.from(rest.data.content, "base64").toString("utf-8")
@@ -34,12 +42,17 @@ function githubFetch(entry) {
     });
 }
 
-function httpGet() {
-  if (res.statusCode < 200 || res.statusCode >= 300) {
-    return rslv("server returned error or redirect");
-  }
-  res.pipe(fs.createWriteStream(path));
+function httpGet(entry) {
+  const options = getOptions(entry);
+  const req = require(options.protocol).request(options, function (res) {
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      return console.error("server returned error or redirect");
+    }
+    res.pipe(fs.createWriteStream(path));
+  });
+  req.on("error", () => console.error(error));
 }
+
 /**
  * Download remote container bundles
  * @param {{
@@ -55,26 +68,15 @@ module.exports = async remoteEntry => {
   const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
 
   function getPath(entry) {
-    const url = new URL(entry.url);
-    const path = [
-      url.pathname.replace(".js", ""),
-      url.hostname.replace(".", "-"),
-      url.port,
-      entry.name.concat(".js"),
-    ].join("-");
+    // const url = new URL(entry.url);
+    // const path = [
+    //   url.pathname.replace(".js", ""),
+    //   url.hostname.replace(".", "-"),
+    //   url.port,
+    //   entry.name.concat(".js"),
+    // ].join("-");
 
     return entry.path.concat("/remoteEntry.js");
-  }
-
-  function getOptions(entry) {
-    const url = new URL(entry.url);
-    return {
-      hostname: url.hostname,
-      pathname: url.pathname,
-      port: url.port,
-      protocol: url.protocol,
-      rejectUnauthorized: false,
-    };
   }
 
   const remotes = await Promise.all(
@@ -83,11 +85,11 @@ module.exports = async remoteEntry => {
       console.log(path);
 
       return new Promise(resolve => {
-        const rslv = data => {
-          console.log(data);
-          resolve({ [entry.name]: path });
-        };
-        githubFetch(entry);
+        if (entry.url.startsWith("https://github")) {
+          githubFetch(entry);
+        } else {
+          httpGet(entry);
+        }
         resolve({ [entry.name]: path });
       });
     })
