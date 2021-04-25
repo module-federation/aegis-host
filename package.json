@@ -52,6 +52,7 @@
     "import-fresh": "^3.3.0",
     "jwks-rsa": "^2.0.1",
     "mongodb": "^3.6.3",
+    "node-fetch": "^2.6.1",
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {

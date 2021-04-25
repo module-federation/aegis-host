@@ -1,23 +1,45 @@
-const { URL } = require("url");
-const fs = require("fs");
-//const https = require("follow-redirects").https;
-const https = require("https");
 const { Octokit } = require("@octokit/rest");
+const fs = require("fs");
+const path = require("path");
 
 const octokit = new Octokit();
 
-// Compare: https://docs.github.com/en/rest/reference/repos/#list-organization-repositories
-octokit
-  .request("GET /repos/{owner}/{repo}/git/blobs/{file_sha}", {
-    owner: "octocat",
-    repo: "hello-world",
-    file_sha: "31a832c61a091f54e73a7888b93316f84ec9080e",
-  })
-  .then(data => console.log(data));
-//https://docs.github.com/rest/reference/repos#get-repository-content
-// curl \
-// -H "Accept: application/vnd.github.raw" \
-// https://api.github.com/repos/module-federation/MicroLib/contents/src/index.
+function githubFetch(entry) {
+  octokit
+    .request("GET /repos/{owner}/{repo}/contents/{path}?ref=oldstyle-stream", {
+      owner: "module-federation",
+      repo: "MicroLib-Example",
+      path: "dist",
+    })
+    .then(function (rest) {
+      console.log(rest);
+      const file = rest.data.find(d => d.name === "remoteEntry.js");
+      console.log(file);
+      return file.sha;
+    })
+    .then(function (sha) {
+      console.log(sha);
+      return octokit.request("GET /repos/{owner}/{repo}/git/blobs/{sha}", {
+        owner: "module-federation",
+        repo: "MicroLib-Example",
+        sha: sha,
+      });
+    })
+    .then(function (rest) {
+      console.log(rest);
+      fs.writeFileSync(
+        path.resolve(entry.path, "remoteEntry.js"),
+        Buffer.from(rest.data.content, "base64").toString("utf-8")
+      );
+    });
+}
+
+function httpGet() {
+  if (res.statusCode < 200 || res.statusCode >= 300) {
+    return rslv("server returned error or redirect");
+  }
+  res.pipe(fs.createWriteStream(path));
+}
 /**
  * Download remote container bundles
  * @param {{
@@ -41,7 +63,7 @@ module.exports = async remoteEntry => {
       entry.name.concat(".js"),
     ].join("-");
 
-    return entry.path.concat(path);
+    return entry.path.concat("/remoteEntry.js");
   }
 
   function getOptions(entry) {
@@ -49,7 +71,7 @@ module.exports = async remoteEntry => {
     return {
       hostname: url.hostname,
       pathname: url.pathname,
-      port: 443,
+      port: url.port,
       protocol: url.protocol,
       rejectUnauthorized: false,
     };
@@ -65,39 +87,10 @@ module.exports = async remoteEntry => {
           console.log(data);
           resolve({ [entry.name]: path });
         };
-
-        // const req = https.request(getOptions(entry), res => {
-        const req = octokit
-          .request("GET /repos/{owner}/{repo}/git/blobs/{file_sha}", {
-            owner: "octocat",
-            repo: "hello-world",
-            file_sha: "31a832c61a091f54e73a7888b93316f84ec9080e",
-          })
-          .then(data => {
-            console.log(data);
-
-            console.debug({
-              url: entry.url,
-              options: getOptions(entry),
-              reponseHeaders: res.headers,
-              statusCode: res.statusCode,
-              statusMessage: res.statusMessage,
-            });
-            if (res.statusCode < 200 || res.statusCode >= 300) {
-              return rslv("server returned error or redirect");
-            }
-            res.pipe(fs.createWriteStream(path));
-          });
-
-        req.on("error", rslv);
-        req.end();
+        githubFetch(entry);
+        resolve({ [entry.name]: path });
       });
     })
-  ).catch(() => {
-    return entries.map(entry => ({
-      [entry.name]: getPath(entry),
-    }));
-  });
-
+  );
   return remotes.reduce((p, c) => ({ ...c, ...p }));
 };

@@ -7,6 +7,7 @@ let reloadList = [];
 let workerList = [];
 
 /**
+ * @typedef {function()} startWorker
  * Start a new worker,
  * listen for a reload request from it,
  * add it to `workerList` which is used during the rolling restart.
@@ -56,6 +57,7 @@ function startWorker() {
 }
 
 /**
+ * @typedef {function()} stopWorker
  * Gracefully stop a worker on the reload list.
  */
 function stopWorker() {
@@ -69,7 +71,7 @@ function stopWorker() {
 
 /**
  * Control execution of stop/start request
- * @param {function()} callback - a callback that starts your app
+ * @param {stopWorker|startWorker} callback
  * @param {number} waitms - Delay execution by `waitms`
  * milliseconds so your app has time to start
  */

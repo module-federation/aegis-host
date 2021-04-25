@@ -98,8 +98,8 @@ export function logError(id, error, options) {
  * @param {*} id
  * @returns
  */
-function readyToTest(id) {
-  const log = fetchLog(id);
+function readyToTest(log) {
+  if (log.length < 1) return true;
   const lastEntry = log[log.length - 1];
   return Date.now() - lastEntry.time > lastEntry.testDelay;
 }
