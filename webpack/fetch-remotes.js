@@ -1,6 +1,7 @@
 const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
 const path = require("path");
+const token = process.env.GITHUB_TOKEN;
 
 function getOptions(entry) {
   const url = new URL(entry.url);
@@ -13,7 +14,7 @@ function getOptions(entry) {
   };
 }
 
-const octokit = new Octokit();
+const octokit = new Octokit({ auth: token });
 
 function githubFetch(entry) {
   octokit
