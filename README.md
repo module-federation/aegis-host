@@ -265,7 +265,7 @@ SSL_ENABLED=true
 
 ## Further Reading
 
-[Stop Paying the Microservice Premium](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
+[Stop Paying the Microservice Premium: Achieving Deployment Independence in a Monolithic Architecture](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
