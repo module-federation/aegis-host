@@ -265,6 +265,8 @@ SSL_ENABLED=true
 
 ## Further Reading
 
+[Stop Paying the Microservice Premium](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
+
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
 [Webpack 5 Module Federation: A game-changer in JavaScript architecture](https://medium.com/swlh/webpack-5-module-federation-a-game-changer-to-javascript-architecture-bcdd30e02669)
