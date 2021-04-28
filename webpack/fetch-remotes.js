@@ -16,43 +16,53 @@ function getOptions(entry) {
 
 const octokit = new Octokit({ auth: token });
 
-function githubFetch(entry) {
-  octokit
-    .request("GET /repos/{owner}/{repo}/contents/{path}?ref={branch}", {
-      owner: "module-federation",
-      repo: "MicroLib-Example",
-      path: "dist",
-      branch: "oldstyle-stream",
+async function githubFetch(entry, path) {
+  return octokit
+    .request("GET {url}", {
+      url: entry.url.replace("https://github.com", ""),
     })
     .then(function (rest) {
-      const file = rest.data.find(d => d.name === "remoteEntry.js");
+      const file = rest.data.find(f => f.name === "remoteEntry.js");
       return file.sha;
     })
     .then(function (sha) {
       console.log(sha);
+      const dir = entry.url.split("/");
       return octokit.request("GET /repos/{owner}/{repo}/git/blobs/{sha}", {
-        owner: "module-federation",
-        repo: "MicroLib-Example",
+        owner: dir[4],
+        repo: dir[5],
         sha: sha,
       });
     })
     .then(function (rest) {
       fs.writeFileSync(
-        path.resolve(entry.path, "remoteEntry.js"),
+        path,
         Buffer.from(rest.data.content, "base64").toString("utf-8")
       );
     });
 }
 
-function httpGet(entry) {
+function httpGet(entry, path, done) {
   const options = getOptions(entry);
   const req = require(options.protocol).request(options, function (res) {
     if (res.statusCode < 200 || res.statusCode >= 300) {
       return console.error("server returned error or redirect");
     }
+    res.on("end", done);
     res.pipe(fs.createWriteStream(path));
   });
   req.on("error", () => console.error(error));
+}
+
+function dedupEntries(entries) {
+  return entries
+    .map(e => ({
+      [new URL(e.url).hostname.concat(e.pathname)]: {
+        ...e,
+        name: new URL(e.url).hostname.concat(e.path),
+      },
+    }))
+    .reduce((p, c) => ({ ...p, ...c }));
 }
 
 /**
@@ -70,31 +80,64 @@ module.exports = async remoteEntry => {
   const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
 
   function getPath(entry) {
-    // const url = new URL(entry.url);
-    // const path = [
-    //   url.pathname.replace(".js", ""),
-    //   url.hostname.replace(".", "-"),
-    //   url.port,
-    //   entry.name.concat(".js"),
-    // ].join("-");
+    const url = new URL(entry.url);
+    const filename = [
+      url.hostname.replaceAll(".", "-"),
+      url.pathname.replaceAll("/", "-").replace("-", ""),
+      "remoteEntry.js",
+    ].join("-");
 
-    return entry.path.concat("/remoteEntry.js");
+    let basedir = entry.path;
+    if (entry.path.charAt(entry.path.length - 1) !== "/") {
+      basedir = entry.path.concat("/");
+    }
+    return basedir.concat(filename);
   }
 
+  const uniqueEntries = dedupEntries(entries);
+
   const remotes = await Promise.all(
-    entries.map(async entry => {
+    Object.values(uniqueEntries).map(function (entry) {
       const path = getPath(entry);
       console.log(path);
 
-      return new Promise(resolve => {
-        if (entry.url.startsWith("https://github")) {
-          githubFetch(entry);
+      return new Promise(async function (resolve) {
+        const resolvePath = () => resolve({ [entry.name]: path });
+
+        if (/^http.*github/i.test(entry.url)) {
+          await githubFetch(entry, path);
+          resolvePath();
         } else {
-          httpGet(entry);
+          httpGet(entry, path, resolvePath);
         }
-        resolve({ [entry.name]: path });
       });
     })
   );
-  return remotes.reduce((p, c) => ({ ...c, ...p }));
+  console.log(remotes);
+  const updatedEntries = entries
+    .map(function (e) {
+      const eid = new URL(e.url).hostname.concat(e.path);
+      return { [e.name]: remotes.find(r => r[eid])[eid] };
+    })
+    .reduce((p, c) => ({ ...p, ...c }));
+  return updatedEntries;
+  console.log(updatedEntries);
+  // const remotes = await Promise.all(
+  //   entries.map(async entry => {
+  //     const path = getPath(entry);
+  //     console.log(path);
+
+  //     return new Promise(async resolve => {
+  //       const resolvePath = () => resolve({ [entry.name]: path });
+
+  //       if (entry.url.startsWith("https://github")) {
+  //         await githubFetch(entry);
+  //         resolvePath();
+  //       } else {
+  //         httpGet(entry, resolvePath);
+  //       }
+  //     });
+  //   })
+  // );
+  //return remotes.reduce((p, c) => ({ ...c, ...p }));
 };

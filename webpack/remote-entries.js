@@ -2,7 +2,7 @@ module.exports = [
   {
     name: "microservices",
     url:
-      "https://github.com/repos/module-federation/MicroLib-Example/contents/dist/remoteEntry.js",
+      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=oldstyle-stream",
     path: __dirname,
     type: "model",
     importRemote: async () => {
@@ -13,7 +13,7 @@ module.exports = [
   {
     name: "adapters",
     url:
-      "https://github.com/repos/module-federation/MicroLib-Example/contents/remoteEntry.js",
+      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=oldstyle-stream",
     path: __dirname,
     type: "adapter",
     importRemote: async () => {
@@ -24,7 +24,7 @@ module.exports = [
   {
     name: "services",
     url:
-      "https://github.com/repos/module-federation/MicroLib-Example/contents/remoteEntry.js",
+      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=oldstyle-stream",
     path: __dirname,
     type: "service",
     importRemote: async () => {
