@@ -32192,8 +32192,9 @@ module.exports = require("zlib");
 /******/ 		const { Octokit } = require("@octokit/rest");
 /******/ 		const fs = require("fs");
 /******/ 		const path = require("path");
+/******/ 		const token = process.env.GITHUB_TOKEN;
 /******/ 		
-/******/ 		const octokit = new Octokit();
+/******/ 		const octokit = new Octokit({ auth: token });
 /******/ 		
 /******/ 		function httpRequest(url) {
 /******/ 		  return new Promise(function (resolve, reject) {
