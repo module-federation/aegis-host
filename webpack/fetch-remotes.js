@@ -18,10 +18,11 @@ const octokit = new Octokit({ auth: token });
 
 function githubFetch(entry) {
   octokit
-    .request("GET /repos/{owner}/{repo}/contents/{path}?ref=oldstyle-stream", {
+    .request("GET /repos/{owner}/{repo}/contents/{path}?ref={branch}", {
       owner: "module-federation",
       repo: "MicroLib-Example",
       path: "dist",
+      branch: "oldstyle-stream",
     })
     .then(function (rest) {
       const file = rest.data.find(d => d.name === "remoteEntry.js");

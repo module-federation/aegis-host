@@ -36,7 +36,7 @@ async function startMicroLib({ hot = false } = {}) {
     // clear cache on hot reload
     serverModule.default.clear();
   }
-  serverModule.default.start(app);
+  return serverModule.default.start(app);
 }
 
 /**
@@ -45,7 +45,7 @@ async function startMicroLib({ hot = false } = {}) {
  */
 function clearRoutes() {
   app._router.stack = app._router.stack.filter(
-    k => !(k?.route?.path && k.route.path.startsWith(apiRoot))
+    k => !(k && k.route && k.route.path && k.route.path.startsWith(apiRoot))
   );
 }
 
@@ -112,19 +112,29 @@ function startWebServer() {
  * clustered or single process,
  * hot reload via rolling restart or deleting cache
  */
-function startService() {
-  startMicroLib().then(() => {
+async function startService() {
+  return startMicroLib().then(() => {
     app.use(express.json());
     app.use(express.static("public"));
     reloadCallback();
-    //startWebServer();
+    startWebServer();
   });
 }
 
-if (clusterEnabled) {
-  cluster.startCluster(startService);
-} else {
-  startService();
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = app;
+if (!envLambda) {
+  if (clusterEnabled) {
+    cluster.startCluster(startService);
+  } else {
+    startService();
+  }
+}
+
+module.exports.start = async function (callback) {
+  await startService();
+  await sleep(1000);
+  return app;
+};

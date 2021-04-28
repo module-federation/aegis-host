@@ -1,5 +1,13 @@
-//arrequire("source-map-support/register");
-const serverlessExpress = require("@vendia/serverless-express");
-const app = require("./index");
+const microlib = require("./index");
+const serverless = require("serverless-http");
+let app = null;
+let callback = async () => console.log("not started");
 
-exports.handler = serverlessExpress({ app });
+
+module.exports.handler = async (event, context) => {
+  if (!app) {
+    app = await microlib.start();
+    callback = serverless(app);
+  }
+  return await callback(event, context);
+};
