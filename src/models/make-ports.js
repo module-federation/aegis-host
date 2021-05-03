@@ -97,7 +97,7 @@ function getPortCallback(cb) {
 /**
  * Are we compensating for a failed or canceled transaction?
  * @param {import(".").Model} model
- * @returns {boolean}
+ * @returns {Promise<boolean>}
  */
 async function isUndoRunning(model) {
   const latest = await model.find(model.getId());

@@ -1,0 +1,9 @@
+{
+  "function": {
+    "aegisFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  }
+}

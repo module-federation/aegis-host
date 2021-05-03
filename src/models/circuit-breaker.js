@@ -82,7 +82,7 @@ function setStateOnError(log, error, options) {
 }
 
 /**
- * log error in circuit breaker log for evaluation
+ * log error and run thru breaker logic.
  * @param {string} id name of protected function
  * @param {string} error
  */

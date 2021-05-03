@@ -51,14 +51,14 @@ function handleRestart(repository) {
  * }} options
  */
 export default function ({ models, observer, repository, modelName }) {
-  return function loadModels() {
+  return async function loadModels() {
     const spec = models.getModelSpec(modelName);
 
-    repository.load({
+    //setTimeout(handleRestart, 30000, repository);
+
+    return repository.load({
       hydrate: hydrateModels(models.loadModel, observer, repository),
       serializer: Serializer.addSerializer(spec.serializers),
     });
-
-    setTimeout(handleRestart, 30000, repository);
   };
 }

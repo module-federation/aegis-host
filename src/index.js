@@ -9,17 +9,19 @@ const https = require("https");
 const express = require("express");
 const cluster = require("./cluster");
 const graceful = require("express-graceful-shutdown");
+const authorization = require("./auth");
 
 const port = process.env.PORT || 8707;
 const sslPort = process.env.SSL_PORT || 8070;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
+const serverless = /true/i.test(process.env.SERVERLESS);
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
-const envLambda = /true/i.test(process.env.ENV_LAMBDA);
+let serviceStarted = false;
 
-// Optionally enable authorization
-const app = require("./auth")(express(), "/microlib");
+// enable authorization
+const app = authorization(express(), "/microlib");
 
 /**
  * Load federated server module. Call `clear` to delete non-webpack cache if
@@ -36,7 +38,8 @@ async function startMicroLib({ hot = false } = {}) {
     // clear cache on hot reload
     serverModule.default.clear();
   }
-  return serverModule.default.start(app);
+  await serverModule.default.start(app);
+  return serverModule.default.controller;
 }
 
 /**
@@ -82,9 +85,6 @@ function reloadCallback() {
  * Start web server, optionally require secure socket.
  */
 function startWebServer() {
-  // let lamdba handle server
-  if (envLambda) return;
-
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
@@ -113,19 +113,18 @@ function startWebServer() {
  * hot reload via rolling restart or deleting cache
  */
 async function startService() {
-  return startMicroLib().then(() => {
+  try {
+    await startMicroLib();
     app.use(express.json());
     app.use(express.static("public"));
     reloadCallback();
-    startWebServer();
-  });
+    if (!serverless) startWebServer();
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-if (!envLambda) {
+if (!serverless) {
   if (clusterEnabled) {
     cluster.startCluster(startService);
   } else {
@@ -133,8 +132,71 @@ if (!envLambda) {
   }
 }
 
-module.exports.start = async function (callback) {
-  await startService();
-  await sleep(1000);
-  return app;
+const res = {
+  send(data) {
+    console.log("send", data);
+    return data;
+  },
+  status(num) {
+    console.log("status", num);
+    return this;
+  },
+  set(data) {
+    console.log("set", data);
+  },
+  headers: {},
+  type: data => console.log(data),
+};
+
+const serverlessAdapter = {
+  controller: null,
+
+  parsers: {
+    aws: args => ({ req: { ...args }, res }),
+    azure: args => ({ req: { ...args }, res }),
+    google: args => ({ req: { ...args }, res }),
+    ibm: args => ({ req: { ...args }, res }),
+  },
+
+  parsePayload(...args) {
+    console.debug({ name: this.parsePayload.name, args });
+    const parse = this.parsers.aws;
+
+    if (typeof parse === "function") {
+      const output = parse(...args);
+      console.debug({ func: parse.name, output });
+      return output;
+    }
+    console.warn("no parser found for provider", args.provider);
+  },
+
+  async getController() {
+    /**
+     * invokes the controller for a given route
+     * @param  {...any} args
+     */
+    function invoke(...args) {
+      const { req, res } = this.parsePayload(...args);
+      this.controller(req.path, req.method, req, res);
+    }
+
+    if (this.controller) {
+      return {
+        invoke: invoke.bind(this),
+      };
+    }
+
+    this.controller = await startMicroLib();
+    await new Promise(resolve => setTimeout(resolve, 4000));
+
+    return {
+      invoke: invoke.bind(this),
+    };
+  },
+};
+
+exports.handleServerlessRequest = async function (...args) {
+  console.info("serverless mode initializing", args);
+  const controller = await serverlessAdapter.getController();
+  return controller.invoke(...args);
 };

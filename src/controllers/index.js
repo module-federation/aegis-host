@@ -34,9 +34,9 @@ export const getConfig = () => getConfigFactory(listConfigs());
 export const initCache = () => {
   const label = "\ntime to load cache";
   const models = loadModels();
-  function load() {
+  async function load() {
     console.time(label);
-    models.forEach(m => m.fn());
+    await Promise.all(models.map(async m => m.fn()));
     console.timeEnd(label);
   }
   return {

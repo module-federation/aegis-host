@@ -82,7 +82,7 @@ export default class DataSource {
    *
    * @param {*} options
    */
-  load(options) {}
+  async load(options) {}
 
   getFactory() {
     return this.factory;

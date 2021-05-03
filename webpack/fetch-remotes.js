@@ -57,7 +57,7 @@ function httpGet(entry, path, done) {
 function dedupEntries(entries) {
   return entries
     .map(e => ({
-      [new URL(e.url).hostname.concat(e.pathname)]: {
+      [new URL(e.url).hostname.concat(e.path)]: {
         ...e,
         name: new URL(e.url).hostname.concat(e.path),
       },
@@ -99,7 +99,7 @@ module.exports = async remoteEntry => {
   const remotes = await Promise.all(
     Object.values(uniqueEntries).map(function (entry) {
       const path = getPath(entry);
-      console.log(path);
+      console.log("unique entry", path);
 
       return new Promise(async function (resolve) {
         const resolvePath = () => resolve({ [entry.name]: path });
@@ -113,15 +113,16 @@ module.exports = async remoteEntry => {
       });
     })
   );
-  console.log(remotes);
+  //console.log(remotes); 
   const updatedEntries = entries
     .map(function (e) {
       const eid = new URL(e.url).hostname.concat(e.path);
       return { [e.name]: remotes.find(r => r[eid])[eid] };
     })
-    .reduce((p, c) => ({ ...p, ...c }));
-  return updatedEntries;
+    .reduce((p, c) => ({ ...c, ...p }));
+
   console.log(updatedEntries);
+  return updatedEntries;
   // const remotes = await Promise.all(
   //   entries.map(async entry => {
   //     const path = getPath(entry);

@@ -15,6 +15,9 @@ import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
 const Server = (() => {
+  const routes = new Map();
+  const serverless = /true/i.test(process.env.SERVERLESS);
+  const serverMode = serverless ? "serverless" : "webserver";
   const port = process.env.PORT || "8070";
   const sslPort = process.env.SSL_PORT || "8707";
   const apiRoot = process.env.API_ROOT || "/microlib/api";
@@ -41,13 +44,51 @@ const Server = (() => {
     app.get(`${apiRoot}/config`, adapter(getConfig()));
   }
 
-  function make(path, app, method, controllers) {
-    controllers().forEach(ctlr => {
-      console.info(ctlr);
-      app[method](path(ctlr.endpoint), http(ctlr.fn));
-    });
-  }
+  const make = {
+    /**
+     * webServer mode - create routes and register controllers
+     * @param {*} path
+     * @param {*} app
+     * @param {*} method
+     * @param {*} controllers
+     */
+    webserver(path, method, controllers, app) {
+      console.info("running in webserver mode");
+      controllers().forEach(ctlr => {
+        console.info(ctlr);
+        app[method](path(ctlr.endpoint), http(ctlr.fn));
+      });
+    },
 
+    /**
+     * serverless mode - save routes, etc for fast lookup
+     * @param {*} path
+     * @param {*} method
+     * @param {*} controllers
+     */
+    serverless(path, method, controllers) {
+      console.info("running in serverless mode");
+      controllers().forEach(ctlr => {
+        const route = path(ctlr.endpoint);
+        if (routes.has(route)) {
+          routes.set(route, {
+            ...routes.get(route),
+            [method]: http(ctlr.fn),
+          });
+          return;
+        }
+        routes.set(route, { [method]: http(ctlr.fn) });
+      });
+    },
+  };
+
+  /**
+   * Clear all non-webpack module cache, i.e.
+   * everything bundled by remoteEntry.js (models
+   * & remoteEntry config), which includes all the
+   * user code downloaded from the remote. This is
+   * the code that needs to be disposed of & reimported.
+   */
   function clear() {
     try {
       Object.keys(__non_webpack_require__.cache).forEach(k => {
@@ -59,31 +100,60 @@ const Server = (() => {
     }
   }
 
-  function start(router) {
+  /**
+   * call controllers directly in serverless mode
+   */
+  async function controller(path, method, req, res) {
+    console.debug({ path, method, req, res });
+    if (routes.has(path)) {
+      try {
+        console.debug("path match");
+        const fn = routes.get(path)[method];
+        if (fn) {
+          console.debug("method match");
+          return fn(req, res);
+        }
+        console.warn("method not supported", path, method);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    console.warn("potential configuration issue", path, method);
+  }
+
+  async function start(router) {
     const label = "\ntotal time to import & register remote modules";
     console.time(label);
 
     const overrides = { save, find, Persistence };
 
-    getRemoteEntries.then(remotes => {
-      getRemoteModules.then(initRemotes => {
-        initRemotes(remotes, overrides).then(() => {
+    // const entries = await getRemoteEntries;
+    // const initRemotes = await getRemoteModules;
+    // await initRemotes(entries, overrides);
+
+    return getRemoteEntries.then(remotes => {
+      return getRemoteModules.then(initRemotes => {
+        initRemotes(remotes, overrides).then(async () => {
           const cache = initCache();
 
-          make(endpoint, router, "post", postModels);
-          make(endpoint, router, "get", getModels);
-          make(endpointId, router, "get", getModelsById);
-          make(endpointId, router, "patch", patchModels);
-          make(endpointCmd, router, "patch", patchModels);
-          make(endpointId, router, "delete", deleteModels);
+          make[serverMode](endpoint, "post", postModels, router);
+          make[serverMode](endpoint, "get", getModels, router);
+          make[serverMode](endpointId, "get", getModelsById, router);
+          make[serverMode](endpointId, "patch", patchModels, router);
+          make[serverMode](endpointCmd, "patch", patchModels, router);
+          make[serverMode](endpointId, "delete", deleteModels, router);
 
           makeAdmin(router, http);
+          console.info(routes);
           console.timeEnd(label);
-          cache.load();
+
+          await cache.load();
 
           if (sslEnabled) console.log(`\nhttps://localhost:${sslPort} 🌎`);
           else console.log(`\nhttp://localhost:${port} 🌎`);
+
           process.on("SIGTERM", () => close());
+          return router;
         });
       });
     });
@@ -92,6 +162,7 @@ const Server = (() => {
   return {
     clear,
     start,
+    controller,
   };
 })();
 
