@@ -1,16 +1,4 @@
-// const serverless = require("serverless-http");
-// let callback;
-
-// require("./dist/index").startService(function (app) {
-//   callback = serverless(app);
-// });
-
-// module.exports.handler = async (event, context) => {
-//   return await callback(event, context);
-// };
 const microlib = require("./dist");
-const context = {};
-const callback = () => "don't care";
 
 const order = {
   firstName: "Uncle",
@@ -61,10 +49,14 @@ const getById = {
   provider: "aws",
 };
 
-microlib.handleServerlessRequest(post, {}, x => x);
+setTimeout(microlib.handleServerlessRequest, 20000, getById);
 
-const sleep = async ms => await new Promise(res => setTimeout(res, 3000));
+process.stdin.pipe(require("split")()).on("data", processLine);
 
-sleep(3000);
+async function processLine(line) {
+  post.msg = line;
+  console.log(line + "!");
+  await microlib.handleServerlessRequest(post, {}, x => x);
+}
 
-microlib.handleServerlessRequest(getById, {}, x => x);
+setTimeout(microlib.handleServerlessRequest, 20000, getById);
