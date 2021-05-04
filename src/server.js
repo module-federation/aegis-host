@@ -15,16 +15,21 @@ import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
 const apiRoot = process.env.API_ROOT || "/microlib/api";
-//const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
 const modelPath = `${apiRoot}/models`;
 
 class RouteMap extends Map {
   has(route) {
     if (super.has(route)) return true;
-    if (super.has(route.split("/").concat([":id"]).join("/"))) {
+    if (
+      route.match(/\//g) === 4 &&
+      super.has(route.split("/").splice(0, 4).concat([":id"]).join("/"))
+    ) {
       return true;
     }
-    if (super.has(route.split("/").concat([":id", ":cmd"]).join("/"))) {
+    if (
+      route.match(/\//g) === 5 &&
+      super.has(route.split("/").splice(0, 4).concat([":id", ":cmd"]).join("/"))
+    ) {
       return true;
     }
     return false;

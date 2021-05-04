@@ -32,22 +32,13 @@ module.exports.ServerlessAdapter = async function (
     console.warn("no parser found for provider");
   }
 
-  async function handleReload(result) {
-    if (result === "reload") {
-      return async function reload(reloadCallback) {
-        controller = await reloadCallback();
-      };
-    }
-    return result;
-  }
-
   /**
    * invokes the controller for a given route
    * @param  {...any} args
    */
   function invoke(...args) {
     const { req, res } = parsePayload(...args);
-    return handleReload(controller(req.path, req.method, req, res));
+    controller(req.path, req.method, req, res);
   }
 
   if (controller) {

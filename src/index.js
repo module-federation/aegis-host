@@ -48,9 +48,9 @@ async function startMicroLib({ hot = false } = {}) {
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
   if (hot) {
-    clearRoutes();
     // clear cache on hot reload
     serverModule.default.clear();
+    clearRoutes();
   }
   await serverModule.default.start(app);
   return serverModule.default.controller;
@@ -135,15 +135,6 @@ if (!serverless) {
   }
 }
 
-function handleReload(result) {
-  if (typeof result === "function" && result.name === "reload") {
-    result(function () {
-      return startMicroLib({ hot: true });
-    });
-  }
-  return result;
-}
-
 /**
  *
  * @param  {...any} args
@@ -152,5 +143,5 @@ exports.handleServerlessRequest = async function (...args) {
   console.info("serverless mode initializing", args);
 
   const adapter = await ServerlessAdapter(startMicroLib, cloudName, parsers);
-  handleReload(adapter.invoke(...args));
+  return adapter.invoke(...args);
 };
