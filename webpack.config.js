@@ -7,14 +7,17 @@ const remoteEntries = require("./webpack/remote-entries");
 const port = process.env.PORT || 8707;
 const sslPort = process.env.SSL_PORT || 8070;
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
+const serverless = /true/i.test(process.env.SERVERLESS);
 const publicPort = sslEnabled ? sslPort : port;
 const chalk = require("chalk");
 
 module.exports = env => {
-  console.log(env);
-  if (/serverless/i.test(env)) {
-    console.info(chalk.red("starting serverless build"));
+  if (/serverless/i.test(env) && serverless) {
+    console.info(chalk.yellow("starting serverless build"));
     remoteEntries.forEach(e => (e.path = "webpack"));
+  } else {
+    console.warn(chalk.red("set SERVERLESS_prop in .env to  "));
+    process.exit();
   }
   return new Promise(resolve => {
     fetchRemotes(remoteEntries).then(remotes => {
