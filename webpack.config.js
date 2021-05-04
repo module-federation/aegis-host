@@ -2,7 +2,6 @@ require("dotenv").config();
 const path = require("path");
 const ModuleFederationPlugin = require("webpack").container
   .ModuleFederationPlugin;
-const EnvironmentPlugin = require("webpack").EnvironmentPlugin;
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
 const port = process.env.PORT || 8707;
@@ -46,9 +45,6 @@ module.exports = env => {
           ],
         },
         plugins: [
-          new EnvironmentPlugin({
-            SERVERLESS: /serverless/i.test(env) ? "true" : "false",
-          }),
           new ModuleFederationPlugin({
             name: "microlib",
             filename: "remoteEntry.js",

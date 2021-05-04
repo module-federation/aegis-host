@@ -49,8 +49,6 @@ const getById = {
   provider: "aws",
 };
 
-setTimeout(microlib.handleServerlessRequest, 20000, getById);
-
 process.stdin.pipe(require("split")()).on("data", processLine);
 
 console.log("press return to execute");

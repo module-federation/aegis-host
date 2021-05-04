@@ -4,13 +4,13 @@ let controller = null;
 
 /**
  * Start `startService` if it hasn't been started
- * already, and wait for it to return the`controller
+ * already, and wait for it to return the`controller`
  * function, which allows us to call any controller
- * in the servive. Save a reference to it so we can use
- * it on the next call and avoid starting the service again,
+ * in the service. Save a reference to it so we can use
+ * it agan on the next call and avoid starting the service again,
  * which is what would happen if we were warm-started.
  * @param {function()} startService - callback that starts service (MicroLib)
- * @param {"aws"|"google"|"microsoft"|"ibm"} provider - the name of the serverless provider
+ * @param {"aws"|"google"|"azure"|"ibm"} provider - the name of the serverless provider
  * @param {{req:{send:function(),status:function()},res:{}}} parsers - messsage parsers
  * @returns {Promise<{invoke:function(...args)}>}
  * call `invoke` to parse the input and call the `controller`
@@ -48,7 +48,7 @@ module.exports.ServerlessAdapter = async function (
   }
 
   // Call MicroLib and wait for controller
-  controller = await handleReload(startService());
+  controller = await startService();
 
   /**
    * @todo fix the upstream async problem:

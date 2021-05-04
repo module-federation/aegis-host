@@ -253,11 +253,13 @@ export default function makePorts(ports, adapters, observer) {
       return {
         // The port function
         async [port](...args) {
-          const config = portConf.circuitBreaker;
           // check if the port requires a breaker
+          const config = portConf.circuitBreaker;
+
           if (config) {
             // wrap port call in circuit breaker
             const breaker = CircuitBreaker(port, portFn, config);
+
             // invoke port with circuit breaker failsafe
             return breaker.invoke.apply(this, args);
           }
