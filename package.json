@@ -23,7 +23,7 @@
     "rebuild": "npm run build && npm run hot-reload",
     "start": "node -r dotenv/config dist/index.js",
     "run-lambda": "node -r dotenv/config lambda.js",
-    "transpile": "babel src/index.js src/auth.js src/cluster.js src/expressless.js -d dist",
+    "transpile": "babel src/index.js src/auth.js src/cluster.js webpack/ -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test": "mocha --recursive -r esm",

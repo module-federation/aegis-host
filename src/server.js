@@ -18,10 +18,10 @@ const Server = (() => {
   const routes = new Map();
   const serverless = /true/i.test(process.env.SERVERLESS);
   const serverMode = serverless ? "serverless" : "webserver";
-  const port = process.env.PORT || "8070";
-  const sslPort = process.env.SSL_PORT || "8707";
+  //const port = process.env.PORT || "8070";
+  //const sslPort = process.env.SSL_PORT || "8707";
   const apiRoot = process.env.API_ROOT || "/microlib/api";
-  const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
+  //const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
   const modelPath = `${apiRoot}/models`;
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;
@@ -149,11 +149,11 @@ const Server = (() => {
 
           await cache.load();
 
-          if (sslEnabled) console.log(`\nhttps://localhost:${sslPort} 🌎`);
-          else console.log(`\nhttp://localhost:${port} 🌎`);
+          // if (sslEnabled) console.log(`\nhttps://localhost:${sslPort} 🌎`);
+          // else console.log(`\nhttp://localhost:${port} 🌎`);
 
           process.on("SIGTERM", () => close());
-          return router;
+          return controller;
         });
       });
     });

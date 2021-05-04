@@ -59,7 +59,9 @@ export class DataSourceMongoDb extends DataSourceMemory {
   async loadModels() {
     try {
       const cursor = this.collection.find().limit(this.cacheSize);
-      cursor.forEach(model => super.save(model.id, this.hydrate(model)));
+      cursor.forEach(
+        async model => await super.save(model.id, this.hydrate(model))
+      );
     } catch (error) {
       console.error(error);
     }

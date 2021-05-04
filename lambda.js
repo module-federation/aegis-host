@@ -53,6 +53,7 @@ setTimeout(microlib.handleServerlessRequest, 20000, getById);
 
 process.stdin.pipe(require("split")()).on("data", processLine);
 
+console.log("press return to execute");
 async function processLine(line) {
   post.msg = line;
   console.log(line + "!");

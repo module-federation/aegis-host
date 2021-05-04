@@ -116,6 +116,8 @@ ENTRYPOINT ["/bin/bash"]
 
 COPY dist dist/
 COPY package.json .
+COPY  dest
+COPY webpack webpack/
 ENV PORT 8070
 EXPOSE 80701
 

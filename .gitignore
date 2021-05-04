@@ -10,7 +10,7 @@ src/models/.DS_Store
 .DS_Store
 accessToken.sh
 public/token.json
-
+.serverless
 #amplify
 amplify/\#current-cloud-backend
 amplify/.config/local-*
