@@ -50,23 +50,26 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-#package:
-#  patterns:
-#    - '!exclude-me.js'
+package:
+  patterns:
+    - '!doc'
 #    - '!exclude-me-dir/**'
 #    - include-me.js
 #    - include-me-dir/**
 
 functions:
-  startAegis:
+  aegis:
     handler: dist/index.handleServerlessRequest
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
-    #events:
-    #  http:
-    #    path: /{any+} # this matches any path, the token 'any' doesn't mean anything special
-    #    method: ANY
+    events:
+      - http:
+          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          method: post
+      - http:
+          path: /
+          method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)

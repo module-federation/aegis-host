@@ -18,7 +18,7 @@ Resources:
   ExpressLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://aegisserverless2/863ce8c4a69817975c49db469cb939b6
+      CodeUri: s3://aegisserverless2/801619a88b45ff4a40221351c1c5e056
       Handler: lambda.handler
       MemorySize: 1024
       Runtime: nodejs12.x

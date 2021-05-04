@@ -14,15 +14,30 @@ import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 
+const apiRoot = process.env.API_ROOT || "/microlib/api";
+//const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
+const modelPath = `${apiRoot}/models`;
+
+class RouteMap extends Map {
+  has(route) {
+    if (super.has(route)) return true;
+    if (super.has(route.split("/").concat([":id"]).join("/"))) {
+      return true;
+    }
+    if (super.has(route.split("/").concat([":id", ":cmd"]).join("/"))) {
+      return true;
+    }
+    return false;
+  }
+}
+
 const Server = (() => {
-  const routes = new Map();
+  const routes = new RouteMap();
   const serverless = /true/i.test(process.env.SERVERLESS);
   const serverMode = serverless ? "serverless" : "webserver";
   //const port = process.env.PORT || "8070";
   //const sslPort = process.env.SSL_PORT || "8707";
-  const apiRoot = process.env.API_ROOT || "/microlib/api";
-  //const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
-  const modelPath = `${apiRoot}/models`;
+
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;
   const endpointCmd = e => `${modelPath}/${e}/:id/:command`;
@@ -53,7 +68,6 @@ const Server = (() => {
      * @param {*} controllers
      */
     webserver(path, method, controllers, app) {
-      console.info("running in webserver mode");
       controllers().forEach(ctlr => {
         console.info(ctlr);
         app[method](path(ctlr.endpoint), http(ctlr.fn));
@@ -67,7 +81,6 @@ const Server = (() => {
      * @param {*} controllers
      */
     serverless(path, method, controllers) {
-      console.info("running in serverless mode");
       controllers().forEach(ctlr => {
         const route = path(ctlr.endpoint);
         if (routes.has(route)) {
@@ -135,6 +148,8 @@ const Server = (() => {
       return getRemoteModules.then(initRemotes => {
         initRemotes(remotes, overrides).then(async () => {
           const cache = initCache();
+
+          console.log(`running in ${serverMode} mode`);
 
           make[serverMode](endpoint, "post", postModels, router);
           make[serverMode](endpoint, "get", getModels, router);

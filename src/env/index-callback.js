@@ -10,8 +10,6 @@ const express = require("express");
 const cluster = require("./cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("./auth");
-const parsers = require("./serverless-messages").parsers;
-const { ServerlessAdapter } = require("./serverless-adapter");
 
 const port = process.env.PORT || 8707;
 const sslPort = process.env.SSL_PORT || 8070;
@@ -19,7 +17,6 @@ const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
 const serverless = /true/i.test(process.env.SERVERLESS);
-const cloudName = process.env.PROVIDER_NAME;
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 let serviceStarted = false;
 
@@ -33,7 +30,7 @@ const app = authorization(express(), "/microlib");
  *
  * @param {boolean} hot `true` to hot reload
  */
-async function startMicroLib({ hot = false } = {}) {
+async function startMicroLib({ hot = false, cb = () => null } = {}) {
   const remoteEntry = importFresh("./remoteEntry");
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
@@ -42,6 +39,7 @@ async function startMicroLib({ hot = false } = {}) {
     serverModule.default.clear();
   }
   await serverModule.default.start(app);
+  cb(serverModule.default.controller);
   return serverModule.default.controller;
 }
 
@@ -116,15 +114,20 @@ function startWebServer() {
  * hot reload via rolling restart or deleting cache
  */
 async function startService() {
-  try {
-    await startMicroLib();
-    app.use(express.json());
-    app.use(express.static("public"));
-    reloadCallback();
-    if (!serverless) startWebServer();
-  } catch (e) {
-    console.error(e);
-  }
+  startMicroLib(() => {
+    try {
+      app.use(express.json());
+      app.use(express.static("public"));
+      reloadCallback();
+      if (!serverless) {
+        startWebServer();
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    console.info("running in serverless mode");
+  });
 }
 
 if (!serverless) {
@@ -135,12 +138,65 @@ if (!serverless) {
   }
 }
 
-/**
- *
- * @param  {...any} args
- */
+const res = {
+  send(data) {
+    console.log("send", data);
+    return data;
+  },
+  status(num) {
+    console.log("status", num);
+    return this;
+  },
+  set(data) {
+    console.log("set", data);
+  },
+  headers: {},
+  type: data => console.log(data),
+};
+
+const ServerlessAdapter = (() => {
+  let controller = null;
+  let started = false;
+
+  const parsers = {
+    aws: args => ({ req: { ...args }, res }),
+    azure: args => ({ req: { ...args }, res }),
+    google: args => ({ req: { ...args }, res }),
+    ibm: args => ({ req: { ...args }, res }),
+  };
+
+  function parsePayload(...args) {
+    console.debug({ name: parsePayload.name, args });
+    const parse = parsers.aws;
+
+    if (typeof parse === "function") {
+      const output = parse(...args);
+      console.debug({ func: parse.name, output });
+      return output;
+    }
+    console.warn("no parser found for provider", args.provider);
+  }
+
+  function controllerCallback(...args) {
+    return async function (controller) {
+      const { req, res } = parsePayload(...args);
+      controller(...args);
+    };
+  }
+
+  return {
+    async invokeController(...args) {
+      if (started) {
+        controllerCallback(...args)(controller);
+      }
+
+      started = true;
+      controller = await startMicroLib({ cb: controllerCallback(...args) });
+    },
+  };
+})();
+
 exports.handleServerlessRequest = async function (...args) {
   console.info("serverless mode initializing", args);
-  const adapter = await ServerlessAdapter(startMicroLib, cloudName, parsers);
-  return adapter.invoke(...args);
+  ServerlessAdapter.invokeController(...args);
 };
