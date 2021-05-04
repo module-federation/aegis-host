@@ -4,7 +4,7 @@ let controller = null;
 
 /**
  * Start `startService` if it hasn't been started
- * already, and wait for it to return the`controller`
+ * already, and wait for it to return the`controller
  * function, which allows us to call any controller
  * in the servive. Save a reference to it so we can use
  * it on the next call and avoid starting the service again,
@@ -32,14 +32,22 @@ module.exports.ServerlessAdapter = async function (
     console.warn("no parser found for provider");
   }
 
+  async function handleReload(result) {
+    if (result === "reload") {
+      return async function reload(reloadCallback) {
+        controller = await reloadCallback();
+      };
+    }
+    return result;
+  }
+
   /**
-   * invokes the controller for a given routed
+   * invokes the controller for a given route
    * @param  {...any} args
    */
   function invoke(...args) {
     const { req, res } = parsePayload(...args);
-
-    return controller(req.path, req.method, req, res);
+    return handleReload(controller(req.path, req.method, req, res));
   }
 
   if (controller) {
@@ -49,7 +57,7 @@ module.exports.ServerlessAdapter = async function (
   }
 
   // Call MicroLib and wait for controller
-  controller = await startService();
+  controller = await handleReload(startService());
 
   /**
    * @todo fix the upstream async problem:

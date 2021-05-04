@@ -118,6 +118,7 @@ const Server = (() => {
    */
   async function controller(path, method, req, res) {
     console.debug({ path, method, req, res });
+    if (path === "/reload") return "reload";
     if (routes.has(path)) {
       try {
         console.debug("path match");

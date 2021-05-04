@@ -85,10 +85,10 @@
               }
             }
           },
-          "StartAegisLogGroup": {
+          "AegisLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/aegis-dev-startAegis"
+              "LogGroupName": "/aws/lambda/aegis-dev-aegis"
             }
           },
           "IamRoleLambdaExecution": {
@@ -202,7 +202,7 @@
                         "Resource": [
                           {
                             "Fn::GetAtt": [
-                              "StartAegisLogGroup",
+                              "AegisLogGroup",
                               "Arn"
                             ]
                           }
@@ -214,18 +214,18 @@
               ]
             }
           },
-          "StartAegisLambdaFunction": {
+          "AegisLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/aegis/dev/1620014762478-2021-05-03T04:06:02.478Z/aegis.zip"
+                "S3Key": "serverless/aegis/dev/1620139862169-2021-05-04T14:51:02.169Z/aegis.zip"
               },
-              "Handler": "s_startAegis.handler",
+              "Handler": "s_aegis.handler",
               "Runtime": "nodejs12.x",
-              "FunctionName": "aegis-dev-startAegis",
+              "FunctionName": "aegis-dev-aegis",
               "MemorySize": 1024,
               "Timeout": 6,
               "Role": {
@@ -236,26 +236,365 @@
               }
             },
             "DependsOn": [
-              "StartAegisLogGroup"
+              "AegisLogGroup"
             ]
           },
-          "StartAegisLambdaVersionoSP53H9ACqUtiRsz6JjqqI5JjGZczATrxCRt9IQNw": {
+          "AegisLambdaVersionOydjLaCaheneBSnKLcfLrmZGJmiAqQblYpFCRqpbzI": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
-                "Ref": "StartAegisLambdaFunction"
+                "Ref": "AegisLambdaFunction"
               },
-              "CodeSha256": "FyRLQimAVhNzShRlvxF3ZIaDUCB9nyDEoBfmUT06YxA="
+              "CodeSha256": "1KAGDP/N0Y4kIZU8xnP8NxESneMe9Xd6ox3P9sXWdUo="
             }
           },
-          "CloudWatchLogsSubscriptionFilterStartAegisLogGroup": {
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-aegis",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceMicrolib": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "microlib",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceMicrolibApi": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceMicrolib"
+              },
+              "PathPart": "api",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceMicrolibApiModels": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceMicrolibApi"
+              },
+              "PathPart": "models",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceMicrolibApiModelsAnyVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceMicrolibApiModels"
+              },
+              "PathPart": "{any+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodMicrolibApiModelsAnyVarPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceMicrolibApiModelsAnyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AegisLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AegisLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1620139851523": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodMicrolibApiModelsAnyVarPost",
+              "ApiGatewayMethodGet"
+            ]
+          },
+          "AegisLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "AegisLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "ApiGatewayLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/api-gateway/aegis-dev"
+            }
+          },
+          "CustomApiGatewayAccountCloudWatchRole": {
+            "Type": "Custom::ApiGatewayAccountRole",
+            "Version": 1,
+            "Properties": {
+              "ServiceToken": {
+                "Fn::GetAtt": [
+                  "CustomDashresourceDashapigwDashcwDashroleLambdaFunction",
+                  "Arn"
+                ]
+              }
+            }
+          },
+          "IamRoleCustomResourcesLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "dev",
+                        "aegis",
+                        "custom-resources-lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Resource": {
+                          "Fn::Join": [
+                            ":",
+                            [
+                              "arn",
+                              {
+                                "Ref": "AWS::Partition"
+                              },
+                              "iam:",
+                              {
+                                "Ref": "AWS::AccountId"
+                              },
+                              "role/*"
+                            ]
+                          ]
+                        },
+                        "Action": [
+                          "iam:AttachRolePolicy",
+                          "iam:CreateRole",
+                          "iam:ListAttachedRolePolicies",
+                          "iam:PassRole"
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Resource": {
+                          "Fn::Join": [
+                            ":",
+                            [
+                              "arn",
+                              {
+                                "Ref": "AWS::Partition"
+                              },
+                              "apigateway:*::/account"
+                            ]
+                          ]
+                        },
+                        "Action": [
+                          "apigateway:GET",
+                          "apigateway:PATCH"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "CustomDashresourceDashapigwDashcwDashroleLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/aegis/dev/1620139862169-2021-05-04T14:51:02.169Z/custom-resources.zip"
+              },
+              "FunctionName": "aegis-dev-custom-resource-apigw-cw-role",
+              "Handler": "apiGatewayCloudWatchRole/handler.handler",
+              "MemorySize": 1024,
+              "Runtime": "nodejs12.x",
+              "Timeout": 180,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleCustomResourcesLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "IamRoleCustomResourcesLambdaExecution"
+            ]
+          },
+          "CloudWatchLogsSubscriptionFilterAegisLogGroup": {
             "Type": "AWS::Logs::SubscriptionFilter",
             "Properties": {
               "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:TKJtqmbyYj3y7tvRjt#nggJhkpFXFwd5Mfz2f#aegis#dev",
               "FilterPattern": "?\"REPORT RequestId: \" ?\"SERVERLESS_ENTERPRISE\"",
               "LogGroupName": {
-                "Ref": "StartAegisLogGroup"
+                "Ref": "AegisLogGroup"
+              }
+            }
+          },
+          "CloudWatchLogsSubscriptionFilterApiGatewayLogGroup": {
+            "Type": "AWS::Logs::SubscriptionFilter",
+            "Properties": {
+              "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:TKJtqmbyYj3y7tvRjt#nggJhkpFXFwd5Mfz2f#aegis#dev",
+              "FilterPattern": "\"SLS_ACCESS_LOG\"",
+              "LogGroupName": {
+                "Ref": "ApiGatewayLogGroup"
               }
             }
           }
@@ -280,13 +619,39 @@
               "Name": "sls-aegis-dev-EnterpriseLogAccessIamRole"
             }
           },
-          "StartAegisLambdaFunctionQualifiedArn": {
+          "AegisLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "StartAegisLambdaVersionoSP53H9ACqUtiRsz6JjqqI5JjGZczATrxCRt9IQNw"
+              "Ref": "AegisLambdaVersionOydjLaCaheneBSnKLcfLrmZGJmiAqQblYpFCRqpbzI"
             },
             "Export": {
-              "Name": "sls-aegis-dev-StartAegisLambdaFunctionQualifiedArn"
+              "Name": "sls-aegis-dev-AegisLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-aegis-dev-ServiceEndpoint"
             }
           }
         }
@@ -373,20 +738,40 @@
           }
         }
       },
+      "logs": {
+        "restApi": {
+          "format": "{\"requestTime\":\"$context.requestTime\",\"requestId\":\"$context.requestId\",\"apiId\":\"$context.apiId\",\"resourceId\":\"$context.resourceId\",\"resourcePath\":\"$context.resourcePath\",\"path\":\"$context.path\",\"httpMethod\":\"$context.httpMethod\",\"status\":\"$context.status\",\"authLatency\":\"$context.authorizer.integrationLatency\",\"integrationLatency\":\"$context.integrationLatency\",\"integrationStatus\":\"$context.integrationStatus\",\"responseLatency\":\"$context.responseLatency\",\"responseLength\":\"$context.responseLength\",\"errorMessage\":\"$context.error.message\",\"format\":\"SLS_ACCESS_LOG\",\"version\":\"1.0.0\"}"
+        }
+      },
       "vpc": {}
     },
     "pluginsData": {},
     "functions": {
-      "startAegis": {
-        "handler": "s_startAegis.handler",
-        "events": [],
-        "name": "aegis-dev-startAegis",
+      "aegis": {
+        "handler": "s_aegis.handler",
+        "events": [
+          {
+            "http": {
+              "path": "microlib/api/models/{any+}",
+              "method": "post",
+              "integration": "AWS_PROXY"
+            }
+          },
+          {
+            "http": {
+              "path": "",
+              "method": "get",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "aegis-dev-aegis",
         "package": {},
         "memory": 1024,
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "StartAegisLambdaVersionoSP53H9ACqUtiRsz6JjqqI5JjGZczATrxCRt9IQNw"
+        "versionLogicalId": "AegisLambdaVersionOydjLaCaheneBSnKLcfLrmZGJmiAqQblYpFCRqpbzI"
       }
     },
     "configValidationMode": "warn",
@@ -404,6 +789,17 @@
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
       },
+      "package": {
+        "patterns": [
+          "!doc"
+        ],
+        "include": [
+          "s_*.js",
+          "serverless_sdk/**"
+        ],
+        "artifact": "/Users/tmidboeus.ibm.com/module-federation/MicroLib/.serverless/aegis.zip",
+        "artifactDirectoryName": "serverless/aegis/dev/1620139862169-2021-05-04T14:51:02.169Z"
+      },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
       }
@@ -415,7 +811,7 @@
     "artifact": "/Users/tmidboeus.ibm.com/module-federation/MicroLib/.serverless/aegis.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/aegis/dev/1620014762478-2021-05-03T04:06:02.478Z",
+    "artifactDirectoryName": "serverless/aegis/dev/1620139862169-2021-05-04T14:51:02.169Z",
     "artifact": "aegis.zip"
   }
 }

@@ -27,6 +27,16 @@ let serviceStarted = false;
 const app = authorization(express(), "/microlib");
 
 /**
+ * Callbacks attached to existing routes are stale.
+ * Clear the routes we need to update.
+ */
+function clearRoutes() {
+  app._router.stack = app._router.stack.filter(
+    k => !(k && k.route && k.route.path && k.route.path.startsWith(apiRoot))
+  );
+}
+
+/**
  * Load federated server module. Call `clear` to delete non-webpack cache if
  * hot reloading. Call `start` to import remote models, adapters, services,
  * set API routes and load persisted data from storage.
@@ -38,21 +48,12 @@ async function startMicroLib({ hot = false } = {}) {
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
   if (hot) {
+    clearRoutes();
     // clear cache on hot reload
     serverModule.default.clear();
   }
   await serverModule.default.start(app);
   return serverModule.default.controller;
-}
-
-/**
- * Callbacks attached to existing routes are stale.
- * Clear the routes we need to update.
- */
-function clearRoutes() {
-  app._router.stack = app._router.stack.filter(
-    k => !(k && k.route && k.route.path && k.route.path.startsWith(apiRoot))
-  );
 }
 
 /**
@@ -75,7 +76,6 @@ function reloadCallback() {
 
   app.use(reloadPath, async function (req, res) {
     try {
-      clearRoutes();
       await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");
     } catch (error) {
@@ -135,12 +135,22 @@ if (!serverless) {
   }
 }
 
+function handleReload(result) {
+  if (typeof result === "function" && result.name === "reload") {
+    result(function () {
+      return startMicroLib({ hot: true });
+    });
+  }
+  return result;
+}
+
 /**
  *
  * @param  {...any} args
  */
 exports.handleServerlessRequest = async function (...args) {
   console.info("serverless mode initializing", args);
+
   const adapter = await ServerlessAdapter(startMicroLib, cloudName, parsers);
-  return adapter.invoke(...args);
+  handleReload(adapter.invoke(...args));
 };
