@@ -53,7 +53,7 @@ async function startMicroLib({ hot = false } = {}) {
     clearRoutes();
   }
   await serverModule.default.start(app);
-  return serverModule.default.controller;
+  return serverModule.default.control;
 }
 
 /**
@@ -136,12 +136,11 @@ if (!serverless) {
 }
 
 /**
- *
+ * 
  * @param  {...any} args
  */
 exports.handleServerlessRequest = async function (...args) {
   console.info("serverless mode initializing", args);
-
   const adapter = await ServerlessAdapter(startMicroLib, cloudName, parsers);
   return adapter.invoke(...args);
 };

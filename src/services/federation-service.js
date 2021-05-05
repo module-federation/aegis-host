@@ -10,6 +10,7 @@ export async function importRemoteModels(remoteEntries) {
   const remoteModels = [];
   try {
     for (const entry of remoteEntries) {
+      console.info(`streaming from ${entry.url}`);
       if (entry.type === "model") {
         const models = await entry.importRemote();
         remoteModels.push(models);
@@ -35,6 +36,7 @@ export async function importRemoteServices(remoteEntries) {
 
   let services = [];
   for (const entry of remoteEntries) {
+    console.info(`streaming from ${entry.url}`);
     if (entry.type === "service") {
       const service = await entry.importRemote();
       services.push(service);
@@ -55,6 +57,7 @@ export async function importRemoteAdapters(remoteEntries) {
   let adapters = [];
   for (const entry of remoteEntries) {
     if (entry.type === "adapter") {
+      console.info(`streaming from ${entry.url}`);
       const adapter = await entry.importRemote();
       adapters.push(adapter);
     }

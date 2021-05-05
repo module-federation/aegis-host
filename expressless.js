@@ -13,50 +13,69 @@ const order = {
   ],
 };
 
-const post = {
-  query: null,
-  path: "/microlib/api/models/orders",
-  method: "post",
-  get: header => {
-    const headers = {
-      "Content-Type": "application/json",
-      referer: "localhost",
-      "User-Agent": "expressless",
-    };
-    return headers[header];
+const payloads = {
+  post: {
+    query: null,
+    path: "/microlib/api/models/orders",
+    method: "post",
+    get: header => {
+      const headers = {
+        "Content-Type": "application/json",
+        referer: "localhost",
+        "User-Agent": "expressless",
+      };
+      return headers[header];
+    },
+    body: order,
+    query: "count=all",
+    params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
+    provider: "aws",
   },
-  body: order,
-  query: "count=all",
-  params: null,
-  provider: "aws",
-};
 
-const getById = {
-  query: null,
-  path: "/microlib/api/models/orders/:id",
-  method: "get",
-  get: header => {
-    const headers = {
-      "Content-Type": "application/json",
-      referer: "localhost",
-      "User-Agent": "expressless",
-    };
-    return headers[header];
+  getbyid: {
+    query: null,
+    path: "/microlib/api/models/orders/116ce522-a7dc-4578-aef3-bb9ce276df08",
+    method: "get",
+    params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
+    get: header => {
+      const headers = {
+        "Content-Type": "application/json",
+        referer: "localhost",
+        "User-Agent": "expressless",
+      };
+      return headers[header];
+    },
+    query: "count=all",
+    params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
+    provider: "aws",
   },
-  body: order,
-  query: "count=all",
-  params: null,
-  provider: "aws",
-};
 
-setTimeout(microlib.handleServerlessRequest, 20000, getById);
+  get: {
+    query: null,
+    path: "/microlib/api/models/orders",
+    method: "get",
+    params: null,
+    get: header => {
+      const headers = {
+        "Content-Type": "application/json",
+        referer: "localhost",
+        "User-Agent": "expressless",
+      };
+      return headers[header];
+    },
+    query: "count=all",
+    params: { id: null, command: null },
+    provider: "aws",
+  },
+};
 
 process.stdin.pipe(require("split")()).on("data", processLine);
-
 console.log("press return to execute");
 
 async function processLine(line) {
-  post.msg = line;
-  console.log(line + "!");
-  await microlib.handleServerlessRequest(post);
+  msg = line;
+
+  if (["post", "getbyid", "get"].includes(msg.toLowerCase()))
+    await microlib.handleServerlessRequest(payloads[msg.toLowerCase()]);
+  else await microlib.handleServerlessRequest(payloads["post"]);
 }

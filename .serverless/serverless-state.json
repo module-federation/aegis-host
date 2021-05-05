@@ -221,7 +221,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/aegis/dev/1620149993754-2021-05-04T17:39:53.754Z/aegis.zip"
+                "S3Key": "serverless/aegis/dev/1620193833801-2021-05-05T05:50:33.801Z/aegis.zip"
               },
               "Handler": "s_aegis.handler",
               "Runtime": "nodejs12.x",
@@ -239,14 +239,14 @@
               "AegisLogGroup"
             ]
           },
-          "AegisLambdaVersionDSyig2GDeci1YQ8tI7kpkMwsO9dzX6D492fA3pXr8RE": {
+          "AegisLambdaVersionFrKQTntbdoLOpUR7wonPhOWl3BVdUO9MIziOeX3uM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AegisLambdaFunction"
               },
-              "CodeSha256": "id9DUMVGKt++B6c9Ja/7kTiD1x7RkX68K7vW7BTC6FY="
+              "CodeSha256": "IFot88q+ICgZfAXw/XHDRynTKv6fbwfxJ0zXAtCdh28="
             }
           },
           "ApiGatewayRestApi": {
@@ -401,7 +401,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1620149984554": {
+          "ApiGatewayDeployment1620193824649": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -560,7 +560,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/aegis/dev/1620149993754-2021-05-04T17:39:53.754Z/custom-resources.zip"
+                "S3Key": "serverless/aegis/dev/1620193833801-2021-05-05T05:50:33.801Z/custom-resources.zip"
               },
               "FunctionName": "aegis-dev-custom-resource-apigw-cw-role",
               "Handler": "apiGatewayCloudWatchRole/handler.handler",
@@ -622,7 +622,7 @@
           "AegisLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AegisLambdaVersionDSyig2GDeci1YQ8tI7kpkMwsO9dzX6D492fA3pXr8RE"
+              "Ref": "AegisLambdaVersionFrKQTntbdoLOpUR7wonPhOWl3BVdUO9MIziOeX3uM"
             },
             "Export": {
               "Name": "sls-aegis-dev-AegisLambdaFunctionQualifiedArn"
@@ -771,7 +771,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "AegisLambdaVersionDSyig2GDeci1YQ8tI7kpkMwsO9dzX6D492fA3pXr8RE"
+        "versionLogicalId": "AegisLambdaVersionFrKQTntbdoLOpUR7wonPhOWl3BVdUO9MIziOeX3uM"
       }
     },
     "configValidationMode": "warn",
@@ -798,7 +798,7 @@
           "serverless_sdk/**"
         ],
         "artifact": "/Users/tmidboeus.ibm.com/module-federation/MicroLib/.serverless/aegis.zip",
-        "artifactDirectoryName": "serverless/aegis/dev/1620149993754-2021-05-04T17:39:53.754Z"
+        "artifactDirectoryName": "serverless/aegis/dev/1620193833801-2021-05-05T05:50:33.801Z"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
@@ -811,7 +811,7 @@
     "artifact": "/Users/tmidboeus.ibm.com/module-federation/MicroLib/.serverless/aegis.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/aegis/dev/1620149993754-2021-05-04T17:39:53.754Z",
+    "artifactDirectoryName": "serverless/aegis/dev/1620193833801-2021-05-05T05:50:33.801Z",
     "artifact": "aegis.zip"
   }
 }

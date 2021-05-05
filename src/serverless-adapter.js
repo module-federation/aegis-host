@@ -4,7 +4,7 @@ let controller = null;
 
 /**
  * Start `startService` if it hasn't been started
- * already, and wait for it to return the`controller`
+ * already, and wait for it to return the`control`
  * function, which allows us to call any controller
  * in the service. Save a reference to it so we can use
  * it agan on the next call and avoid starting the service again,

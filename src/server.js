@@ -19,20 +19,37 @@ const modelPath = `${apiRoot}/models`;
 
 class RouteMap extends Map {
   has(route) {
-    if (super.has(route)) return true;
-    if (
-      route.match(/\//g) === 4 &&
-      super.has(route.split("/").splice(0, 4).concat([":id"]).join("/"))
-    ) {
+    if (!route) {
+      console.warn("route is ", typeof route);
+      return false;
+    }
+    
+    if (super.has(route)) {
+      this.route = super.get(route);
       return true;
     }
-    if (
-      route.match(/\//g) === 5 &&
-      super.has(route.split("/").splice(0, 4).concat([":id", ":cmd"]).join("/"))
-    ) {
+
+    const idRoute = route.split("/").splice(0, 5).concat([":id"]).join("/");
+    if (route.match(/\//g).length === 5 && super.has(idRoute)) {
+      this.route = super.get(idRoute);
       return true;
+    }
+
+    const cmdRoute = route
+      .split("/")
+      .splice(0, 6)
+      .concat([":id", ":cmd"])
+      .join("/");
+    if (route.match(/\//g).length === 6 && super.has(cmdRoute)) {
+      this.route = super.get(cmdRoute);
+      return true;
+      s;
     }
     return false;
+  }
+
+  get(route) {
+    return this.route;
   }
 }
 
@@ -121,16 +138,15 @@ const Server = (() => {
   /**
    * call controllers directly in serverless mode
    */
-  async function controller(path, method, req, res) {
+  async function control(path, method, req, res) {
     console.debug({ path, method, req, res });
-    if (path === "/reload") return "reload";
     if (routes.has(path)) {
       try {
         console.debug("path match");
         const fn = routes.get(path)[method];
         if (fn) {
           console.debug("method match");
-          return fn(req, res);
+          return await fn(req, res);
         }
         console.warn("method not supported", path, method);
       } catch (error) {
@@ -174,7 +190,7 @@ const Server = (() => {
           // else console.log(`\nhttp://localhost:${port} 🌎`);
 
           process.on("SIGTERM", () => close());
-          return controller;
+          return control;
         });
       });
     });
@@ -183,7 +199,7 @@ const Server = (() => {
   return {
     clear,
     start,
-    controller,
+    control,
   };
 })();
 
