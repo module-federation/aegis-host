@@ -56,13 +56,16 @@ function httpGet(entry, path, done) {
 
 function dedupEntries(entries) {
   return entries
-    .map(e => ({
-      [new URL(e.url).hostname.concat(e.path)]: {
-        ...e,
-        name: new URL(e.url).hostname.concat(e.path),
-      },
-    }))
-    .reduce((p, c) => ({ ...p, ...c }));
+    .map(function (e) {
+      const dupName = new URL(e.url).hostname.concat(e.path);
+      return {
+        [dupName]: {
+          ...e,
+          name: dupName,
+        },
+      };
+    })
+    .reduce((p, c) => ({ ...p, ...c, ...c[0] }));
 }
 
 /**
@@ -113,15 +116,15 @@ module.exports = async remoteEntry => {
       });
     })
   );
-  //console.log(remotes); 
-  const updatedEntries = entries
-    .map(function (e) {
-      const eid = new URL(e.url).hostname.concat(e.path);
-      return { [e.name]: remotes.find(r => r[eid])[eid] };
-    })
-    .reduce((p, c) => ({ ...c, ...p }));
 
-  console.log(updatedEntries);
+  const updatedEntries = entries.map(function (e) {
+    const commonName = new URL(e.url).hostname.concat(e.path);
+    return {
+      [e.name]: remotes.find(r => r[commonName])[commonName],
+    };
+  });
+
+  console.log(updatedEntries[0]);
   return updatedEntries;
   // const remotes = await Promise.all(
   //   entries.map(async entry => {
