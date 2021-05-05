@@ -13,6 +13,7 @@ const chalk = require("chalk");
 module.exports = env => {
   if (/serverless/i.test(env)) {
     remoteEntries.forEach(e => (e.path = "webpack"));
+    console.log(chalk.yellow("serverless build"));
   }
   return new Promise(resolve => {
     fetchRemotes(remoteEntries).then(remotes => {

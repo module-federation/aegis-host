@@ -121,7 +121,7 @@ async function startService() {
     app.use(express.json());
     app.use(express.static("public"));
     reloadCallback();
-    if (!serverless) startWebServer();
+    startWebServer();
   } catch (e) {
     console.error(e);
   }
@@ -136,7 +136,7 @@ if (!serverless) {
 }
 
 /**
- * 
+ *
  * @param  {...any} args
  */
 exports.handleServerlessRequest = async function (...args) {
