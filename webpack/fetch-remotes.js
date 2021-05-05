@@ -65,7 +65,7 @@ function dedupEntries(entries) {
         },
       };
     })
-    .reduce((p, c) => ({ ...p, ...c, ...c[0] }));
+    .reduce((p, c) => ({ ...p, ...c }));
 }
 
 /**
@@ -124,24 +124,5 @@ module.exports = async remoteEntry => {
     };
   });
 
-  console.log(updatedEntries[0]);
   return updatedEntries;
-  // const remotes = await Promise.all(
-  //   entries.map(async entry => {
-  //     const path = getPath(entry);
-  //     console.log(path);
-
-  //     return new Promise(async resolve => {
-  //       const resolvePath = () => resolve({ [entry.name]: path });
-
-  //       if (entry.url.startsWith("https://github")) {
-  //         await githubFetch(entry);
-  //         resolvePath();
-  //       } else {
-  //         httpGet(entry, resolvePath);
-  //       }
-  //     });
-  //   })
-  // );
-  //return remotes.reduce((p, c) => ({ ...c, ...p }));
 };

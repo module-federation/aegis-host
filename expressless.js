@@ -27,14 +27,14 @@ const payloads = {
       return headers[header];
     },
     body: order,
-    query: "count=all",
+    query: null,
     params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
     provider: "aws",
   },
 
   getbyid: {
     query: null,
-    path: "/microlib/api/models/orders/116ce522-a7dc-4578-aef3-bb9ce276df08",
+    path: "/microlib/api/models/orders",
     method: "get",
     params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
     get: header => {
@@ -45,7 +45,7 @@ const payloads = {
       };
       return headers[header];
     },
-    query: "count=all",
+    query: null,
     params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
     provider: "aws",
   },
@@ -63,8 +63,8 @@ const payloads = {
       };
       return headers[header];
     },
-    query: "count=all",
-    params: { id: null, command: null },
+    query: null,
+    params: null,
     provider: "aws",
   },
 };
@@ -73,9 +73,17 @@ process.stdin.pipe(require("split")()).on("data", processLine);
 console.log("press return to execute");
 
 async function processLine(line) {
-  msg = line;
+  const methodModelId = line.split(" ");
 
-  if (["post", "getbyid", "get"].includes(msg.toLowerCase()))
-    await microlib.handleServerlessRequest(payloads[msg.toLowerCase()]);
-  else await microlib.handleServerlessRequest(payloads["post"]);
+  if (["post", "getbyid", "get"].includes(methodModelId[0].toLowerCase())) {
+    if (methodModelId.length > 1) {
+      payloads["getbyid"].url += "/" + methodModelId[1];
+    }
+    const result = await microlib.handleServerlessRequest(
+      payloads[methodModelId[0].toLowerCase()]
+    );
+    console.log(result);
+  } else {
+    console.log(await microlib.handleServerlessRequest(payloads["post"]));
+  }
 }

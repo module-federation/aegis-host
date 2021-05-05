@@ -51,13 +51,14 @@ export default function buildCallback(controller) {
       },
     };
 
-    controller(httpRequest)
+    return controller(httpRequest)
       .then(httpResponse => {
         if (httpResponse.headers) {
           res.set(httpResponse.headers);
         }
         res.type("json");
-        return res.status(httpResponse.statusCode).send(httpResponse.body);
+        res.status(httpResponse.statusCode).send(httpResponse.body);
+        return httpResponse.body;
       })
       .catch(e => res.status(500).send({ error: "An unkown error occurred." }));
   };

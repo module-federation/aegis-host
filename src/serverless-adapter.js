@@ -38,7 +38,7 @@ module.exports.ServerlessAdapter = async function (
    */
   function invoke(...args) {
     const { req, res } = parsePayload(...args);
-    controller(req.path, req.method, req, res);
+    return controller(req.path, req.method, req, res);
   }
 
   if (controller) {
