@@ -71,9 +71,7 @@ console.log(
 
 async function processLine(line) {
   let [method, modelId, command] = line.split(" ");
-
   method = method.toLowerCase();
-  command = command.toLowerCase();
 
   if (Object.keys(payloads).includes(method)) {
     if (modelId) {
@@ -81,9 +79,9 @@ async function processLine(line) {
       payloads[method].event.pathParameters = { id: modelId };
     }
     if (command) {
-      payloads[command].event.path += "/" + command;
-      payloads[command].event.pathParameters = {
-        ...payloads[command].event.pathParameters,
+      payloads[method].event.path += "/" + command;
+      payloads[method].event.pathParameters = {
+        ...payloads[method].event.pathParameters,
         command,
       };
     }
