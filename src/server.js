@@ -23,13 +23,14 @@ class RouteMap extends Map {
       console.warn("route is ", typeof route);
       return false;
     }
-    
+
     if (super.has(route)) {
       this.route = super.get(route);
       return true;
     }
 
     const idRoute = route.split("/").splice(0, 5).concat([":id"]).join("/");
+
     if (route.match(/\//g).length === 5 && super.has(idRoute)) {
       this.route = super.get(idRoute);
       return true;
@@ -40,16 +41,16 @@ class RouteMap extends Map {
       .splice(0, 6)
       .concat([":id", ":cmd"])
       .join("/");
+
     if (route.match(/\//g).length === 6 && super.has(cmdRoute)) {
       this.route = super.get(cmdRoute);
       return true;
-      s;
     }
     return false;
   }
 
   get(route) {
-    return this.route;
+    return this.route ? this.route : super.get(route);
   }
 }
 
