@@ -18,13 +18,17 @@ const sslPort = process.env.SSL_PORT || 8070;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
-const serverless = /true/i.test(process.env.SERVERLESS);
 const cloudName = process.env.PROVIDER_NAME;
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
-let serviceStarted = false;
 
 // enable authorization
 const app = authorization(express(), "/microlib");
+
+function isServerless() {
+  return (
+    /serverless/i.test(process.title) || /true/i.test(process.env.SERVERLESS)
+  );
+}
 
 /**
  * Callbacks attached to existing routes are stale.
@@ -127,7 +131,7 @@ async function startService() {
   }
 }
 
-if (!serverless) {
+if (!isServerless()) {
   if (clusterEnabled) {
     cluster.startCluster(startService);
   } else {

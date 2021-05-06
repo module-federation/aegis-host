@@ -1,3 +1,7 @@
+/**
+ * Serverless test harness.
+ */
+
 const microlib = require("./dist");
 
 const order = {
@@ -70,7 +74,9 @@ const payloads = {
 };
 
 process.stdin.pipe(require("split")()).on("data", processLine);
-console.log("press return to execute");
+console.log(
+  "type post,get,getbyid :id,patch :id,delete :id and press return to execute"
+);
 
 async function processLine(line) {
   const [method, modelId] = line.split(" ");

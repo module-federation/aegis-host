@@ -1,4 +1,4 @@
-const microlib = require("./dist");
+const microlib = require("../dist");
 
 const order = {
   firstName: "Uncle",
@@ -69,21 +69,14 @@ const payloads = {
   },
 };
 
-process.stdin.pipe(require("split")()).on("data", processLine);
-console.log("press return to execute");
-
-async function processLine(line) {
-  const [method, modelId] = line.split(" ");
-
-  if (["post", "getbyid", "get"].includes(method.toLowerCase())) {
-    if (modelId) {
-      payloads["getbyid"].url += "/" + modelId;
-    }
-    const result = await microlib.handleServerlessRequest(
-      payloads[method.toLowerCase()]
-    );
-    console.log(result);
-  } else {
-    console.log(await microlib.handleServerlessRequest(payloads["post"]));
+if (["post", "getbyid", "get"].includes(method.toLowerCase())) {
+  if (modelId) {
+    payloads["getbyid"].url += "/" + modelId;
   }
+  const result = await microlib.handleServerlessRequest(
+    payloads[method.toLowerCase()]
+  );
+  console.log(result);
+} else {
+  console.log(await microlib.handleServerlessRequest(payloads["post"]));
 }

@@ -54,12 +54,16 @@ class RouteMap extends Map {
   }
 }
 
+function isServerless() {
+  return (
+    /serverless/i.test(process.title) || /true/i.test(process.env.SERVERLESS)
+  );
+}
+
 const Server = (() => {
   const routes = new RouteMap();
-  const serverless = /true/i.test(process.env.SERVERLESS);
+  const serverless = isServerless();
   const serverMode = serverless ? "serverless" : "webserver";
-  //const port = process.env.PORT || "8070";
-  //const sslPort = process.env.SSL_PORT || "8707";
 
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;
@@ -137,7 +141,7 @@ const Server = (() => {
   }
 
   /**
-   * call controllers directly in serverless mode
+   * Call controllers directly in serverless mode.
    */
   async function control(path, method, req, res) {
     console.debug({ path, method, req, res });
@@ -174,12 +178,12 @@ const Server = (() => {
 
           console.log(`running in ${serverMode} mode`);
 
-          make[serverMode](endpoint, "post", postModels, router);
           make[serverMode](endpoint, "get", getModels, router);
+          make[serverMode](endpoint, "post", postModels, router);
           make[serverMode](endpointId, "get", getModelsById, router);
           make[serverMode](endpointId, "patch", patchModels, router);
-          make[serverMode](endpointCmd, "patch", patchModels, router);
           make[serverMode](endpointId, "delete", deleteModels, router);
+          make[serverMode](endpointCmd, "patch", patchModels, router);
 
           makeAdmin(router, http);
           console.info(routes);
