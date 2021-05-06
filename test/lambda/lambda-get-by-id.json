@@ -1,0 +1,6 @@
+{
+  "path": "/microlib/api/models/orders",
+  "httpMethod": "post",
+  "pathParameters": { "id": "9753f3ca-2de9-462f-9bf6-a5d8061c87d6" },
+  "isBase64Encoded": false
+}

@@ -18,15 +18,15 @@
   },
   "scripts": {
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
-    "build+deploy-serverless": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && npm run serverless-deploy",
+    "build+deploy-serverless": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && npm run serverless-deploy && npm run call-aegis-on-lambda",
     "hot-reload": "curl http://localhost:8707/microlib/reload",
     "restart": "npm run build && npm run start",
     "rebuild": "npm run build && npm run hot-reload",
     "start": "node --title aegis -r dotenv/config dist/index.js",
-    "start-serverless": "node --title aegis-serverless -r dotenv/config expressless.js",
-    "call-aegis-on-lambda": "aws lambda invoke --function arn:aws:lambda:us-east-1:758072746799:function:aegis-dev-aegis  lambda-aegis-response.json && cat lambda-aegis-response.json",
     "transpile": "babel src/index.js src/cluster.js src/auth.js src/serverless-messages.js src/serverless-adapter.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
+    "start-serverless": "node --title aegis-serverless -r dotenv/config expressless.js",
+    "call-aegis-on-lambda": "aws lambda invoke --function arn:aws:lambda:us-east-1:758072746799:function:aegis-dev-aegis --payload file://test/lambda/lambda-get-by-id.json lambda.out --cli-binary-format raw-in-base64-out && cat lambda.out",
     "clean": "rimraf dist",
     "test": "mocha --recursive -r esm",
     "demo": "open http://localhost:8707",
@@ -42,7 +42,7 @@
     "aws-deploy": "cross-var aws cloudformation deploy --template-file sam-template.packaged.yaml --stack-name $npm_package_config_cloudFormationStackName --capabilities CAPABILITY_IAM --region $npm_package_config_region --parameter-overrides DomainName=$npm_package_config_domain",
     "aws-package-deploy": "npm run build && npm run package && npm run deploy",
     "aws-delete-stack": "cross-var aws cloudformation delete-stack --stack-name $npm_package_config_cloudFormationStackName --region $npm_package_config_region",
-    "setup": "npm install && (cross-var aws s3api get-bucket-location --bucket $npm_package_config_s3BucketName --region $npm_package_config_region || npm run create-bucket) && npm run package-deploy"
+    "aws-setup": "npm install && (cross-var aws s3api get-bucket-location --bucket $npm_package_config_s3BucketName --region $npm_package_config_region || npm run create-bucket) && npm run package-deploy"
   },
   "author": "Tyson Midboe",
   "license": "MIT",

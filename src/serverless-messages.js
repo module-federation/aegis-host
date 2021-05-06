@@ -28,11 +28,11 @@ const req = {
 export const parsers = {
   aws: args => ({
     req: {
-      path: args.event.path,
-      method: args.event.httpMethod,
-      params: args.event.pathParameters,
-      body: args.event.body,
-      query: args.event.queryStringParameters,
+      path: args.path,
+      method: args.httpMethod,
+      params: args.pathParameters,
+      body: args.body,
+      query: args.queryStringParameters,
       other: { ...args },
     },
     res,

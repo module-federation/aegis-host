@@ -50,26 +50,47 @@ const payloads = {
     context: {},
     callback: x => x,
   },
+
+  patch: {
+    event: awsEvent("patch", "/microlib/api/models/orders/"),
+    context: {},
+    callback: x => x,
+  },
+
+  delete: {
+    event: awsEvent("delete", "/microlib/api/models/orders/"),
+    context: {},
+    callback: x => x,
+  },
 };
 
 process.stdin.pipe(require("split")()).on("data", processLine);
 console.log(
-  "type post,get,getbyid,patch,delete with modelId if needed and press return to execute"
+  "type post,get,getbyid,patch,delete with :id if needed and press return to execute"
 );
 
 async function processLine(line) {
-  const [method, modelId] = line.split(" ");
+  let [method, modelId, command] = line.split(" ");
 
-  if (["post", "getbyid", "get"].includes(method.toLowerCase())) {
+  method = method.toLowerCase();
+  command = command.toLowerCase();
+
+  if (Object.keys(payloads).includes(method)) {
     if (modelId) {
-      payloads["getbyid"].event.path += String(modelId);
-      payloads["getbyid"].event.pathParameters = { id: modelId };
+      payloads[method].event.path += String(modelId);
+      payloads[method].event.pathParameters = { id: modelId };
     }
-    const result = await microlib.handleServerlessRequest(
-      payloads[method.toLowerCase()]
-    );
+    if (command) {
+      payloads[command].event.path += "/" + command;
+      payloads[command].event.pathParameters = {
+        ...payloads[command].event.pathParameters,
+        command,
+      };
+    }
+    const result = await microlib.handleServerlessRequest(payloads[method]);
     console.log(result);
   } else {
-    console.log(await microlib.handleServerlessRequest(payloads["post"]));
+    const result = await microlib.handleServerlessRequest(payloads["post"]);
+    console.log(result);
   }
 }

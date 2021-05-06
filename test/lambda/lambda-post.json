@@ -1,9 +1,8 @@
 {
   "path": "/microlib/api/models/orders",
-  "method": "post",
+  "httpMethod": "post",
+  "isBase64Encoded": false,
   "body": {
-    "path": "/microlib/api/models/orders",
-    "method": "post",
     "firstName": "Uncle",
     "lastName": "Bob",
     "email": "bob@email.com",
@@ -20,7 +19,6 @@
         "price": 59,
         "qty": 4
       }
-    ],
-    "provider": "aws"
+    ]
   }
 }
