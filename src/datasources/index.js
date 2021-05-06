@@ -3,26 +3,21 @@
 /**
  * @typedef {import('../models').Model} Model
  */
-import Transaction from ".";
+import Transaction from "./transaction";
 import ModelFactory from "../models";
 import * as adapters from "./adapters";
-import {
-  DataSourceFile,
-  DataSourceMemory,
-  DataSourceMongoDb,
-} from "./adapters";
 
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
-const DataSource = adapters[adapter];
+const DefaultDataSource = adapters[adapter];
 
 function getBaseClass(name) {
-  if (name === "DataSourceMemory") {
-    return DataSourceMemory;
+  if (name === "DataSourceFile") {
+    return require("./adapters").DataSourceFile;
   }
   if (name === "DataSourceMongoDb") {
-    return DataSourceMongoDb;
+    return require("./adapters").DataSourceMongoDb;
   }
-  return DataSourceFile;
+  return require("./adapters").DataSourceMemory;
 }
 
 const DataSourceFactory = (() => {
@@ -35,18 +30,17 @@ const DataSourceFactory = (() => {
       const url = spec.datasource.url;
       const cacheSize = spec.datasource.cacheSize;
       const adapterFactory = spec.datasource.factory;
-      // Can't use property key to select from adapters.
-      const baseClass = getBaseClass(spec.datasource.baseClass);
+      const BaseClass = getBaseClass(spec.datasource.baseClass);
 
       try {
-        const adapter = adapterFactory(url, cacheSize, baseClass);
-        return new adapter(ds, factory, name);
+        const DataSource = adapterFactory(url, cacheSize, BaseClass);
+        return new DataSource(ds, factory, name);
       } catch (error) {
         console.error(error);
       }
     }
     // use default datasource
-    return new DataSource(ds, factory, name);
+    return new DefaultDataSource(ds, factory, name);
   }
 
   /**

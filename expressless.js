@@ -73,14 +73,14 @@ process.stdin.pipe(require("split")()).on("data", processLine);
 console.log("press return to execute");
 
 async function processLine(line) {
-  const methodModelId = line.split(" ");
+  const [method, modelId] = line.split(" ");
 
-  if (["post", "getbyid", "get"].includes(methodModelId[0].toLowerCase())) {
-    if (methodModelId.length > 1) {
-      payloads["getbyid"].url += "/" + methodModelId[1];
+  if (["post", "getbyid", "get"].includes(method.toLowerCase())) {
+    if (modelId) {
+      payloads["getbyid"].url += "/" + modelId;
     }
     const result = await microlib.handleServerlessRequest(
-      payloads[methodModelId[0].toLowerCase()]
+      payloads[method.toLowerCase()]
     );
     console.log(result);
   } else {

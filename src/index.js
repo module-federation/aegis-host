@@ -136,8 +136,8 @@ if (!serverless) {
 }
 
 /**
- *
- * @param  {...any} args
+ * Serverless entry point - called by the serverless function.
+ * @param  {...any} args arguments passsed to serverless function
  */
 exports.handleServerlessRequest = async function (...args) {
   console.info("serverless mode initializing", args);
