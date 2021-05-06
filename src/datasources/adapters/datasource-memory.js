@@ -3,7 +3,7 @@
 import DataSource from "../datasource";
 
 /**
- * Temporary in-memory storage
+ * Temporary in-memory storage.
  */
 export class DataSourceMemory extends DataSource {
   constructor(dataSource, factory, name) {
@@ -11,10 +11,13 @@ export class DataSourceMemory extends DataSource {
   }
 
   /**
+   * Update cache and datasource. Sync cache of other
+   * cluster members if running in cluster mode.
    * @override
    */
   async save(id, data) {
     if (process.send === "function") {
+      /** send data to cluster members */
       process.send({
         cmd: "saveBroadcast",
         pid: process.pid,
@@ -45,6 +48,7 @@ export class DataSourceMemory extends DataSource {
   }
 
   /**
+   * Return filtered or unfiltered list of model instances in cache.
    * @override
    * @param {{key1,keyN}} query
    * @returns

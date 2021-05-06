@@ -26,7 +26,17 @@ const req = {
 };
 
 export const parsers = {
-  aws: args => ({ req: { ...args, ...req }, res }),
+  aws: args => ({
+    req: {
+      ...args,
+      path: "event".path,
+      method: "event".httpMethod,
+      params: "event".pathParameters,
+      body: "event".body,
+      query: "event".queryStringParameters,
+    },
+    res,
+  }),
   azure: args => ({ req: { ...args, ...req }, res }),
   google: args => ({ req: { ...args, ...req }, res }),
   ibm: args => ({ req: { ...args, ...req }, res }),

@@ -24,6 +24,7 @@
     "rebuild": "npm run build && npm run hot-reload",
     "start": "node --title aegis -r dotenv/config dist/index.js",
     "start-serverless": "node --title aegis-serverless -r dotenv/config expressless.js",
+    "call-aegis-on-lambda": "aws lambda invoke --function arn:aws:lambda:us-east-1:758072746799:function:aegis-dev-aegis  lambda-aegis-response.json && cat lambda-aegis-response.json",
     "transpile": "babel src/index.js src/cluster.js src/auth.js src/serverless-messages.js src/serverless-adapter.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
@@ -55,7 +56,6 @@
     "import-fresh": "^3.3.0",
     "jwks-rsa": "^2.0.1",
     "mongodb": "^3.6.3",
-    "node-fetch": "^2.6.1",
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {

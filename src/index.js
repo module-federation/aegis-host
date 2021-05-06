@@ -54,6 +54,7 @@ async function startMicroLib({ hot = false } = {}) {
   if (hot) {
     // clear cache on hot reload
     serverModule.default.clear();
+    // Clear express routes
     clearRoutes();
   }
   await serverModule.default.start(app);

@@ -8,14 +8,18 @@ const State = {
   Open: Symbol(),
   /** Closed circuit. Normal operation. Client call allowed. */
   Closed: Symbol(),
-  /** Testing circuit. */
+  /** Test circuit. Let next transation through. Close if it fails. */
   HalfOpen: Symbol(),
 };
 
 const DefaultThreshold = {
+  /** Percentage of requests that failed within `intervalMs`. */
   errorRate: 20,
+  /** Total number of requests within `intervalMs` */
   callVolume: 10,
+  /** Milliseconds in which to measure threshold*/
   intervalMs: 10000,
+  /** Milliseconds to wait after tripping breaker before retesting */
   retryDelay: 30000,
 };
 
@@ -109,8 +113,9 @@ function readyToTest(log) {
  */
 const Switch = function (id, options) {
   const log = fetchLog(id);
-  /** current state of the braker */
+
   return {
+    /** current state of the braker */
     state: getState(log),
     /**
      * Breaker closed. Normal function. Requests allowed.
@@ -127,27 +132,51 @@ const Switch = function (id, options) {
       return this.state === State.Open;
     },
     /**
-     *
+     * Ready to test breaker.
      * @returns {boolean}
      */
     halfOpen() {
       return this.state === State.HalfOpen;
     },
+    /**
+     * Trip the breaker. Open switch.
+     */
     trip() {
       this.state = State.Open;
     },
+    /**
+     * Reset the breaker. Close switch.
+     */
     reset() {
       this.state = State.Closed;
     },
+    /**
+     * Test the breaker. Open switch half way. Let next transation thru.
+     * If it fails, close it immediately without checking threshold.
+     */
     test() {
       this.state = State.HalfOpen;
     },
+    /**
+     * Check error-specific threshold.
+     * If none found, use default threshold
+     * @param {Error} error
+     * @returns {boolean}
+     */
     thresholdBreached(error) {
       return thresholdBreached(log, error, options);
     },
+    /**
+     * Check if its time to test the circuit, i.e. retry.
+     * @returns {boolean}
+     */
     readyToTest() {
       return readyToTest(log);
     },
+    /**
+     * Update log with current state and error details if error.
+     * @param {*} error
+     */
     appendLog(error = null) {
       log.push({
         name: id,
@@ -175,13 +204,13 @@ const Switch = function (id, options) {
  *  },
  * }} options thresholds for different errors
  * @returns
+ * @class
  */
 const CircuitBreaker = function (id, protectedCall, options) {
   return {
     // wrap client call
     async invoke(...args) {
       const breaker = Switch(id, options);
-      //console.debug(fetchLog());
       breaker.appendLog();
 
       // check breaker status

@@ -137,10 +137,3 @@ export const withObserver = observer => o => {
     },
   };
 };
-
-// export const runCommands = event => async o => {
-//   return {
-//     ...o,
-
-//   }
-// }

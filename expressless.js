@@ -17,41 +17,34 @@ const order = {
   ],
 };
 
+const awsEvent = {
+  resource: "Resource path",
+  path: "http://microlib/api/models/orders",
+  httpMethod: "get",
+  headers: "String containing incoming request headers",
+  multiValueHeaders: "ist of strings containing incoming request headers",
+  queryStringParameters: "query string parameters",
+  multiValueQueryStringParameters: "List of query string parameters",
+  pathParameters: "",
+  stageVariables: "",
+  requestContext:
+    "Request context, including authorizer-returned key-value pairs",
+  body: 
+  isBase64Encoded: false
+};
+
 const payloads = {
   post: {
-    query: null,
-    path: "/microlib/api/models/orders",
-    method: "post",
-    get: header => {
-      const headers = {
-        "Content-Type": "application/json",
-        referer: "localhost",
-        "User-Agent": "expressless",
-      };
-      return headers[header];
-    },
-    body: order,
-    query: null,
-    params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
-    provider: "aws",
+    event: awsEvent,
+    context: {},
+    callback: x => x,
   },
 
   getbyid: {
     query: null,
     path: "/microlib/api/models/orders",
     method: "get",
-    params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
-    get: header => {
-      const headers = {
-        "Content-Type": "application/json",
-        referer: "localhost",
-        "User-Agent": "expressless",
-      };
-      return headers[header];
-    },
-    query: null,
-    params: { id: "116ce522-a7dc-4578-aef3-bb9ce276df08" },
-    provider: "aws",
+    pa,
   },
 
   get: {
@@ -75,7 +68,7 @@ const payloads = {
 
 process.stdin.pipe(require("split")()).on("data", processLine);
 console.log(
-  "type post,get,getbyid :id,patch :id,delete :id and press return to execute"
+  "type post,get,getbyid,patch,delete with modelId if needed and press return to execute"
 );
 
 async function processLine(line) {

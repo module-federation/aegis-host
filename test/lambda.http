@@ -1,0 +1,1 @@
+GET https://efki49vj87.execute-api.us-east-1.amazonaws.com/dev/microlib/api/models/{any+}
