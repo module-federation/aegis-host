@@ -147,10 +147,10 @@ const Server = (() => {
     console.debug({ path, method, req, res });
     if (routes.has(path)) {
       try {
-        console.debug("path match");
+        console.debug("path match", path);
         const fn = routes.get(path)[method];
         if (fn) {
-          console.debug("method match");
+          console.debug("method match", method);
           return await fn(req, res);
         }
         console.warn("method not supported", path, method);

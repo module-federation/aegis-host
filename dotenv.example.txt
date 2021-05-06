@@ -10,8 +10,8 @@ SERVERLESS=false
 # Create child processes, one per core
 CLUSTER_ENABLED=false
 
-# Token-based authenitication (JSON Web Tokens)
-# See auth/key-set.json
+# Token-based authorization (JSON Web Tokens)
+# Secure protected routes. See auth/key-set.json.
 AUTH_ENABLED=false
 
 # Use Secure Sockets Layer / TLS / HTTPS
@@ -20,7 +20,7 @@ SSL_ENABLED=false
 SSL_PORT=8070
 PORT=8707
 
-# Default data source for models that do not specify one
+# Default datasource for models that do not specify one
 # DATASOURCE_ADAPTER=DataSourceMongoDb
 # DATASOURCE_ADAPTER=DataSourceFile
 DATASOURCE_ADAPTER=DataSourceMemory

@@ -4,65 +4,51 @@
 
 const microlib = require("./dist");
 
-const order = {
-  firstName: "Uncle",
-  lastName: "Bob",
-  email: "bob@email.com",
-  creditCardNumber: "378282246310005",
-  shippingAddress: "123 Park Ave. NY, NY 45678",
-  billingAddress: "123 Park Ave. NY, NY 45678",
-  orderItems: [
-    { itemId: "item1", price: 329.95 },
-    { itemId: "item2", price: 59.0, qty: 4 },
-  ],
-};
-
-const awsEvent = {
-  resource: "Resource path",
-  path: "http://microlib/api/models/orders",
-  httpMethod: "get",
-  headers: "String containing incoming request headers",
-  multiValueHeaders: "ist of strings containing incoming request headers",
-  queryStringParameters: "query string parameters",
-  multiValueQueryStringParameters: "List of query string parameters",
-  pathParameters: "",
-  stageVariables: "",
-  requestContext:
-    "Request context, including authorizer-returned key-value pairs",
-  body: 
-  isBase64Encoded: false
-};
+function awsEvent(method, path) {
+  return {
+    path: path,
+    httpMethod: method,
+    headers: "String containing incoming request headers",
+    multiValueHeaders: "ist of strings containing incoming request headers",
+    queryStringParameters: "",
+    multiValueQueryStringParameters: "List of query string parameters",
+    pathParameters: "",
+    stageVariables: "",
+    requestContext:
+      "Request context, including authorizer-returned key-value pairs",
+    body: {
+      firstName: "Uncle",
+      lastName: "Bob",
+      email: "bob@email.com",
+      creditCardNumber: "378282246310005",
+      shippingAddress: "123 Park Ave. NY, NY 45678",
+      billingAddress: "123 Park Ave. NY, NY 45678",
+      orderItems: [
+        { itemId: "item1", price: 329.95 },
+        { itemId: "item2", price: 59.0, qty: 4 },
+      ],
+    },
+    isBase64Encoded: false,
+  };
+}
 
 const payloads = {
   post: {
-    event: awsEvent,
+    event: awsEvent("post", "/microlib/api/models/orders"),
+    context: {},
+    callback: x => x,
+  },
+
+  get: {
+    event: awsEvent("get", "/microlib/api/models/orders"),
     context: {},
     callback: x => x,
   },
 
   getbyid: {
-    query: null,
-    path: "/microlib/api/models/orders",
-    method: "get",
-    pa,
-  },
-
-  get: {
-    query: null,
-    path: "/microlib/api/models/orders",
-    method: "get",
-    params: null,
-    get: header => {
-      const headers = {
-        "Content-Type": "application/json",
-        referer: "localhost",
-        "User-Agent": "expressless",
-      };
-      return headers[header];
-    },
-    query: null,
-    params: null,
-    provider: "aws",
+    event: awsEvent("get", "/microlib/api/models/orders/"),
+    context: {},
+    callback: x => x,
   },
 };
 
@@ -76,7 +62,8 @@ async function processLine(line) {
 
   if (["post", "getbyid", "get"].includes(method.toLowerCase())) {
     if (modelId) {
-      payloads["getbyid"].url += "/" + modelId;
+      payloads["getbyid"].event.path += String(modelId);
+      payloads["getbyid"].event.pathParameters = { id: modelId };
     }
     const result = await microlib.handleServerlessRequest(
       payloads[method.toLowerCase()]
