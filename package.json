@@ -26,7 +26,7 @@
     "transpile": "babel src/index.js src/cluster.js src/auth.js src/serverless-messages.js src/serverless-adapter.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "start-serverless": "node --title aegis-serverless -r dotenv/config expressless.js",
-    "call-aegis-on-lambda": "aws lambda invoke --function arn:aws:lambda:us-east-1:758072746799:function:aegis-dev-aegis --payload file://test/lambda/lambda-get-by-id.json lambda.out --cli-binary-format raw-in-base64-out && cat lambda.out",
+    "call-aegis-on-lambda": "aws lambda invoke --function arn:aws:lambda:us-east-1:758072746799:function:aegis-dev-aegis --payload file://test/lambda/lambda-post.json lambda.out --cli-binary-format raw-in-base64-out && cat lambda.out",
     "clean": "rimraf dist",
     "test": "mocha --recursive -r esm",
     "demo": "open http://localhost:8707",
@@ -47,6 +47,7 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-lambda": "^3.14.0",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "dotenv": "^8.2.0",
@@ -56,7 +57,8 @@
     "import-fresh": "^3.3.0",
     "jwks-rsa": "^2.0.1",
     "mongodb": "^3.6.3",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "serverless-aws-static-file-handler": "^2.0.8"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -64,6 +66,8 @@
     "@babel/node": "^7.10.5",
     "@babel/polyfill": "^7.11.5",
     "@babel/preset-env": "^7.11.0",
+    "@types/node": "^14.14.7",
+    "babel": "^6.23.0",
     "babel-loader": "^8.1.0",
     "babel-preset-env": "^1.7.0",
     "chalk": "^2.4.2",

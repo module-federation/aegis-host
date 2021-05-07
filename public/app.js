@@ -14,7 +14,7 @@
   const copyButton = document.querySelector("#copyButton");
 
   // Include JWT access token in header for auth check
-  let authHeader = {};
+  let authHeader = { "x-api-key": "EuSXwZDxkh1l1dDRBwDi94BP4bDtyIvz71fkYqGh"  };
 
   /**
    * Returns headers, including auth header if auth is enabled.
@@ -115,7 +115,7 @@
 
   function updateModelId(id) {
     if (id) modelIdInput.value = id;
-  } 
+  }
 
   function handleResponse(response) {
     try {
@@ -134,7 +134,7 @@
 
   postButton.onclick = function () {
     document.getElementById("modelId").value = "";
-    fetch(getUrl(), {
+    fetch({
       method: "POST",
       body: document.getElementById("payload").value,
       headers: getHeaders(),

@@ -21,7 +21,6 @@ module.exports.ServerlessAdapter = async function (
   parsers
 ) {
   function parsePayload(...args) {
-    console.debug({ name: parsePayload.name, provider, parsers, args });
     const parse = parsers[provider];
 
     if (typeof parse === "function") {

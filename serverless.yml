@@ -9,7 +9,10 @@
 # For full config options, check the docs:
 #    docs.serverless.com
 #
-# Happy Coding!
+# Happy Codi
+
+plugins:
+  - serverless-aws-static-file-handler/plugins/BinaryMediaTypes
 
 service: aegis
 # app and org for use with dashboard.serverless.com
@@ -18,7 +21,7 @@ org: tysonrm
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
-frameworkVersion: '2'
+frameworkVersion: "2"
 
 provider:
   name: aws
@@ -52,7 +55,7 @@ provider:
 # you can add packaging information here
 package:
   patterns:
-    - '!doc'
+    - "!doc"
 #    - '!exclude-me-dir/**'
 #    - include-me.js
 #    - include-me-dir/**
@@ -60,15 +63,31 @@ package:
 functions:
   aegis:
     handler: dist/index.handleServerlessRequest
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
+    #    The following are a few example events you can configure
+    #    NOTE: Please make sure to change your handler code to work with those events
+    #    Check the event documentation for details
     events:
       - http:
           path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
           method: post
+  html:
+    handler: dist/index.html
+    events:
       - http:
           path: /
+          method: get
+
+  png:
+    handler: handler.png
+    events:
+      - http:
+          path: png
+          method: get
+  jpg:
+    handler: handler.jpg
+    events:
+      - http:
+          path: jpg
           method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}

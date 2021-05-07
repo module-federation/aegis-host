@@ -12,6 +12,7 @@ const graceful = require("express-graceful-shutdown");
 const authorization = require("./auth");
 const parsers = require("./serverless-messages").parsers;
 const { ServerlessAdapter } = require("./serverless-adapter");
+const StaticFileHandler = require("serverless-aws-static-file-handler");
 
 const port = process.env.PORT || 8707;
 const sslPort = process.env.SSL_PORT || 8070;
@@ -148,4 +149,19 @@ exports.handleServerlessRequest = async function (...args) {
   console.info("serverless mode initializing", args);
   const adapter = await ServerlessAdapter(startMicroLib, cloudName, parsers);
   return adapter.invoke(...args);
+};
+
+const fileHandler = new StaticFileHandler("public");
+/**
+ * Serve static files, i.e. the demo app.
+ * @param {*} event
+ * @param {*} context
+ * @returns
+ */
+exports.html = async (event, context) => {
+  console.debug({ event, context });
+  if (!event.path) {
+    event.path = "index.html";
+  }
+  return fileHandler.get(event, context);
 };
