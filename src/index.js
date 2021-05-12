@@ -123,9 +123,9 @@ function startWebServer() {
  */
 async function startService() {
   try {
-    await startMicroLib();
     app.use(express.json());
     app.use(express.static("public"));
+    await startMicroLib();
     reloadCallback();
     startWebServer();
   } catch (e) {
@@ -158,7 +158,7 @@ const fileHandler = new StaticFileHandler("public");
  * @param {*} context
  * @returns
  */
-exports.html = async (event, context) => {
+exports.serveHtml = async (event, context) => {
   console.debug({ event, context });
   if (!event.path) {
     event.path = "index.html";

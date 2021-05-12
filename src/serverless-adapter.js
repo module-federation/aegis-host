@@ -60,13 +60,6 @@ module.exports.ServerlessAdapter = async function (
 
   // Call MicroLib and wait for controller
   controller = await startService();
-  /**
-   * @todo fix the upstream async problem:
-   * Something isn't awaiting during startup,
-   * so we end up invoking too soon, before
-   * the APIs have finished building.
-   */
-  await new Promise(resolve => setTimeout(resolve, 4000));
 
   return {
     invoke,

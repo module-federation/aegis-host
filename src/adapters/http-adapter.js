@@ -17,7 +17,7 @@
  * @param {httpController} controller
  */
 export default function buildCallback(controller) {
-  return (req, res) => {
+  return async (req, res) => {
     const httpRequest = {
       body: req.body,
       query: req.query,

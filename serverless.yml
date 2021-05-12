@@ -9,7 +9,7 @@
 # For full config options, check the docs:
 #    docs.serverless.com
 #
-# Happy Codi
+# Happy Coding!
 
 service: aegis
 # app and org for use with dashboard.serverless.com
@@ -70,9 +70,14 @@ functions:
       - http:
           path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
           method: GET
-
+      - http:
+          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          method: PATCH
+      - http:
+          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          method: DELETE
   html:
-    handler: dist/index.html
+    handler: dist/index.serveHtml
     events:
       - http:
           path: /
