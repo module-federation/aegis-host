@@ -14,7 +14,7 @@
   const copyButton = document.querySelector("#copyButton");
 
   // Include JWT access token in header for auth check
-  let authHeader = { "x-api-key": "EuSXwZDxkh1l1dDRBwDi94BP4bDtyIvz71fkYqGh"  };
+  let authHeader = { "x-api-key": "EuSXwZDxkh1l1dDRBwDi94BP4bDtyIvz71fkYqGh" };
 
   /**
    * Returns headers, including auth header if auth is enabled.
@@ -45,6 +45,7 @@
       const data = await fetch(config.oauthUri, {
         method: "POST",
         headers: getHeaders(),
+        mode: "cors",
         body: JSON.stringify({
           client_id: config.client_id,
           client_secret: config.client_secret,
@@ -93,6 +94,7 @@
     const id = document.getElementById("modelId").value;
     const param = document.getElementById("parameter").value;
     const query = document.getElementById("query").value;
+    const lambda = ""
     let url = `${modelApiPath}/${model}`;
     if (id) url += `/${id}`;
     if (param) url += `/${param}`;
@@ -138,6 +140,7 @@
       method: "POST",
       body: document.getElementById("payload").value,
       headers: getHeaders(),
+      mode: "cors",
     })
       .then(handleResponse)
       .then(showMessage)
@@ -150,6 +153,7 @@
     document.getElementById("query").value = "";
     fetch(getUrl(), {
       method: "PATCH",
+      mode: "cors",
       body: document.getElementById("payload").value,
       headers: getHeaders(),
     })
@@ -162,7 +166,7 @@
 
   getButton.onclick = function () {
     document.getElementById("parameter").value = "";
-    fetch(getUrl(), { headers: getHeaders() })
+    fetch(getUrl(), { mode: "cors", headers: getHeaders() })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -171,7 +175,7 @@
   };
 
   deleteButton.onclick = function () {
-    fetch(getUrl(), { method: "DELETE", headers: getHeaders() })
+    fetch(getUrl(), { method: "DELETE", headers: getHeaders(), mode: "cors" })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {

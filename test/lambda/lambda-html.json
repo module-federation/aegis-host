@@ -1,0 +1,37 @@
+{
+  "resource": "index.html",
+  "path": "public",
+  "httpMethod": "GET",
+  "headers": {
+    "Accept": "application/x-javascript,text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4",
+    "cache-control": "max-age=0",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-Country": "GB",
+    "content-type": "application/x-www-form-urlencoded",
+    "upgrade-insecure-requests": "1",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https"
+  },
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {
+    "path": "/dev/",
+    "resourcePath": "/",
+    "httpMethod": "GET"
+  },
+
+  "multiValueHeaders": {},
+
+  "multiValueQueryStringParameters": {},
+
+  "body": {},
+  "isBase64Encoded": false
+}

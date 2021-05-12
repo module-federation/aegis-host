@@ -20,8 +20,19 @@ module.exports.ServerlessAdapter = async function (
   provider,
   parsers
 ) {
-  function parsePayload(...args) {
-    const parse = parsers[provider];
+  function parseRequest(...args) {
+    const parse = parsers[provider].request;
+
+    if (typeof parse === "function") {
+      const output = parse(...args);
+      console.debug({ func: parse.name, output });
+      return output;
+    }
+    console.warn("no parser found for provider");
+  }
+
+  function parseResponse(...args) {
+    const parse = parsers[provider].response;
 
     if (typeof parse === "function") {
       const output = parse(...args);
@@ -35,9 +46,10 @@ module.exports.ServerlessAdapter = async function (
    * invokes the controller for a given route
    * @param  {...any} args
    */
-  function invoke(...args) {
-    const { req, res } = parsePayload(...args);
-    return controller(req.path, req.method, req, res);
+  async function invoke(...args) {
+    const { req, res } = parseRequest(...args);
+    const response = await controller(req.path, req.method, req, res);
+    return parseResponse(response);
   }
 
   if (controller) {
@@ -48,7 +60,6 @@ module.exports.ServerlessAdapter = async function (
 
   // Call MicroLib and wait for controller
   controller = await startService();
-
   /**
    * @todo fix the upstream async problem:
    * Something isn't awaiting during startup,

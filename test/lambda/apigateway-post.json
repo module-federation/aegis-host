@@ -1,0 +1,16 @@
+{
+  "version": "2.0",
+  "rawPath": "/microlib/api/models",
+  "pathParameters": "orders",
+  "domainName": "id.execute-api.us-east-1.amazonaws.com",
+  "domainPrefix": "id",
+  "http": {
+    "method": "POST",
+    "path": "/microlib/api/models/orders",
+    "protocol": "HTTP/1.1",
+    "sourceIp": "IP",
+    "userAgent": "agent"
+  },
+  "body": "{\n  \"path\": \"/microlib/api/models/orders\",\n  \"httpMethod\": \"post\",\n  \"isBase64Encoded\": false,\n  \"body\": {\n    \"firstName\": \"Uncle\",\n    \"lastName\": \"Bob\",\n    \"email\": \"bob@email.com\",\n    \"creditCardNumber\": \"378282246310005\",\n    \"shippingAddress\": \"123 Park Ave. NY, NY 45678\",\n    \"billingAddress\": \"123 Park Ave. NY, NY 45678\",\n    \"orderItems\": [\n      {\n        \"itemId\": \"item1\",\n        \"price\": 329.95\n      },\n      {\n        \"itemId\": \"item2\",\n        \"price\": 59,\n        \"qty\": 4\n      }\n    ]\n  }\n}",
+  "isBase64Encoded": false
+}

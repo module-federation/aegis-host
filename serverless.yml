@@ -11,9 +11,6 @@
 #
 # Happy Codi
 
-plugins:
-  - serverless-aws-static-file-handler/plugins/BinaryMediaTypes
-
 service: aegis
 # app and org for use with dashboard.serverless.com
 app: microlib
@@ -69,25 +66,16 @@ functions:
     events:
       - http:
           path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
-          method: post
+          method: POST
+      - http:
+          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          method: GET
+
   html:
     handler: dist/index.html
     events:
       - http:
           path: /
-          method: get
-
-  png:
-    handler: handler.png
-    events:
-      - http:
-          path: png
-          method: get
-  jpg:
-    handler: handler.jpg
-    events:
-      - http:
-          path: jpg
           method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}

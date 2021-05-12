@@ -54,7 +54,7 @@ function httpGet(entry, path, done) {
   req.on("error", () => console.error(error));
 }
 
-function dedupEntries(entries) {
+function dedupUrls(entries) {
   return entries
     .map(function (e) {
       const dupName = new URL(e.url).hostname.concat(e.path);
@@ -74,7 +74,7 @@ function dedupEntries(entries) {
  *  name: string,
  *  url: string,
  *  path: string
- * }[]} remoteEntry `name` of app, `url` of remote entry, download file to `path`
+ * }[]} remoteEntry `name` of file, `url` of file, download file to `path`
  *
  * @returns {Promise<{[index: string]: string}>} local paths to downloaded entries
  */
@@ -97,10 +97,10 @@ module.exports = async remoteEntry => {
     return basedir.concat(filename);
   }
 
-  const uniqueEntries = dedupEntries(entries);
+  const uniqueUrls = dedupUrls(entries);
 
   const remotes = await Promise.all(
-    Object.values(uniqueEntries).map(function (entry) {
+    Object.values(uniqueUrls).map(function (entry) {
       const path = getPath(entry);
       console.log("unique entry", path);
 
@@ -116,6 +116,7 @@ module.exports = async remoteEntry => {
       });
     })
   );
+  console.log(remotes);
 
   const updatedEntries = entries.map(function (e) {
     const commonName = new URL(e.url).hostname.concat(e.path);
