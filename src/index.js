@@ -109,7 +109,7 @@ function startWebServer() {
   app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
 
   httpServer.listen(port, function () {
-    console.info(`\n🌎 https://localhost:${port} 🌎\n`);
+    console.info(`\n🌎 http://localhost:${port} 🌎\n`);
   });
 }
 
