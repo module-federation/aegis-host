@@ -173,7 +173,7 @@ const Server = (() => {
 
     return getRemoteEntries.then(remotes => {
       return getRemoteModules.then(initRemotes => {
-        initRemotes(remotes, overrides).then(async () => {
+        return initRemotes(remotes, overrides).then(async () => {
           const cache = initCache();
 
           console.log(`running in ${serverMode} mode`);
@@ -190,10 +190,6 @@ const Server = (() => {
           console.timeEnd(label);
 
           await cache.load();
-
-          // if (sslEnabled) console.log(`\nhttps://localhost:${sslPort} 🌎`);
-          // else console.log(`\nhttp://localhost:${port} 🌎`);
-
           process.on("SIGTERM", () => close());
           return control;
         });
