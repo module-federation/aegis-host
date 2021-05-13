@@ -160,10 +160,7 @@ const fileHandler = new StaticFileHandler("public");
  */
 exports.serveHtml = async (event, context) => {
   console.debug({ event, context });
-  if (event.path === "index.html") {
-    event.path = "app.js";
-  } else {
-    event.path = "index.html";
-  }
+  console.log(event.path);
+  event.path = "index.html";
   return fileHandler.get(event, context);
 };

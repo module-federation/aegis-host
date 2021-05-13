@@ -1,3 +1,21 @@
 {
-  "body": " {\n    \"firstName\": \"Uncle\",\n    \"lastName\": \"Bob\",\n    \"email\": \"bob@email.com\",\n    \"creditCardNumber\": \"378282246310005\",\n    \"shippingAddress\": \"123 Park Ave. NY, NY 45678\",\n    \"billingAddress\": \"123 Park Ave. NY, NY 45678\",\n    \"orderItems\": [\n      {\n        \"itemId\": \"item1\",\n        \"price\": 329.95\n      },\n      {\n        \"itemId\": \"item2\",\n        \"price\": 59,\n        \"qty\": 4\n      }\n    ]\n  }\n}"
+  "body2": " {\n    \"firstName\": \"Uncle\",\n    \"lastName\": \"Bob\",\n    \"email\": \"bob@email.com\",\n    \"creditCardNumber\": \"378282246310005\",\n    \"shippingAddress\": \"123 Park Ave. NY, NY 45678\",\n    \"billingAddress\": \"123 Park Ave. NY, NY 45678\",\n    \"orderItems\": [\n      {\n        \"itemId\": \"item1\",\n        \"price\": 329.95\n      },\n      {\n        \"itemId\": \"item2\",\n        \"price\": 59,\n        \"qty\": 4\n      }\n    ]\n  }\n}",
+
+  "firstName": "Uncle",
+  "lastName": "Bob",
+  "email": "bob@email.com",
+  "creditCardNumber": "378282246310005",
+  "shippingAddress": "123 Park Ave. NY, NY 45678",
+  "billingAddress": "123 Park Ave. NY, NY 45678",
+  "orderItems": [
+    {
+      "itemId": "item1",
+      "price": 329.95
+    },
+    {
+      "itemId": "item2",
+      "price": 59,
+      "qty": 4
+    }
+  ]
 }

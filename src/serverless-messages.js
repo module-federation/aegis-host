@@ -28,7 +28,6 @@ let reqContent = {
 // Thanks API GW for this 🙁
 function handleMultiline(body) {
   if (!body) return null;
-  console.log(body);
   try {
     return JSON.parse(
       body
@@ -58,7 +57,8 @@ export const parsers = {
             : getPropVal("path", args),
         method: getPropVal("httpMethod", args, "post").toLowerCase(),
         body: handleMultiline(args.body),
-        query: getPropVal("queryStringParameters", args),
+        query: { ...getPropVal("queryStringParameters", args) },
+        params: { ...getPropVal("pathParameters", args) },
         apiGatewayRequest: { ...args },
       },
       res,

@@ -73,6 +73,9 @@ functions:
     #    Check the event documentation for details
     events:
       - http:
+          path: /microlib/api/config/{any+}
+          method: GET
+      - http:
           path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
           method: POST
       - http:
@@ -84,14 +87,21 @@ functions:
       - http:
           path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
           method: DELETE
+
   html:
     handler: dist/index.serveHtml
     events:
       - http:
           path: /
-          method: get
+          method: GET
       - http:
           path: /{app.js}
+          method: GET
+  png:
+    handler: handler.png
+    events:
+      - http:
+          path: /public/{microlib.png}
           method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}

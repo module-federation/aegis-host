@@ -84,6 +84,7 @@ const Server = (() => {
 
   function makeAdmin(app, adapter) {
     app.get(`${apiRoot}/config`, adapter(getConfig()));
+    routes.add(`${apiRoot}/config`, { get: adapter(getConfig()) });
   }
 
   const make = {
