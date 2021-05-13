@@ -1,6 +1,6 @@
 "use strict";
 
-let controller = null;
+let invokeController = null;
 
 /**
  * Start `startService` if it hasn't been started
@@ -39,18 +39,18 @@ exports.ServerlessAdapter = async function (startService, provider, parsers) {
    */
   async function invoke(...args) {
     const { req, res } = parseMessage("request", ...args);
-    const response = await controller(req.path, req.method, req, res);
+    const response = await invokeController(req.path, req.method, req, res);
     return parseMessage("response", response);
   }
 
-  if (controller) {
+  if (invokeController) {
     return {
       invoke,
     };
   }
 
   // Call MicroLib and wait for controller
-  controller = await startService();
+  invokeController = await startService();
 
   return {
     invoke,

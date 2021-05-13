@@ -219,7 +219,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aegis/dev/1620852742688-2021-05-12T20:52:22.688Z/aegis.zip"
+          "S3Key": "serverless/aegis/dev/1620889644280-2021-05-13T07:07:24.280Z/aegis.zip"
         },
         "Handler": "s_aegis.handler",
         "Runtime": "nodejs12.x",
@@ -244,7 +244,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aegis/dev/1620852742688-2021-05-12T20:52:22.688Z/aegis.zip"
+          "S3Key": "serverless/aegis/dev/1620889644280-2021-05-13T07:07:24.280Z/aegis.zip"
         },
         "Handler": "s_html.handler",
         "Runtime": "nodejs12.x",
@@ -262,30 +262,34 @@
         "HtmlLogGroup"
       ]
     },
-    "AegisLambdaVersionEooCJSiry6y8EuCF8nFYNV5Oow0JOy5oolNZWmZs": {
+    "AegisLambdaVersionRRLXbaKRkor06xhqbDzXn2hOlUoXoyKDKn5TkurM": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AegisLambdaFunction"
         },
-        "CodeSha256": "ikGoI0hIMIj3HSwmvuEaVlq4XqhI3XVzvrdfuDS3qrE="
+        "CodeSha256": "SkrpLIzNhL5cwgKizNZm4dduBfJG+ua4Yos3Ft84RF0="
       }
     },
-    "HtmlLambdaVersionXiXCNM2VaILnvrgHPOBD09MR1at50S4rob84JuM": {
+    "HtmlLambdaVersion1e2DFjoDXzAXLR3zVoPeXLcp0VMqHk1J4oKrrwu2Rs": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "HtmlLambdaFunction"
         },
-        "CodeSha256": "ikGoI0hIMIj3HSwmvuEaVlq4XqhI3XVzvrdfuDS3qrE="
+        "CodeSha256": "SkrpLIzNhL5cwgKizNZm4dduBfJG+ua4Yos3Ft84RF0="
       }
     },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Name": "dev-aegis",
+        "BinaryMediaTypes": [
+          "image/png",
+          "image/jpeg"
+        ],
         "EndpointConfiguration": {
           "Types": [
             "EDGE"
@@ -340,6 +344,21 @@
           "Ref": "ApiGatewayResourceMicrolibApiModels"
         },
         "PathPart": "{any+}",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceAppjsVar": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "{app.js}",
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         }
@@ -563,7 +582,50 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1620852733628": {
+    "ApiGatewayMethodAppjsVarGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceAppjsVar"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "HtmlLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1620889635329": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -576,7 +638,8 @@
         "ApiGatewayMethodMicrolibApiModelsAnyVarGet",
         "ApiGatewayMethodMicrolibApiModelsAnyVarPatch",
         "ApiGatewayMethodMicrolibApiModelsAnyVarDelete",
-        "ApiGatewayMethodGet"
+        "ApiGatewayMethodGet",
+        "ApiGatewayMethodAppjsVarGet"
       ]
     },
     "AegisLambdaPermissionApiGateway": {
@@ -762,7 +825,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/aegis/dev/1620852742688-2021-05-12T20:52:22.688Z/custom-resources.zip"
+          "S3Key": "serverless/aegis/dev/1620889644280-2021-05-13T07:07:24.280Z/custom-resources.zip"
         },
         "FunctionName": "aegis-dev-custom-resource-apigw-cw-role",
         "Handler": "apiGatewayCloudWatchRole/handler.handler",
@@ -834,7 +897,7 @@
     "AegisLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AegisLambdaVersionEooCJSiry6y8EuCF8nFYNV5Oow0JOy5oolNZWmZs"
+        "Ref": "AegisLambdaVersionRRLXbaKRkor06xhqbDzXn2hOlUoXoyKDKn5TkurM"
       },
       "Export": {
         "Name": "sls-aegis-dev-AegisLambdaFunctionQualifiedArn"
@@ -843,7 +906,7 @@
     "HtmlLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "HtmlLambdaVersionXiXCNM2VaILnvrgHPOBD09MR1at50S4rob84JuM"
+        "Ref": "HtmlLambdaVersion1e2DFjoDXzAXLR3zVoPeXLcp0VMqHk1J4oKrrwu2Rs"
       },
       "Export": {
         "Name": "sls-aegis-dev-HtmlLambdaFunctionQualifiedArn"

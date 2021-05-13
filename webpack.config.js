@@ -1,7 +1,7 @@
 require("dotenv").config();
 const path = require("path");
-const ModuleFederationPlugin = require("webpack").container
-  .ModuleFederationPlugin;
+const ModuleFederationPlugin =
+  require("webpack").container.ModuleFederationPlugin;
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
 const port = process.env.PORT || 8707;
@@ -26,7 +26,7 @@ module.exports = env => {
         output: {
           publicPath: `http://localhost:${publicPort}`,
           path: path.resolve(__dirname, "dist"),
-          libraryTarget: "commonjs2",
+          libraryTarget: "commonjs",
         },
         resolve: {
           extensions: [".js"],

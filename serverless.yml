@@ -25,6 +25,14 @@ provider:
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
 
+plugins:
+  - serverless-aws-static-file-handler/plugins/BinaryMediaTypes
+
+custom:
+  apiGateway:
+    binaryMediaTypes:
+      - "image/png"
+      - "image/jpeg"
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -81,6 +89,9 @@ functions:
     events:
       - http:
           path: /
+          method: get
+      - http:
+          path: /{app.js}
           method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
