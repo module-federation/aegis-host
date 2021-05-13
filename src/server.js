@@ -31,7 +31,7 @@ class RouteMap extends Map {
 
     const idRoute = route.split("/").splice(0, 5).concat([":id"]).join("/");
 
-    if (route.match(/\//g).length === 5 && super.has(idRoute)) {
+    if (super.has(idRoute)) {
       this.route = super.get(idRoute);
       return true;
     }
@@ -39,10 +39,10 @@ class RouteMap extends Map {
     const cmdRoute = route
       .split("/")
       .splice(0, 6)
-      .concat([":id", ":cmd"])
+      .concat([":id", ":command"])
       .join("/");
 
-    if (route.match(/\//g).length === 6 && super.has(cmdRoute)) {
+    if (super.has(cmdRoute)) {
       this.route = super.get(cmdRoute);
       return true;
     }
