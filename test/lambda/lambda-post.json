@@ -1,25 +1,19 @@
 {
-  "path": "/microlib/api/models/orders",
-  "httpMethod": "post",
-  "isBase64Encoded": false,
-  "body": {
-    "firstName": "Uncle",
-    "lastName": "Bob",
-    "email": "bob@email.com",
-    "creditCardNumber": "378282246310005",
-    "shippingAddress": "123 Park Ave. NY, NY 45678",
-    "billingAddress": "123 Park Ave. NY, NY 45678",
-    "orderItems": [
-      {
-        "itemId": "item1",
-        "price": 329.95
-      },
-      {
-        "itemId": "item2",
-        "price": 59,
-        "qty": 4
-      }
-    ]
-  }
+  "firstName": "Uncle",
+  "lastName": "Bob",
+  "email": "bob@email.com",
+  "creditCardNumber": "378282246310005",
+  "shippingAddress": "123 Park Ave. NY, NY 45678",
+  "billingAddress": "123 Park Ave. NY, NY 45678",
+  "orderItems": [
+    {
+      "itemId": "item1",
+      "price": 329.95
+    },
+    {
+      "itemId": "item2",
+      "price": 59,
+      "qty": 4
+    }
+  ]
 }
-

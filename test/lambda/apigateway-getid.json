@@ -1,0 +1,15 @@
+{
+  "resource": "/microlib/api/models/{any+}",
+  "path": "/microlib/api/models/orders/9f1e89a7-2c7d-4021-94b8-1648ea0410d8",
+  "httpMethod": "GET",
+  "headers": {
+    "Accept-Encoding": "gzip, deflate, br"
+  },
+  "multiValueHeaders": {
+    "Accept": "[Array]"
+  },
+  "queryStringParameters": { "count": "all" },
+  "pathParameters": { "id": "2039895f-d9dd-427f-a52e-4e85f1f0c7d1" },
+  "body": null,
+  "isBase64Encoded": false
+}

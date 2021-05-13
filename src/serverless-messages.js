@@ -7,22 +7,9 @@ const res = {
     console.log("status", num);
     return this;
   },
-  set(data) {
-    console.log("set", data);
-  },
+  set: data => data,
   headers: {},
-  type: data => console.log(data),
-};
-
-let reqContent = {
-  get: header => {
-    const headers = {
-      "Content-Type": "application/json",
-      referer: "localhost",
-      "User-Agent": "expressless",
-    };
-    return headers[header];
-  },
+  type: data => data,
 };
 
 // Thanks API GW for this 🙁
@@ -35,41 +22,30 @@ function handleMultiline(body) {
         .map(s => s.trim())
         .join("")
     );
-  } catch {}
-  return body;
+  } catch {
+    return body;
+  }
 }
-
-function getPropVal(key, obj, defaultValue = null) {
-  return obj && obj[key] ? obj[key] : defaultValue;
-}
-
-const defaultPath = "/microlib/api/models/orders";
 
 export const parsers = {
   aws: {
     request: args => ({
       req: {
-        ...reqContent,
-        path:
-          getPropVal("path", args, "{any1+}").replace("{any+}", "orders") ===
-          defaultPath
-            ? defaultPath
-            : getPropVal("path", args),
-        method: getPropVal("httpMethod", args, "post").toLowerCase(),
+        // API GW req format
+        path: args.path,
+        method: args.httpMethod.toLowerCase(),
+        query: args.queryStringParameters,
+        params: args.pathParameters,
         body: handleMultiline(args.body),
-        query: { ...getPropVal("queryStringParameters", args) },
-        params: { ...getPropVal("pathParameters", args) },
-        apiGatewayRequest: { ...args },
       },
       res,
     }),
     response: args => ({
+      // API GW res
       isBase64Encoded: false,
-      statusCode: getPropVal("statusCode", args, 200),
-      headers: getPropVal("headers", args, {
-        "Content-Type": "application/json",
-      }),
-      body: JSON.stringify(getPropVal("body", args, {})),
+      statusCode: args.statusCode,
+      headers: args.headers,
+      body: JSON.stringify(args.body),
     }),
   },
 
