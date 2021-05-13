@@ -31,7 +31,7 @@ class RouteMap extends Map {
 
     const idRoute = route.split("/").splice(0, 5).concat([":id"]).join("/");
 
-    if (super.has(idRoute)) {
+    if (route.match(/\//g).length === 5 && super.has(idRoute)) {
       this.route = super.get(idRoute);
       return true;
     }
@@ -124,34 +124,15 @@ const Server = (() => {
   };
 
   /**
-   * Clear all non-webpack module cache, i.e.
-   * everything bundled by remoteEntry.js (models
-   * & remoteEntry config), which includes all the
-   * user code downloaded from the remote. This is
-   * the code that needs to be disposed of & reimported.
-   */
-  function clear() {
-    try {
-      Object.keys(__non_webpack_require__.cache).forEach(k => {
-        console.log("deleting cached module", k);
-        delete __non_webpack_require__.cache[k];
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  /**
    * Call controllers directly in serverless mode.
    */
   async function control(path, method, req, res) {
-    console.debug({ path, method, req, res });
     if (routes.has(path)) {
       try {
-        console.debug("path match", path);
+        console.debug("path match:", path);
         const fn = routes.get(path)[method];
         if (fn) {
-          console.debug("method match", method);
+          console.debug("method match:", method);
           return await fn(req, res);
         }
         console.warn("method not supported", path, method);
@@ -160,6 +141,26 @@ const Server = (() => {
       }
     }
     console.warn("potential configuration issue", path, method);
+  }
+
+  /**
+   * Clear all non-webpack module cache, i.e.
+   * everything bundled by remoteEntry.js (models
+   * & remoteEntry config), which includes all the
+   * user code downloaded from the remote. This is
+   * the code that needs to be disposed of & reimported.
+   */
+  function clear() {
+    try {
+      routes.clear();
+
+      Object.keys(__non_webpack_require__.cache).forEach(k => {
+        console.log("deleting cached module", k);
+        delete __non_webpack_require__.cache[k];
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async function start(router) {
