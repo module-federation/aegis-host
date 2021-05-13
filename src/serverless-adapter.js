@@ -42,9 +42,9 @@ module.exports.ServerlessAdapter = async function (
    * @param  {...any} args
    */
   async function invoke(...args) {
-    const { req, res } = parseRequest(...args);
+    const { req, res } = parseMessage("request", ...args);
     const response = await controller(req.path, req.method, req, res);
-    return parseResponse(response);
+    return parseMessage("response", response);
   }
 
   if (controller) {
