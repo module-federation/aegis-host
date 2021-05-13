@@ -1,6 +1,7 @@
+"use strict";
+
 const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
-const path = require("path");
 const token = process.env.GITHUB_TOKEN;
 
 function getOptions(entry) {
@@ -16,22 +17,29 @@ function getOptions(entry) {
 
 const octokit = new Octokit({ auth: token });
 
+/**
+ * Download remote entry from github. Will be a blob (> 1MB).
+ * File is base64 encoded. Decode to utf-8 and write to `path`.
+ *
+ * @param {*} entry remote entry record
+ * @param {*} path where to write file contents
+ * @returns
+ */
 async function githubFetch(entry, path) {
   return octokit
     .request("GET {url}", {
-      url: entry.url.replace("https://github.com", ""),
+      url: entry.url,
     })
     .then(function (rest) {
       const file = rest.data.find(f => f.name === "remoteEntry.js");
       return file.sha;
     })
     .then(function (sha) {
-      console.log(sha);
-      const dir = entry.url.split("/");
+      const [, , , , owner, repo] = entry.url.split("/");
       return octokit.request("GET /repos/{owner}/{repo}/git/blobs/{sha}", {
-        owner: dir[4],
-        repo: dir[5],
-        sha: sha,
+        owner,
+        repo,
+        sha,
       });
     })
     .then(function (rest) {
@@ -54,14 +62,34 @@ function httpGet(entry, path, done) {
   req.on("error", () => console.error(error));
 }
 
+function getPath(entry) {
+  const url = new URL(entry.url);
+  const filename = [
+    url.hostname.replaceAll(".", "-"),
+    url.pathname.replaceAll("/", "-").replace("-", ""),
+    "remoteEntry.js",
+  ].join("-");
+
+  let basedir = entry.path;
+  if (entry.path.charAt(entry.path.length - 1) !== "/") {
+    basedir = entry.path.concat("/");
+  }
+  return basedir.concat(filename);
+}
+
+/**
+ * Return each unique url just once
+ * @param {{name:string,path:sting,url:string}[]} entries
+ * @returns {{[x:string]:{name:string,path:string,url:string}}}
+ */
 function dedupUrls(entries) {
   return entries
     .map(function (e) {
-      const dupName = new URL(e.url).hostname.concat(e.path);
+      const commonName = new URL(e.url).hostname.concat(e.path);
       return {
-        [dupName]: {
+        [commonName]: {
           ...e,
-          name: dupName,
+          name: commonName,
         },
       };
     })
@@ -69,7 +97,7 @@ function dedupUrls(entries) {
 }
 
 /**
- * Download remote container bundles
+ * Download each unique remote entry file.
  * @param {{
  *  name: string,
  *  url: string,
@@ -79,35 +107,19 @@ function dedupUrls(entries) {
  * @returns {Promise<{[index: string]: string}>} local paths to downloaded entries
  */
 module.exports = async remoteEntry => {
-  console.log(remoteEntry);
+  console.info(remoteEntry);
   const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
 
-  function getPath(entry) {
-    const url = new URL(entry.url);
-    const filename = [
-      url.hostname.replaceAll(".", "-"),
-      url.pathname.replaceAll("/", "-").replace("-", ""),
-      "remoteEntry.js",
-    ].join("-");
-
-    let basedir = entry.path;
-    if (entry.path.charAt(entry.path.length - 1) !== "/") {
-      basedir = entry.path.concat("/");
-    }
-    return basedir.concat(filename);
-  }
-
-  const uniqueUrls = dedupUrls(entries);
-
   const remotes = await Promise.all(
-    Object.values(uniqueUrls).map(function (entry) {
+    Object.values(dedupUrls(entries)).map(function (entry) {
       const path = getPath(entry);
-      console.log("unique entry", path);
+      console.log("downloading file to", path);
 
       return new Promise(async function (resolve) {
         const resolvePath = () => resolve({ [entry.name]: path });
 
         if (/^http.*github/i.test(entry.url)) {
+          // Download from github.
           await githubFetch(entry, path);
           resolvePath();
         } else {
@@ -116,14 +128,11 @@ module.exports = async remoteEntry => {
       });
     })
   );
-  console.log(remotes);
 
-  const updatedEntries = entries.map(function (e) {
+  return entries.map(function (e) {
     const commonName = new URL(e.url).hostname.concat(e.path);
     return {
       [e.name]: remotes.find(r => r[commonName])[commonName],
     };
   });
-
-  return updatedEntries;
 };

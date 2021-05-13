@@ -3,7 +3,7 @@
 import portHandler from "./port-handler";
 import async from "../lib/async-error";
 import domainEvents from "./domain-events";
-import CircuitBreaker, { logError } from "./circuit-breaker";
+import CircuitBreaker from "./circuit-breaker";
 
 const TIMEOUTSECONDS = 60;
 const MAXRETRY = 5;
@@ -65,7 +65,7 @@ function setPortTimeout(options) {
   // Retry the port on timeout
   const timerId = setTimeout(async () => {
     // Notify interested parties
-    model.emit(domainEvents.portTimeout(model), options);
+    await model.emit(domainEvents.portTimeout(model), options);
 
     // Invoke optional custom handler
     if (handler) handler(options);
@@ -211,12 +211,7 @@ export default function makePorts(ports, adapters, observer) {
         });
 
         if (timer.enabled && timer.expired()) {
-          // This means we hit max retries, update circuit breaker
-          logError(
-            portName,
-            domainEvents.portRetryFailed(this),
-            portConf.circuitBreaker
-          );
+          // This means we hit max retries
           return this;
         }
 
@@ -237,7 +232,7 @@ export default function makePorts(ports, adapters, observer) {
 
           return saved;
         } catch (error) {
-          console.error({ file: __filename, func: port, args, error });
+          console.error({ func: port, args, error });
 
           // Is the timer still running?
           if (timer.expired()) {
@@ -254,13 +249,17 @@ export default function makePorts(ports, adapters, observer) {
         // The port function
         async [port](...args) {
           // check if the port requires a breaker
-          const config = portConf.circuitBreaker;
+          const thresholds = portConf.circuitBreaker;
 
-          if (config) {
+          if (thresholds) {
             // wrap port call in circuit breaker
-            const breaker = CircuitBreaker(port, portFn, config);
+            const breaker = CircuitBreaker(port, portFn, thresholds);
 
-            // invoke port with circuit breaker failsafe
+            // Listen for errors
+            breaker.errorListener(domainEvents.portRetryFailed(this));
+            breaker.errorListener(domainEvents.portTimeout(this, port));
+
+            // invoke port with circuits breaker failsafe
             return breaker.invoke.apply(this, args);
           }
           // no breaker

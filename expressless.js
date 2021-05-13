@@ -6,16 +6,6 @@ const microlib = require("./dist");
 
 function awsEvent(method, path) {
   return {
-    path: path,
-    httpMethod: method,
-    headers: "String containing incoming request headers",
-    multiValueHeaders: "ist of strings containing incoming request headers",
-    queryStringParameters: "",
-    multiValueQueryStringParameters: "List of query string parameters",
-    pathParameters: "",
-    stageVariables: "",
-    requestContext:
-      "Request context, including authorizer-returned key-value pairs",
     body: {
       firstName: "Uncle",
       lastName: "Bob",
@@ -28,7 +18,6 @@ function awsEvent(method, path) {
         { itemId: "item2", price: 59.0, qty: 4 },
       ],
     },
-    isBase64Encoded: false,
   };
 }
 

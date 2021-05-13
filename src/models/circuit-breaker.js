@@ -1,5 +1,7 @@
 "use strict";
 
+import { bind } from "core-js/core/function";
+
 /**
  * State of the breaker.
  */
@@ -27,6 +29,7 @@ const DefaultThreshold = {
  * Circuit history
  */
 const logs = new Map();
+const events = new Map();
 
 /**
  *
@@ -51,8 +54,8 @@ function getState(log) {
   return State.Closed;
 }
 
-function getThreshold(error, options) {
-  return options[error.name] || options.default || DefaultThreshold;
+function getThreshold(error, thresholds) {
+  return thresholds[error.name] || thresholds.default || DefaultThreshold;
 }
 
 /**
@@ -80,7 +83,7 @@ function setStateOnError(log, error, options) {
     state === State.HalfOpen ||
     (state === State.Closed && thresholdBreached(log, error, options))
   ) {
-    return State.Open();
+    return State.Open;
   }
   return state;
 }
@@ -111,7 +114,7 @@ function readyToTest(log) {
 /**
  * The breaker switch.
  */
-const Switch = function (id, options) {
+const Switch = function (id, thresholds) {
   const log = fetchLog(id);
 
   return {
@@ -164,7 +167,7 @@ const Switch = function (id, options) {
      * @returns {boolean}
      */
     thresholdBreached(error) {
-      return thresholdBreached(log, error, options);
+      return thresholdBreached(log, error, thresholds);
     },
     /**
      * Check if its time to test the circuit, i.e. retry.
@@ -182,7 +185,7 @@ const Switch = function (id, options) {
         name: id,
         time: Date.now(),
         state: this.state,
-        testDelay: getThreshold(error, options).retryDelay,
+        testDelay: getThreshold(error, thresholds).retryDelay,
         error,
       });
     },
@@ -190,11 +193,23 @@ const Switch = function (id, options) {
 };
 
 /**
- * Decorate client library functions with a circut breaker. When the breaker trips,
- * the breaker opens and prevents the client function from being executed. After a
- * wait period, the break switches to halfOpen. If the next transaction fails
+ * @typedef breaker
+ * @property {function([])} invoke call protected function with args
+ * @property {function(string)} errorListener update circuit breaker on error
+ */
+
+/**
+ * Decorate client library functions with a circuit breaker. When the
+ * function throws an exception, we check a threshold based on the error,
+ * volume of requests and the rate of failure over a given interval. If a
+ * threshold is breached, the breaker trips (opens) and prevents the client
+ * function from being executed. It remains open until a test interval has
+ * elapsed, at which point it is switched to half-open. If the next
+ * transaction succeeds, it resets (closes) ands transactions can proceed
+ * as normal. If it fails, the breaker trips again.
+ *
  * @param {string} id function name or other unique name
- * @param {function()} protectedCall decorated client function
+ * @param {function()} protectedCall client function to protect
  * @param {{
  *  [x:string]: {
  *    errorRate:number
@@ -202,15 +217,14 @@ const Switch = function (id, options) {
  *    intervalMs:number,
  *    fallbackFn:function()
  *  },
- * }} options thresholds for different errors
- * @returns
- * @class
+ * }} thresholds thresholds for different errors
+ * @returns {breaker}
  */
-const CircuitBreaker = function (id, protectedCall, options) {
+const CircuitBreaker = function (id, protectedCall, thresholds) {
   return {
     // wrap client call
     async invoke(...args) {
-      const breaker = Switch(id, options);
+      const breaker = Switch(id, thresholds);
       breaker.appendLog();
 
       // check breaker status
@@ -245,6 +259,19 @@ const CircuitBreaker = function (id, protectedCall, options) {
           breaker.appendLog(error);
         }
       }
+    },
+
+    /**
+     * Listen for async / unthrown errors
+     * @param {*} event
+     */
+    errorListener(event) {
+      if (this.addListener) {
+        this.addListener(event, ({ eventName }) =>
+          logError(id, eventName, thresholds)
+        );
+      }
+      console.error("not supported");
     },
   };
 };

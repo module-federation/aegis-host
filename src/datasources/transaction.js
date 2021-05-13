@@ -1,11 +1,11 @@
 /**
- * @todo implement federated transaction (2-phase) 
+ * @todo implement federated transaction (2-phase)
  * to cut down on eventual consistency
  * @param {import("../models").Model[]} models
  * @param {{model1:*,model2:*}} updates
  * @returns
  */
-export const Transaction = function (models, updates) {
+export default Transaction = function (models, updates) {
   return {
     modified: null,
 
