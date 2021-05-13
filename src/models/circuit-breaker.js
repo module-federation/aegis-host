@@ -27,7 +27,6 @@ const DefaultThreshold = {
  * Circuit history
  */
 const logs = new Map();
-const events = new Map();
 
 /**
  *
