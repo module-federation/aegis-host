@@ -67,6 +67,7 @@ function createEventName(eventType, modelName) {
 }
 
 /**
+ * @todo handle all state same way
  * @type {Map<string,ModelSpecification>}
  */
 const modelFactories = new Map();

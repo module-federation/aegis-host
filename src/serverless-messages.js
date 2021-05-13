@@ -28,13 +28,18 @@ let reqContent = {
 // Thanks API GW for this 🙁
 function handleMultiline(body) {
   if (!body) return null;
-  return JSON.parse(
-    body
-      .split("\n")
-      .map(s => s.trim())
-      .join("")
-  );
+  console.log(body);
+  try {
+    return JSON.parse(
+      body
+        .split("\n")
+        .map(s => s.trim())
+        .join("")
+    );
+  } catch {}
+  return body;
 }
+
 function getPropVal(key, obj, defaultValue = null) {
   return obj && obj[key] ? obj[key] : defaultValue;
 }
@@ -52,7 +57,7 @@ export const parsers = {
             ? defaultPath
             : getPropVal("path", args),
         method: getPropVal("httpMethod", args, "post").toLowerCase(),
-        body: handleMultiline(getPropVal("body", args)),
+        body: handleMultiline(args.body),
         query: getPropVal("queryStringParameters", args),
         apiGatewayRequest: { ...args },
       },

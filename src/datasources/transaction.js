@@ -5,7 +5,7 @@
  * @param {{model1:*,model2:*}} updates
  * @returns
  */
-export default Transaction = function (models, updates) {
+export const Transaction = function (models, updates) {
   return {
     modified: null,
 

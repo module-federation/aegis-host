@@ -104,6 +104,7 @@ class ObserverImpl extends Observer {
 }
 
 /**
+ * @todo handle all state same way
  */
 const ObserverFactory = (() => {
   let instance;

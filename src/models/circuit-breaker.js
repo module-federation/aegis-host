@@ -25,6 +25,7 @@ const DefaultThreshold = {
 
 /**
  * Circuit history
+ * @todo handle all state same way
  */
 const logs = new Map();
 
@@ -59,12 +60,12 @@ function getThreshold(error, thresholds) {
  *
  * @param {*} id
  * @param {*} error
- * @param {*} options
+ * @param {*} thresholds
  * @returns
  */
-function thresholdBreached(log, error, options) {
+function thresholdBreached(log, error, thresholds) {
   if (log.length < 1) return false;
-  const threshold = getThreshold(error, options);
+  const threshold = getThreshold(error, thresholds);
   const entriesInScope = log.filter(
     entry => entry.time > Date.now() - threshold.intervalMs
   );
@@ -90,10 +91,10 @@ function setStateOnError(log, error, options) {
  * @param {string} id name of protected function
  * @param {string} error
  */
-export function logError(id, error, options) {
+export function logError(id, error, thresholds) {
   const log = fetchLog(id);
-  let state = setStateOnError(log, error, options);
-  const testDelay = getThreshold(error, options).retryDelay;
+  let state = setStateOnError(log, error, thresholds);
+  const testDelay = getThreshold(error, thresholds).retryDelay;
   log.push({ name: id, time: Date.now(), state, error, testDelay });
 }
 
@@ -191,7 +192,7 @@ const Switch = function (id, thresholds) {
 
 /**
  * @typedef breaker
- * @property {function([])} invoke call protected function with args
+ * @property {function(...any)} invoke call protected function with args
  * @property {function(string)} errorListener update circuit breaker on error
  */
 

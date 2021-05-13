@@ -3,7 +3,7 @@
 /**
  * @typedef {import('../models').Model} Model
  */
-import Transaction from "./transaction";
+import { Transaction } from "./transaction";
 import ModelFactory from "../models";
 import * as adapters from "./adapters";
 
@@ -20,10 +20,21 @@ function getBaseClass(name) {
   return require("./adapters").DataSourceMemory;
 }
 
+/**
+ * @todo handle all state same way
+ */
 const DataSourceFactory = (() => {
+  // References all DSes
   let dataSources;
 
-  function getCustomDataSource(ds, factory, name) {
+  /**
+   * Get datasource from model spec or return default for server.
+   * @param {*} ds
+   * @param {*} factory this factory
+   * @param {*} name datasource name
+   * @returns
+   */
+  function getSpecDataSource(ds, factory, name) {
     const spec = ModelFactory.getModelSpec(name);
 
     if (spec?.datasource) {
@@ -44,11 +55,8 @@ const DataSourceFactory = (() => {
   }
 
   /**
-   * Get the datasource for each model. Optionally inject logic
-   * for custom de/serialization and unmarshaling deserialized models
+   * Get the datasource for each model.
    * @param {string} name - model name
-   * @param {import('../models/index').serializer[]} [serializers] - callbacks invoked during de/serialization
-   * @param {function(Map<string,Model>):Map<string,Model} [hydrate] - unmarshalling deserialized objects
    */
   function getDataSource(name) {
     if (!dataSources) {
@@ -59,7 +67,7 @@ const DataSourceFactory = (() => {
       return dataSources.get(name);
     }
 
-    const newDs = getCustomDataSource(new Map(), this, name);
+    const newDs = getSpecDataSource(new Map(), this, name);
     dataSources.set(name, newDs);
     return newDs;
   }
@@ -69,7 +77,7 @@ const DataSourceFactory = (() => {
   }
 
   /**
-   * Manage transaction across models
+   * Manage transaction across models and datasources
    * @param {import("../models/index").ports} ports
    */
   async function executeTransaction(models, updates) {

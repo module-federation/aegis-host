@@ -67,13 +67,13 @@ export class DataSourceMongoDb extends DataSourceMemory {
     }
   }
 
-  checkConnection(error) {
+  async checkConnection(error) {
     try {
       console.error("check connection on error", error);
       if (!this.client || !this.client.isConnected) {
-        return this.connectDb()
-          .then(() => this.setCollection())
-          .then(() => this.flush());
+        await this.connectDb();
+        this.setCollection();
+        return this.flush();
       }
     } catch (error) {
       console.error(error);
