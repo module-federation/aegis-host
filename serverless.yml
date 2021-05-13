@@ -74,40 +74,43 @@ functions:
     events:
       - http:
           path: /microlib/api/models/{modelName}/{id+}
-          method: GET
+          method: get
       - http:
-          path: /microlib/api/models/{modelName}
-          method: GET
+          path: /microlib/api/models/{modelName+}
+          method: get
       - http:
           path: /microlib/api/models/{modelName+} # this matches any path, the token 'any' doesn't mean anything special
-          method: POST
+          method: post
       - http:
           path: /microlib/api/models/{modelName}/{id+} # this matches any path, the token 'any' doesn't mean anything special
-          method: PATCH
+          method: patch
       - http:
           path: /microlib/api/models/{modelName}/{id}/{command+} # this matches any path, the token 'any' doesn't mean anything special
-          method: PATCH
+          method: patch
       - http:
           path: /microlib/api/models/{modelName}/{id+} #x this matches any path, the token 'any' doesn't mean anything special
-          method: DELETE
+          method: delete
       - http:
-          path: /microlib/api/models/config
-          method: GET
+          path: /microlib/api/models/{config+}
+          method: get
+      - http:
+          path: /microlib/{reload+}
+          method: get
 
   html:
     handler: dist/index.serveHtml
     events:
       - http:
           path: /
-          method: GET
+          method: get
       - http:
           path: /{app.js}
-          method: GET
-  png:
-    handler: handler.png
+          method: get
+  binary:
+    handler: handler.binary
     events:
       - http:
-          path: /public/{microlib.png}
+          path: /public/{microlib.png+}
           method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}

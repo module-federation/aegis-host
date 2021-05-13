@@ -37,6 +37,7 @@ export const parsers = {
         query: args.queryStringParameters,
         params: args.pathParameters,
         body: handleMultiline(args.body),
+        all: { ...args },
       },
       res,
     }),
@@ -45,7 +46,7 @@ export const parsers = {
       isBase64Encoded: false,
       statusCode: args.statusCode,
       headers: args.headers,
-      body: JSON.stringify(args.body),
+      body: JSON.stringify(args.body || args),
     }),
   },
 
