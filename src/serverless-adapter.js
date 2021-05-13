@@ -15,11 +15,7 @@ let controller = null;
  * @returns {Promise<{invoke:function(...args)}>}
  * call `invoke` to parse the input and call the `controller`
  */
-module.exports.ServerlessAdapter = async function (
-  startService,
-  provider,
-  parsers
-) {
+exports.ServerlessAdapter = async function (startService, provider, parsers) {
   /**
    *
    * @param {"request"|"response"} type
