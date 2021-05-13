@@ -1,7 +1,5 @@
 "use strict";
 
-import { bind } from "core-js/core/function";
-
 /**
  * State of the breaker.
  */
