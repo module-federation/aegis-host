@@ -73,19 +73,16 @@ functions:
     #    Check the event documentation for details
     events:
       - http:
-          path: /microlib/api/config/{any+}
+          path: /microlib/api/{any+}
           method: GET
       - http:
-          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          path: /microlib/api/{any+} # this matches any path, the token 'any' doesn't mean anything special
           method: POST
       - http:
-          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
-          method: GET
-      - http:
-          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          path: /microlib/api/{any+} # this matches any path, the token 'any' doesn't mean anything special
           method: PATCH
       - http:
-          path: /microlib/api/models/{any+} # this matches any path, the token 'any' doesn't mean anything special
+          path: /microlib/api/{any+} # this matches any path, the token 'any' doesn't mean anything special
           method: DELETE
 
   html:
