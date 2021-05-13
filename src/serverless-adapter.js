@@ -20,19 +20,14 @@ module.exports.ServerlessAdapter = async function (
   provider,
   parsers
 ) {
-  function parseRequest(...args) {
-    const parse = parsers[provider].request;
-
-    if (typeof parse === "function") {
-      const output = parse(...args);
-      console.debug({ func: parse.name, output });
-      return output;
-    }
-    console.warn("no parser found for provider");
-  }
-
-  function parseResponse(...args) {
-    const parse = parsers[provider].response;
+  /**
+   *
+   * @param {"request"|"response"} type
+   * @param  {...any} args
+   * @returns
+   */
+  function parseMessage(type, ...args) {
+    const parse = parsers[provider][type];
 
     if (typeof parse === "function") {
       const output = parse(...args);
