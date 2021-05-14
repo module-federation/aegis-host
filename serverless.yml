@@ -11,9 +11,9 @@
 #
 # Happy Coding!
 
-service: aegis
+service: modfed
 # app and org for use with dashboard.serverless.com
-app: microlib
+app: ae
 org: tysonrm
 
 # You can pin your service to only deploy with a specific Serverless version
