@@ -108,6 +108,7 @@ async function startWebServer() {
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
 
     httpsServer.listen(sslPort, function () {
+      console.info(`ec2-54-198-145-57.compute-1.amazonaws.com`);
       console.info(`\n🌎 https://${ipAddress}:${sslPort} 🌎\n`);
     });
     return;
@@ -116,7 +117,8 @@ async function startWebServer() {
   app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
 
   httpServer.listen(port, function () {
-    console.info(`\n🌎 http://${ipAddress}:${port} 🌎\n`);
+    console.info("🌎 http://ec2-54-198-145-57.compute-1.amazonaws.com 🌎");
+    //  console.info(`\n🌎 http://${ipAddress}:${port} 🌎\n`);
   });
 }
 
