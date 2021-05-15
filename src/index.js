@@ -90,10 +90,17 @@ function reloadCallback() {
   });
 }
 
+async function getHostAddress(options) {
+  const { lookup } = require("dns").promises;
+  const { hostname } = require("os");
+  return (await lookup(hostname(), options)).address;
+}
+
 /**
  * Start web server, optionally require secure socket.
  */
-function startWebServer() {
+async function startWebServer() {
+  const ipAddress = await getHostAddress();
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
@@ -101,7 +108,7 @@ function startWebServer() {
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
 
     httpsServer.listen(sslPort, function () {
-      console.info(`\n🌎 https://localhost:${sslPort} 🌎\n`);
+      console.info(`\n🌎 https://${ipAddress}:${sslPort} 🌎\n`);
     });
     return;
   }
@@ -109,7 +116,7 @@ function startWebServer() {
   app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
 
   httpServer.listen(port, function () {
-    console.info(`\n🌎 http://localhost:${port} 🌎\n`);
+    console.info(`\n🌎 http://${ipAddress}:${port} 🌎\n`);
   });
 }
 
@@ -127,7 +134,7 @@ async function startService() {
     app.use(express.static("public"));
     await startMicroLib();
     reloadCallback();
-    startWebServer();
+    await startWebServer();
   } catch (e) {
     console.error(e);
   }
