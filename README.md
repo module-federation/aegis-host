@@ -1,6 +1,6 @@
 ![MicroLib](doc/microlib.png)
 
-# MicroLib <sub><sup>codename _Aegis_</sup></sub>
+# MicroLib <sub><sup>codename _ÆGIS_</sup></sub>
 
 Microservice Libraries
 
