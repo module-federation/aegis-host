@@ -31,3 +31,5 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 lambda.out
+.aws/config
+.aws/credentials
