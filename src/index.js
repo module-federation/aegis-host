@@ -90,53 +90,53 @@ function reloadCallback() {
   });
 }
 
-async function getHostAddress(options) {
-  const { lookup } = require("dns").promises;
-  const { hostname } = require("os");
-  return (await lookup(hostname(), options)).address;
-}
-
 /**
  * Start web server, optionally require secure socket.
  */
-async function startWebServer() {
-  const ipAddress = await getHostAddress();
+ async function startWebServer() {
+  const status = http.get({ 
+    hostname: "checkip.amazonaws.com", 
+    method:"get",
+  }, function(response){
+    const bytes = [];
+    const proto = sslEnabled?"https":"http";
+    const prt = sslEnabled? sslPort: port;
+    response.on("data", chunk=>bytes.push(chunk))
+    response.on("end", () => console.log(
+      `\n🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${prt}`
+      )) 
+  });
+
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
     const httpsServer = https.createServer({ key, cert }, app);
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
 
-    httpsServer.listen(sslPort, function () {
-      console.info(`ec2-54-198-145-57.compute-1.amazonaws.com`);
-      console.info(`\n🌎 https://${ipAddress}:${sslPort} 🌎\n`);
-    });
-    return;
-  }
+    httpsServer.listen(sslPort, status);
+  } else {
   const httpServer = http.createServer(app);
   app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
-
-  httpServer.listen(port, function () {
-    console.info("🌎 http://ec2-54-198-145-57.compute-1.amazonaws.com 🌎");
-    //  console.info(`\n🌎 http://${ipAddress}:${port} 🌎\n`);
-  });
+  httpServer.listen(port, status);
+  }
 }
 
 /**
  * Handle options and start the server.
  * Options:
  * https or http,
- * authorization (via jwt and auth0) enabled or disabled
+ * authorization (via jwt and a\
+ * uth0) enabled or disabled
  * clustered or single process,
  * hot reload via rolling restart or deleting cache
  */
-async function startService() {
+ async function startService() {
   try {
     app.use(express.json());
     app.use(express.static("public"));
     await startMicroLib();
     reloadCallback();
-    await startWebServer();
+    startWebServer();
   } catch (e) {
     console.error(e);
   }

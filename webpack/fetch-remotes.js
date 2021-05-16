@@ -65,8 +65,8 @@ function httpGet(entry, path, done) {
 function getPath(entry) {
   const url = new URL(entry.url);
   const filename = [
-    url.hostname.replaceAll(".", "-"),
-    url.pathname.replaceAll("/", "-").replace("-", ""),
+    url.hostname.split(".").join("-"),
+    url.pathname.split("/").join("-"),
     "remoteEntry.js",
   ].join("-");
 
