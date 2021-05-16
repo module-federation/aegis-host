@@ -1,3 +1,9 @@
+"use strict";
+
+/**
+ * Cloud-specific message parsers.
+ */
+
 const res = {
   send(data) {
     console.log("send", data);

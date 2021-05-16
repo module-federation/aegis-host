@@ -166,12 +166,7 @@ const Server = (() => {
   async function start(router) {
     const label = "\ntotal time to import & register remote modules";
     console.time(label);
-
     const overrides = { save, find, Persistence };
-
-    // const entries = await getRemoteEntries;
-    // const initRemotes = await getRemoteModules;
-    // await initRemotes(entries, overrides);
 
     return getRemoteEntries.then(remotes => {
       return getRemoteModules.then(initRemotes => {

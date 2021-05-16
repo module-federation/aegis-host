@@ -10,7 +10,7 @@ const express = require("express");
 const cluster = require("./cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("./auth");
-const parsers = require("./serverless-messages").parsers;
+const messageParser = require("./message").parsers;
 const { ServerlessAdapter } = require("./serverless-adapter");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
 
@@ -19,7 +19,7 @@ const sslPort = process.env.SSL_PORT || 8070;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
-const cloudName = process.env.PROVIDER_NAME;
+const cloudProvider = process.env.CLOUD_PROVIDER;
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 
 // enable authorization
@@ -91,10 +91,12 @@ function reloadCallback() {
 }
 
 /**
- * Start web server, optionally require secure socket.
+ *
+ * @param {*} provider
+ * @param {*} messages
  */
-async function startWebServer() {
-  const status = http.get(
+function showPublicIpAddress() {
+  http.get(
     {
       hostname: "checkip.amazonaws.com",
       method: "get",
@@ -111,18 +113,23 @@ async function startWebServer() {
       );
     }
   );
+}
 
+/**
+ * Start web server, optionally require secure socket.
+ */
+async function startWebServer() {
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
     const httpsServer = https.createServer({ key, cert }, app);
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
 
-    httpsServer.listen(sslPort, status);
+    httpsServer.listen(sslPort, showPublicIpAddress);
   } else {
     const httpServer = http.createServer(app);
     app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
-    httpServer.listen(port, status);
+    httpServer.listen(port, showPublicIpAddress);
   }
 }
 
@@ -160,8 +167,12 @@ if (!isServerless()) {
  * @param  {...any} args arguments passsed to serverless function
  */
 exports.handleServerlessRequest = async function (...args) {
-  console.info("serverless mode initializing", args);
-  const adapter = await ServerlessAdapter(startMicroLib, cloudName, parsers);
+  console.info("running in serverless mode", args);
+  const adapter = await ServerlessAdapter(
+    startMicroLib,
+    cloudProvider,
+    messageParser
+  );
   return adapter.invoke(...args);
 };
 

@@ -22,7 +22,7 @@
     "hot-reload": "curl http://localhost:8707/microlib/reload",
     "restart": "npm run build && npm run start",
     "start": "node --title aegis -r dotenv/config dist/index.js",
-    "transpile": "babel src/index.js src/cluster.js src/auth.js src/serverless-messages.js src/serverless-adapter.js -d dist",
+    "transpile": "babel src/index.js src/cluster.js src/auth.js src/message.js src/serverless-adapter.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test": "mocha --recursive -r esm",

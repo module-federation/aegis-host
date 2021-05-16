@@ -259,7 +259,7 @@ export default function makePorts(ports, adapters, observer) {
             breaker.errorListener(domainEvents.portRetryFailed(this));
             breaker.errorListener(domainEvents.portTimeout(this, port));
 
-            // invoke port with circuits breaker failsafe
+            // invoke port with circuit breaker failsafe
             return breaker.invoke.apply(this, args);
           }
           // no breaker
