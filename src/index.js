@@ -93,19 +93,24 @@ function reloadCallback() {
 /**
  * Start web server, optionally require secure socket.
  */
- async function startWebServer() {
-  const status = http.get({ 
-    hostname: "checkip.amazonaws.com", 
-    method:"get",
-  }, function(response){
-    const bytes = [];
-    const proto = sslEnabled?"https":"http";
-    const prt = sslEnabled? sslPort: port;
-    response.on("data", chunk=>bytes.push(chunk))
-    response.on("end", () => console.log(
-      `\n🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${prt}`
-      )) 
-  });
+async function startWebServer() {
+  const status = http.get(
+    {
+      hostname: "checkip.amazonaws.com",
+      method: "get",
+    },
+    function (response) {
+      const bytes = [];
+      const proto = sslEnabled ? "https" : "http";
+      const prt = sslEnabled ? sslPort : port;
+      response.on("data", chunk => bytes.push(chunk));
+      response.on("end", () =>
+        console.log(
+          `\n🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${prt}`
+        )
+      );
+    }
+  );
 
   if (sslEnabled) {
     const key = fs.readFileSync("cert/server.key", "utf8");
@@ -115,9 +120,9 @@ function reloadCallback() {
 
     httpsServer.listen(sslPort, status);
   } else {
-  const httpServer = http.createServer(app);
-  app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
-  httpServer.listen(port, status);
+    const httpServer = http.createServer(app);
+    app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
+    httpServer.listen(port, status);
   }
 }
 
@@ -130,7 +135,7 @@ function reloadCallback() {
  * clustered or single process,
  * hot reload via rolling restart or deleting cache
  */
- async function startService() {
+async function startService() {
   try {
     app.use(express.json());
     app.use(express.static("public"));
