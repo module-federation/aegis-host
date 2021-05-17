@@ -6,12 +6,11 @@ Microservice Libraries
 
 # Getting started
 ## please use `pre-npm` branch at tbis time
-```js
+```shell
 git clone https://github.com/module-federation/MicroLib
-checkout pre-npm
+git checkout pre-npm
 npm ci
-yarn 
-yarn build
+npm 
 npm start .
 ```
 
