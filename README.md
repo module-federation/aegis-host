@@ -8,12 +8,14 @@ Microservice Libraries
 ## please use `pre-npm` branch at tbis time
 ```shell
 git clone https://github.com/module-federation/MicroLib
+cd MicoLib
 git checkout pre-npm
 npm ci
 npm run build
-npm start .
-```
+npm start .\gd
 
+# NPM go F urself
+lll
 ## Purpose
 
 Stop paying the "microservices premium".
