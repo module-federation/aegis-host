@@ -19,8 +19,6 @@ modules directly from GitHub. If you want to update any of the sample services, 
 the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Clone your fork, etc. make your changes,
 build the webpack bundles, commit and push. In order for the host to see your changes are hot reload, either configure a webhook in your repo that points at http://your-aegis-server:8707/microlib/reload or run the hot reload script. `npm run hot-reload`.
 
-Note: The host's remote entry config now uses GitHub as the remote.
-
 
 ## Purpose
 
@@ -30,7 +28,7 @@ When evaluating microservices as a candidate architecture, the most important fa
 
 This trade-off, dealing with the increased scope, cost and risk that stems from distribution, is called paying the "microservices premium". Sometimes the premium is well worth it. But in many cases it does more harm than good, leading many experts to advise against starting with microservices, but to instead introduce them gradually as scope or demand increases.
 
-That said, in cases where the implementation does succeed, organizations generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
+That said, in cases where the implementation does succeed,   generally prefer microservices to monoliths because of the increased speed and agility that deployment independence brings. So one could make the argument that if the premium were somehow discounted, microservices would be appropriate for a much wider audience.
 
 _**Consider, then, what would happen if we could eliminate the need for distribution and still allow for independent deployment.**_
 
