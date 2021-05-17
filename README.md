@@ -10,7 +10,7 @@ Microservice Libraries
 git clone https://github.com/module-federation/MicroLib
 git checkout pre-npm
 npm ci
-npm 
+npm run build
 npm start .
 ```
 
