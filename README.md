@@ -8,6 +8,7 @@ Microservice Libraries
 ## please use `pre-npm` branch at this time
 ```shell
 git clone https://github.com/module-federation/MicroLib
+git checkout pre-npm
 cp dotenv.example.txt .env
 npm ci
 npm run build
