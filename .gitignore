@@ -33,3 +33,4 @@ amplifytools.xcconfig
 lambda.out
 .aws/config
 .aws/credentials
+nohup.out
