@@ -166,8 +166,6 @@ if (!isServerless()) {
   }
 }
 
-require("scandium");
-
 let serverlessAdapter = null;
 
 /**
