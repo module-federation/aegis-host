@@ -4,6 +4,23 @@
 
 Microservice Libraries
 
+# TLDR;
+
+```shell
+git clone https://github.com/module-federation/MicroLib
+git checkout pre-npm
+cp dotenv.example .env
+npm ci
+npm run build
+npm start .
+npm run demo
+```
+
+Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
+modules directly from GitHub. If you want to update any of the sample services, fork the MicroLib-Example repo. Update
+the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Clone your fork, etc. make your changes,
+build the webpack bundles, commit and push. In order for the host to see your changes are hot reload, either configure a webhook in your repo that points at http://your-aegis-server:8707/microlib/reload or run the hot reload script. `npm run hot-reload`.
+
 ## Purpose
 
 Stop paying the "microservices premium".
@@ -245,11 +262,11 @@ SSL_ENABLED=true
 
 ![hotreload](doc/hot-reload.gif)
 
-### 
+###
+
 https://user-images.githubusercontent.com/38910830/116915957-4f9cd880-ac12-11eb-8255-41e4e3be80c3.mov
 
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
-
 
 ## Further Reading
 
