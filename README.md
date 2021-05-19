@@ -9,6 +9,7 @@ Microservice Libraries
 ```shell
 git clone https://github.com/module-federation/MicroLib
 git checkout pre-npm
+cd MicroLib
 cp dotenv.example .env
 npm ci
 npm run build
@@ -154,6 +155,8 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 ---
 
 ## Running the Application
+
+See above TLDS; section for a simple install.
 
 To demonstrate that polyrepo code sharing is a reality, you will clone two repos. The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote. The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
