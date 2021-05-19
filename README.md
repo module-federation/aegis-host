@@ -4,8 +4,9 @@
 
 Microservice Libraries
 
-# Getting started
-## please use `pre-npm` branch at this time
+
+## TLDR;
+
 ```shell
 git clone https://github.com/module-federation/MicroLib
 git checkout pre-npm
@@ -13,12 +14,13 @@ cp dotenv.example .env
 npm ci
 npm run build
 npm start .
+npm run demo
 ```
+
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
 modules directly from GitHub. If you want to update any of the sample services, fork the MicroLib-Example repo. Update
 the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Clone your fork, etc. make your changes,
 build the webpack bundles, commit and push. In order for the host to see your changes are hot reload, either configure a webhook in your repo that points at http://your-aegis-server:8707/microlib/reload or run the hot reload script. `npm run hot-reload`.
-
 
 ## Purpose
 
@@ -152,6 +154,19 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
+### Simple Install:
+
+```shell
+git clone https://github.com/module-federation/MicroLib
+git checkout pre-npm
+cp dotenv.example .env
+npm ci
+npm run build
+npm start .
+npm run demo
+```
+
+### Test integrations, orchestration with mock services and kafka event bus.
 To demonstrate that polyrepo code sharing is a reality, you will clone two repos. The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote. The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
 ```shell
