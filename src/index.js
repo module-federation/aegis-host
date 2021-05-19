@@ -13,7 +13,6 @@ const authorization = require("./auth");
 const messageParser = require("./message").parsers;
 const { ServerlessAdapter } = require("./serverless-adapter");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
-const { env } = require("node:process");
 
 const port = process.env.PORT || 8707;
 const sslPort = process.env.SSL_PORT || 8070;
@@ -98,14 +97,13 @@ function reloadCallback() {
  */
 function checkPublicIpAddress() {
   const check = process.env.CHECK_PUBLIC_IP;
-  if (!ipCheck) {
+  if (!check) {
     return "localhost";
   }
   http.get(
     {
-      hostname: ipCheck, //"checkip.amazonaws.com",
+      hostname: check, //"checkip.amazonaws.com",
       method: "get",
-      
     },
     function (response) {
       const bytes = [];
@@ -114,7 +112,7 @@ function checkPublicIpAddress() {
       response.on("data", chunk => bytes.push(chunk));
       response.on("end", () =>
         console.log(
-          `\n🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${prt}`
+          `\n 🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${prt}`
         )
       );
     }
@@ -168,18 +166,26 @@ if (!isServerless()) {
   }
 }
 
+require("scandium");
+
+let serverlessAdapter = null;
+
 /**
  * Serverless entry point - called by the serverless function.
  * @param  {...any} args arguments passsed to serverless function
  */
 exports.handleServerlessRequest = async function (...args) {
   console.info("running in serverless mode", args);
-  const adapter = await ServerlessAdapter(
-    startMicroLib,
-    cloudProvider,
-    messageParser
-  );
-  return adapter.invoke(...args);
+
+  if (!serverlessAdapter) {
+    serverlessAdapter = await ServerlessAdapter(
+      startMicroLib,
+      cloudProvider,
+      messageParser
+    );
+  }
+
+  return serverlessAdapter.invokeController(...args);
 };
 
 const fileHandler = new StaticFileHandler("public");

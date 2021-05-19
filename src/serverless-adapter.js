@@ -13,7 +13,7 @@ let invokeController = null;
  * @param {"aws"|"google"|"azure"|"ibm"} provider - the name of the serverless provider
  * @param {{req:{send:function(),status:function()},res:{}}} parsers - messsage parsers
  * @returns {Promise<{invoke:function(...args)}>}
- * call `invoke` to parse the input and call the `controller`
+ * call `invokeController` to parse the input and call the controller
  */
 exports.ServerlessAdapter = async function (startService, provider, parsers) {
   /**
@@ -45,7 +45,7 @@ exports.ServerlessAdapter = async function (startService, provider, parsers) {
 
   if (invokeController) {
     return {
-      invoke,
+      invokeController: invoke,
     };
   }
 
@@ -53,6 +53,6 @@ exports.ServerlessAdapter = async function (startService, provider, parsers) {
   invokeController = await startService();
 
   return {
-    invoke,
+    invokeController: invoke,
   };
 };

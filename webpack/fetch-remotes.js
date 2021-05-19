@@ -85,11 +85,11 @@ function getPath(entry) {
 function dedupUrls(entries) {
   return entries
     .map(function (e) {
-      const commonName = new URL(e.url).hostname.concat(e.path);
+      const commonPath = new URL(e.url).hostname.concat(e.path);
       return {
-        [commonName]: {
+        [commonPath]: {
           ...e,
-          name: commonName,
+          name: commonPath,
         },
       };
     })
@@ -130,9 +130,9 @@ module.exports = async remoteEntry => {
   );
 
   return entries.map(function (e) {
-    const commonName = new URL(e.url).hostname.concat(e.path);
+    const commonPath = new URL(e.url).hostname.concat(e.path);
     return {
-      [e.name]: remotes.find(r => r[commonName])[commonName],
+      [e.name]: remotes.find(r => r[commonPath])[commonPath],
     };
   });
 };

@@ -183,8 +183,8 @@ const Server = (() => {
           make[serverMode](endpointCmd, "patch", patchModels, router);
 
           makeAdmin(router, http);
-          console.info(routes);
           console.timeEnd(label);
+          console.info(routes);
 
           await cache.load();
           process.on("SIGTERM", () => close());

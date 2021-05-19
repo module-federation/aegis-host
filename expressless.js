@@ -55,7 +55,7 @@ const payloads = {
 
 process.stdin.pipe(require("split")()).on("data", processLine);
 console.log(
-  "type post,get,getbyid,patch,delete with :id if needed and press return to execute"
+  "type post,get,getbyid,patch,delete (:id) and press return to execute"
 );
 
 async function processLine(line) {
