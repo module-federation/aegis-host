@@ -96,23 +96,24 @@ function reloadCallback() {
  * @param {*} messages
  */
 function checkPublicIpAddress() {
-  const check = process.env.CHECK_PUBLIC_IP;
-  if (!check) {
+  const checkIp = process.env.CHECK_PUBLIC_IP;
+  if (!checkIp) {
     return "localhost";
   }
+  console.info("ping");
   http.get(
     {
-      hostname: check, //"checkip.amazonaws.com",
+      hostname: checkIp, //"checkip.amazonaws.com",
       method: "get",
     },
     function (response) {
       const bytes = [];
       const proto = sslEnabled ? "https" : "http";
-      const prt = sslEnabled ? sslPort : port;
+      const p = sslEnabled ? sslPort : port;
       response.on("data", chunk => bytes.push(chunk));
       response.on("end", () =>
         console.log(
-          `\n 🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${prt}`
+          `\n 🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${p}`
         )
       );
     }

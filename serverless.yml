@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: modfed
+service: aegis
 # app and org for use with dashboard.serverless.com
 app: ae
 org: tysonrm

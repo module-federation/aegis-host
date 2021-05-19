@@ -8,7 +8,7 @@
 SERVERLESS=false
 
 # Create child processes, one per core
-CLUSTER_ENABLED=false
+CLUSTER_ENABLED=true
 
 # Token-based authorization (JSON Web Tokens)
 # Secure protected routes. See auth/key-set.json.
@@ -27,6 +27,8 @@ DATASOURCE_ADAPTER=DataSourceMemory
 
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000
+DISTRIBUTED_CACHE_ENABLED=true
+DISTRIBUTED_CACHE_EVENTS=order.save,order.delete
 
 # URL root level path
 API_ROOT=/microlib/api
@@ -39,9 +41,6 @@ ENCRYPTION_PWD=secret
 # PROVIDER_NAME=azure
 # PROVIDER_NAME=google
 PROVIDER_NAME=aws
-
-# Distribute federated cache
-# FEDERATE_CACHE=host2.domain.com,host3.domain.com
 
 # Required by 3rd party client APIs
 MONGODB_URL=mongodb://localhost:27017

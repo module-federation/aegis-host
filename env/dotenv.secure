@@ -12,13 +12,13 @@ CLUSTER_ENABLED=false
 
 # Token-based authorization (JSON Web Tokens)
 # Secure protected routes. See auth/key-set.json.
-AUTH_ENABLED=false
+AUTH_ENABLED=true
 
 # Use Secure Sockets Layer / TLS / HTTPS
 # See cert/domain.crt, cert/server.key
-SSL_ENABLED=false
-SSL_PORT=8070
-PORT=8707
+SSL_ENABLED=true
+SSL_PORT=8071
+PORT=8070
 
 # Default datasource for models that do not specify one
 # DATASOURCE_ADAPTER=DataSourceMongoDb
