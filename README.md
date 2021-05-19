@@ -9,10 +9,7 @@ Microservice Libraries
 ```shell
 git clone https://github.com/module-federation/MicroLib
 cd MicroLib
-yarn
-cp dotenv.example .env
-npm ci
-npm run build
+yarn && yarn build
 npm start .
 npm run demo
 ```
