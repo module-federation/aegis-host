@@ -4,7 +4,7 @@
 
 Microservice Libraries
 
-## TLDR;
+## TL;DR
 
 ```shell
 git clone https://github.com/module-federation/MicroLib
