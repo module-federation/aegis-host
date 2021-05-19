@@ -9,7 +9,8 @@ Microservice Libraries
 ```shell
 git clone https://github.com/module-federation/MicroLib
 cd MicroLib
-yarn && yarn build
+npm ci
+npm run buid
 npm start .
 npm run demo
 ```
