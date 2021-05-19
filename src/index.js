@@ -96,14 +96,10 @@ function reloadCallback() {
  * @param {*} messages
  */
 function checkPublicIpAddress() {
-  const checkIp = process.env.CHECK_PUBLIC_IP;
-  if (!checkIp) {
-    return "localhost";
-  }
-  console.info("ping");
+  //const ipAddr = proces.env.CHECK_PUBLIC_IP || "checkip.amazonaws.com";
   http.get(
     {
-      hostname: checkIp, //"checkip.amazonaws.com",
+      hostname: "checkip.amazonaws.com",
       method: "get",
     },
     function (response) {
