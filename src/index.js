@@ -96,22 +96,27 @@ function reloadCallback() {
  * @param {*} messages
  */
 function checkPublicIpAddress() {
-  //const ipAddr = proces.env.CHECK_PUBLIC_IP || "checkip.amazonaws.com";
+  const bytes = [];
+  const proto = sslEnabled ? "https" : "http";
+  const p = sslEnabled ? sslPort : port;
+
+  if (/local/i.test(process.env.NODE_ENV)) {
+    const ipAddr = "localhost";
+    console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${p} \n`);
+    return;
+  }
   http.get(
     {
       hostname: "checkip.amazonaws.com",
       method: "get",
     },
     function (response) {
-      const bytes = [];
-      const proto = sslEnabled ? "https" : "http";
-      const p = sslEnabled ? sslPort : port;
+
       response.on("data", chunk => bytes.push(chunk));
-      response.on("end", () =>
-        console.log(
-          `\n 🌎 ÆGIS listening on ${proto}://${bytes.join("").trim()}:${p}`
-        )
-      );
+      response.on("end", function () {
+        const ipAddr = bytes.join("").trim();
+        console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${p} \n`);
+      });
     }
   );
 }
