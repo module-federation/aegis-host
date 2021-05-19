@@ -9,7 +9,7 @@ Microservice Libraries
 ```shell
 git clone https://github.com/module-federation/MicroLib
 git checkout pre-npm
-cp dotenv.example.txt .env
+cp dotenv.example .env
 npm ci
 npm run build
 npm start .
