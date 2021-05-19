@@ -15,8 +15,7 @@
   },
   "repository": {
     "url": "https://github.com/module-federation/microlib"
-  },
-  "scripts": {
+  },    "scripts": {
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "hot-reload": "curl http://localhost:8707/microlib/reload",

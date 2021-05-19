@@ -39,7 +39,7 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-md-6">
 
         <div class="form-floating mb-3">
           <input class="form-control bg-dark text-white" id="model" list="modelList" placeholder="Type to search...">
@@ -51,6 +51,7 @@
           <input class="form-control bg-dark text-white" id="modelId" placeholder="Model ID">
           <label for="modelId" class="form-label text-white">Model ID</label>
           <button class="btn btn-outline-light" type="button" id="copyButton">Copy</button>
+          <button class="btn btn-outline-light" type="button" id="clearIdButton">Clear</button>
         </div>
 
         <div class="form-floating mb-3">
@@ -105,7 +106,7 @@
         </div>
       </div>
 
-      <div class="col-md-7">
+      <div class="col-md-6">
         <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
         <pre id="messages" class="text-light mb-3 overflow-scroll" style="height:415px">
           <code id="jsonCode"></code>

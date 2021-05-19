@@ -13,6 +13,7 @@ const authorization = require("./auth");
 const messageParser = require("./message").parsers;
 const { ServerlessAdapter } = require("./serverless-adapter");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
+const { env } = require("node:process");
 
 const port = process.env.PORT || 8707;
 const sslPort = process.env.SSL_PORT || 8070;
@@ -95,11 +96,16 @@ function reloadCallback() {
  * @param {*} provider
  * @param {*} messages
  */
-function showPublicIpAddress() {
+function checkPublicIpAddress() {
+  const check = process.env.CHECK_PUBLIC_IP;
+  if (!ipCheck) {
+    return "localhost";
+  }
   http.get(
     {
-      hostname: "checkip.amazonaws.com",
+      hostname: ipCheck, //"checkip.amazonaws.com",
       method: "get",
+      
     },
     function (response) {
       const bytes = [];
@@ -125,11 +131,11 @@ async function startWebServer() {
     const httpsServer = https.createServer({ key, cert }, app);
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
 
-    httpsServer.listen(sslPort, showPublicIpAddress);
+    httpsServer.listen(sslPort, checkPublicIpAddress);
   } else {
     const httpServer = http.createServer(app);
     app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
-    httpServer.listen(port, showPublicIpAddress);
+    httpServer.listen(port, checkPublicIpAddress);
   }
 }
 

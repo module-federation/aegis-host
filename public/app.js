@@ -12,6 +12,7 @@
   const queryInput = document.querySelector("#query");
   const paramInput = document.querySelector("#parameter");
   const copyButton = document.querySelector("#copyButton");
+  const clearIdButton = document.querySelector("#clearIdButton");
 
   // Include JWT access token in header for auth check
   let authHeader = {};
@@ -186,6 +187,10 @@
   copyButton.addEventListener("click", function () {
     modelIdInput.select();
     document.execCommand("copy");
+  });
+
+  clearIdButton.addEventListener("click", function () {
+    document.getElementById("modelId").value = "";
   });
 
   window.addEventListener("load", async function () {

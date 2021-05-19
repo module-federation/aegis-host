@@ -1,5 +1,5 @@
 {
-  "resource": "index.html",
+  "resource": "",
   "path": "public",
   "httpMethod": "GET",
   "headers": {
