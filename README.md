@@ -156,7 +156,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 ## Running the Application
 
 s
-See above TLDS; section for a simplied install. Get up and running in about 5 seconds.
+See above TLDS; section for a simplied install. Get up and running in about 60 seconds.
 
 To demonstrate that polyrepo code sharing is a reality, you will clone two repos. The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote. The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
