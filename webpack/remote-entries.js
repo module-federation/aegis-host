@@ -4,7 +4,7 @@ module.exports = [
   {
     name: "microservices",
     url:
-      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=oldstyle-stream",
+      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=master",
     path: __dirname,
     type: "model",
     importRemote: async () => {
@@ -15,7 +15,7 @@ module.exports = [
   {
     name: "adapters",
     url:
-      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=oldstyle-stream",
+      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=master",
     path: __dirname,
     type: "adapter",
     importRemote: async () => {
@@ -26,7 +26,7 @@ module.exports = [
   {
     name: "services",
     url:
-      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=oldstyle-stream",
+      "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=master",
     path: __dirname,
     type: "service",
     importRemote: async () => {
