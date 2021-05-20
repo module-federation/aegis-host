@@ -29,7 +29,7 @@ function getRetries(args) {
 }
 
 /**
- * Implement recursive retry if port times out.
+ * Recursively retry if the adapter times out.
  * @param {{
  *  portName: string,
  *  portConf: import('../models').ports,
@@ -46,7 +46,7 @@ function setPortTimeout(options) {
 
   const timer = {
     enabled: false,
-    stopTimer: () => void 0,
+    stopTimer: id => id,
     expired,
   };
 

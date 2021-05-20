@@ -61,7 +61,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <div class="form-floating mb-3">
+          <div class="form-floating mb-3 input-group">
             <input
               class="form-control bg-dark text-white"
               id="model"
@@ -70,6 +70,13 @@
             />
             <label for="model" class="form-label text-white">Model</label>
             <datalist id="modelList"></datalist>
+            <button
+              class="btn btn-outline-light"
+              type="button"
+              id="clearModelButton"
+            >
+              Clear
+            </button>
           </div>
 
           <div class="form-floating mb-3 input-group">
@@ -91,7 +98,7 @@
             </button>
           </div>
 
-          <div class="form-floating mb-3">
+          <div class="form-floating mb-3 input-group">
             <input
               type="text"
               class="form-control bg-dark text-white"
@@ -106,6 +113,13 @@
               <option value="approve">Checkout</option>
               <option value="cancel"></option>
             </datalist>
+            <button
+              class="btn btn-outline-light"
+              type="button"
+              id="clearParamButton"
+            >
+              Clear
+            </button>
           </div>
 
           <div class="form-floating mb-3 input-group">

@@ -93,7 +93,7 @@ function setStateOnError(log, error, options) {
  */
 export function logError(id, error, thresholds) {
   const log = fetchLog(id);
-  let state = setStateOnError(log, error, thresholds);
+  const state = setStateOnError(log, error, thresholds);
   const testDelay = getThreshold(error, thresholds).retryDelay;
   log.push({ name: id, time: Date.now(), state, error, testDelay });
 }

@@ -17,6 +17,12 @@ import http from "./adapters/http-adapter";
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const modelPath = `${apiRoot}/models`;
 
+const idRoute = route =>
+  route.split("/").splice(0, 5).concat([":id"]).join("/");
+
+const cmdRoute = route =>
+  route.split("/").splice(0, 6).concat([":id", ":command"]).join("/");
+
 class RouteMap extends Map {
   has(route) {
     if (!route) {
@@ -29,21 +35,15 @@ class RouteMap extends Map {
       return true;
     }
 
-    const idRoute = route.split("/").splice(0, 5).concat([":id"]).join("/");
-
-    if (route.match(/\//g).length === 5 && super.has(idRoute)) {
-      this.route = super.get(idRoute);
+    const idInstance = idRoute(route);
+    if (route.match(/\//g).length === 5 && super.has(idInstance)) {
+      this.route = super.get(idInstance);
       return true;
     }
 
-    const cmdRoute = route
-      .split("/")
-      .splice(0, 6)
-      .concat([":id", ":command"])
-      .join("/");
-
-    if (super.has(cmdRoute)) {
-      this.route = super.get(cmdRoute);
+    const cmdInstance = cmdRoute(route);
+    if (route.match(/\//g).length === 6 && super.has(cmdInstance)) {
+      this.route = super.get(cmdInstance);
       return true;
     }
     return false;
@@ -143,6 +143,12 @@ const Server = (() => {
     console.warn("potential configuration issue", path, method);
   }
 
+  function shutdown(callback) {
+    console.warn("Received SIGTERM - system shutdown in progress");
+    callback();
+    process.exit(1);
+  }
+
   /**
    * Clear all non-webpack module cache, i.e.
    * everything bundled by remoteEntry.js (models
@@ -187,7 +193,10 @@ const Server = (() => {
           console.info(routes);
 
           await cache.load();
-          process.on("SIGTERM", () => close());
+          process.on(
+            "SIGTERM",
+            shutdown(() => close())
+          );
           return control;
         });
       });
