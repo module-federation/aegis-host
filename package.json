@@ -17,6 +17,7 @@
     "url": "https://github.com/module-federation/microlib"
   },
   "scripts": {
+    "easy-button": "git clone https://github.com/module-federation/MicroLib && cd MicroLib &&  cp dotenv.example .env && npm ci && npm run build && npm start . && npm run demo",
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "hot-reload": "curl http://localhost:8070/microlib/reload",
