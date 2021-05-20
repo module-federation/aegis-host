@@ -267,7 +267,7 @@ SSL_ENABLED=true
 
 ### Reference Architecture
 
-https://user-images.githubusercontent.com/38910830/118898089-5f364580-b8d1-11eb-851f-297977b07406.mov
+https://user-images.githubusercontent.com/38910830/118922448-b3f0b500-b8ff-11eb-8139-6ab4e35776a3.mov
 
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
