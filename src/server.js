@@ -13,6 +13,7 @@ import {
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
+import ModelFactory from "./models";
 
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const modelPath = `${apiRoot}/models`;
@@ -158,6 +159,7 @@ const Server = (() => {
   function clear() {
     try {
       routes.clear();
+      ModelFactory.clearModels();
 
       Object.keys(__non_webpack_require__.cache).forEach(k => {
         console.log("deleting cached module", k);
