@@ -55,8 +55,6 @@ async function startMicroLib({ hot = false } = {}) {
   if (hot) {
     // clear cache on hot reload
     serverModule.default.clear();
-    // Clear express routes
-    clearRoutes();
   }
   await serverModule.default.start(app);
   return serverModule.default.control;
@@ -82,6 +80,7 @@ function reloadCallback() {
 
   app.use(reloadPath, async function (req, res) {
     try {
+      clearRoutes();
       await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");
     } catch (error) {
