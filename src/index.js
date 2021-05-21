@@ -111,7 +111,6 @@ function checkPublicIpAddress() {
       method: "get",
     },
     function (response) {
-
       response.on("data", chunk => bytes.push(chunk));
       response.on("end", function () {
         const ipAddr = bytes.join("").trim();

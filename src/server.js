@@ -143,10 +143,9 @@ const Server = (() => {
     console.warn("potential configuration issue", path, method);
   }
 
-  function shutdown(callback) {
+  function shutdown(shutdownTasks) {
     console.warn("Received SIGTERM - system shutdown in progress");
-    callback();
-    process.exit(1);
+    shutdownTasks();
   }
 
   /**
@@ -193,10 +192,7 @@ const Server = (() => {
           console.info(routes);
 
           await cache.load();
-          process.on(
-            "SIGTERM",
-            shutdown(() => close())
-          );
+          process.on("sigterm", () => shutdown(() => close()));
           return control;
         });
       });
