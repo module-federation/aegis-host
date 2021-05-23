@@ -8,9 +8,10 @@ function getFileName(entry) {
   const url = new URL(entry.url);
   const hostpart = url.hostname.split(".").join("-");
   const pathpart = url.pathname.split("/").join("-");
+  const portpart = url.port ? url.port : 80;
   if (pathpart.endsWith("remoteEntry.js"))
-    return `${hostpart}-${url.port}${pathpart}`;
-  return `${hostpart}-${url.port}${pathpart}-remoteEntry.js`;
+    return `${hostpart}-${portpart}${pathpart}`;
+  return `${hostpart}-${portpart}${pathpart}-remoteEntry.js`;
 }
 
 function getPath(entry) {
@@ -59,7 +60,7 @@ async function githubFetch(entry, path) {
 
 function httpGet(entry, path, done) {
   const url = new URL(entry.url);
-  require(url.protocol.substr(0, 4)).get(
+  require(url.protocol.replace(":", "")).get(
     entry.url,
     { rejectUnauthorized: false },
     function (response) {
@@ -74,14 +75,13 @@ function httpGet(entry, path, done) {
  * @param {{name:string,path:sting,url:string}[]} entries
  * @returns {{[x:string]:{name:string,path:string,url:string}}}
  */
-function dedupUrls(entries) {
+function deduplicateUrls(entries) {
   return entries
     .map(function (e) {
-      const commonPath = new URL(e.url).hostname.concat(e.path);
       return {
-        [commonPath]: {
+        [e.url]: {
           ...e,
-          name: commonPath,
+          name: e.url,
         },
       };
     })
@@ -103,7 +103,7 @@ module.exports = async remoteEntry => {
   const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
 
   const remotes = await Promise.all(
-    Object.values(dedupUrls(entries)).map(function (entry) {
+    Object.values(deduplicateUrls(entries)).map(function (entry) {
       const path = getPath(entry);
       console.log("downloading file to", path);
 
@@ -122,9 +122,8 @@ module.exports = async remoteEntry => {
   );
 
   return entries.map(function (e) {
-    const commonPath = new URL(e.url).hostname.concat(e.path);
     return {
-      [e.name]: remotes.find(r => r[commonPath])[commonPath],
+      [e.name]: remotes.find(r => r[e.url])[e.url],
     };
   });
 };

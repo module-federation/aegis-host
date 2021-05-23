@@ -53,6 +53,8 @@ async function startMicroLib({ hot = false } = {}) {
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
   if (hot) {
+    // clear stale routes
+    clearRoutes();
     // clear cache on hot reload
     serverModule.default.clear();
   }
@@ -80,7 +82,7 @@ function reloadCallback() {
 
   app.use(reloadPath, async function (req, res) {
     try {
-      clearRoutes();
+      //clearRoutes();
       await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");
     } catch (error) {

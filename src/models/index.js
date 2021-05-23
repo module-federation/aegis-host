@@ -189,7 +189,9 @@ const deleteEvent = model => ({
 async function initModels(remoteEntries, services, adapters) {
   const models = await importRemoteModels(remoteEntries);
 
-  Object.values(models).forEach(model => {
+  console.info(models.models);
+
+  Object.values(models.models).forEach(model => {
     if (
       model.hasOwnProperty("modelName") &&
       model.hasOwnProperty("factory") &&
@@ -239,6 +241,8 @@ async function initModels(remoteEntries, services, adapters) {
 export async function initRemotes(remoteEntries, overrides = {}) {
   const services = await importRemoteServices(remoteEntries);
   const adapters = await importRemoteAdapters(remoteEntries);
+
+  console.info({ services, adapters, overrides });
 
   await initModels(
     remoteEntries,
