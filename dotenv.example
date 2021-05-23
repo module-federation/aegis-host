@@ -1,7 +1,7 @@
 
 # Example .env file
 
-# Target environment: e.g. dev, test, prod
+# Target environment: e.g. local, dev, test, prod
 # NODE_ENV=dev
 
 # Run in serverless mode (no webserver)
@@ -22,8 +22,11 @@ PORT=8070
 
 # Default datasource for models that do not specify one
 # DATASOURCE_ADAPTER=DataSourceMongoDb
-# DATASOURCE_ADAPTER=DataSourceFile
-DATASOURCE_ADAPTER=DataSourceMemory
+DATASOURCE_ADAPTER=DataSourceFile
+# DATASOURCE_ADAPTER=DataSourceMemory
+
+# write files to web server dir, so they can be downloaded
+DATASOURCE_FILE_DIRECTORY=../public
 
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000

@@ -11,9 +11,7 @@ module.exports = [
     url: "https://api.github.com/repos/module-federation/MicroLib-Example/contents/dist?ref=master",
     path: __dirname,
     type: "adapter",
-    importRemote: async () => {
-      return import("microservices/adapters");
-    },
+    importRemote: async () => import("microservices/adapters"),
   },
   {
     name: "services",
