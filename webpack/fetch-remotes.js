@@ -4,15 +4,22 @@ const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
 const token = process.env.GITHUB_TOKEN;
 
-function getOptions(entry) {
+function getFileName(entry) {
   const url = new URL(entry.url);
-  return {
-    hostname: url.hostname,
-    pathname: url.pathname,
-    port: url.port,
-    protocol: url.protocol,
-    rejectUnauthorized: false,
-  };
+  const hostpart = url.hostname.split(".").join("-");
+  const pathpart = url.pathname.split("/").join("-");
+  if (pathpart.endsWith("remoteEntry.js"))
+    return `${hostpart}-${url.port}${pathpart}`;
+  return `${hostpart}-${url.port}${pathpart}-remoteEntry.js`;
+}
+
+function getPath(entry) {
+  const fileName = getFileName(entry);
+  let basedir = entry.path;
+  if (entry.path.charAt(entry.path.length - 1) !== "/") {
+    basedir = entry.path.concat("/");
+  }
+  return basedir.concat(fileName);
 }
 
 const octokit = new Octokit({ auth: token });
@@ -51,30 +58,15 @@ async function githubFetch(entry, path) {
 }
 
 function httpGet(entry, path, done) {
-  const options = getOptions(entry);
-  const req = require(options.protocol).request(options, function (res) {
-    if (res.statusCode < 200 || res.statusCode >= 300) {
-      return console.error("server returned error or redirect");
-    }
-    res.on("end", done);
-    res.pipe(fs.createWriteStream(path));
-  });
-  req.on("error", () => console.error(error));
-}
-
-function getPath(entry) {
   const url = new URL(entry.url);
-  const filename = [
-    url.hostname.split(".").join("-"),
-    url.pathname.split("/").join("-"),
-    "remoteEntry.js",
-  ].join("-");
-
-  let basedir = entry.path;
-  if (entry.path.charAt(entry.path.length - 1) !== "/") {
-    basedir = entry.path.concat("/");
-  }
-  return basedir.concat(filename);
+  require(url.protocol.substr(0, 4)).get(
+    entry.url,
+    { rejectUnauthorized: false },
+    function (response) {
+      response.pipe(fs.createWriteStream(path));
+      response.on("end", done);
+    }
+  );
 }
 
 /**
@@ -118,7 +110,7 @@ module.exports = async remoteEntry => {
       return new Promise(async function (resolve) {
         const resolvePath = () => resolve({ [entry.name]: path });
 
-        if (/^http.*github/i.test(entry.url)) {
+        if (/^https:\/\/api.github.com.*/i.test(entry.url)) {
           // Download from github.
           await githubFetch(entry, path);
           resolvePath();
