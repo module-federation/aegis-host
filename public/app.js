@@ -194,16 +194,23 @@
 
   clearModelButton.addEventListener("click", function () {
     document.getElementById("model").value = "";
+    document.getElementById("modelId").value = "";
+    document.getElementById("query").value = "";
+    document.getElementById("parameter").value = "";
     getUrl();
   });
 
   clearParamButton.addEventListener("click", function () {
     document.getElementById("parameter").value = "";
+    document.getElementById("modelId").value = "";
+    document.getElementById("query").value = "";
     getUrl();
   });
 
   clearIdButton.addEventListener("click", function () {
     document.getElementById("modelId").value = "";
+    document.getElementById("parameter").value = "";
+    document.getElementById("query").value = "";
     getUrl();
   });
 
