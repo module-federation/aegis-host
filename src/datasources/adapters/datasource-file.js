@@ -21,11 +21,10 @@ export class DataSourceFile extends DataSourceMemory {
    * @param {{
    *  hydrate:function(Map<string,import("../../models/model").Model>),
    *  serializer:import("../../lib/serializer").Serializer,
-   *  directory:string,
    * }} param0
    */
   async load({ hydrate, serializer }) {
-    this.file = path.resolve(directoryPath, this.name.concat(".json"));
+    this.file = path.join(directoryPath, this.name.concat(".json"));
     this.serializer = serializer;
     this.dataSource = this.readFile(hydrate);
   }
