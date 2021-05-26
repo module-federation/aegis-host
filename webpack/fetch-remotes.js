@@ -121,9 +121,5 @@ module.exports = async remoteEntry => {
     })
   );
 
-  return entries.map(function (e) {
-    return {
-      [e.name]: remotes.find(r => r[e.url])[e.url],
-    };
-  });
+  return entries.map(e => ({ [e.name]: remotes.find(r => r[e.url])[e.url] }));
 };

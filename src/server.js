@@ -130,7 +130,7 @@ const Server = (() => {
   async function control(path, method, req, res) {
     if (routes.has(path)) {
       try {
-        console.debug("path match:", path);
+        console.debug("path match: ", path);
         const fn = routes.get(path)[method];
         if (fn) {
           console.debug("method match:", method);
@@ -158,6 +158,7 @@ const Server = (() => {
    */
   function clear() {
     try {
+      close();
       routes.clear();
       ModelFactory.clearModels();
 
@@ -174,52 +175,31 @@ const Server = (() => {
     const label = "\ntotal time to import & register remote modules";
     console.time(label);
     const overrides = { save, find, Persistence };
-    const remotes = await getRemoteEntries;
-    const initRemotes = await getRemoteModules;
-    await initRemotes(remotes, overrides);
-    const cache = initCache();
 
-    console.log(`running in ${serverMode} mode`);
+    return getRemoteEntries.then(remotes => {
+      return getRemoteModules.then(initRemotes => {
+        return initRemotes(remotes, overrides).then(async () => {
+          const cache = initCache();
 
-    make[serverMode](endpoint, "get", getModels, router);
-    make[serverMode](endpoint, "post", postModels, router);
-    make[serverMode](endpointId, "get", getModelsById, router);
-    make[serverMode](endpointId, "patch", patchModels, router);
-    make[serverMode](endpointId, "delete", deleteModels, router);
-    make[serverMode](endpointCmd, "patch", patchModels, router);
+          console.info(`running in ${serverMode} mode`);
 
-    makeAdmin(router, http);
-    console.timeEnd(label);
-    console.info(routes);
+          make[serverMode](endpoint, "get", getModels, router);
+          make[serverMode](endpoint, "post", postModels, router);
+          make[serverMode](endpointId, "get", getModelsById, router);
+          make[serverMode](endpointId, "patch", patchModels, router);
+          make[serverMode](endpointId, "delete", deleteModels, router);
+          make[serverMode](endpointCmd, "patch", patchModels, router);
 
-    await cache.load();
-    process.on("sigterm", () => shutdown(() => close()));
-    return control;
+          makeAdmin(router, http);
+          console.timeEnd(label);
+          console.info(routes);
 
-    // return getRemoteEntries.then(remotes => {
-    //   return getRemoteModules.then(initRemotes => {
-    //     return initRemotes(remotes, overrides).then(async () => {
-    //       const cache = initCache();
-
-    //       console.log(`running in ${serverMode} mode`);
-
-    //       make[serverMode](endpoint, "get", getModels, router);
-    //       make[serverMode](endpoint, "post", postModels, router);
-    //       make[serverMode](endpointId, "get", getModelsById, router);
-    //       make[serverMode](endpointId, "patch", patchModels, router);
-    //       make[serverMode](endpointId, "delete", deleteModels, router);
-    //       make[serverMode](endpointCmd, "patch", patchModels, router);
-
-    //       makeAdmin(router, http);
-    //       console.timeEnd(label);
-    //       console.info(routes);
-
-    //       await cache.load();
-    //       process.on("sigterm", () => shutdown(() => close()));
-    //       return control;
-    //     });
-    //   });
-    // });
+          await cache.load();
+          process.on("sigterm", () => shutdown(() => close()));
+          return control;
+        });
+      });
+    });
   }
 
   return {

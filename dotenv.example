@@ -31,6 +31,16 @@ DATASOURCE_FILE_DIRECTORY=../public
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000
 
+#######################################
+# If streaming from GitHub, set to path 
+# of your remoteEntry.js and bundles.
+# ------------------------------------
+GITHUB_BRANCH=master
+GITHUB_REPO=MicroLib-Example
+GITHUB_OWNER=module-federation
+GITHUB_PATH=dist
+######################################
+
 # URL root level path
 API_ROOT=/microlib/api
 
@@ -43,8 +53,8 @@ ENCRYPTION_PWD=secret
 # PROVIDER_NAME=google
 PROVIDER_NAME=aws
 
-# Distribute federated cache
-# FEDERATE_CACHE=host2.domain.com,host3.domain.com
+# Participate in distributed cache
+# DISTRIBUTED_CACHE_EVENTS=CREATEORDER,UPDATEORDER,DELETEORDER
 
 # Required by 3rd party client APIs
 MONGODB_URL=mongodb://localhost:27017
