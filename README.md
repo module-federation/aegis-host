@@ -259,7 +259,11 @@ SSL_ENABLED=true
 
 ### Installation
 
-![install](doc/microlib-install-4k.gif)
+
+https://user-images.githubusercontent.com/38910830/119805772-2b49ba00-bea7-11eb-8ada-bd4a8c9b277c.mov
+
+
+
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
