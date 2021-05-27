@@ -271,18 +271,19 @@ https://user-images.githubusercontent.com/38910830/119805772-2b49ba00-bea7-11eb-
 
 ### Reference Architecture
 
-https://user-images.githubusercontent.com/38910830/118922448-b3f0b500-b8ff-11eb-8139-6ab4e35776a3.mov
 
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
 ## Further Reading
 
-[Stop Paying the Microservice Premium: Achieving Deployment Independence in a Monolithic Architecture](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
+[Stop Paying the Microservice Premium: Eliminating the Microservices Deployment/Distribution Trade-Off](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
 [Webpack 5 Module Federation: A game-changer in JavaScript architecture](https://medium.com/swlh/webpack-5-module-federation-a-game-changer-to-javascript-architecture-bcdd30e02669)
 
 [Microservice trade-offs](https://martinfowler.com/articles/microservice-trade-offs.html)
+
+[Microservice Library Videos](https://www.youtube.com/channel/UCT-3YJ2Ilgcjebqvs40Qz2A)
 
 <img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=MicroLIb&dp=/email/MicroLib">
