@@ -18,8 +18,7 @@ npm run demo
 
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
 modules directly from GitHub. If you want to update any of the sample services, fork the MicroLib-Example repo. Update
-the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Clone your fork, etc. make your changes,
-build the webpack bundles, commit and push. In order for the host to see your changes are hot reload, either configure a webhook in your repo that points at http://your-aegis-server:8707/microlib/reload or run the hot reload script. `npm run hot-reload`.
+the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Update .env GITHUB_* props to reflect your repo owner, name, branch and path of directory containing build output (location of remoteEntry.js and bundles). Clone your fork, etc. make your changes, build the webpack bundles, commit and push. In order for the host to see your changes, either configure a webhook in your repo that points at http://your-aegis-server:8707/microlib/reload, hot the url manually or run the hot reload script. `npm run hot-reload`.
 
 ## Purpose
 
