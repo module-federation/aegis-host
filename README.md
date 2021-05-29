@@ -266,7 +266,7 @@ https://user-images.githubusercontent.com/38910830/119805772-2b49ba00-bea7-11eb-
 
 <iframe width="1280" height="800" src="https://www.youtube.com/embed/RkSZ1QJZQtk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-[{hotreload}()]({https://www.youtube.com/watch?v=WqRlSnBxLYw&t=140s})
+[{hotreload}(https://youtu.be/RkSZ1QJZQtk?t=1)]({https://www.youtube.com/watch?v=WqRlSnBxLYw&t=140s})
 
 -[Reference Architecture](https://www.youtube.com/watch?v=Rf4Z-KBHNgw)
 
