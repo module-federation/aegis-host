@@ -260,13 +260,13 @@ SSL_ENABLED=true
 
 https://user-images.githubusercontent.com/38910830/119805772-2b49ba00-bea7-11eb-8ada-bd4a8c9b277c.mov
 
-[![Zero downtime, zero installtion](https://studio.youtube.com/channel/UCT-3YJ2Ilgcjebqvs40Qz2A/editing/images)](https://youtu.be/WqRlSnBxLYw "Reference Architecture")
+[![Zero downtime, zero installtion](https://youtu.be/RkSZ1QJZQtk?t=1)](https://youtu.be/WqRlSnBxLYw "Reference Architecture")
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
 <iframe width="1280" height="800" src="https://www.youtube.com/embed/RkSZ1QJZQtk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-[{hotreload}]({https://www.youtube.com/watch?v=WqRlSnBxLYw&t=140s})
+[{hotreload}()]({https://www.youtube.com/watch?v=WqRlSnBxLYw&t=140s})
 
 -[Reference Architecture](https://www.youtube.com/watch?v=Rf4Z-KBHNgw)
 
