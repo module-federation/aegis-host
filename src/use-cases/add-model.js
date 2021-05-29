@@ -1,5 +1,6 @@
 "use strict";
 
+import DataSourceFactory from "../datasources";
 import domainEvents from "../models/domain-events";
 
 /**
@@ -29,7 +30,7 @@ export default function addModelFactory({
 
   // Add an event whose callback invokes this factory.
   observer.on(domainEvents.addModel(eventName), addModel, false);
-
+  const dc = distributedCache;
   async function addModel(input) {
     const model = await models.createModel(
       observer,

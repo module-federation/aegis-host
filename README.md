@@ -18,7 +18,7 @@ npm run demo
 
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
 modules directly from GitHub. If you want to update any of the sample services, fork the MicroLib-Example repo. Update
-the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Update .env GITHUB_* props to reflect your repo owner, name, branch and path of directory containing build output (location of remoteEntry.js and bundles). Clone your fork, etc. make your changes, build the webpack bundles, commit and push. In order for the host to see your changes, either configure a webhook in your repo that points at http://your-aegis-server:8707/microlib/reload, hot the url manually or run the hot reload script. `npm run hot-reload`.
+the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Update .env GITHUB\_\* props to reflect your repo owner, name, branch and path of directory containing build output (location of remoteEntry.js and bundles). Clone your fork, etc. make your changes, build the webpack bundles, commit and push. In order for the host to see your changes, either configure a webhook in your repo that points at http://your-aegis-server:8707/microlib/reload, hot the url manually or run the hot reload script. `npm run hot-reload`.
 
 ## Purpose
 
@@ -258,22 +258,17 @@ SSL_ENABLED=true
 
 ### Installation
 
-
 https://user-images.githubusercontent.com/38910830/119805772-2b49ba00-bea7-11eb-8ada-bd4a8c9b277c.mov
 
-
-[![Alternate Text](https://studio.youtube.com/channel/UCT-3YJ2Ilgcjebqvs40Qz2A/editing/images)](https://youtu.be/WqRlSnBxLYw "Reference Architecture")
-
-
-
-
+[![Zero downtime, zero installtion](https://studio.youtube.com/channel/UCT-3YJ2Ilgcjebqvs40Qz2A/editing/images)](https://youtu.be/WqRlSnBxLYw "Reference Architecture")
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
-  -[hotreload](https://www.youtube.com/watch?v=WqRlSnBxLYw&t=140s)
+<iframe width="1280" height="800" src="https://www.youtube.com/embed/RkSZ1QJZQtk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+[{hotreload}]({https://www.youtube.com/watch?v=WqRlSnBxLYw&t=140s})
 
 -[Reference Architecture](https://www.youtube.com/watch?v=Rf4Z-KBHNgw)
-
 
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 

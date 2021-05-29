@@ -4,8 +4,8 @@ const ModuleFederationPlugin =
   require("webpack").container.ModuleFederationPlugin;
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
-const port = process.env.PORT || 8707;
-const sslPort = process.env.SSL_PORT || 8070;
+const port = process.env.PORT || 8070;
+const sslPort = process.env.SSL_PORT || 8071;
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);
 const publicPort = sslEnabled ? sslPort : port;
 const chalk = require("chalk");

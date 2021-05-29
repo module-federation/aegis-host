@@ -24,6 +24,7 @@ function buildOptions(model) {
     models: ModelFactory,
     observer: ObserverFactory.getInstance(),
     handlers: model.eventHandlers,
+    remoteCache: model.remoteCache,
     repository: DataSourceFactory.getDataSource(model.modelName),
   };
 }
