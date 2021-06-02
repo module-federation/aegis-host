@@ -3,26 +3,28 @@ import ModelFactory from "../models";
 import publishEvent from "../services/publish-event";
 import { EventBus } from "microservices/event-bus";
 
-const broadcast = process.env.BROADCAST_CHANNEL || "broadcastChannel";
+const broadcast = process.env.TOPIC_BROADCAST || "broadcastChannel";
 
 /**
  *
  * @param {*} param0
  * @returns
  */
-function updateCache({ model, eventName }) {
-  const ds = DataSourceFactory.getDataSource(model.modelName);
+export function updateCache({ message }) {
+  const event = JSON.parse(message);
+  const ds = DataSourceFactory.getDataSource(event.modelName);
 
   if (
     eventName.startsWith(models.EventTypes.CREATE) ||
     eventName.startsWith(models.EventTypes.UPDATE)
   ) {
-    ds.save(model.id, ModelFactory.loadModel(model, model.modelName));
+    ds.save(model.id, ModelFactory.loadModel(event.eventData, model.modelName));
     return;
+    ca;
   }
 
   if (eventName.startsWith(models.EventTypes.DELETE)) {
-    ds.delete(model.id, ModelFactory.loadModel(model, model.modelName));
+    ds.delete(model.id, ModelFactory.loadModel(eventData, model.modelName));
     return;
   }
 }
@@ -33,27 +35,39 @@ function updateCache({ model, eventName }) {
  * registered in the model factory and listen for remote
  * CRUD events from it. On startup, optionally load the
  * remote data source up to the cache limit - or load
- * based on cache misses.
+ * on cache misses.
  */
-const cacheEventHandler = {
+export const cacheEventHandler = {
   models: ModelFactory.getModelSpecs(),
   rels: models.map(m => ({ ...m.relations })),
 
   // Are there relations to other models not registered with us?
   listen() {
     const unregistered = this.rels.filter(
-      r => !this.models.find(m => m.modelName === r.modelName)
+      u => !this.models.find(m => m.modelName === u.modelName)
     );
 
-    if (unregistered.length > 0) {
-      unregistered.forEach(function (m) {
-        EventBus.listen(broadcast, {
-          once: false,
-          topic: broadcast,
-          callback: updateCache,
-        });
+    unregistered.forEach(function (u) {
+      EventBus.listen(broadcast, {
+        callback: updateCache,
+        topic: broadcast,
+        once: false,
+        filters: [
+          ModelFactory.getEventName(
+            ModelFactory.EventTypes.CREATE,
+            u.modelName
+          ),
+          ModelFactory.getEventName(
+            ModelFactory.EventTypes.UPDATE,
+            u.modelName
+          ),
+          ModelFactory.getEventName(
+            ModelFactory.EventTypes.DELETE,
+            u.modelName
+          ),
+        ],
       });
-    }
+    });
   },
 };
 
