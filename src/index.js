@@ -82,7 +82,6 @@ function reloadCallback() {
 
   app.use(reloadPath, async function (req, res) {
     try {
-      //clearRoutes();
       await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");
     } catch (error) {
@@ -130,7 +129,6 @@ async function startWebServer() {
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
     const httpsServer = https.createServer({ key, cert }, app);
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
-
     httpsServer.listen(sslPort, checkPublicIpAddress);
   } else {
     const httpServer = http.createServer(app);

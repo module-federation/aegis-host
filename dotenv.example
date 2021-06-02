@@ -53,9 +53,6 @@ ENCRYPTION_PWD=secret
 # PROVIDER_NAME=google
 PROVIDER_NAME=aws
 
-# Participate in distributed cache
-# DISTRIBUTED_CACHE_EVENTS=CREATEORDER,UPDATEORDER,DELETEORDER
-
 # Required by 3rd party client APIs
 MONGODB_URL=mongodb://localhost:27017
 KAFKA_GROUP_ID=microlib-host
