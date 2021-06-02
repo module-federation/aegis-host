@@ -15,8 +15,8 @@ export default async function compensate(model) {
 
     await updated.emit(domainEvents.undoStarted(updated), "undo starting");
 
-    const undoResult = await portFlow.reduceRight(
-      async (_prev, port, index, arr) => {
+    const undoResult = await Promise.resolve(
+      portFlow.reduceRight(async (_prev, port, index, arr) => {
         if (ports[port].undo) {
           console.log("calling undo on port: ", port);
           const result = await async(ports[port].undo(updated));
@@ -26,8 +26,8 @@ export default async function compensate(model) {
           }
           throw new Error("undo failed on port: ", port, result.error);
         }
-        return Promise.resolve(arr.splice(0, index));
-      }
+        return arr.splice(0, index);
+      })
     );
 
     if (undoResult.length > 0) {

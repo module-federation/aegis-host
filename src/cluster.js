@@ -39,7 +39,7 @@ function startWorker() {
 
   worker.on("message", function (message) {
     if (message.pid === process.pid) return;
-    
+
     if (/.*Broadcast$/.test(message.cmd)) {
       for (const id in cluster.workers) {
         if (cluster.workers[id].process.pid !== message.pid) {
@@ -104,7 +104,7 @@ function continueReload(callback, waitms) {
  * @param {number} [waitms] - Wait `waitms` milliseconds between start
  * and stop to allow time for your app to come up. Default is 2000 ms.
  */
-module.exports.startCluster = function (startService, waitms = 2000) {
+exports.startCluster = function (startService, waitms = 2000) {
   if (cluster.isMaster) {
     // Worker stopped. If reloading, start a new one.
     cluster.on("exit", function (worker) {

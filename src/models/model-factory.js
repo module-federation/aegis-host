@@ -9,7 +9,7 @@ import Event from "./event";
 /** @typedef {import('../datasources/datasource').default} Datasource */
 
 /**
- * @typedef {Object} ModelFactory Creates new model instances.
+ * @typedef {Object} ModelFactory
  * @property {function(Observer,Datasource,string,...args):Promise<Readonly<Model>>} createModel
  * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
  * @property {function(Model,object):Model} updateModel
@@ -189,9 +189,9 @@ const ModelFactory = {
   /**
    * Get federated models imported from remote server
    */
-  getRemoteModels: () => {
-    return [...modelFactories.values()];
-  },
+  getRemoteModels: () => [...modelFactories.values()],
+
+  getModelSpecs: () => [...modelFactories.values()],
 
   /**
    * Get the model's specification

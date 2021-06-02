@@ -138,10 +138,10 @@ const Server = (() => {
         }
         console.warn("method not supported", path, method);
       } catch (error) {
-        console.error(error);
+        console.error("problem running controller", error);
       }
     }
-    console.warn("potential configuration issue", path, method);
+    console.warn("potential config issue", path, method);
   }
 
   function shutdown(shutdownTasks) {

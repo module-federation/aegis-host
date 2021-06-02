@@ -1,22 +1,30 @@
 import DataSourceFactory from "../datasources";
 import ModelFactory from "../models";
 import publishEvent from "../services/publish-event";
+import { EventBus } from "microservices/event-bus";
 
-streamCachedModelCode = function () {};
+const broadcast = process.env.BROADCAST_CHANNEL || "broadcastChannel";
 
-function updateCache(event) {
-  // const ds = DataSourceFactory.getDataSource(event.eventName);
-  // if (eventName.contains(models.eventTypes.UPDATE)) {
-  //   eventName.modelData.srcUrl
-  //   ds.save(event.modelData.id, dis );
-  //   return;
-  // }
-  //   ds.delete(event.eventData.modelData.id);
+function updateCache({ model, eventName }) {
+  const ds = DataSourceFactory.getDataSource(model.modelName);
+
+  if (
+    eventName.startsWith(models.EventTypes.CREATE) ||
+    eventName.startsWith(models.EventTypes.UPDATE)
+  ) {
+    ds.save(model.id, ModelFactory.loadModel(model, model.modelName));
+    return;
+  }
+
+  if (eventName.startsWith(models.EventTypes.DELETE)) {
+    ds.delete(model.id, ModelFactory.loadModel(model, model.modelName));
+    return;
+  }
 }
 
 /**
- * Distributed cache event handler. Find any model
- * referenced by a relationship that is not registered
+
+ * referenced by a relation that is not registered
  * in the model factory and listen for remote CRUD events
  * from it. On startup, optionally load the remote data
  * source up to the cache limit - or load based on cache
@@ -25,24 +33,31 @@ function updateCache(event) {
  * @param {*} models list of all imported models
  * @returns
  */
-const cacheEventHandler = function (models) {
+const cacheEventHandler = function () {
+  const models = ModelFactory.getModelSpecs();
+  const rels = models.map(m => ({ ...m.relations }));
+
   // Are there relations to other models not registered with us?
   return {
-    listen(observer) {
-      models.forEach(function (m) {
-        const relations = m.getModelSpec().relations;
-        if (relations) {
-          const localModel = Object.keys(relations).find(r =>
-            models.find(m2 => m2.modelName === relations[r].modelName)
-          );
-          if (!localModel) {
-            observer.on(m2.modelName, updateCache);
-          }
-        }
-      });
+    listen() {
+      const unregistered = rels.filter(
+        r => !models.find(m => m.modelName === r.modelName)
+      );
+
+      if (unregistered.length > 0) {
+        unregistered.forEach(function (m) {
+          EventBus.listen(broadcast, {
+            once: false,
+            topic: broadcast,
+            callback: updateCache,
+          });
+        });
+      }
     },
   };
 };
+
+const cacheHandler = cacheEventHandler();
 
 /**
  *
@@ -51,13 +66,15 @@ const cacheEventHandler = function (models) {
  */
 export default function handleEvents(observer) {
   observer.on(/.*/, async event => publishEvent(event, observer));
-
-  const cacheHandler = cacheEventHandler(ModelFactory.getRemoteModels());
-  cacheHandler.listen(observer);
+  observer.on(/.*/, async event => EventBus.notify({ broadcast, event }));
+  /**
+   * Manage distributed cache
+   */
+  cacheHandler.listen();
 
   /**
-   * This is the cluster sync listener - when data is saved
-   * in another process, the master forwards the data to
+   * This is the cluster cache sync listener - when data is
+   * saved in another process, the master forwards the data to
    * all the other workers, so they can update their cache.
    *
    */
@@ -68,6 +85,7 @@ export default function handleEvents(observer) {
         ds.clusterSave(id, ModelFactory.loadModel(observer, ds, data, name));
         return;
       }
+
       if (cmd === "deleteCommand") {
         const ds = DataSourceFactory.getDataSource(name);
         ds.clusterDelete(id);

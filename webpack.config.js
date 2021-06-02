@@ -18,7 +18,7 @@ module.exports = env => {
   }
   return new Promise(resolve => {
     fetchRemotes(remoteEntries).then(remotes => {
-      console.log(remotes);
+      console.info(remotes);
       resolve({
         target: "async-node",
         mode: "development",
