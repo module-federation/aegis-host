@@ -272,6 +272,8 @@ MicroLib prevents vendor lock-in by providing a layer of abstraction on top of v
 
 ## Further Reading
 
+[Federated Microservices: Manageable Autonomy](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
+
 [Stop Paying the Microservice Premium: Eliminating the Microservices Deployment/Distribution Trade-Off](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
