@@ -12,7 +12,7 @@ import ObserverFactory from "../models/observer";
 import ModelFactory from "../models";
 import handleEvents from "./handle-events";
 
-handleEvents(ObserverFactory.getInstance());
+handleEvents(ObserverFactory.getInstance(), DataSourceFactory.getDataSource);
 
 /**
  *
@@ -23,7 +23,7 @@ function buildOptions(model) {
     modelName: model.modelName,
     models: ModelFactory,
     observer: ObserverFactory.getInstance(),
-    handlers: [model.eventHandlers, cacheEvents.getHandlers()],
+    handlers: model.eventHandlers,
     repository: DataSourceFactory.getDataSource(model.modelName),
   };
 }

@@ -257,4 +257,6 @@ export async function initRemotes(remoteEntries, overrides = {}) {
   );
 }
 
+export async function initRemote(name) {}
+
 export default ModelFactory;

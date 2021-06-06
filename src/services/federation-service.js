@@ -10,8 +10,8 @@ export async function importRemoteModels(remoteEntries) {
   const remoteModels = [];
   try {
     for (const entry of remoteEntries) {
-      console.info(`streaming from ${entry.url}`);
       if (entry.type === "model") {
+        console.info(`streaming from ${entry.url}`);
         const models = await entry.importRemote();
         remoteModels.push(models);
       }
@@ -36,8 +36,8 @@ export async function importRemoteServices(remoteEntries) {
 
   let services = [];
   for (const entry of remoteEntries) {
-    console.info(`streaming from ${entry.url}`);
     if (entry.type === "service") {
+      console.info(`streaming from ${entry.url}`);
       const service = await entry.importRemote();
       services.push(service);
     }

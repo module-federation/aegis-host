@@ -9,7 +9,7 @@ function getFileName(entry) {
   const hostpart = url.hostname.split(".").join("-");
   const pathpart = url.pathname.split("/").join("-");
   const portpart = url.port ? url.port : 80;
-  if (pathpart.endsWith("remoteEntry.js"))
+  if (/remoteEntry/i.test(pathpart))
     return `${hostpart}-${portpart}${pathpart}`;
   return `${hostpart}-${portpart}${pathpart}-remoteEntry.js`;
 }
