@@ -22,21 +22,21 @@ export function updateCache({ datasource, observer }) {
       await initRemote(event.modelName);
     }
 
-    if (eventName.startsWith(CREATE) || eventName.startsWith(UPDATE)) {
-      return ds.save(
-        event.model.id,
-        ModelFactory.loadModel(
-          observer,
-          datasource,
-          event.model,
-          event.modelName
-        )
-      );
-    }
+    const model = ModelFactory.loadModel(
+      observer,
+      datasource,
+      event.model,
+      event.modelName
+    );
 
-    if (eventName.startsWith(DELETE)) {
-      return ds.delete(event.model.id);
-    }
+    return datasource.save(model.getId(), model);
+  };
+}
+
+export function deleteFromCache({ datasource }) {
+  return async function ({ message }) {
+    const event = JSON.parse(message);
+    return datasource.delete(event.model.id);
   };
 }
 
@@ -60,18 +60,27 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
       );
 
       unregistered.forEach(function (u) {
+        const datasource = getDataSource(u.modelName);
+
         EventBus.listen(BROADCAST, {
-          callback: updateCache({
-            observer,
-            datasource: getDataSource(u.name),
-          }),
+          callback: updateCache({ observer, datasource }),
           topic: BROADCAST,
           once: false,
-          filters: [
-            ModelFactory.getEventName(CREATE, u.modelName),
-            ModelFactory.getEventName(UPDATE, u.modelName),
-            ModelFactory.getEventName(DELETE, u.modelName),
-          ],
+          filters: [ModelFactory.getEventName(CREATE, u.modelName)],
+        });
+
+        EventBus.listen(BROADCAST, {
+          callback: updateCache({ observer, datasource }),
+          topic: BROADCAST,
+          once: false,
+          filters: [ModelFactory.getEventName(UPDATE, u.modelName)],
+        });
+
+        EventBus.listen(BROADCAST, {
+          callback: deleteFromCache({ datasource }),
+          topic: BROADCAST,
+          once: false,
+          filters: [ModelFactory.getEventName(DELETE, u.modelName)],
         });
       });
     },
@@ -85,9 +94,7 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
  */
 export default function handleEvents(observer, getDataSource) {
   observer.on(/.*/, async event => publishEvent(event));
-  // observer.on(/.*/, async event =>
-  //   EventBus.notify({ topic: BROADCAST, event })
-  // );
+  // observer.on(/.*/, async event => EventBus.notify(BROADCAST, event));
 
   // const cache = cacheEventHandler({ observer, getDataSource });
   // cache.listen();

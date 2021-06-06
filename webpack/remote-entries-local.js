@@ -1,23 +1,23 @@
 module.exports = [
   {
-    name: "microservices",
+    name: "distributed-cache",
     url: "http://localhost:8060/remoteEntry.js",
     path: __dirname,
-    type: "model",
-    importRemote: async () => import("microservices/models"),
+    type: "model-cache",
+    importRemote: async () => import("distributed-cache/models-cache"),
   },
   {
-    name: "adapters",
+    name: "adapters-cache",
     url: "http://localhost:8060/remoteEntry.js",
     path: __dirname,
-    type: "adapter",
-    importRemote: async () => import("microservices/adapters"),
+    type: "adapter-cache",
+    importRemote: async () => import("distributed-cache/adapters-cache"),
   },
   {
-    name: "services",
+    name: "services-cache",
     url: "http://localhost:8060/remoteEntry.js",
     path: __dirname,
-    type: "service",
-    importRemote: async () => import("microservices/services"),
+    type: "service-cache",
+    importRemote: async () => import("distributed-cache/services-cache"),
   },
 ];

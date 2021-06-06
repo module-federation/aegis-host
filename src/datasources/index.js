@@ -57,14 +57,22 @@ const DataSourceFactory = (() => {
   /**
    * Get the datasource for each model.
    * @param {string} name - model name
+   * @param {boolean} cacheOnly - if true returns memory adapter, default is false
    */
-  function getDataSource(name) {
+  function getDataSource(name, cacheOnly = false) {
     if (!dataSources) {
       dataSources = new Map();
     }
 
     if (dataSources.has(name)) {
       return dataSources.get(name);
+    }
+
+    if (cacheOnly) {
+      const BaseClass = getBaseClass("DataSourceMemory");
+      const newDs = new BaseClass(new Map(), this, name);
+      dataSources.set(name, newDs);
+      return newDs;
     }
 
     const newDs = getSpecDataSource(new Map(), this, name);

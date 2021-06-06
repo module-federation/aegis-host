@@ -31674,7 +31674,7 @@ var moduleMap = {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./event-bus": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_event-bus_js")]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
 	}
 };
 var get = (module) => {
