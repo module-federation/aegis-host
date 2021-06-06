@@ -31671,7 +31671,10 @@ var moduleMap = {
 		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./services": () => {
-		return __webpack_require__.e("src_services_index_js").then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+	},
+	"./event-bus": () => {
+		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_event-bus_js")]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
 	}
 };
 var get = (module) => {
@@ -32153,8 +32156,7 @@ module.exports = require("zlib");
 /******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
 /******/ 			],
 /******/ 			"src_services_index_js": [
-/******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk",
-/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
+/******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			]
 /******/ 		};
 /******/ 		__webpack_require__.f.consumes = (chunkId, promises) => {

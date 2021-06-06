@@ -12,9 +12,11 @@ import ObserverFactory from "../models/observer";
 import ModelFactory from "../models";
 import handleEvents from "./handle-events";
 
-handleEvents(ObserverFactory.getInstance(), name =>
-  DataSourceFactory.getDataSource(name, true)
-);
+export function registerCacheEvents() {
+  handleEvents(ObserverFactory.getInstance(), name =>
+    DataSourceFactory.getDataSource(name, true)
+  );
+}
 
 /**
  *

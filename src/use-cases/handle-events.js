@@ -1,7 +1,7 @@
 import ModelFactory, { initRemote } from "../models";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
-//import importRemoteModels from "../services"
+// import importRemoteModels from "../services"
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 const UPDATE = ModelFactory.EventTypes.UPDATE;
@@ -53,34 +53,42 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
   return {
     listen() {
       const models = ModelFactory.getModelSpecs();
-      const rels = models.map(m => ({ ...m.relations }));
 
-      const unregistered = rels.filter(
+      console.info(models);
+
+      const relations = models.map(m => ({ ...m.relations }));
+
+      console.info(relations);
+
+      const unregistered = relations.filter(
         u => !models.find(m => m.modelName === u.modelName)
       );
 
+      console.info(unregistered);
+
       unregistered.forEach(function (u) {
+        if (!u.modelName) return;
         const datasource = getDataSource(u.modelName);
 
         EventBus.listen(BROADCAST, {
           callback: updateCache({ observer, datasource }),
           topic: BROADCAST,
           once: false,
-          filters: [ModelFactory.getEventName(CREATE, u.modelName)],
+          filters: [CREATE.concat(u.modelName)],
         });
 
         EventBus.listen(BROADCAST, {
           callback: updateCache({ observer, datasource }),
           topic: BROADCAST,
           once: false,
-          filters: [ModelFactory.getEventName(UPDATE, u.modelName)],
+          filters: [UPDATE.concat(modelName)],
         });
 
         EventBus.listen(BROADCAST, {
           callback: deleteFromCache({ datasource }),
           topic: BROADCAST,
           once: false,
-          filters: [ModelFactory.getEventName(DELETE, u.modelName)],
+          filters: [DELETE.concat(u.modelName)],
         });
       });
     },
@@ -94,10 +102,13 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
  */
 export default function handleEvents(observer, getDataSource) {
   observer.on(/.*/, async event => publishEvent(event));
-  // observer.on(/.*/, async event => EventBus.notify(BROADCAST, event));
+  observer.on(/.*/, async event => {
+    console.debug(event);
+    // EventBus.notify(BROADCAST, event);
+  });
 
-  // const cache = cacheEventHandler({ observer, getDataSource });
-  // cache.listen();
+  const cache = cacheEventHandler({ observer, getDataSource });
+  cache.listen();
 
   /**
    * This is the cluster cache sync listener - when data is

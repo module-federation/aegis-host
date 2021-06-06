@@ -154,6 +154,9 @@ import {
   importRemoteModels,
   importRemoteServices,
   importRemoteAdapters,
+  importModelsCache,
+  importAdaptersCache,
+  importServicesCache,
 } from "../services/federation-service";
 
 /**
@@ -179,6 +182,47 @@ const deleteEvent = model => ({
   model: model,
 });
 
+function register(model, services, adapters) {
+  if (
+    model.hasOwnProperty("modelName") &&
+    model.hasOwnProperty("factory") &&
+    model.hasOwnProperty("endpoint")
+  ) {
+    const serviceAdapters = makeAdapters(model.ports, adapters, services);
+
+    // override adapters
+    const dependencies = {
+      ...model.dependencies,
+      ...serviceAdapters,
+    };
+
+    ModelFactory.registerModel({
+      ...model,
+      dependencies,
+      factory: model.factory(dependencies),
+      isRemote: true,
+    });
+
+    ModelFactory.registerEvent(
+      ModelFactory.EventTypes.CREATE,
+      model.modelName,
+      createEvent
+    );
+
+    ModelFactory.registerEvent(
+      ModelFactory.EventTypes.UPDATE,
+      model.modelName,
+      updateEvent
+    );
+
+    ModelFactory.registerEvent(
+      ModelFactory.EventTypes.DELETE,
+      model.modelName,
+      deleteEvent
+    );
+  }
+}
+
 /**
  * Imports remote models and overrides their service adapters
  * with those specified by the host config.
@@ -191,47 +235,12 @@ async function initModels(remoteEntries, services, adapters) {
 
   console.info(models.models);
 
-  Object.values(models.models).forEach(model => {
-    if (
-      model.hasOwnProperty("modelName") &&
-      model.hasOwnProperty("factory") &&
-      model.hasOwnProperty("endpoint")
-    ) {
-      const serviceAdapters = makeAdapters(model.ports, adapters, services);
-
-      // override adapters
-      const dependencies = {
-        ...model.dependencies,
-        ...serviceAdapters,
-      };
-
-      ModelFactory.registerModel({
-        ...model,
-        dependencies,
-        factory: model.factory(dependencies),
-        isRemote: true,
-      });
-
-      ModelFactory.registerEvent(
-        ModelFactory.EventTypes.CREATE,
-        model.modelName,
-        createEvent
-      );
-
-      ModelFactory.registerEvent(
-        ModelFactory.EventTypes.UPDATE,
-        model.modelName,
-        updateEvent
-      );
-
-      ModelFactory.registerEvent(
-        ModelFactory.EventTypes.DELETE,
-        model.modelName,
-        deleteEvent
-      );
-    }
-  });
+  Object.values(models.models).forEach(model =>
+    register(model, services, adapters)
+  );
 }
+
+let remotesConfig;
 
 /**
  * Import remote models, services, and adapters.
@@ -239,6 +248,7 @@ async function initModels(remoteEntries, services, adapters) {
  * @param {*} overrides - override or add services and adapters
  */
 export async function initRemotes(remoteEntries, overrides = {}) {
+  remotesConfig = remoteEntries;
   const services = await importRemoteServices(remoteEntries);
   const adapters = await importRemoteAdapters(remoteEntries);
 
@@ -257,6 +267,23 @@ export async function initRemotes(remoteEntries, overrides = {}) {
   );
 }
 
-export async function initRemote(name) {}
+let servicesCache;
+let adaptersCache;
+let modelsCache;
+
+export async function initRemote(name) {
+  if (!modelsCache) {
+    modelsCache = await importModelsCache(remotesConfig);
+    adaptersCache = await importAdaptersCache(remotesConfig);
+    servicesCache = await importServicesCache(remotesConfig);
+  }
+
+  const model = modelsCache.models[name];
+  if (model) {
+    console.warn("no model found in cache for", name);
+    return;
+  }
+  register(model, adaptersCache, servicesCache);
+}
 
 export default ModelFactory;
