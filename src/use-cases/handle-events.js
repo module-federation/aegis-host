@@ -17,7 +17,7 @@ export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
 
-    if (ModelFactory.getModelSpec(event.modelName)) {
+    if (!ModelFactory.getModelSpec(event.modelName)) {
       // Stream the code for the model
       await initRemote(event.modelName);
     }
