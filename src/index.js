@@ -14,8 +14,10 @@ const messageParser = require("./message").parsers;
 const { ServerlessAdapter } = require("./serverless-adapter");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
 
-const port = process.env.PORT || 8707;
-const sslPort = process.env.SSL_PORT || 8070;
+console.log(process.argv[2]);
+
+const port = process.argv[2] ? process.argv[2] : process.env.PORT || 8070;
+const sslPort = process.env.SSL_PORT || 8071;
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const reloadPath = process.env.RELOAD_PATH || "/microlib/reload";
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED);

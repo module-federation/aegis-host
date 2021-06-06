@@ -104,7 +104,7 @@ export default function handleEvents(observer, getDataSource) {
   observer.on(/.*/, async event => publishEvent(event));
   observer.on(/.*/, async event => {
     console.debug(event);
-    // EventBus.notify(BROADCAST, event);
+    EventBus.notify(BROADCAST, JSON.stringify(event));
   });
 
   const cache = cacheEventHandler({ observer, getDataSource });

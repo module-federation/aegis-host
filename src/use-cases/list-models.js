@@ -26,6 +26,9 @@ const DateFunctions = {
  */
 async function parseQuery(query, repository) {
   if (query?.count) {
+    if (typeof query.count === "number") {
+      return repository.list(query);
+    }
     const dateFunc = DateFunctions[query.count];
 
     if (dateFunc) {

@@ -59,6 +59,9 @@ export class DataSourceMemory extends DataSource {
     if (query) {
       const keys = Object.keys(query);
 
+      if (keys.includes("count") && typeof keys.count === "number") {
+        return values.splice(0, keys.count);
+      }
       if (keys.length > 0) {
         return values.filter(v =>
           keys.every(k => (v[k] ? query[k] === v[k] : false))

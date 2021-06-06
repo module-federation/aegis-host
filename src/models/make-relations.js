@@ -19,9 +19,25 @@ const relationType = {
    * @param {import("./index").relations[relation]} config
    */
   manyToOne: async (model, ds, rel) => await ds.find(model[rel.foreignKey]),
-
+  /**
+   * Same as many to one as far as the lookup.
+   * @param {*} model
+   * @param {*} ds
+   * @param {*} rel
+   * @returns
+   */
   oneToOne(model, ds, rel) {
     return this.manyToOne(model, ds, rel);
+  },
+  /**
+   * Used for transparent integration.
+   * @param {*} model
+   * @param {*} ds
+   * @param {*} rel
+   * @returns
+   */
+  oneToAny(model, ds, rel) {
+    return ds.list({ count: 1 });
   },
 };
 
