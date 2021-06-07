@@ -89,7 +89,7 @@ export async function importModelsCache(remoteEntries) {
 
   console.timeEnd(label);
 
-  if (remoteModels.length === 0) return {};
+  if (remoteModels.length === 0) return;
 
   return remoteModels.reduce((p, c) => ({ ...p, ...c }));
 }
@@ -112,7 +112,7 @@ export async function importServicesCache(remoteEntries) {
 
   console.timeEnd(label);
 
-  if (services.length === 0) return {};
+  if (services.length === 0) return;
 
   return services.reduce((p, c) => ({ ...p, ...c }));
 }
@@ -132,7 +132,7 @@ export async function importAdaptersCache(remoteEntries) {
 
   console.timeEnd(label);
 
-  if (adapters.length === 0) return {};
+  if (adapters.length === 0) return;
 
   return adapters.reduce((p, c) => ({ ...p, ...c }));
 }

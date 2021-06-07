@@ -1,4 +1,4 @@
-import ModelFactory, { initRemote } from "../models";
+import ModelFactory, { initRemoteCache } from "../models";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
 
@@ -24,7 +24,7 @@ export function updateCache({ datasource, observer }) {
     ) {
       if (!ModelFactory.getModelSpec(event.modelName)) {
         // Stream the code for the model
-        await initRemote(event.modelName);
+        await initRemoteCache(event.modelName);
       }
 
       const model = ModelFactory.loadModel(

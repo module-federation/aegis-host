@@ -271,14 +271,22 @@ let servicesCache;
 let adaptersCache;
 let modelsCache;
 
-export async function initRemote(name) {
+export async function initRemoteCache(name) {
   if (!modelsCache) {
     modelsCache = await importModelsCache(remotesConfig);
+  }
+  if (!adaptersCache) {
     adaptersCache = await importAdaptersCache(remotesConfig);
+  }
+  if (!servicesCache) {
     servicesCache = await importServicesCache(remotesConfig);
   }
 
-  const model = modelsCache.models[name];
+  console.debug({ ...modelsCache.models });
+  const model = modelsCache.models.find(m => {
+    console.info({ m, modelsCache });
+    return Object.keys(m).find(k => m[k].modelName === name);
+  });
   if (model) {
     console.warn("no model found in cache for", name);
     return;
