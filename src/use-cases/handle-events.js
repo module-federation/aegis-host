@@ -1,7 +1,6 @@
 import ModelFactory, { initRemote } from "../models";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
-// import importRemoteModels from "../services"
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 const UPDATE = ModelFactory.EventTypes.UPDATE;
@@ -17,26 +16,29 @@ export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
 
-    if (!ModelFactory.getModelSpec(event.modelName)) {
-      // Stream the code for the model
-      await initRemote(event.modelName);
+    console.log("updateCache called", event.eventName);
+
+    if (
+      event.eventName.startsWith(CREATE) ||
+      event.eventName.startsWith(UPDATE)
+    ) {
+      if (!ModelFactory.getModelSpec(event.modelName)) {
+        // Stream the code for the model
+        await initRemote(event.modelName);
+      }
+
+      const model = ModelFactory.loadModel(
+        observer,
+        datasource,
+        event.model,
+        event.modelName
+      );
+      return datasource.save(model.getId(), model);
     }
 
-    const model = ModelFactory.loadModel(
-      observer,
-      datasource,
-      event.model,
-      event.modelName
-    );
-
-    return datasource.save(model.getId(), model);
-  };
-}
-
-export function deleteFromCache({ datasource }) {
-  return async function ({ message }) {
-    const event = JSON.parse(message);
-    return datasource.delete(event.model.id);
+    if (event.eventName.startsWith(DELETE)) {
+      return datasource.delete(event.modelId);
+    }
   };
 }
 
@@ -51,44 +53,45 @@ export function deleteFromCache({ datasource }) {
  */
 export const cacheEventHandler = function ({ observer, getDataSource }) {
   return {
+    notify() {
+      observer.on(/CREATE|UPDATE|DELETE/, async event =>
+        EventBus.notify(BROADCAST, JSON.stringify(event))
+      );
+    },
     listen() {
       const models = ModelFactory.getModelSpecs();
-
-      console.info(models);
-
       const relations = models.map(m => ({ ...m.relations }));
-
-      console.info(relations);
-
       const unregistered = relations.filter(
         u => !models.find(m => m.modelName === u.modelName)
       );
-
-      console.info(unregistered);
-
       unregistered.forEach(function (u) {
-        if (!u.modelName) return;
-        const datasource = getDataSource(u.modelName);
+        Object.keys(u).forEach(k => {
+          console.debug("modelName", u[k].modelName);
+          if (!u[k] || !u[k].modelName) return;
+          const datasource = getDataSource(u[k].modelName);
+          console.debug("calling listen", u[k]);
 
-        EventBus.listen(BROADCAST, {
-          callback: updateCache({ observer, datasource }),
-          topic: BROADCAST,
-          once: false,
-          filters: [CREATE.concat(u.modelName)],
-        });
-
-        EventBus.listen(BROADCAST, {
-          callback: updateCache({ observer, datasource }),
-          topic: BROADCAST,
-          once: false,
-          filters: [UPDATE.concat(modelName)],
-        });
-
-        EventBus.listen(BROADCAST, {
-          callback: deleteFromCache({ datasource }),
-          topic: BROADCAST,
-          once: false,
-          filters: [DELETE.concat(u.modelName)],
+          EventBus.listen({
+            topic: BROADCAST,
+            id: new Date().getTime() + "create",
+            callback: updateCache({ observer, datasource }),
+            once: false,
+            filters: [CREATE.concat(u[k].modelName).toUpperCase()],
+          });
+          EventBus.listen({
+            topic: BROADCAST,
+            id: new Date().getTime() + "update",
+            callback: updateCache({ observer, datasource }),
+            once: false,
+            filters: [UPDATE.concat(u[k].modelName).toUpperCase()],
+          });
+          EventBus.listen({
+            topic: BROADCAST,
+            id: new Date().getTime() + "delete",
+            callback: updateCache({ observer, datasource }),
+            once: false,
+            filters: [DELETE.concat(u[k].modelName).toUpperCase()],
+          });
         });
       });
     },
@@ -102,13 +105,13 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
  */
 export default function handleEvents(observer, getDataSource) {
   observer.on(/.*/, async event => publishEvent(event));
-  observer.on(/.*/, async event => {
-    console.debug(event);
-    EventBus.notify(BROADCAST, JSON.stringify(event));
-  });
 
-  const cache = cacheEventHandler({ observer, getDataSource });
-  cache.listen();
+  // Distributed object cache - must be explicitly enabled
+  if (process.env.DISTRIBUTED_CACHE_ENABLED) {
+    const cache = cacheEventHandler({ observer, getDataSource });
+    cache.listen();
+    cache.notify();
+  }
 
   /**
    * This is the cluster cache sync listener - when data is

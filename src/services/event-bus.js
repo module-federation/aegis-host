@@ -5,6 +5,7 @@ const EventBus = {
     if (!service) {
       service = (await import("microservices/event-bus")).EventBus;
     }
+    console.debug("calling service.listen()", args);
     return service.listen(...args);
   },
   async notify(...args) {
