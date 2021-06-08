@@ -36,12 +36,12 @@ export const getConfig = () => getConfigFactory(listConfigs());
 export const initCache = () => {
   const label = "\ntime to load cache";
   const models = loadModels();
-  registerCacheEvents();
 
   async function load() {
     console.time(label);
     await Promise.all(models.map(async m => m.fn()));
     console.timeEnd(label);
+    registerCacheEvents();
   }
   return {
     load,

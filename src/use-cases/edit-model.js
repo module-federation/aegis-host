@@ -19,7 +19,7 @@ import domainEvents from "../models/domain-events";
  * @param {ModelParam} param0
  * @returns {function():Promise<import("../models/model").Model>}
  */
-export default function editModelFactory({
+export default function makeEditModel({
   modelName,
   models,
   repository,

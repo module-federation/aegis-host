@@ -4,7 +4,7 @@ const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
 const token = process.env.GITHUB_TOKEN;
 
-function getFileName(entry) {
+function generateFilename(entry) {
   const url = new URL(entry.url);
   const hostpart = url.hostname.split(".").join("-");
   const pathpart = url.pathname.split("/").join("-");
@@ -15,12 +15,12 @@ function getFileName(entry) {
 }
 
 function getPath(entry) {
-  const fileName = getFileName(entry);
+  const filename = generateFilename(entry);
   let basedir = entry.path;
   if (entry.path.charAt(entry.path.length - 1) !== "/") {
     basedir = entry.path.concat("/");
   }
-  return basedir.concat(fileName);
+  return basedir.concat(filename);
 }
 
 const octokit = new Octokit({ auth: token });

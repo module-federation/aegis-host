@@ -1,6 +1,5 @@
 "use strict";
 
-import DataSourceFactory from "../datasources";
 import domainEvents from "../models/domain-events";
 
 /**
@@ -17,7 +16,7 @@ import domainEvents from "../models/domain-events";
  * @param {dependencies} param0
  * @returns {function():Promise<import('../models').Model>}
  */
-export default function addModelFactory({
+export default function makeAddModel({
   modelName,
   models,
   repository,

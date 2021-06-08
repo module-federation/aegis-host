@@ -67,7 +67,7 @@ async function parseQuery(query, repository) {
  * @param {{repository:import('../datasources/datasource').default}}
  * @returns {listModels}
  */
-export default function listModelsFactory({ repository } = {}) {
+export default function makeListModels({ repository } = {}) {
   return async function listModels(query) {
     return parseQuery(query, repository);
   };

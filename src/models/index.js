@@ -1,5 +1,7 @@
 "use strict";
 
+import webpack from "webpack";
+
 /** @typedef {import("./model").Model} Model */
 /** @typedef {import('./event').Event} Event */
 /** @typedef {string} eventName */
@@ -241,6 +243,7 @@ async function initModels(remoteEntries, services, adapters) {
 }
 
 let remotesConfig;
+let localOverrides = {};
 
 /**
  * Import remote models, services, and adapters.
@@ -249,6 +252,8 @@ let remotesConfig;
  */
 export async function initRemotes(remoteEntries, overrides = {}) {
   remotesConfig = remoteEntries;
+  localOverrides = overrides;
+
   const services = await importRemoteServices(remoteEntries);
   const adapters = await importRemoteAdapters(remoteEntries);
 
@@ -267,31 +272,31 @@ export async function initRemotes(remoteEntries, overrides = {}) {
   );
 }
 
-let servicesCache;
-let adaptersCache;
 let modelsCache;
+let adaptersCache;
+let servicesCache;
 
 export async function initRemoteCache(name) {
-  if (!modelsCache) {
-    modelsCache = await importModelsCache(remotesConfig);
-  }
-  if (!adaptersCache) {
-    adaptersCache = await importAdaptersCache(remotesConfig);
-  }
-  if (!servicesCache) {
-    servicesCache = await importServicesCache(remotesConfig);
+  if (!remotesConfig) {
+    console.warn("distributed cache cannot be initialized");
+    return;
   }
 
-  console.debug({ ...modelsCache.models });
-  const model = modelsCache.models.find(m => {
-    console.info({ m, modelsCache });
-    return Object.keys(m).find(k => m[k].modelName === name);
-  });
-  if (model) {
+  if (!modelCache) {
+    modelsCache = await importModelsCache(remotesConfig);
+    const services = await importServicesCache(remotesConfig);
+    const adapters = await importAdaptersCache(remotesConfig);
+    servicesCache = { ...services, ...localOverrides };
+    adaptersCache = { ...adapters, ...localOverrides };
+    console.info({ servicesCache, adaptersCache, localOverrides });
+  }
+  const model = modelsCache.models.find(m => m.name === name);
+
+  if (!model) {
     console.warn("no model found in cache for", name);
     return;
   }
-  register(model, adaptersCache, servicesCache);
+  register(model, servicesCache, adaptersCache);
 }
 
 export default ModelFactory;

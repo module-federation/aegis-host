@@ -70,7 +70,7 @@ export async function importRemoteAdapters(remoteEntries) {
   return adapters.reduce((p, c) => ({ ...p, ...c }));
 }
 
-export async function importModelsCache(remoteEntries) {
+export async function importModelsCache(remoteEntries, name) {
   const label = "\ntime to import remote models cache";
   console.time(label);
 
@@ -79,7 +79,7 @@ export async function importModelsCache(remoteEntries) {
     for (const entry of remoteEntries) {
       if (entry.type === "model-cache") {
         console.info(`streaming from ${entry.url}`);
-        const models = await entry.importRemote();
+        const models = await entry.importRemote(name);
         remoteModels.push(models);
       }
     }

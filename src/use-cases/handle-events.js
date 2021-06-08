@@ -22,11 +22,14 @@ export function updateCache({ datasource, observer }) {
       event.eventName.startsWith(CREATE) ||
       event.eventName.startsWith(UPDATE)
     ) {
+      console.debug("check if we have the code for this object...");
       if (!ModelFactory.getModelSpec(event.modelName)) {
+        console.debug("we don't, import it...");
         // Stream the code for the model
         await initRemoteCache(event.modelName);
       }
 
+      console.debug("unmarshal the deserialized model");
       const model = ModelFactory.loadModel(
         observer,
         datasource,
@@ -62,7 +65,7 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
       const models = ModelFactory.getModelSpecs();
       const relations = models.map(m => ({ ...m.relations }));
       const unregistered = relations.filter(
-        u => !models.find(m => m.modelName === u.modelName)
+        r => !models.find(m => m.modelName === r.modelName)
       );
       unregistered.forEach(function (u) {
         Object.keys(u).forEach(k => {
