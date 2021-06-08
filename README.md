@@ -258,15 +258,15 @@ SSL_ENABLED=true
 
 ### Installation
 
-[![install movie](https://i9.ytimg.com/vi_webp/sHZgpIA_iWY/mqdefault.webp?time=1622634600000&sqp=COjg3YUG&rs=AOn4CLBRcOB4cvkABDcedh2WlSww2k2f2g)](https://youtu.be/sHZgpIA_iWY)
+[![install movie](https://i9.ytimg.com/vi_webp/sHZgpIA_iWY/mqdefault.webp?time=1623193800000&sqp=CMjx_4UG&rs=AOn4CLCQnaq8ug9xzR-XQLH_B_M-XeEspQ)](https://youtu.be/sHZgpIA_iWY)
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
-[![hot deployment](https://i9.ytimg.com/vi/WqRlSnBxLYw/mqdefault.jpg?time=1622634900000&sqp=CJTj3YUG&rs=AOn4CLA8wFlgdJCLMEA9YOl3uPUqnuescA)](https://youtu.be/WqRlSnBxLYw)
+[![hot deployment](https://i9.ytimg.com/vi/WqRlSnBxLYw/mqdefault.jpg?time=1623193800000&sqp=CMjx_4UG&rs=AOn4CLCwEOuAE0i_GuAwtG2CtW-zzOmjWA)](https://youtu.be/WqRlSnBxLYw)
 
 ### Reference Architecture
 
-[![ref arch](https://i.ytimg.com/vi/LmtGlJLRY6M/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDEJ35yf8FNpbbUfYn1eIPpqPWUVQ)](https://youtu.be/mr0frpRRLKI)
+[![ref arch](https://i9.ytimg.com/vi/6GJYX9cmk2Q/mq1.jpg?sqp=CPTz_4UG&rs=AOn4CLC5sti0pAm2iWRUCZ3oAjGO_KElmg)](https://youtu.be/6GJYX9cmk2Q)
 
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
