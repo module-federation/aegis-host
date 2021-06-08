@@ -107,10 +107,10 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
  * @param {import('../adapters/event-adapter').EventService} eventService
  */
 export default function handleEvents(observer, getDataSource) {
-  observer.on(/.*/, async event => publishEvent(event));
+  //observer.on(/.*/, async event => publishEvent(event));
 
   // Distributed object cache - must be explicitly enabled
-  if (process.env.DISTRIBUTED_CACHE_ENABLED) {
+  if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
     const cache = cacheEventHandler({ observer, getDataSource });
     cache.listen();
     cache.notify();
