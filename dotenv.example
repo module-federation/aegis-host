@@ -35,9 +35,9 @@ CACHE_SIZE=2000
 # If streaming from GitHub, set to path 
 # of your remoteEntry.js and bundles.
 # ------------------------------------
-GITHUB_BRANCH=master
+GITHUB_BRANCH=order-server
 GITHUB_REPO=MicroLib-Example
-GITHUB_OWNER=module-federation
+GITHUB_OWNER=module-federations
 GITHUB_PATH=dist
 ######################################
 

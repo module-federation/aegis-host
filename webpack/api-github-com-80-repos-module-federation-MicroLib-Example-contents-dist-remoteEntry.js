@@ -31977,7 +31977,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com/module-federation/MicroLib-Example/dist?ref=customer-server";
+/******/ 		__webpack_require__.p = "https://api.github.com/module-federation/MicroLib-Example/dist?ref=order-server";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
@@ -32202,7 +32202,7 @@ module.exports = require("zlib");
 /******/ 		
 /******/ 		const octokit = new Octokit({ auth: token });
 /******/ 		
-/******/ 		function githubFetch(url) {
+/******/ 		function giTit(url) {
 /******/ 		  return new Promise(function (resolve, reject) {
 /******/ 		    octokit
 /******/ 		    .request(
@@ -32236,10 +32236,10 @@ module.exports = require("zlib");
 /******/ 		}
 /******/ 		function httpRequest(url) {
 /******/ 		  if (/github/i.test(url.hostname)) 
-/******/ 		    return githubFetch(url)
-/******/ 		  return httpGet(url)
+/******/ 		    return giTit(url)
+/******/ 		  return httpRequestPlain(url)
 /******/ 		}
-/******/ 		function httpGet(params) {
+/******/ 		function httpRequestPlain(params) {
 /******/ 		  return new Promise(function(resolve, reject) {
 /******/ 		    var req = require(params.protocol.slice(0, params.protocol.length - 1)).request(params, function(res) {
 /******/ 		      if (res.statusCode < 200 || res.statusCode >= 300) {
