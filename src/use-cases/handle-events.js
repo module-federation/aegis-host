@@ -16,7 +16,7 @@ export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
 
-    console.log("updateCache called", event.eventName);
+    console.log("handle cache event", event.eventName);
 
     if (
       event.eventName.startsWith(CREATE) ||
@@ -38,6 +38,7 @@ export function updateCache({ datasource, observer }) {
           event.model,
           event.modelName
         );
+
         return datasource.save(model.getId(), model);
       } catch (e) {
         console.error("distributed cache", e);
@@ -107,12 +108,12 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
 };
 
 /**
- *
+ * Handle internal and external events. Distributed cache.
  * @param {import('../models/observer').Observer} observer
  * @param {import('../adapters/event-adapter').EventService} eventService
  */
 export default function handleEvents(observer, getDataSource) {
-    observer.on(/.*/, async event => publishEvent(event));
+  observer.on(/.*/, async event => publishEvent(event));
 
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
