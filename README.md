@@ -6,7 +6,6 @@
 
 ![federated-micoservices](https://user-images.githubusercontent.com/38910830/121280415-de4ce700-c89b-11eb-9854-3ad921503743.gif)
 
-
 ## TL;DR
 
 ```shell
@@ -261,15 +260,15 @@ SSL_ENABLED=true
 
 ### Installation
 
-[![install movie](https://img.youtube.com/vi/sHZgpIA_iWY/0.jpg)](https://youtu.be/sHZgpIA_iWY)
+[![install movie](https://img.youtube.com/vi/sHZgpIA_iWY/maxresdefault.jpg)](https://youtu.be/sHZgpIA_iWY)
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
-[![hot deployment](https://img.youtube.com/vi/9h7NkINr7Wo/0.jpg)](https://youtu.be/WqRlSnBxLYw)
+[![hot deployment](https://img.youtube.com/vi/9h7NkINr7Wo/maxresdefault.jpg)](https://youtu.be/WqRlSnBxLYw)
 
 ### Reference Architecture
 
-[![ref arch](https://img.youtube.com/vi/6GJYX9cmk2Q/0.jpg)](https://youtu.be/6GJYX9cmk2Q)
+[![ref arch](https://img.youtube.com/vi/6GJYX9cmk2Q/maxresdefault.jpg)](https://youtu.be/6GJYX9cmk2Q)
 
 MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
