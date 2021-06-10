@@ -14,7 +14,7 @@ module.exports = [
     importRemote: async () => import("distributed-cache/adapters-cache"),
   },
   {
-    name: "services-cache",
+    name: "service-cache",
     url: "http://localhost:8060/remoteEntry.js",
     path: __dirname,
     type: "service-cache",

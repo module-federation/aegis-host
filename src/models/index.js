@@ -282,7 +282,7 @@ export async function initRemoteCache(name) {
     return;
   }
 
-  if (!modelCache) {
+  if (!modelsCache) {
     modelsCache = await importModelsCache(remotesConfig);
     const services = await importServicesCache(remotesConfig);
     const adapters = await importAdaptersCache(remotesConfig);
