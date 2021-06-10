@@ -265,7 +265,7 @@ SSL_ENABLED=true
 
 ### Zero Downtime - Zero Install Deployment, API Generation
 
-[![hot deployment](https://i.ytimg.com/an_webp/6GJYX9cmk2Q/mqdefault_6s.webp?du=3000&sqp=CIz3_4UG&rs=AOn4CLBUMope2IIoSWz5YYTDeDXV5pM6IA)](https://youtu.be/WqRlSnBxLYw)
+[![hot deployment](https://img.youtube.com/vi/9h7NkINr7Wo/1.jpg)](https://youtu.be/WqRlSnBxLYw)
 
 ### Reference Architecture
 
