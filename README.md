@@ -15,7 +15,7 @@ cd MicroLib
 cp dotenv.example .env
 npm ci
 npm run build
-npm start .
+npm start
 npm run demo
 ```
 
