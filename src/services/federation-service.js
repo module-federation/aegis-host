@@ -70,7 +70,7 @@ export async function importRemoteAdapters(remoteEntries) {
   return adapters.reduce((p, c) => ({ ...p, ...c }));
 }
 
-export async function importModelsCache(remoteEntries, name) {
+export async function importModelCache(remoteEntries, name) {
   const label = "\ntime to import remote models cache";
   console.time(label);
 
@@ -97,7 +97,7 @@ export async function importModelsCache(remoteEntries, name) {
 /**
  * Imports remote service modules.
  */
-export async function importServicesCache(remoteEntries) {
+export async function importServiceCache(remoteEntries) {
   const label = "\ntime to import remote services cache";
   console.time(label);
 
@@ -117,7 +117,7 @@ export async function importServicesCache(remoteEntries) {
   return services.reduce((p, c) => ({ ...p, ...c }));
 }
 
-export async function importAdaptersCache(remoteEntries) {
+export async function importAdapterCache(remoteEntries) {
   const label = "\ntime to import remote adapters cache";
   console.time(label);
 

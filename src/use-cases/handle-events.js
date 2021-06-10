@@ -23,20 +23,25 @@ export function updateCache({ datasource, observer }) {
       event.eventName.startsWith(UPDATE)
     ) {
       console.debug("check if we have the code for this object...");
+
       if (!ModelFactory.getModelSpec(event.modelName)) {
         console.debug("we don't, import it...");
         // Stream the code for the model
-        await initRemoteCache(event.modelName);
+        await initRemoteCache();
       }
 
-      console.debug("unmarshal the deserialized model");
-      const model = ModelFactory.loadModel(
-        observer,
-        datasource,
-        event.model,
-        event.modelName
-      );
-      return datasource.save(model.getId(), model);
+      try {
+        console.debug("unmarshal the deserialized model");
+        const model = ModelFactory.loadModel(
+          observer,
+          datasource,
+          event.model,
+          event.modelName
+        );
+        return datasource.save(model.getId(), model);
+      } catch (e) {
+        console.error("distributed cache", e);
+      }
     }
 
     if (event.eventName.startsWith(DELETE)) {
@@ -107,13 +112,15 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
  * @param {import('../adapters/event-adapter').EventService} eventService
  */
 export default function handleEvents(observer, getDataSource) {
-  //observer.on(/.*/, async event => publishEvent(event));
+    observer.on(/.*/, async event => publishEvent(event));
 
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
     const cache = cacheEventHandler({ observer, getDataSource });
-    cache.listen();
-    cache.notify();
+    setTimeout(() => {
+      cache.notify();
+      cache.listen();
+    }, 10000);
   }
 
   /**
