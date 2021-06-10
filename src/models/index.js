@@ -276,7 +276,7 @@ let modelCache;
 let adapterCache;
 let serviceCache;
 
-export async function initRemoteCache(name) {
+export async function initRemoteCache() {
   if (!remotesConfig) {
     console.warn("distributed cache cannot be initialized");
     return;
