@@ -31664,13 +31664,13 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 "use strict";
 var moduleMap = {
-	"./models-cache": () => {
+	"./model-cache": () => {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
-	"./adapters-cache": () => {
+	"./adapter-cache": () => {
 		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
-	"./services-cache": () => {
+	"./service-cache": () => {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./event-bus": () => {

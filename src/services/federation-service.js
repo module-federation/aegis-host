@@ -22,7 +22,7 @@ export async function importRemoteModels(remoteEntries) {
 
   console.timeEnd(label);
 
-  if (remoteModels.length === 0) return {};
+  if (remoteModels.length === 0) return;
 
   return remoteModels.reduce((p, c) => ({ ...p, ...c }));
 }

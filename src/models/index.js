@@ -290,6 +290,11 @@ export async function initRemoteCache(name) {
     adaptersCache = { ...adapters, ...localOverrides };
     console.info({ servicesCache, adaptersCache, localOverrides });
   }
+
+  if (!modelsCache.models) {
+    console.error({ modelsCache });
+    return;
+  }
   const model = modelsCache.models.find(m => m.name === name);
 
   if (!model) {
