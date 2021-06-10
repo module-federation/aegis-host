@@ -156,9 +156,9 @@ import {
   importRemoteModels,
   importRemoteServices,
   importRemoteAdapters,
-  importModelsCache,
-  importAdaptersCache,
-  importServicesCache,
+  importModelCache,
+  importAdapterCache,
+  importServiceCache,
 } from "../services/federation-service";
 
 /**
@@ -272,9 +272,9 @@ export async function initRemotes(remoteEntries, overrides = {}) {
   );
 }
 
-let modelsCache;
-let adaptersCache;
-let servicesCache;
+let modelCache;
+let adapterCache;
+let serviceCache;
 
 export async function initRemoteCache(name) {
   if (!remotesConfig) {
@@ -283,20 +283,26 @@ export async function initRemoteCache(name) {
   }
 
   if (!modelCache) {
-    modelsCache = await importModelsCache(remotesConfig);
-    const services = await importServicesCache(remotesConfig);
-    const adapters = await importAdaptersCache(remotesConfig);
-    servicesCache = { ...services, ...localOverrides };
-    adaptersCache = { ...adapters, ...localOverrides };
-    console.info({ servicesCache, adaptersCache, localOverrides });
+    modelCache = await importModelCache(remotesConfig);
+    serviceCache = {
+      ...(await importServiceCache(remotesConfig)),
+      ...localOverrides,
+    };
+    adapterCache = {
+      ...(await importAdapterCache(remotesConfig)),
+      ...localOverrides,
+    };
+    console.info({ modelCache, serviceCache, adapterCache, localOverrides });
   }
-  const model = modelsCache.models.find(m => m.name === name);
 
-  if (!model) {
-    console.warn("no model found in cache for", name);
+  if (!modelCache || !modelCache.models) {
+    console.error("no models found in cache");
     return;
   }
-  register(model, servicesCache, adaptersCache);
+
+  Object.values(modelCache.models).forEach(model =>
+    register(model, serviceCache, adapterCache)
+  );
 }
 
 export default ModelFactory;
