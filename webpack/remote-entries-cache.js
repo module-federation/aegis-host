@@ -1,21 +1,21 @@
 module.exports = [
   {
     name: "distributed-cache",
-    url: "http://localhost:8060/remoteEntry.js",
+    url: "http://cache.aegis.dev:8060/remoteEntry.js",
     path: __dirname,
     type: "model-cache",
-    importRemote: async => import("distributed-cache/model-cache"),
+    importRemote: async () => import("distributed-cache/model-cache"),
   },
   {
     name: "adapter-cache",
-    url: "http://localhost:8060/remoteEntry.js",
+    url: "http://cache.aegis.dev:8060/remoteEntry.js",
     path: __dirname,
     type: "adapter-cache",
     importRemote: async () => import("distributed-cache/adapter-cache"),
   },
   {
     name: "service-cache",
-    url: "http://localhost:8060/remoteEntry.js",
+    url: "http://cache.aegis.dev:8060/remoteEntry.js",
     path: __dirname,
     type: "service-cache",
     importRemote: async () => import("distributed-cache/service-cache"),
