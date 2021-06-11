@@ -31,7 +31,7 @@ export function updateCache({ datasource, observer }) {
       }
 
       try {
-        console.debug("unmarshal the deserialized model", event.modelName);
+        console.debug("unmarshal deserialized model", event.modelName);
         const model = ModelFactory.loadModel(
           observer,
           datasource,
@@ -57,10 +57,10 @@ export function updateCache({ datasource, observer }) {
  * the model factory and listen for remote CRUD events
  * from it. On receipt of the event, import the remote
  * modules for the model and its adapters/services, if
- * they haven't been already, then rehydrate and load
- * the model into the cache.
+ * they haven't been already, then rehydrate and save
+ * the model instance to the cache.
  */
-export const cacheEventHandler = function ({ observer, getDataSource }) {
+export const cacheEventBroker = function ({ observer, getDataSource }) {
   return {
     notify() {
       observer.on(/CREATE|UPDATE|DELETE/, async event =>
@@ -85,7 +85,7 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
             id: new Date().getTime() + "create",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [CREATE.concat(u[k].modelName).toUpperCase()],
+            filters: [ModelFactory.getEventName(CREATE, u[k].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
@@ -117,10 +117,10 @@ export default function handleEvents(observer, getDataSource) {
 
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
-    const cache = cacheEventHandler({ observer, getDataSource });
+    const broker = cacheEventBroker({ observer, getDataSource });
     setTimeout(() => {
-      cache.notify();
-      cache.listen();
+      broker.notify();
+      broker.listen();
     }, 10000);
   }
 
