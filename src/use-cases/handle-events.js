@@ -92,14 +92,14 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
             id: new Date().getTime() + "update",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [UPDATE.concat(u[k].modelName).toUpperCase()],
+            filters: [ModelFactory.getEventName(UPDATE, u[k].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "delete",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [DELETE.concat(u[k].modelName).toUpperCase()],
+            filters: [ModelFactory.getEventName(DELETE, u[k].modelName)],
           });
         });
       });
