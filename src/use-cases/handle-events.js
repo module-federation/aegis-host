@@ -16,7 +16,7 @@ export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
 
-    console.log("handle cache event", event.eventName);
+    console.debug("handle cache event", event.eventName, event.modelName);
 
     if (
       event.eventName.startsWith(CREATE) ||
@@ -27,11 +27,11 @@ export function updateCache({ datasource, observer }) {
       if (!ModelFactory.getModelSpec(event.modelName)) {
         console.debug("we don't, import it...");
         // Stream the code for the model
-        await initRemoteCache();
+        await initRemoteCache(event.modelName);
       }
 
       try {
-        console.debug("unmarshal the deserialized model");
+        console.debug("unmarshal the deserialized model", event.modelName);
         const model = ModelFactory.loadModel(
           observer,
           datasource,

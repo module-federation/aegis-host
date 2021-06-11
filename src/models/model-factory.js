@@ -160,7 +160,7 @@ const ModelFactory = {
         },
       });
     }
-    throw new Error("unregistered model");
+    throw new Error("unregistered model", name);
   },
 
   /**
