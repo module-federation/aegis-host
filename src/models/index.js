@@ -307,11 +307,6 @@ export async function initRemoteCache(name) {
     return;
   }
   register(model, serviceCache, adapterCache);
-
-  // Object.values(modelCache.models).forEach(model => {
-  //   console.debug(model);
-  //   register(model, serviceCache, adapterCache);
-  // });
 }
 
 export default ModelFactory;
