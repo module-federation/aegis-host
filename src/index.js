@@ -48,7 +48,7 @@ function clearRoutes() {
  *
  * @param {boolean} hot `true` to hot reload
  */
-async function startMicroLib({ hot = false } = {}) {
+async function startMicroLib({ hot = false, serverless = false } = {}) {
   const remoteEntry = importFresh("./remoteEntry");
   const factory = await remoteEntry.microlib.get("./server");
   const serverModule = factory();
@@ -58,7 +58,7 @@ async function startMicroLib({ hot = false } = {}) {
     // clear cache on hot reload
     serverModule.default.clear();
   }
-  await serverModule.default.start(app);
+  await serverModule.default.start(app, serverless);
   return serverModule.default.control;
 }
 
@@ -177,7 +177,7 @@ exports.handleServerlessRequest = async function (...args) {
 
   if (!serverlessAdapter) {
     serverlessAdapter = await ServerlessAdapter(
-      startMicroLib,
+      () => startMicroLib({ serverless: true }),
       cloudProvider,
       messageParser
     );

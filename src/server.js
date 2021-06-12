@@ -55,16 +55,8 @@ class RouteMap extends Map {
   }
 }
 
-function isServerless() {
-  return (
-    /serverless/i.test(process.title) || /true/i.test(process.env.SERVERLESS)
-  );
-}
-
 const Server = (() => {
   const routes = new RouteMap();
-  const serverless = isServerless();
-  const serverMode = serverless ? "serverless" : "webserver";
 
   const endpoint = e => `${modelPath}/${e}`;
   const endpointId = e => `${modelPath}/${e}/:id`;
@@ -82,11 +74,6 @@ const Server = (() => {
   const getRemoteEntries = remoteEntry.microlib
     .get("./remoteEntries")
     .then(factory => factory());
-
-  function makeAdmin(app, adapter) {
-    app.get(`${apiRoot}/config`, adapter(getConfig()));
-    routes.set(`${apiRoot}/config`, { get: adapter(getConfig()) });
-  }
 
   const make = {
     /**
@@ -123,6 +110,14 @@ const Server = (() => {
       });
     },
   };
+
+  function makeAdmin(app, adapter, serverMode) {
+    if (serverMode === make.webserver.name) {
+      app.get(`${apiRoot}/config`, adapter(getConfig()));
+    } else if (serverMode === make.serverless.name) {
+      routes.set(`${apiRoot}/config`, { get: adapter(getConfig()) });
+    }
+  }
 
   /**
    * Call controllers directly in serverless mode.
@@ -171,10 +166,22 @@ const Server = (() => {
     }
   }
 
-  async function start(router) {
+  /**
+   * Import federated modules {@see module:src/models/index.initRemotes}. Then, generate routes for each 
+   * controller method and model. If running as a serverless function, store the routes
+   * and controllers for direct invocation via the {@link control}
+   * method.
+   *
+   * @param {import("express").Router} router - express app/router
+   * @param {boolean} serverless - set to true if running as a servless function
+   * @returns
+   */
+  async function start(router, serverless = false) {
+    const serverMode = serverless ? make.serverless.name : make.webserver.name;
+    const overrides = { save, find, Persistence };
+
     const label = "\ntotal time to import & register remote modules";
     console.time(label);
-    const overrides = { save, find, Persistence };
 
     return getRemoteEntries.then(remotes => {
       return getRemoteModules.then(initRemotes => {
@@ -190,12 +197,12 @@ const Server = (() => {
           make[serverMode](endpointId, "delete", deleteModels, router);
           make[serverMode](endpointCmd, "patch", patchModels, router);
 
-          makeAdmin(router, http);
+          makeAdmin(router, http, serverMode);
           console.timeEnd(label);
           console.info(routes);
 
-          await cache.load();
           process.on("sigterm", () => shutdown(() => close()));
+          await cache.load();
           return control;
         });
       });

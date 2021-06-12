@@ -18,6 +18,8 @@
   },
   "scripts": {
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
+    "build-order": "cp webpack/remote-entries-order.js webpack/remote-entries.js && npm run build",
+    "build-customer": "cp webpack/remote-entries-customer.js webpack/remote-entries.js && npm run build",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "hot-reload": "curl http://localhost:8070/microlib/reload",
     "restart": "npm run build && npm run start",
