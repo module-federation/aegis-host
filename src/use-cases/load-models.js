@@ -41,7 +41,7 @@ function handleRestart(repository) {
 }
 
 /**
- * Factory returns function to unmarshal deserialized models
+ * Returns factory function to unmarshal deserialized models.
  * @typedef {import('../models').Model} Model
  * @param {{
  *  models:import('../models/model-factory').ModelFactory,
@@ -49,6 +49,7 @@ function handleRestart(repository) {
  *  repository:import('../datasources/datasource').default,
  *  modelName:string
  * }} options
+ * @returns {function():Promise<void>}
  */
 export default function ({ models, observer, repository, modelName }) {
   return async function loadModels() {

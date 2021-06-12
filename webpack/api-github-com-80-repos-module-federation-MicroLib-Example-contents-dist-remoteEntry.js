@@ -31654,7 +31654,7 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 /***/ }),
 
-/***/ "webpack/container/entry/distributed-cache":
+/***/ "webpack/container/entry/microservices":
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -31664,13 +31664,13 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 "use strict";
 var moduleMap = {
-	"./models-cache": () => {
+	"./models": () => {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
-	"./adapters-cache": () => {
+	"./adapters": () => {
 		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
-	"./services-cache": () => {
+	"./services": () => {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./event-bus": () => {
@@ -31977,7 +31977,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "http://cache.aegis.dev:8060";
+/******/ 		__webpack_require__.p = "https://api.github.com/module-federation/MicroLib-Example/dist?ref=order-server";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
@@ -32268,7 +32268,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			"distributed-cache": 0
+/******/ 			"microservices": 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -32331,7 +32331,7 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__("webpack/container/entry/distributed-cache");
+/******/ 	return __webpack_require__("webpack/container/entry/microservices");
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map

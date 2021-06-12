@@ -16,7 +16,7 @@ export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
 
-    console.log("updateCache called", event.eventName);
+    console.debug("handle cache event", event.eventName);
 
     if (
       event.eventName.startsWith(CREATE) ||
@@ -27,17 +27,22 @@ export function updateCache({ datasource, observer }) {
       if (!ModelFactory.getModelSpec(event.modelName)) {
         console.debug("we don't, import it...");
         // Stream the code for the model
-        await initRemoteCache();
+        await initRemoteCache(event.modelName);
       }
 
       try {
-        console.debug("unmarshal the deserialized model");
+        console.debug(
+          "unmarshal deserialized model",
+          event.modelName,
+          event.model.id
+        );
         const model = ModelFactory.loadModel(
           observer,
           datasource,
           event.model,
           event.modelName
         );
+
         return datasource.save(model.getId(), model);
       } catch (e) {
         console.error("distributed cache", e);
@@ -45,6 +50,7 @@ export function updateCache({ datasource, observer }) {
     }
 
     if (event.eventName.startsWith(DELETE)) {
+      console.debug("deleting from cache", event.modelName, event.modelId);
       return datasource.delete(event.modelId);
     }
   };
@@ -56,17 +62,20 @@ export function updateCache({ datasource, observer }) {
  * the model factory and listen for remote CRUD events
  * from it. On receipt of the event, import the remote
  * modules for the model and its adapters/services, if
- * they haven't been already, then rehydrate and load
- * the model into the cache.
+ * they haven't been already, then rehydrate and save
+ * the model instance to the cache.
  */
-export const cacheEventHandler = function ({ observer, getDataSource }) {
+export const cacheEventBroker = function ({ observer, getDataSource }) {
   return {
-    notify() {
+    publishInternalCrudEvents() {
       observer.on(/CREATE|UPDATE|DELETE/, async event =>
         EventBus.notify(BROADCAST, JSON.stringify(event))
       );
     },
-    listen() {
+    /**
+     * Call external event service to subribe to aegis broadcast
+     */
+    subscribeToExternalEvents() {
       const models = ModelFactory.getModelSpecs();
       const relations = models.map(m => ({ ...m.relations }));
       const unregistered = relations.filter(
@@ -84,21 +93,21 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
             id: new Date().getTime() + "create",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [CREATE.concat(u[k].modelName).toUpperCase()],
+            filters: [ModelFactory.getEventName(CREATE, u[k].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "update",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [UPDATE.concat(u[k].modelName).toUpperCase()],
+            filters: [ModelFactory.getEventName(UPDATE, u[k].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "delete",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [DELETE.concat(u[k].modelName).toUpperCase()],
+            filters: [ModelFactory.getEventName(DELETE, u[k].modelName)],
           });
         });
       });
@@ -107,19 +116,20 @@ export const cacheEventHandler = function ({ observer, getDataSource }) {
 };
 
 /**
- *
+ * Handle internal and external events. Distributed cache.
  * @param {import('../models/observer').Observer} observer
  * @param {import('../adapters/event-adapter').EventService} eventService
  */
-export default function handleEvents(observer, getDataSource) {
-    observer.on(/.*/, async event => publishEvent(event));
+export default function brokerEvents(observer, getDataSource) {
+  observer.on(/.*/, async event => publishEvent(event));
 
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
-    const cache = cacheEventHandler({ observer, getDataSource });
+    const broker = cacheEventBroker({ observer, getDataSource });
+    // do this later; let startup continue
     setTimeout(() => {
-      cache.notify();
-      cache.listen();
+      broker.publishInternalCrudEvents();
+      broker.subscribeToExternalEvents();
     }, 10000);
   }
 

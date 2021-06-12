@@ -185,14 +185,10 @@ const deleteEvent = model => ({
 });
 
 function register(model, services, adapters) {
-  if (
-    model.hasOwnProperty("modelName") &&
-    model.hasOwnProperty("factory") &&
-    model.hasOwnProperty("endpoint")
-  ) {
+  if (model.modelName && model.endpoint) {
     const serviceAdapters = makeAdapters(model.ports, adapters, services);
 
-    // override adapters
+    // override adaptersq q
     const dependencies = {
       ...model.dependencies,
       ...serviceAdapters,
@@ -300,9 +296,17 @@ export async function initRemoteCache(name) {
     return;
   }
 
-  Object.values(modelCache.models).forEach(model =>
-    register(model, serviceCache, adapterCache)
+  console.debug("cached models", Object.values(modelCache.models));
+
+  const model = Object.values(modelCache.models).find(
+    model => model.modelName.toUpperCase() === name.toUpperCase()
   );
+
+  if (!model) {
+    console.error("could not find model in cache", name);
+    return;
+  }
+  register(model, serviceCache, adapterCache);
 }
 
 export default ModelFactory;

@@ -10,10 +10,10 @@ import makeListConfig from "./list-configs";
 import DataSourceFactory from "../datasources";
 import ObserverFactory from "../models/observer";
 import ModelFactory from "../models";
-import handleEvents from "./handle-events";
+import brokerEvents from "./broker-events";
 
 export function registerCacheEvents() {
-  handleEvents(ObserverFactory.getInstance(), name =>
+  brokerEvents(ObserverFactory.getInstance(), name =>
     DataSourceFactory.getDataSource(name, true)
   );
 }
@@ -33,10 +33,10 @@ function buildOptions(model) {
 }
 
 function make(factory) {
-  const models = ModelFactory.getRemoteModels();
-  return models.map(model => ({
-    endpoint: model.endpoint,
-    fn: factory(buildOptions(model)),
+  const specs = ModelFactory.getModelSpecs();
+  return specs.map(spec => ({
+    endpoint: spec.endpoint,
+    fn: factory(buildOptions(spec)),
   }));
 }
 
