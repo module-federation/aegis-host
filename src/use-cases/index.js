@@ -10,10 +10,10 @@ import makeListConfig from "./list-configs";
 import DataSourceFactory from "../datasources";
 import ObserverFactory from "../models/observer";
 import ModelFactory from "../models";
-import handleEvents from "./handle-events";
+import brokerEvents from "./broker-events";
 
 export function registerCacheEvents() {
-  handleEvents(ObserverFactory.getInstance(), name =>
+  brokerEvents(ObserverFactory.getInstance(), name =>
     DataSourceFactory.getDataSource(name, true)
   );
 }

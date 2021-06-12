@@ -62,12 +62,12 @@ export function updateCache({ datasource, observer }) {
  */
 export const cacheEventBroker = function ({ observer, getDataSource }) {
   return {
-    notify() {
+    publishInternalCrudEvents() {
       observer.on(/CREATE|UPDATE|DELETE/, async event =>
         EventBus.notify(BROADCAST, JSON.stringify(event))
       );
     },
-    listen() {
+    subscribeToExternalEvents() {
       const models = ModelFactory.getModelSpecs();
       const relations = models.map(m => ({ ...m.relations }));
       const unregistered = relations.filter(
@@ -112,15 +112,15 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
  * @param {import('../models/observer').Observer} observer
  * @param {import('../adapters/event-adapter').EventService} eventService
  */
-export default function handleEvents(observer, getDataSource) {
+export default function brokerEvents(observer, getDataSource) {
   observer.on(/.*/, async event => publishEvent(event));
 
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
     const broker = cacheEventBroker({ observer, getDataSource });
     setTimeout(() => {
-      broker.notify();
-      broker.listen();
+      broker.publishInternalCrudEvents();
+      broker.subscribeToExternalEvents();
     }, 10000);
   }
 
