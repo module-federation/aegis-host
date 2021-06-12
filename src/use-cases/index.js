@@ -33,10 +33,10 @@ function buildOptions(model) {
 }
 
 function make(factory) {
-  const models = ModelFactory.getRemoteModels();
-  return models.map(model => ({
-    endpoint: model.endpoint,
-    fn: factory(buildOptions(model)),
+  const specs = ModelFactory.getModelSpecs();
+  return specs.map(spec => ({
+    endpoint: spec.endpoint,
+    fn: factory(buildOptions(spec)),
   }));
 }
 

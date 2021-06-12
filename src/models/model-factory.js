@@ -20,6 +20,7 @@ import Event from "./event";
  * @property {function(Model):string[]} getPortFlow
  * @property {function(Model,string):Model} loadModel
  * @property {function():ModelSpecification[]} getRemoteModels
+ * @property {function():ModelSpecification[]} getModelSpecs
  * @property {function(Model|string):ModelSpecification} getModelSpec
  */
 
@@ -188,9 +189,14 @@ const ModelFactory = {
 
   /**
    * Get federated models imported from remote server
+   * @deprecated
    */
   getRemoteModels: () => [...modelFactories.values()],
 
+  /**
+   * Get federated models imported from remote server
+   * @returns
+   */
   getModelSpecs: () => [...modelFactories.values()],
 
   /**

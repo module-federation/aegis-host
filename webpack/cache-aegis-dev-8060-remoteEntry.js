@@ -31977,7 +31977,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "http://localhost:8060";
+/******/ 		__webpack_require__.p = "http://cache.aegis.dev:8060";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */

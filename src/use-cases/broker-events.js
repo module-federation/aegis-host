@@ -16,7 +16,7 @@ export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
 
-    console.debug("handle cache event", event.eventName, event.modelName);
+    console.debug("handle cache event", event.eventName);
 
     if (
       event.eventName.startsWith(CREATE) ||
@@ -31,7 +31,11 @@ export function updateCache({ datasource, observer }) {
       }
 
       try {
-        console.debug("unmarshal deserialized model", event.modelName);
+        console.debug(
+          "unmarshal deserialized model",
+          event.modelName,
+          event.model.id
+        );
         const model = ModelFactory.loadModel(
           observer,
           datasource,
@@ -46,6 +50,7 @@ export function updateCache({ datasource, observer }) {
     }
 
     if (event.eventName.startsWith(DELETE)) {
+      console.debug("deleting from cache", event.modelName, event.modelId);
       return datasource.delete(event.modelId);
     }
   };
@@ -67,6 +72,9 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
         EventBus.notify(BROADCAST, JSON.stringify(event))
       );
     },
+    /**
+     * Call external event service to subribe to aegis broadcast
+     */
     subscribeToExternalEvents() {
       const models = ModelFactory.getModelSpecs();
       const relations = models.map(m => ({ ...m.relations }));
@@ -118,6 +126,7 @@ export default function brokerEvents(observer, getDataSource) {
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
     const broker = cacheEventBroker({ observer, getDataSource });
+    // do this later; let startup continue
     setTimeout(() => {
       broker.publishInternalCrudEvents();
       broker.subscribeToExternalEvents();
