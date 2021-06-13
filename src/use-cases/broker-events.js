@@ -15,7 +15,7 @@ const DELETE = ModelFactory.EventTypes.DELETE;
 export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
-
+    if (!event.eventName) return;
     console.debug("handle cache event", event.eventName);
 
     if (
@@ -82,32 +82,32 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
         r => !models.find(m => m.modelName === r.modelName)
       );
       unregistered.forEach(function (u) {
-        Object.keys(u).forEach(k => {
-          console.debug("modelName", u[k].modelName);
-          if (!u[k] || !u[k].modelName) return;
-          const datasource = getDataSource(u[k].modelName);
-          console.debug("calling listen", u[k]);
+        Object.keys(u).forEach(function (r) {
+          if (!u[r].modelName) return;
+
+          const datasource = getDataSource(u[r].modelName);
+          console.debug("listen", u[r]);
 
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "create",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [ModelFactory.getEventName(CREATE, u[k].modelName)],
+            filters: [ModelFactory.getEventName(CREATE, u[r].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "update",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [ModelFactory.getEventName(UPDATE, u[k].modelName)],
+            filters: [ModelFactory.getEventName(UPDATE, u[r].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "delete",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [ModelFactory.getEventName(DELETE, u[k].modelName)],
+            filters: [ModelFactory.getEventName(DELETE, u[r].modelName)],
           });
         });
       });
@@ -130,7 +130,7 @@ export default function brokerEvents(observer, getDataSource) {
     setTimeout(() => {
       broker.publishInternalCrudEvents();
       broker.subscribeToExternalEvents();
-    }, 10000);
+    }, 20000);
   }
 
   /**
