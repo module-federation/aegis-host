@@ -60,6 +60,7 @@ import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
 import pipe from "../lib/pipe";
 import uuid from "../lib/uuid";
+import ModelFactory from "./model-factory";
 
 /**
  * @namespace
@@ -210,11 +211,20 @@ const Model = (() => {
 
         // by default merge the incoming model with the last one saved
         const merge = overwrite ? model : { ...saved, ...model };
-        
-        return datasource.save(model[ID], {
+
+        const final = datasource.save(model[ID], {
           ...merge,
           [UPDATETIME]: new Date().getTime(),
         });
+
+        const event = ModelFactory.createEvent(
+          ModelFactory.EventTypes.UPDATE,
+          this[MODELNAME],
+          final
+        );
+        await observer.notify(event.eventName, event);
+
+        return final;
       },
 
       /**

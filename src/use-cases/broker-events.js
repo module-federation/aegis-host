@@ -7,15 +7,18 @@ const UPDATE = ModelFactory.EventTypes.UPDATE;
 const CREATE = ModelFactory.EventTypes.CREATE;
 const DELETE = ModelFactory.EventTypes.DELETE;
 
+/** @typedef {import("../datasources/datasource").default} DataSource */
+/** @typedef {import('../models/observer').Observer} Observer */
+
 /**
  *
- * @param {*} param0
+ * @param {{observer:Observer,datasource:DataSource}} param0
  * @returns
  */
 export function updateCache({ datasource, observer }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
-
+    if (!event.eventName) return;
     console.debug("handle cache event", event.eventName);
 
     if (
@@ -64,16 +67,21 @@ export function updateCache({ datasource, observer }) {
  * modules for the model and its adapters/services, if
  * they haven't been already, then rehydrate and save
  * the model instance to the cache.
+ *
+ * @param {{observer:Observer,getDataSource:function():DataSource}} options
  */
 export const cacheEventBroker = function ({ observer, getDataSource }) {
   return {
+    /**
+     * Forward all local CRUD events to event bus.
+     */
     publishInternalCrudEvents() {
       observer.on(/CREATE|UPDATE|DELETE/, async event =>
         EventBus.notify(BROADCAST, JSON.stringify(event))
       );
     },
     /**
-     * Call external event service to subribe to aegis broadcast
+     * Subscribe to event bus to receive remote CRUD events.
      */
     subscribeToExternalEvents() {
       const models = ModelFactory.getModelSpecs();
@@ -82,32 +90,32 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
         r => !models.find(m => m.modelName === r.modelName)
       );
       unregistered.forEach(function (u) {
-        Object.keys(u).forEach(k => {
-          console.debug("modelName", u[k].modelName);
-          if (!u[k] || !u[k].modelName) return;
-          const datasource = getDataSource(u[k].modelName);
-          console.debug("calling listen", u[k]);
+        Object.keys(u).forEach(function (r) {
+          if (!u[r].modelName) return;
+
+          const datasource = getDataSource(u[r].modelName);
+          //console.debug("listen", u[r]);
 
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "create",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [ModelFactory.getEventName(CREATE, u[k].modelName)],
+            filters: [ModelFactory.getEventName(CREATE, u[r].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "update",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [ModelFactory.getEventName(UPDATE, u[k].modelName)],
+            filters: [ModelFactory.getEventName(UPDATE, u[r].modelName)],
           });
           EventBus.listen({
             topic: BROADCAST,
             id: new Date().getTime() + "delete",
             callback: updateCache({ observer, datasource }),
             once: false,
-            filters: [ModelFactory.getEventName(DELETE, u[k].modelName)],
+            filters: [ModelFactory.getEventName(DELETE, u[r].modelName)],
           });
         });
       });
@@ -118,7 +126,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
 /**
  * Handle internal and external events. Distributed cache.
  * @param {import('../models/observer').Observer} observer
- * @param {import('../adapters/event-adapter').EventService} eventService
+ * @param {function():DataSource} getDataSource
  */
 export default function brokerEvents(observer, getDataSource) {
   observer.on(/.*/, async event => publishEvent(event));
@@ -130,7 +138,7 @@ export default function brokerEvents(observer, getDataSource) {
     setTimeout(() => {
       broker.publishInternalCrudEvents();
       broker.subscribeToExternalEvents();
-    }, 10000);
+    }, 20000);
   }
 
   /**

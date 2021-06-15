@@ -1,5 +1,6 @@
 "use strict";
 
+import { env } from "process";
 import Serializer from "../lib/serializer";
 import resumeWorkflow from "./resume-workflow";
 
@@ -37,6 +38,7 @@ function handleError(e) {
  */
 function handleRestart(repository) {
   // console.log("resuming workflow", repository.name);
+  if (process.env.RESUME_WORKFLOW_DISABLED) return;
   repository.list().then(resumeWorkflow).catch(handleError);
 }
 
@@ -55,7 +57,7 @@ export default function ({ models, observer, repository, modelName }) {
   return async function loadModels() {
     const spec = models.getModelSpec(modelName);
 
-    setTimeout(handleRestart, 30000, repository);
+    setInterval(handleRestart, 30000, repository);
 
     return repository.load({
       hydrate: hydrateModels(models.loadModel, observer, repository),

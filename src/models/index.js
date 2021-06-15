@@ -1,7 +1,5 @@
 "use strict";
 
-import webpack from "webpack";
-
 /** @typedef {import("./model").Model} Model */
 /** @typedef {import('./event').Event} Event */
 /** @typedef {string} eventName */
@@ -188,7 +186,6 @@ function register(model, services, adapters) {
   if (model.modelName && model.endpoint) {
     const serviceAdapters = makeAdapters(model.ports, adapters, services);
 
-    // override adaptersq q
     const dependencies = {
       ...model.dependencies,
       ...serviceAdapters,
@@ -280,6 +277,7 @@ export async function initRemoteCache(name) {
 
   if (!modelCache) {
     modelCache = await importModelCache(remotesConfig);
+    // Check if we have since loaded the model
     serviceCache = {
       ...(await importServiceCache(remotesConfig)),
       ...localOverrides,
@@ -288,15 +286,15 @@ export async function initRemoteCache(name) {
       ...(await importAdapterCache(remotesConfig)),
       ...localOverrides,
     };
-    console.info({ modelCache, serviceCache, adapterCache, localOverrides });
+    //console.info({ modelCache, serviceCache, adapterCache, localOverrides });
   }
+
+  if (ModelFactory.getModelSpec(name)) return;
 
   if (!modelCache || !modelCache.models) {
     console.error("no models found in cache");
     return;
   }
-
-  console.debug("cached models", Object.values(modelCache.models));
 
   const model = Object.values(modelCache.models).find(
     model => model.modelName.toUpperCase() === name.toUpperCase()

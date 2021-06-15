@@ -22,6 +22,7 @@ function getBaseClass(name) {
 
 /**
  * @todo handle all state same way
+ * @name DataSourceFactory
  */
 const DataSourceFactory = (() => {
   // References all DSes

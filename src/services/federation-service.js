@@ -4,8 +4,7 @@
  * @returns {Promise<import('../models').ModelSpecification[]>}
  */
 export async function importRemoteModels(remoteEntries) {
-  const label = "\ntime to import remote models";
-  console.time(label);
+  const startTime = Date.now();
 
   const remoteModels = [];
   try {
@@ -20,7 +19,7 @@ export async function importRemoteModels(remoteEntries) {
     console.error(e);
   }
 
-  console.timeEnd(label);
+  console.info("model import took %d ms", Date.now() - startTime);
 
   if (remoteModels.length === 0) return;
 
@@ -31,8 +30,7 @@ export async function importRemoteModels(remoteEntries) {
  * Imports remote service modules.
  */
 export async function importRemoteServices(remoteEntries) {
-  const label = "\ntime to import remote services";
-  console.time(label);
+  const startTime = Date.now();
 
   let services = [];
   for (const entry of remoteEntries) {
@@ -43,7 +41,7 @@ export async function importRemoteServices(remoteEntries) {
     }
   }
 
-  console.timeEnd(label);
+  console.info("services import took %d ms", Date.now() - startTime);
 
   if (services.length === 0) return {};
 
@@ -51,8 +49,7 @@ export async function importRemoteServices(remoteEntries) {
 }
 
 export async function importRemoteAdapters(remoteEntries) {
-  const label = "\ntime to import remote adapters";
-  console.time(label);
+  const startTime = Date.now();
 
   let adapters = [];
   for (const entry of remoteEntries) {
@@ -63,7 +60,7 @@ export async function importRemoteAdapters(remoteEntries) {
     }
   }
 
-  console.timeEnd(label);
+  console.info("adapters import took %d ms", Date.now() - startTime);
 
   if (adapters.length === 0) return {};
 
@@ -71,8 +68,7 @@ export async function importRemoteAdapters(remoteEntries) {
 }
 
 export async function importModelCache(remoteEntries, name) {
-  const label = "\ntime to import remote models cache";
-  console.time(label);
+  const startTime = Date.now();
 
   const remoteModels = [];
   try {
@@ -87,7 +83,7 @@ export async function importModelCache(remoteEntries, name) {
     console.error(e);
   }
 
-  console.timeEnd(label);
+  console.info("models import took %d ms", Date.now() - startTime);
 
   if (remoteModels.length === 0) return;
 
@@ -98,8 +94,7 @@ export async function importModelCache(remoteEntries, name) {
  * Imports remote service modules.
  */
 export async function importServiceCache(remoteEntries) {
-  const label = "\ntime to import remote services cache";
-  console.time(label);
+  const startTime = Date.now();
 
   let services = [];
   for (const entry of remoteEntries) {
@@ -110,7 +105,7 @@ export async function importServiceCache(remoteEntries) {
     }
   }
 
-  console.timeEnd(label);
+  console.info("services import took %d ms", Date.now() - startTime);
 
   if (services.length === 0) return;
 
@@ -118,8 +113,7 @@ export async function importServiceCache(remoteEntries) {
 }
 
 export async function importAdapterCache(remoteEntries) {
-  const label = "\ntime to import remote adapters cache";
-  console.time(label);
+  const startTime = Date.now();
 
   let adapters = [];
   for (const entry of remoteEntries) {
@@ -130,7 +124,7 @@ export async function importAdapterCache(remoteEntries) {
     }
   }
 
-  console.timeEnd(label);
+  console.info("adapters import took %d ms", Date.now() - startTime);
 
   if (adapters.length === 0) return;
 
