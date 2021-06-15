@@ -7,9 +7,12 @@ const UPDATE = ModelFactory.EventTypes.UPDATE;
 const CREATE = ModelFactory.EventTypes.CREATE;
 const DELETE = ModelFactory.EventTypes.DELETE;
 
+/** @typedef {import("../datasources/datasource").default} DataSource */
+/** @typedef {import('../models/observer').Observer} Observer */
+
 /**
  *
- * @param {*} param0
+ * @param {{observer:Observer,datasource:DataSource}} param0
  * @returns
  */
 export function updateCache({ datasource, observer }) {
@@ -64,16 +67,21 @@ export function updateCache({ datasource, observer }) {
  * modules for the model and its adapters/services, if
  * they haven't been already, then rehydrate and save
  * the model instance to the cache.
+ *
+ * @param {{observer:Observer,getDataSource:function():DataSource}} options
  */
 export const cacheEventBroker = function ({ observer, getDataSource }) {
   return {
+    /**
+     * Forward all local CRUD events to event bus.
+     */
     publishInternalCrudEvents() {
       observer.on(/CREATE|UPDATE|DELETE/, async event =>
         EventBus.notify(BROADCAST, JSON.stringify(event))
       );
     },
     /**
-     * Call external event service to subribe to aegis broadcast
+     * Subscribe to event bus to receive remote CRUD events.
      */
     subscribeToExternalEvents() {
       const models = ModelFactory.getModelSpecs();
@@ -86,7 +94,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
           if (!u[r].modelName) return;
 
           const datasource = getDataSource(u[r].modelName);
-          console.debug("listen", u[r]);
+          //console.debug("listen", u[r]);
 
           EventBus.listen({
             topic: BROADCAST,
@@ -118,7 +126,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
 /**
  * Handle internal and external events. Distributed cache.
  * @param {import('../models/observer').Observer} observer
- * @param {import('../adapters/event-adapter').EventService} eventService
+ * @param {function():DataSource} getDataSource
  */
 export default function brokerEvents(observer, getDataSource) {
   observer.on(/.*/, async event => publishEvent(event));

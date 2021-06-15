@@ -29,6 +29,7 @@ export default function makeAddModel({
 
   // Add an event whose callback invokes this factory.
   observer.on(domainEvents.addModel(eventName), addModel, false);
+
   async function addModel(input) {
     const model = await models.createModel(
       observer,
