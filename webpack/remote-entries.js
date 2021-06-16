@@ -1,11 +1,4 @@
-//const githubEntries = require("./remote-entries-github");
-//const githubCustomer = require("./remote-entries-github-customer");
-const githubOrder = require("./remote-entries-github-order");
-const cacheEntries = require("./remote-entries-cache");
+const cache = require("./remote-entries-cache");
+const github = require("./remote-entries-github");
 
-//module.exports = githubEntries;
-// module.exports = githubEntries.concat(cacheEntries);
-//module.exports = githubCustomer;
-// module.exports = githubCustomer.concat(cacheEntries);
-//module.exports = githubOrder;
-module.exports = githubOrder.concat(cacheEntries);
+module.exports = github.concat(cache);
