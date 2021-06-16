@@ -36,11 +36,11 @@ const octokit = new Octokit({ auth: token });
 async function githubFetch(entry, path) {
   return octokit
     .request(
-      "GET https://api.github.com/repos/{owner}/{repo}/contents/{filedir}?ref={branch}",
+      "GET https://api.github.com/{owner}/{repo}/contents/{fpath}?ref={branch}",
       {
         owner: entry.owner,
         repo: entry.repo,
-        filedir: entry.filedir,
+        path: entry.gitpath,
         branch: entry.branch,
       }
     )
@@ -49,6 +49,7 @@ async function githubFetch(entry, path) {
       return file.sha;
     })
     .then(function (sha) {
+      const [, , , , owner, repo] = entry.url.split("/");
       return octokit.request("GET /repos/{owner}/{repo}/git/blobs/{sha}", {
         owner: entry.owner,
         repo: entry.repo,

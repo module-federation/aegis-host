@@ -32195,19 +32195,16 @@ module.exports = require("zlib");
 /******/ 		const fs = require("fs");
 /******/ 		const path = require("path");
 /******/ 		const token = process.env.GITHUB_TOKEN;
-/******/ 		const branch = process.env.GITHUB_BRANCH || "master";
-/******/ 		const repo = process.env.GITHUB_REPO || "MicroLib-Example";
-/******/ 		const owner = process.env.GITHUB_OWNER || "module-federation";
-/******/ 		const gitpath = process.env.GITHUB_PATH || "dist";
 /******/ 		
 /******/ 		const octokit = new Octokit({ auth: token });
 /******/ 		
 /******/ 		function githubFetch(url) {
 /******/ 		  console.info("github url", url);
+/******/ 		  const [,,,owner,repo,filedir,branch] = url.split(".");
 /******/ 		  return new Promise(function (resolve, reject) {
 /******/ 		    octokit
 /******/ 		      .request(
-/******/ 		        "GET /repos/{owner}/{repo}/contents/{gitpath}?ref={branch}",
+/******/ 		        "GET /repos/{owner}/{repo}/contents/{filedir}?ref={branch}",
 /******/ 		        {
 /******/ 		          owner,
 /******/ 		          repo,

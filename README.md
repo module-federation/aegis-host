@@ -135,9 +135,9 @@ In addition to in-memory function calls, federated objects and ports, services c
 The framework provides a common broker for local service events and injects pub/sub functions into each model:
 
 ```js
-ModelA.listen(event, callback);
+modelA.listen(event, callback);
 
-ModelB.notify(event, data);
+modelB.notify(event, data);
 ```
 
 Local events can also be forwarded to remote event targets. Like any external integration remote ports must be configured for external event sources/sinks. Adapters are provided for **Kafka** and **WebSockets**.
