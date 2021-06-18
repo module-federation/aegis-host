@@ -60,7 +60,6 @@ import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
 import pipe from "../lib/pipe";
 import uuid from "../lib/uuid";
-import ModelFactory from "./model-factory";
 
 /**
  * @namespace
@@ -140,7 +139,7 @@ const Model = (() => {
       ...compose(...mixins)(model),
 
       // Generate functions to fetch related models
-      ...makeRelations(relations, datasource),
+      ...makeRelations(relations, datasource, observer),
 
       // Generate port functions to handle domain I/O
       ...makePorts(ports, dependencies, observer),
@@ -217,12 +216,10 @@ const Model = (() => {
           [UPDATETIME]: new Date().getTime(),
         });
 
-        const event = ModelFactory.createEvent(
-          ModelFactory.EventTypes.UPDATE,
-          this[MODELNAME],
-          final
-        );
-        await observer.notify(event.eventName, event);
+        await observer.notify("UPDATE" + model.modelName, {
+          modelName: model.modelName,
+          model: final,
+        });
 
         return final;
       },

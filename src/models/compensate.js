@@ -1,4 +1,3 @@
-import async from "../lib/async-error";
 import domainEvents from "./domain-events";
 
 /**
@@ -9,44 +8,50 @@ import domainEvents from "./domain-events";
  */
 export default async function compensate(model) {
   try {
-    const updated = await model.update({ compensate: true });
+    const updatedModel = await model.update({ compensate: true });
     const portFlow = model.getPortFlow();
     const ports = model.getPorts();
 
-    await updated.emit(domainEvents.undoStarted(updated), "undo starting");
-
-    const undoResult = await Promise.resolve(
-      portFlow.reduceRight(async function (_prev, port, index, arr) {
-        if (ports[port].undo) {
-          console.log("calling undo on port: ", port);
-          const result = await async(ports[port].undo(updated));
-
-          if (result.ok) {
-            return arr.splice(0, index);
-          }
-          throw new Error("undo failed on port: ", port, result.error);
-        }
-        return arr.splice(0, index);
-      })
+    await updatedModel.emit(
+      domainEvents.undoStarted(updatedModel),
+      "undo starting"
     );
 
-    if (undoResult.length > 0) {
-      const lastPort = portFlow[undoResult.length - 1];
+    const undoneModel = await Promise.resolve(
+      portFlow.reduceRight(async function (model, port, index, arr) {
+        if (ports[port].undo) {
+          console.log("calling undo on port: ", port);
+          try {
+            const undone = await ports[port].undo(model);
+            return await undone.update({
+              [undone.getKey("portFlow")]: arr.splice(0, index),
+            });
+          } catch (error) {
+            console.error(error);
+            return model;
+          }
+        }
+        return model;
+      }, updatedModel)
+    );
+
+    if (undoneModel.getPortFlow().length > 0) {
+      const lastPort = undoneModel.getPortFlow();
       const msg = "undo incomplete, last port compensated " + lastPort;
 
-      const recordPort = await updated.update({
+      const model = await undoneModel.update({
         lastPort,
         compensateResult: "INCOMPLETE",
       });
 
-      await recordPort.emit(domainEvents.undoFailed(model), msg);
-      console.error(msg, updated);
+      await model.emit(domainEvents.undoFailed(model), msg);
+      console.error(msg, updatedModel);
       return;
     }
 
     const compensateResult = "COMPLETE";
-    await updated.emit(domainEvents.undoWorked(model), compensateResult);
-    await updated.update({ compensateResult });
+    await undoneModel.emit(domainEvents.undoWorked(model), compensateResult);
+    await undoneModel.update({ compensateResult });
   } catch (error) {
     console.error(error);
     await model.emit(domainEvents.undoFailed(model), error.message);

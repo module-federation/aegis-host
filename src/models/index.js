@@ -65,7 +65,7 @@
  * @typedef {{
  *  [x: string]: {
  *    modelName:string,
- *    type:"oneToMany"|"manyToOne",
+ *    type:"oneToMany"|"manyToOne"|"oneToOne"|"oneToAny",
  *    foreignKey:any,
  *  }
  * }} relations - define related domain entities
