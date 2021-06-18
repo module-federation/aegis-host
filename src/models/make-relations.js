@@ -3,7 +3,7 @@
 import ModelFactory from "./index";
 import domainEvents from "./domain-events";
 
-const relationType = {
+export const relationType = {
   /**
    * @todo implement cache miss for distributed cache
    *

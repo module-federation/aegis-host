@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 import executeCommand from "./execute-command";
 import fetchRelatedModels from "./fetch-related-models";

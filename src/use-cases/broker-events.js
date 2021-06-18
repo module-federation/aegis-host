@@ -2,6 +2,7 @@ import ModelFactory, { initRemoteCache } from "../models";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
 import domainEvents from "../models/domain-events";
+import { relationType } from "../models/make-relations";
 const os = require("os");
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
@@ -100,6 +101,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
       const unregistered = relations.filter(
         r => !models.find(m => m.modelName === r.modelName)
       );
+      // Look for unregistered models in relations
       unregistered.forEach(function (u) {
         Object.keys(u).forEach(function (r) {
           const relation = u[r];
@@ -124,6 +126,39 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
           );
         });
       });
+
+      // Listen for remote inquiries for the models we have
+      models.forEach(model =>
+        EventBus.listen({
+          topic: BROADCAST,
+          once: false,
+          filters: [domainEvents.remoteObjectInquiry(model.modelName)],
+          id: new Date().getTime() + model.modelName,
+          callback: function ({ message }) {
+            const event = JSON.parse(message);
+
+            const ds = getDataSource(model.modelName);
+            if (!ds) {
+              console.warn("datasource not found", event);
+              return;
+            }
+
+            const result = relationType[event.relation.type](
+              event.model,
+              ds,
+              relation
+            );
+
+            if (result) {
+              EventBus.notify(BROADCAST, {
+                eventName: domainEvents.remoteObjectLocated(model.modelName),
+                modelName: model.modelName,
+                result,
+              });
+            }
+          },
+        })
+      );
     },
   };
 };
@@ -143,7 +178,7 @@ export default function brokerEvents(observer, getDataSource) {
     setTimeout(() => {
       broker.publishInternalEvents();
       broker.consumeExternalEvents();
-    }, 9000);
+    }, 3000);
   }
 
   /**
