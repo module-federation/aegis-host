@@ -36,11 +36,13 @@ export function updateCache({ datasource, observer }) {
         await initRemoteCache(event.modelName);
       }
 
+      const id = event.getId() || event.model.id;
+
       try {
         console.debug(
           "unmarshal deserialized model",
           event.modelName,
-          event.model.id
+          event["getId"] ? event.getId() : event.model.id
         );
 
         const model = ModelFactory.loadModel(

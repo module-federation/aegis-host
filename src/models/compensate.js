@@ -22,10 +22,12 @@ export default async function compensate(model) {
         if (ports[port].undo) {
           console.log("calling undo on port: ", port);
           try {
-            const undone = await ports[port].undo(model);
-            return await undone.update({
-              [undone.getKey("portFlow")]: arr.splice(0, index),
-            });
+            const undone = (await ports[port].undo(model)) || model;
+            return undone.then(model =>
+              model.update({
+                [undone.getKey("portFlow")]: arr.splice(0, index),
+              })
+            );
           } catch (error) {
             console.error(error);
             return model;
