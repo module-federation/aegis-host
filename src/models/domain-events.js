@@ -1,14 +1,8 @@
 "use strict";
 
-// import ModelFactory from "./model-factory";
-// const CREATE = ModelFactory.EventTypes.CREATE;
-// const UPDATE = ModelFactory.EventTypes.UPDATE;
-// const DELETE = ModelFactory.EventTypes.DELETE;
-const cacheHit = modelName => `remoteObjectCacheHit_${modelName}`;
-
 const domainEvents = {
-  consumeRemoteCacheEvents: "consumeRemoteCacheEvents",
-  remoteObjectCacheHit: modelName => cacheHit(modelName),
+  remoteObjectInquiry: modelName => `remoteObjectInquiry_${modelName}`,
+  remoteObjectLocated: modelName => `remoteObjectLocated_${modelName}`,
   portTimeout: (model, port) => `portTimeout_${port}_${model.getName()}`,
   portRetryFailed: (model, port) =>
     `portRetryFailed_${port}_${model.getName()}`,

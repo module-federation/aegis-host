@@ -2,6 +2,7 @@ import ModelFactory, { initRemoteCache } from "../models";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
 import domainEvents from "../models/domain-events";
+const os = require("os");
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 const UPDATE = ModelFactory.EventTypes.UPDATE;
@@ -21,7 +22,7 @@ export function updateCache({ datasource, observer }) {
     const event = JSON.parse(message);
     if (!event.eventName) return;
     console.debug("handle cache event", event.eventName);
-    const cacheHit = domainEvents.remoteObjectCacheHit(event.modelName);
+    const cacheHit = domainEvents.remoteObjectLocated(event.modelName);
 
     if (
       event.eventName.startsWith(CREATE) ||
@@ -36,13 +37,11 @@ export function updateCache({ datasource, observer }) {
         await initRemoteCache(event.modelName);
       }
 
-      const id = event.getId() || event.model.id;
-
       try {
         console.debug(
           "unmarshal deserialized model",
           event.modelName,
-          event["getId"] ? event.getId() : event.model.id
+          event.model.id
         );
 
         const model = ModelFactory.loadModel(
@@ -87,36 +86,10 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
      * Forward local CRUD write events to event bus.
      */
     publishInternalEvents() {
-      observer.on(/CREATE|UPDATE|DELETE/, async event =>
+      observer.on(/CREATE|UPDATE|DELETE|remoteObjectInquiry/, async event =>
         EventBus.notify(BROADCAST, JSON.stringify(event))
       );
     },
-
-    // consumeExternalEvents() {
-    //   observer.on(domainEvents.consumeRemoteCacheEvents, function (eventData) {
-    //     // Listen for remote CRUD events
-    //     [
-    //       ModelFactory.getEventName(CREATE, eventData.modelName),
-    //       ModelFactory.getEventName(UPDATE, eventData.modelName),
-    //       ModelFactory.getEventName(DELETE, eventData.modelName),
-    //       domainEvents.remoteObjectCacheHit(eventData.modelName),
-    //     ].forEach(event =>
-    //       EventBus.listen({
-    //         topic: BROADCAST,
-    //         id: new Date().getTime() + event,
-    //         callback: updateCache({
-    //           observer,
-    //           datasource: getDataSource(eventData.modelName),
-    //         }),
-    //         once: false,
-    //         filters: [event],
-    //       })
-    //     );
-
-    //     // Forward event to query other instances for the object
-    //     EventBus.notify(BROADCAST, JSON.stringify(eventData));
-    //   });
-    // },
 
     /**
      * Subscribe to event bus to receive remote CRUD events.
@@ -134,13 +107,12 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
 
           if (!modelName) return;
 
-          const eventName = domainEvents.remoteObjectCacheHit(modelName);
           const datasource = getDataSource(modelName);
           [
             ModelFactory.getEventName(CREATE, modelName),
             ModelFactory.getEventName(UPDATE, modelName),
             ModelFactory.getEventName(DELETE, modelName),
-            eventName,
+            domainEvents.remoteObjectLocated(modelName),
           ].forEach(event =>
             EventBus.listen({
               topic: BROADCAST,
@@ -149,12 +121,6 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
               once: false,
               filters: [event],
             })
-          );
-
-          // Forward event to query other instances for the object
-          EventBus.notify(
-            BROADCAST,
-            JSON.stringify({ eventName, modelName, relation })
           );
         });
       });

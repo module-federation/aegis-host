@@ -44,48 +44,40 @@ const relationType = {
   },
 };
 
-function isLocalObject(modelName) {
-  if (!ModelFactory.getModelSpec(modelName)) {
-    console.warn("non-local or invalid model", modelName);
-    return false;
-  }
-  return true;
-}
-
 /**
- * If the model is hosted elsewhere, on a remote host instance, sign up
- * for distributed cache events and try to stream its code. The caller
- * waits until the code has been imported or the operation times out.
- * Its a no-op if the object is local.
+ * Retrieve a remote object instance from the distributed cache.
+ * Sign up for distributed cache events and broadcast a global inquiry.
+ * The caller waits until the object has been loaded or the
+ * operation times out.
  *
  * @param {import(".").relations[x]} relation
  * @param {import("./observer").Observer} observer
  * @returns
  */
 function requireRemoteObject(relation, observer) {
-  const cacheEvt = domainEvents.consumeRemoteCacheEvents;
-  const cacheHit = domainEvents.remoteObjectCacheHit(relation.modelName);
-  const callback = fn => () => fn();
+  const inquiry = domainEvents.remoteObjectInquiry(relation.modelName);
+  const located = domainEvents.remoteObjectLocated(relation.modelName);
+  const proceed = fn => () => fn();
 
   const promise = new Promise(function (resolve) {
     setTimeout(resolve, 10000);
-    return observer.on(cacheHit, callback(resolve));
+    return observer.on(located, proceed(resolve));
   });
 
-  observer.notify(cacheEvt, {
-    eventName: cacheEvt,
-    modelName: relation.modelName,
+  observer.notify(inquiry, {
+    eventName: inquiry,
     relation,
   });
 
   return promise;
 }
 
-function handleRemoteObject(relation, observer) {
-  if (!isLocalObject(relation.modelName))
-    return requireRemoteObject(relation, observer);
-
-  return Promise.resolve();
+function isLocalObject(modelName) {
+  if (!ModelFactory.getModelSpec(modelName)) {
+    console.warn("non-local or invalid model", modelName);
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -108,18 +100,16 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation]() {
-            const self = this;
-            // if the object is remote, wait until it has been loaded.
-            // If the model is hosted elsewhere, on a remote host instance,
-            // broadcast the query to other instances and wait for a response.
-            // handleRemoteObject(rel, observer).then(function () {
+            // If the model is hosted on a remote instance
+            if (!isLocalObject(rel.modelName))
+              // broadcast the query to other instances and wait for a response.
+              await requireRemoteObject(relation, observer);
             const ds = dataSource.getFactory().getDataSource(rel.modelName);
-            return relationType[rel.type](self, ds, rel);
-            // });
+            return relationType[rel.type](this, ds, rel);
           },
         };
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     })
     .reduce((c, p) => ({ ...p, ...c }));

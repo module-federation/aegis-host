@@ -183,7 +183,7 @@ const deleteEvent = model => ({
 });
 
 function register(model, services, adapters) {
-  if (model.modelName && model.endpoint) {
+  if (model.modelName && model.endpoint && model.factory) {
     const serviceAdapters = makeAdapters(model.ports, adapters, services);
 
     const dependencies = {
@@ -275,18 +275,19 @@ export async function initRemoteCache(name) {
     return;
   }
 
+  if (ModelFactory.getModelSpec(name)) return;
+
   if (!modelCache) {
     modelCache = await importModelCache(remotesConfig);
     // Check if we have since loaded the model
-    serviceCache = {
-      ...(await importServiceCache(remotesConfig)),
-      ...localOverrides,
-    };
     adapterCache = {
       ...(await importAdapterCache(remotesConfig)),
       ...localOverrides,
     };
-    //console.info({ modelCache, serviceCache, adapterCache, localOverrides });
+    serviceCache = {
+      ...(await importServiceCache(remotesConfig)),
+      ...localOverrides,
+    };
   }
 
   if (ModelFactory.getModelSpec(name)) return;
