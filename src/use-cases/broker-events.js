@@ -2,7 +2,6 @@ import ModelFactory, { initRemoteCache } from "../models";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
 import domainEvents from "../models/domain-events";
-import { relationType } from "../models/make-relations";
 const os = require("os");
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
