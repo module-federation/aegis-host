@@ -103,7 +103,7 @@ export default function makeRelations(relations, dataSource, observer) {
             // If the model is hosted on a remote instance
             if (!isLocalObject(rel.modelName))
               // broadcast the query to other instances and wait for a response.
-              await requireRemoteObject(relation, observer);
+              await requireRemoteObject(rel, observer);
             const ds = dataSource.getFactory().getDataSource(rel.modelName);
             return relationType[rel.type](this, ds, rel);
           },
