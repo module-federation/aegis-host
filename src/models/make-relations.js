@@ -111,7 +111,7 @@ export default function makeRelations(relations, dataSource, observer) {
     if (result) {
       observer.notify(notifyEvent, {
         eventName: notifyEvent,
-        results,
+        result,
       });
     }
   });
