@@ -44,17 +44,26 @@ export const relationType = {
   },
 };
 
+function isLocalObject(modelName) {
+  if (!ModelFactory.getModelSpec(modelName)) {
+    console.warn("non-local or invalid model", modelName);
+    return false;
+  }
+  return true;
+}
+
 /**
  * Retrieve a remote object instance from the distributed cache.
- * Sign up for distributed cache events and broadcast a global inquiry.
- * The caller waits until the object has been loaded or the
- * operation times out.
+ * If a relation specifies an object we don't have, broadcast a
+ * global inquiry specifying the relation for other hosts to run.
+ * If found on another host, it is sent back to us in an event.
+ * The caller waits until either that happens or we timeout.
  *
  * @param {import(".").relations[x]} relation
  * @param {import("./observer").Observer} observer
  * @returns
  */
-function requireRemoteObject(relation, observer) {
+function requireRemoteObject(model, relation, observer) {
   const inquiry = domainEvents.remoteObjectInquiry(relation.modelName);
   const located = domainEvents.remoteObjectLocated(relation.modelName);
   const proceed = fn => () => fn();
@@ -67,17 +76,10 @@ function requireRemoteObject(relation, observer) {
   observer.notify(inquiry, {
     eventName: inquiry,
     relation,
+    model,
   });
 
   return promise;
-}
-
-function isLocalObject(modelName) {
-  if (!ModelFactory.getModelSpec(modelName)) {
-    console.warn("non-local or invalid model", modelName);
-    return false;
-  }
-  return true;
 }
 
 /**
@@ -87,6 +89,32 @@ function isLocalObject(modelName) {
  */
 export default function makeRelations(relations, dataSource, observer) {
   if (Object.getOwnPropertyNames(relations).length < 1) return;
+
+  // Listen for inquiries about this modelname
+  observer.on(new RegExp(domainEvents.remoteObjectInquiry()), function (event) {
+    const notifyEvent = domainEvents.remoteObjectLocated(
+      event.relation.modelName
+    );
+    const ds = getDataSource(event.relation.modelName);
+
+    if (!ds) {
+      console.warn("datasource not found", event);
+      return;
+    }
+
+    const result = relationType[event.relation.type](
+      event.model,
+      ds,
+      event.relation
+    );
+
+    if (result) {
+      observer.notify(notifyEvent, {
+        eventName: notifyEvent,
+        results,
+      });
+    }
+  });
 
   return Object.keys(relations)
     .map(function (relation) {
@@ -103,7 +131,7 @@ export default function makeRelations(relations, dataSource, observer) {
             // If the model is hosted on a remote instance
             if (!isLocalObject(rel.modelName))
               // broadcast the query to other instances and wait for a response.
-              await requireRemoteObject(rel, observer);
+              await requireRemoteObject(this, rel, observer);
             const ds = dataSource.getFactory().getDataSource(rel.modelName);
             return relationType[rel.type](this, ds, rel);
           },

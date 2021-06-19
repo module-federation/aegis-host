@@ -23,12 +23,12 @@ export function updateCache({ datasource, observer }) {
     const event = JSON.parse(message);
     if (!event.eventName) return;
     console.debug("handle cache event", event.eventName);
-    const cacheHit = domainEvents.remoteObjectLocated(event.modelName);
+    const remoteCacheHit = domainEvents.remoteObjectLocated(event.modelName);
 
     if (
       event.eventName.startsWith(CREATE) ||
       event.eventName.startsWith(UPDATE) ||
-      event.eventName === cacheHit
+      event.eventName === remoteCacheHit
     ) {
       console.debug("check if we have the code for this object...");
 
@@ -54,8 +54,8 @@ export function updateCache({ datasource, observer }) {
 
         const saved = await datasource.save(model.getId(), model);
 
-        if (event.eventName === cacheHit) {
-          await observer.notify(cacheHit, event);
+        if (event.eventName === remoteCacheHit) {
+          await observer.notify(remoteCacheHit, event);
         }
         return saved;
       } catch (e) {
@@ -136,26 +136,8 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
           id: new Date().getTime() + model.modelName,
           callback: function ({ message }) {
             const event = JSON.parse(message);
-
-            const ds = getDataSource(model.modelName);
-            if (!ds) {
-              console.warn("datasource not found", event);
-              return;
-            }
-
-            const result = relationType[event.relation.type](
-              event.model,
-              ds,
-              relation
-            );
-
-            if (result) {
-              EventBus.notify(BROADCAST, {
-                eventName: domainEvents.remoteObjectLocated(model.modelName),
-                modelName: model.modelName,
-                result,
-              });
-            }
+            // simply forward the event to local bus
+            observer.notify(event.eventName, event);
           },
         })
       );
