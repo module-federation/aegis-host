@@ -1,6 +1,8 @@
 "use strict";
 
 const domainEvents = {
+  cacheLookupRequest: modelName => `cacheLookupRequest_${modelName}`,
+  cacheLookupResults: modelName => `cacheLookupResponse_${modelName}`,
   remoteObjectInquiry: modelName => `remoteObjectInquiry_${modelName}`,
   remoteObjectLocated: modelName => `remoteObjectLocated_${modelName}`,
   portTimeout: (model, port) => `portTimeout_${port}_${model.getName()}`,
