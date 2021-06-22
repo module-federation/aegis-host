@@ -2,6 +2,7 @@ import ModelFactory, { initRemoteCache } from "../models";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
 import domainEvents from "../models/domain-events";
+import { relationType } from "../models/make-relations";
 const os = require("os");
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
@@ -17,30 +18,31 @@ const DELETE = ModelFactory.EventTypes.DELETE;
  * @param {{observer:Observer,datasource:DataSource}} param0
  * @returns
  */
-export function updateCache({ datasource, observer }) {
+export function updateCache({ datasource, observer, modelName }) {
   return async function ({ message }) {
     const event = JSON.parse(message);
+
     if (!event.eventName) return;
+
     console.debug("handle cache event", event.eventName);
-    const remoteCacheHit = domainEvents.remoteObjectLocated(event.modelName);
 
     if (
       event.eventName.startsWith(CREATE) ||
       event.eventName.startsWith(UPDATE) ||
-      event.eventName === remoteCacheHit
+      event.eventName === domainEvents.remoteObjectLocated(modelName)
     ) {
       console.debug("check if we have the code for this object...");
 
-      if (!ModelFactory.getModelSpec(event.modelName)) {
+      if (!ModelFactory.getModelSpec(modelName)) {
         console.debug("we don't, import it...");
         // Stream the code for the model
-        await initRemoteCache(event.modelName);
+        await initRemoteCache(modelName);
       }
 
       try {
         console.debug(
           "unmarshal deserialized model",
-          event.modelName,
+          modelName,
           event.model.id
         );
 
@@ -48,15 +50,15 @@ export function updateCache({ datasource, observer }) {
           observer,
           datasource,
           event.model,
-          event.modelName
+          modelName
         );
 
-        const saved = await datasource.save(model.getId(), model);
+        await datasource.save(model.getId(), model);
 
-        if (event.eventName === remoteCacheHit) {
-          await observer.notify(remoteCacheHit, event);
-        }
-        return saved;
+        await observer.notify(
+          domainEvents.remoteObjectLocated(modelName),
+          event
+        );
       } catch (e) {
         console.error("distributed cache", e);
       }
@@ -86,57 +88,81 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
      * Forward local CRUD write events to event bus.
      */
     publishInternalEvents() {
-      observer.on(/CREATE|UPDATE|DELETE|remoteObjectInquiry/, async event =>
+      observer.on(/CREATE|UPDATE|DELETE|cacheLookup/, async event =>
         EventBus.notify(BROADCAST, JSON.stringify(event))
       );
     },
 
     /**
-     * Subscribe to event bus to receive remote CRUD events.
+     * Subscribe to the event bus to receive remote CRUD events for
+     * related models.
+     *
+     * Create listeners for each model we are running, so we
+     * provide  service as well as receive it.
      */
     consumeExternalEvents() {
-      const models = ModelFactory.getModelSpecs();
-      const relations = models.map(m => ({ ...m.relations }));
-      const unregistered = relations.filter(
-        r => !models.find(m => m.modelName === r.modelName)
-      );
-      // Look for unregistered models in relations
-      unregistered.forEach(function (u) {
-        Object.keys(u).forEach(function (r) {
-          const relation = u[r];
-          const modelName = relation.modelName;
+      const modelSpecs = ModelFactory.getModelSpecs();
+      const modelNames = [...modelSpecs].map(m => m.modelName);
+      const remoteObjs = [...modelSpecs]
+        .filter(m => m.relations) // only models with relations
+        .map(m =>
+          Object.keys(m.relations).filter(
+            // filter out existing local models
+            k => !modelNames.includes(m.relations[k].modelName)
+          )
+        )
+        .reduce((a, b) => a.concat(b));
 
-          if (!modelName) return;
+      console.debug({ modelNames, remoteObjs });
 
-          const datasource = getDataSource(modelName);
-          [
-            ModelFactory.getEventName(CREATE, modelName),
-            ModelFactory.getEventName(UPDATE, modelName),
-            ModelFactory.getEventName(DELETE, modelName),
-            domainEvents.remoteObjectLocated(modelName),
-          ].forEach(event =>
-            EventBus.listen({
-              topic: BROADCAST,
-              id: new Date().getTime() + event,
-              callback: updateCache({ observer, datasource }),
-              once: false,
-              filters: [event],
-            })
-          );
-        });
+      remoteObjs.forEach(function (remoteObject) {
+        const modelName = remoteObject;
+        if (!modelName) return;
+        [
+          ModelFactory.getEventName(CREATE, modelName),
+          ModelFactory.getEventName(UPDATE, modelName),
+          ModelFactory.getEventName(DELETE, modelName),
+          domainEvents.remoteObjectLocated(modelName),
+        ].forEach(event =>
+          EventBus.listen({
+            topic: BROADCAST,
+            id: Date.now() + event,
+            callback: updateCache({
+              observer,
+              datasource: getDataSource(modelName),
+              modelName,
+            }),
+            once: false,
+            filters: [event],
+          })
+        );
       });
 
-      // Listen for remote inquiries for the models we have
-      models.forEach(model =>
+      // Listen for external requests to provide models we may have
+      modelSpecs.forEach(spec =>
         EventBus.listen({
           topic: BROADCAST,
           once: false,
-          filters: [domainEvents.remoteObjectInquiry(model.modelName)],
-          id: new Date().getTime() + model.modelName,
-          callback: function ({ message }) {
+          filters: [domainEvents.remoteObjectInquiry(spec.modelName)],
+          id: Date.now() + spec.modelName,
+          callback: async function searchCache({ message }) {
             const event = JSON.parse(message);
-            // simply forward the event to local bus
-            observer.notify(event.eventName, event);
+
+            // Listen for inquiries about this modelname
+            const result = await relationType[event.relation.type](
+              event.model,
+              getDataSource(event.model.modelName),
+              event.relation
+            );
+
+            console.debug("result", result);
+
+            if (result) {
+              await EventBus.notify(
+                domainEvents.remoteObjectLocated(event.model.modelName),
+                JSON.stringify(result)
+              );
+            }
           },
         })
       );
@@ -156,10 +182,10 @@ export default function brokerEvents(observer, getDataSource) {
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
     const broker = cacheEventBroker({ observer, getDataSource });
     // do this later; let startup continue
-    setTimeout(() => {
-      broker.publishInternalEvents();
-      broker.consumeExternalEvents();
-    }, 3000);
+    //setTimeout(() => {
+    broker.consumeExternalEvents();
+    broker.publishInternalEvents();
+    //}, 3000);
   }
 
   /**
