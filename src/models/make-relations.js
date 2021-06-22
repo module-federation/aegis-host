@@ -70,21 +70,17 @@ async function requireRemoteObject(model, relation, observer) {
   const results = domainEvents.cacheLookupResults(relation.modelName);
   const proceed = fn => () => fn();
 
-  const promise = new Promise(function (resolve) {
+  return new Promise(function (resolve) {
     setTimeout(resolve, 10000);
-    return observer.on(
-      results,
-      proceed(() => console.log("invoked>>>>>"))
-    ); //proceed(resolve));
-  });
 
-  await observer.notify(request, {
-    eventName: request,
-    relation,
-    model,
-  });
+    observer.on(results, proceed(resolve));
 
-  return promise;
+    return observer.notify(request, {
+      eventName: request,
+      relation,
+      model,
+    });
+  });
 }
 
 /**
@@ -109,6 +105,7 @@ export default function makeRelations(relations, dataSource, observer) {
         return {
           async [relation]() {
             if (!isLocalObject(rel.modelName)) {
+              console.warn("require remote object");
               await requireRemoteObject(this, rel, observer);
             }
             const ds = dataSource.getFactory().getDataSource(rel.modelName);

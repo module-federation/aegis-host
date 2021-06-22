@@ -103,7 +103,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
     consumeExternalEvents() {
       const modelSpecs = ModelFactory.getModelSpecs();
       const modelNames = [...modelSpecs].map(m => m.modelName);
-      const remoteObjs = [...modelSpecs]
+      const modelCache = [...modelSpecs]
         .filter(m => m.relations) // only models with relations
         .map(m =>
           Object.keys(m.relations).filter(
@@ -113,10 +113,9 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
         )
         .reduce((a, b) => a.concat(b));
 
-      console.debug({ modelNames, remoteObjs });
+      console.debug({ modelNames, modelCache });
 
-      remoteObjs.forEach(function (remoteObject) {
-        const modelName = remoteObject;
+      modelCache.forEach(function (modelName) {
         if (!modelName) return;
         [
           ModelFactory.getEventName(CREATE, modelName),
@@ -143,7 +142,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
         EventBus.listen({
           topic: BROADCAST,
           once: false,
-          filters: [domainEvents.remoteObjectInquiry(spec.modelName)],
+          filters: [domainEvents.cacheLookupRequest(spec.modelName)],
           id: Date.now() + spec.modelName,
           callback: async function searchCache({ message }) {
             const event = JSON.parse(message);
@@ -157,12 +156,12 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
 
             console.debug("result", result);
 
-            if (result) {
+            //if (result) {
               await EventBus.notify(
                 domainEvents.remoteObjectLocated(event.model.modelName),
                 JSON.stringify(result)
               );
-            }
+            //}
           },
         })
       );
