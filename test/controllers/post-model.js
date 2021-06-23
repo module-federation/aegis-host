@@ -3,12 +3,12 @@
 var assert = require("assert");
 
 import addModelFactory from "../../src/use-cases/add-model";
-import postModelFactory from "../../src/controllers/post-model";
+import postModelFactory from "../../src/domain/controllers/post-model";
 
-import DataSourceFactory from "../../src/datasources";
+import DataSourceFactory from "../../src/domain/datasources";
 import ModelFactory from "../../src/domain";
-import ObserverFactory from "../../src/lib/observer";
-import hash from "../../src/lib/hash";
+import ObserverFactory from "../../src/domain/observer";
+import hash from "../../src/util/hash";
 
 describe("Controllers", function () {
   describe("postModel()", function () {

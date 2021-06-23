@@ -7,7 +7,7 @@ import makeFindModel from "./find-model";
 import makeRemoveModel from "./remove-model";
 import makeLoadModels from "./load-models";
 import makeListConfig from "./list-configs";
-import DataSourceFactory from "../datasources";
+import DataSourceFactory from "../domain/datasource-factory";
 import ObserverFactory from "../domain/observer";
 import ModelFactory from "../domain";
 import brokerEvents from "./broker-events";

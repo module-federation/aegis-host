@@ -58,7 +58,7 @@ module.exports = env => {
             remotes,
             exposes: {
               "./server": "./src/server",
-              "./models": "./src/domain",
+              "./domain": "./src/domain",
               "./remoteEntries": "./webpack/remote-entries",
             },
           }),

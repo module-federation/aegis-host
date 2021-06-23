@@ -11,7 +11,7 @@ const cluster = require("./cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("./auth");
 const messageParser = require("./message").parsers;
-const { ServerlessAdapter } = require("./serverless-adapter");
+const { ServerlessAdapter } = require("./server-less");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 8070;

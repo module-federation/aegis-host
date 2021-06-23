@@ -1,7 +1,6 @@
 "use strict";
 
-import { env } from "process";
-import Serializer from "../util/serializer";
+import Serializer from "../domain/serializer";
 import resumeWorkflow from "./resume-workflow";
 
 /**

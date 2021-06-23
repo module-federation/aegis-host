@@ -8,7 +8,7 @@ import {
   deleteModels,
   initCache,
   getConfig,
-} from "./controllers";
+} from "./adapters/controllers";
 
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
@@ -65,7 +65,7 @@ const Server = (() => {
   const remoteEntry = __non_webpack_require__("./remoteEntry");
 
   const getRemoteModules = remoteEntry.microlib
-    .get("./models")
+    .get("./domain")
     .then(factory => {
       const Module = factory();
       return Module.initRemotes;

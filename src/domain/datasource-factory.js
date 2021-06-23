@@ -4,19 +4,19 @@
  * @typedef {import('.').Model} Model
  */
 import ModelFactory from ".";
-import * as adapters from "../datasources/adapters";
+import * as adapters from "../adapters/datasources";
 
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
 const DefaultDataSource = adapters[adapter];
 
 function getBaseClass(name) {
   if (name === "DataSourceFile") {
-    return require("../datasources/adapters").DataSourceFile;
+    return require("../adapters/datasources").DataSourceFile;
   }
   if (name === "DataSourceMongoDb") {
-    return require("../datasources/adapters").DataSourceMongoDb;
+    return require("../adapters/datasources").DataSourceMongoDb;
   }
-  return require("../datasources/adapters").DataSourceMemory;
+  return require("../adapters/datasources").DataSourceMemory;
 }
 
 /**
