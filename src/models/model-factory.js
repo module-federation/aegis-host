@@ -10,7 +10,7 @@ import Event from "./event";
 
 /**
  * @typedef {Object} ModelFactory
- * @property {function(Observer,Datasource,string,...args):Promise<Readonly<Model>>} createModel
+ * @property {function(Observer,Datasource,string,...args):Promise<Readonly<Model>>} createModel Create a new model instance
  * @property {function(string,string,*):Promise<Readonly<Event>>} createEvent
  * @property {function(Model,object):Model} updateModel
  * @property {function(Model):Model} deleteModel

@@ -357,7 +357,7 @@ const Model = (() => {
    * @param {{
    *  args: any[],
    *  spec: import('./index').ModelSpecification
-   * }} modelInfo
+   * }} modelInfo Contains model specification and user input to build a model instance
    */
   const Model = async modelInfo =>
     Promise.resolve(

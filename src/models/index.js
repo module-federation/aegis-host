@@ -128,10 +128,10 @@
  * @typedef {Object} ModelSpecification Specify model data and behavior
  * @property {string} modelName name of model (case-insenstive)
  * @property {string} endpoint URI reference (e.g. plural of `modelName`)
- * @property {function(...args): any} factory factory function that creates model insetance
- * @property {object} [dependencies] injected into the model for control inversion
- * @property {Array<import("./mixins").functionalMixin>} [mixins] - use mixins
- * to implement domain logic, like input validation.
+ * @property {function(...args): any} factory factory function that creates model instance
+ * @property {object} [dependencies] injected into the model for dependency and control inversion
+ * @property {Array<import("./mixins").functionalMixin>} [mixins] use mixins instead of inheritance
+ * to implement reusable domain logic, like input validation.
  * @property {onUpdate} [onUpdate] - Function called to handle update requests. Called
  * before save.
  * @property {onDelete} [onDelete] - Function called before deletion.

@@ -1,6 +1,5 @@
 "use strict";
 
-import ModelFactory from "./index";
 import domainEvents from "./domain-events";
 
 export const relationType = {
@@ -44,13 +43,13 @@ export const relationType = {
   },
 };
 
-function isLocalObject(modelName) {
-  if (!ModelFactory.getModelSpec(modelName)) {
-    console.warn("non-local or invalid model", modelName);
-    return false;
-  }
-  return true;
-}
+// function isLocalObject(modelName) {
+//   if (!ModelFactory.getModelSpec(modelName)) {
+//     console.warn("non-local or invalid model", modelName);
+//     return false;
+//   }
+//   return true;
+// }
 
 /**
  * Retrieve a remote object from the distributed cache.
@@ -65,21 +64,15 @@ function isLocalObject(modelName) {
  * @param {import("./observer").Observer} observer
  * @returns
  */
-async function requireRemoteObject(model, relation, observer) {
+function requireRemoteObject(model, relation, observer) {
   const request = domainEvents.cacheLookupRequest(relation.modelName);
   const results = domainEvents.cacheLookupResults(relation.modelName);
-  const proceed = fn => () => fn();
+  const execute = fn => () => fn();
 
   return new Promise(function (resolve) {
     setTimeout(resolve, 10000);
-
-    observer.on(results, proceed(resolve));
-
-    return observer.notify(request, {
-      eventName: request,
-      relation,
-      model,
-    });
+    observer.on(results, execute(resolve));
+    return observer.notify(request, { eventName: request, relation, model });
   });
 }
 
@@ -104,12 +97,25 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation]() {
-            if (!isLocalObject(rel.modelName)) {
-              console.warn("require remote object");
+            let ds = dataSource.getFactory().getDataSource(rel.modelName);
+            let tried = false;
+
+            if (!ds) {
+              await requireRemoteObject(this, rel, observer);
+              ds = await dataSource.getFactory().getDataSource(rel.modelName);
+            }
+
+            const model = await relationType[rel.type](this, ds, rel);
+
+            if (!model && !tried) {
               await requireRemoteObject(this, rel, observer);
             }
-            const ds = dataSource.getFactory().getDataSource(rel.modelName);
-            return relationType[rel.type](this, ds, rel);
+
+            if (!model) {
+              return relationType[rel.type](this, ds, rel);
+            }
+
+            return model;
           },
         };
       } catch (e) {

@@ -3,7 +3,6 @@ import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
 import domainEvents from "../models/domain-events";
 import { relationType } from "../models/make-relations";
-const os = require("os");
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 const UPDATE = ModelFactory.EventTypes.UPDATE;
@@ -72,6 +71,33 @@ export function updateCache({ datasource, observer, modelName }) {
 }
 
 /**
+ *
+ * @param {*} param0
+ */
+function searchCache(getDataSource) {
+  return async function ({ message }) {
+    const event = JSON.parse(message);
+
+    // Listen for inquiries about this model
+    const result = await relationType[event.relation.type](
+      event.model,
+      getDataSource(event.model.modelName),
+      event.relation
+    );
+
+    console.debug("result", result);
+
+    if (result) {
+      // send the results back
+      await EventBus.notify(
+        domainEvents.remoteObjectLocated(event.model.modelName),
+        JSON.stringify(result)
+      );
+    }
+  };
+}
+
+/**
  * Implement distributed object cache. Find any model
  * referenced by a relation that is not registered in
  * the model factory and listen for remote CRUD events
@@ -102,8 +128,8 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
      */
     consumeExternalEvents() {
       const modelSpecs = ModelFactory.getModelSpecs();
-      const modelNames = [...modelSpecs].map(m => m.modelName);
-      const modelCache = [...modelSpecs]
+      const modelNames = modelSpecs.map(m => m.modelName);
+      const modelCache = modelSpecs
         .filter(m => m.relations) // only models with relations
         .map(m =>
           Object.keys(m.relations).filter(
@@ -115,8 +141,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
 
       console.debug({ modelNames, modelCache });
 
-      modelCache.forEach(function (modelName) {
-        if (!modelName) return;
+      [...new Set(modelCache)].forEach(function (modelName) {
         [
           ModelFactory.getEventName(CREATE, modelName),
           ModelFactory.getEventName(UPDATE, modelName),
@@ -137,32 +162,14 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
         );
       });
 
-      // Listen for external requests to provide models we may have
+      // Listen for external requests to find model instances we've created
       modelSpecs.forEach(spec =>
         EventBus.listen({
           topic: BROADCAST,
           once: false,
           filters: [domainEvents.cacheLookupRequest(spec.modelName)],
           id: Date.now() + spec.modelName,
-          callback: async function searchCache({ message }) {
-            const event = JSON.parse(message);
-
-            // Listen for inquiries about this modelname
-            const result = await relationType[event.relation.type](
-              event.model,
-              getDataSource(event.model.modelName),
-              event.relation
-            );
-
-            console.debug("result", result);
-
-            //if (result) {
-              await EventBus.notify(
-                domainEvents.remoteObjectLocated(event.model.modelName),
-                JSON.stringify(result)
-              );
-            //}
-          },
+          callback: searchCache(getDataSource),
         })
       );
     },

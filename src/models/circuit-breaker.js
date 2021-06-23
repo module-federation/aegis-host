@@ -52,15 +52,30 @@ function getState(log) {
   return State.Closed;
 }
 
+/**
+ * @typedef {{
+ *  [x:string]: {
+ *    errorRate:number
+ *    callVolume:number,
+ *    intervalMs:number,
+ *    fallbackFn:function()
+ *  },
+ * }} thresholds threshold iteria
+ */
+
+/**
+ * @param {*} error,
+ * @param {thresholds} thresholds
+ */
 function getThreshold(error, thresholds) {
   return thresholds[error.name] || thresholds.default || DefaultThreshold;
 }
 
 /**
- *
+ * @param
  * @param {*} id
  * @param {*} error
- * @param {*} thresholds
+ * @param {thresholds} thresholds
  * @returns
  */
 function thresholdBreached(log, error, thresholds) {
@@ -111,6 +126,8 @@ function readyToTest(log) {
 
 /**
  * The breaker switch.
+ * @param {string} id - id of the circuit
+ * @param {thresholds} thresholds
  */
 const Switch = function (id, thresholds) {
   const log = fetchLog(id);
