@@ -1,7 +1,7 @@
 "use strict";
 
 import { env } from "process";
-import Serializer from "../lib/serializer";
+import Serializer from "../util/serializer";
 import resumeWorkflow from "./resume-workflow";
 
 /**

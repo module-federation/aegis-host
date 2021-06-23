@@ -1,8 +1,8 @@
 'use strict'
 
 import { withId, withTimestamp } from './mixins';
-import asyncPipe from '../lib/async-pipe';
-import uuid from '../lib/uuid';
+import asyncPipe from '../util/async-pipe';
+import uuid from '../util/uuid';
 
 /**
  * @typedef {import('./model-factory').EventType} EventType

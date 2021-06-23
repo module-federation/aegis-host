@@ -1,7 +1,7 @@
 "use strict";
 
-import checkAcl from "../lib/check-acl";
-import async from "../lib/async-error";
+import checkAcl from "../util/check-acl";
+import async from "../util/async-error";
 import domainEvents from "../domain/domain-events";
 
 const commandType = {

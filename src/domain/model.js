@@ -56,10 +56,10 @@ import {
 import makePorts from "./make-ports";
 import makeRelations from "./make-relations";
 import compensate from "./compensator";
-import asyncPipe from "../lib/async-pipe";
-import compose from "../lib/compose";
-import pipe from "../lib/pipe";
-import uuid from "../lib/uuid";
+import asyncPipe from "../util/async-pipe";
+import compose from "../util/compose";
+import pipe from "../util/pipe";
+import uuid from "../util/uuid";
 
 /**
  * @namespace

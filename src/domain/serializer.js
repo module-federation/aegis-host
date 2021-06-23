@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * @typedef {import('../domain/index').serializer} serializerType
+ * @typedef {import('./index').serializer} serializerType
  */
 
 /**

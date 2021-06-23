@@ -1,6 +1,6 @@
 "use strict";
 
-import async from "../lib/async-error";
+import async from "../util/async-error";
 
 /**
  * @param {import("../domain/model").Model} model

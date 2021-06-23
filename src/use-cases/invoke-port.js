@@ -1,7 +1,7 @@
 "use strict";
 
-import async from "../lib/async-error";
-import checkAcl from "../lib/check-acl";
+import async from "../util/async-error";
+import checkAcl from "../util/check-acl";
 
 function portAuthorized(spec, port, permission) {
   return (
