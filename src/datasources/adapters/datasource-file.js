@@ -19,7 +19,7 @@ export class DataSourceFile extends DataSourceMemory {
   /**
    *
    * @param {{
-   *  hydrate:function(Map<string,import("../../models/model").Model>),
+   *  hydrate:function(Map<string,import("../../domain/model").Model>),
    *  serializer:import("../../lib/serializer").Serializer,
    * }} param0
    */

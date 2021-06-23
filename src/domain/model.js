@@ -55,7 +55,7 @@ import {
 } from "./mixins";
 import makePorts from "./make-ports";
 import makeRelations from "./make-relations";
-import compensate from "./compensate";
+import compensate from "./compensator";
 import asyncPipe from "../lib/async-pipe";
 import compose from "../lib/compose";
 import pipe from "../lib/pipe";
@@ -300,7 +300,7 @@ const Model = (() => {
       /**
        * Returns the `ports` for this model.
        *
-       * @returns {import("../models").ports}
+       * @returns {import(".").ports}
        */
       getPorts() {
         return modelInfo.spec.ports;
@@ -412,7 +412,7 @@ const Model = (() => {
     /**
      * Load a saved model
      * @param {Model} savedModel deserialized model
-     * @param {import('../models').ModelSpecification} spec
+     * @param {import('.').ModelSpecification} spec
      */
     load: modelInfo => loadModel(modelInfo),
 

@@ -1,6 +1,6 @@
 "use strict";
 
-import DataSource from "../datasource";
+import DataSource from "../../domain/datasource";
 
 /**
  * Temporary in-memory storage.

@@ -5,7 +5,7 @@ import asyncPipe from '../lib/async-pipe';
 import uuid from '../lib/uuid';
 
 /**
- * @typedef {import('../models/model-factory').EventType} EventType
+ * @typedef {import('./model-factory').EventType} EventType
  */
 
 /** 

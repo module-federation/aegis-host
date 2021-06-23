@@ -62,7 +62,7 @@ async function parseQuery(query, repository) {
 /**
  * @callback listModels
  * @param {{key1:string, keyN:string}} query
- * @returns {Promise<Array<import("../models/model").Model)>>}
+ * @returns {Promise<Array<import("../domain/model").Model)>>}
  *
  * @param {{repository:import('../datasources/datasource').default}}
  * @returns {listModels}

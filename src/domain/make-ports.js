@@ -32,7 +32,7 @@ function getRetries(args) {
  * Recursively retry if the adapter times out.
  * @param {{
  *  portName: string,
- *  portConf: import('../models').ports,
+ *  portConf: import('.').ports,
  * }} options
  */
 function setPortTimeout(options) {

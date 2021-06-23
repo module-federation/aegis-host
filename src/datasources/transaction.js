@@ -1,7 +1,7 @@
 /**
  * @todo implement federated transaction (2-phase)
  * to cut down on eventual consistency
- * @param {import("../models").Model[]} models
+ * @param {import("../domain").Model[]} models
  * @param {{model1:*,model2:*}} updates
  * @returns
  */

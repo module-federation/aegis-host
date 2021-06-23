@@ -2,7 +2,7 @@
 
 // var assert = require('assert');
 
-// import Model from '../../src/models/model'
+// import Model from '../../src/domain/model'
 
 // describe('Model', function () {
 //   describe('#create()', function () {

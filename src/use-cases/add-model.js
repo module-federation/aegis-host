@@ -1,20 +1,20 @@
 "use strict";
 
-import domainEvents from "../models/domain-events";
+import domainEvents from "../domain/domain-events";
 
 /**
  * @typedef {Object} dependencies injected dependencies
  * @property {String} modelName - name of the domain model
- * @property {import('../models/model-factory').ModelFactory} models - model factory
- * @property {import('../datasources/datasource').default} repository - persistence service
- * @property {import('../models/observer').Observer} observer - application events, propagated to domain
+ * @property {import('../domain/model-factory').ModelFactory} models - model factory
+ * @property {import('../domain/datasource').default
+ * @property {import('../domain/observer').Observer} observer - application events, propagated to domain
  * @property {...Function} handlers - event handlers can be registered by the domain
  */
 
 /**
- * @typedef {function(ModelParam):Promise<import("../models").Model>} addModel
+ * @typedef {function(ModelParam):Promise<import("../domain").Model>} addModel
  * @param {dependencies} param0
- * @returns {function():Promise<import('../models').Model>}
+ * @returns {function():Promise<import('../domain').Model>}
  */
 export default function makeAddModel({
   modelName,

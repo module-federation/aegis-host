@@ -21,7 +21,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
   /**
    * @override
    * @param {{
-   *  hydrate:function(Map<string,import("../../models").Model>),
+   *  hydrate:function(Map<string,import("../../domain").Model>),
    *  serializer:import("../../lib/serializer").Serializer
    * }} options
    */

@@ -13,7 +13,7 @@ import {
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
-import ModelFactory from "./models";
+import ModelFactory from "./domain";
 
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const modelPath = `${apiRoot}/models`;
@@ -167,7 +167,7 @@ const Server = (() => {
   }
 
   /**
-   * Import federated modules {@see module:src/models/index.initRemotes}. Then, generate routes for each 
+   * Import federated modules {@see module:src/domain/index.initRemotes}. Then, generate routes for each
    * controller method and model. If running as a serverless function, store the routes
    * and controllers for direct invocation via the {@link control}
    * method.
