@@ -6,8 +6,8 @@ export const relationType = {
   /**
    * @todo implement cache miss for distributed cache
    *
-   * @param {import("../models/model-factory").Model} model
-   * @param {import("../datasources/datasource").default} ds
+   * @param {import("./model-factory").Model} model
+   * @param {import("./datasource").default} ds
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
@@ -16,8 +16,8 @@ export const relationType = {
   },
   /**
    *
-   * @param {import("../models").Model} model
-   * @param {import("../datasources/datasource").default} ds
+   * @param {import(".").Model} model
+   * @param {import("./datasource").default} ds
    * @param {import("./index").relations[relation]} config
    */
   manyToOne: async (model, ds, rel) => await ds.find(model[rel.foreignKey]),

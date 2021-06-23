@@ -1,10 +1,10 @@
 "use strict";
 
-import async from "../lib/async-error";
+import async from "../util/async-error";
 
 /**
- * @param {import("../models/model").Model} model
- * @param {import("../models".relations)} relation
+ * @param {import("../domain/model").Model} model
+ * @param {import("../domain".relations)} relation
  */
 export default async function fetchRelatedModels(model, relation) {
   const spec = model.getSpec();

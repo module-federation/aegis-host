@@ -1,13 +1,13 @@
 "use strict";
 
-import async from "../lib/async-error";
+import async from "../util/async-error";
 
 /**
  * Check `portFlow` history and resume any workflow
  * that was running before we shut down.
  *
  * @param {function(Model):string[]} getPortFlow history of port calls
- * @param {import("../models").ports} ports
+ * @param {import("../domain").ports} ports
  * @returns {function(Map<string,Model>)}
  */
 export default async function resumeWorkflow(list) {

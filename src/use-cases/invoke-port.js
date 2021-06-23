@@ -1,7 +1,7 @@
 "use strict";
 
-import async from "../lib/async-error";
-import checkAcl from "../lib/check-acl";
+import async from "../util/async-error";
+import checkAcl from "../util/check-acl";
 
 function portAuthorized(spec, port, permission) {
   return (
@@ -10,8 +10,8 @@ function portAuthorized(spec, port, permission) {
 }
 /**
  *
- * @param {import("../models/model-factory").ModelFactory} models
- * @param {import("../models/model").Model} model
+ * @param {import("../domain/model-factory").ModelFactory} models
+ * @param {import("../domain/model").Model} model
  * @param {{port:string}} query
  */
 export default async function invokePort(model, port, permission) {

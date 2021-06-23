@@ -1,6 +1,6 @@
 "use strict";
 
-import pipe from "../lib/pipe";
+import pipe from "../util/pipe";
 
 /**
  * @callback functionalMixin

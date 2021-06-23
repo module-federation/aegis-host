@@ -1,7 +1,7 @@
 /**
  *
- * @param {import("../use-cases/edit-model").editModel} editModel
- * @returns {import("../adapters/http-adapter").httpController}
+ * @param {import("../../use-cases/edit-model").editModel} editModel
+ * @returns {import("../http-adapter").httpController}
  */
 export default function patchModelFactory(editModel, hash) {
   return async function patchModel(httpRequest) {

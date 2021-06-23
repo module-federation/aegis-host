@@ -8,8 +8,8 @@ import makeRemoveModel from "./remove-model";
 import makeLoadModels from "./load-models";
 import makeListConfig from "./list-configs";
 import DataSourceFactory from "../datasources";
-import ObserverFactory from "../models/observer";
-import ModelFactory from "../models";
+import ObserverFactory from "../domain/observer";
+import ModelFactory from "../domain";
 import brokerEvents from "./broker-events";
 
 export function registerCacheEvents() {
@@ -20,7 +20,7 @@ export function registerCacheEvents() {
 
 /**
  *
- * @param {import('../models').ModelSpecification} model
+ * @param {import('../domain').ModelSpecification} model
  */
 function buildOptions(model) {
   return {

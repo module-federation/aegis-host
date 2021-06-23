@@ -1,16 +1,16 @@
-import ModelFactory, { initRemoteCache } from "../models";
+import ModelFactory, { initRemoteCache } from "../domain";
 import publishEvent from "../services/publish-event";
 import EventBus from "../services/event-bus";
-import domainEvents from "../models/domain-events";
-import { relationType } from "../models/make-relations";
+import domainEvents from "../domain/domain-events";
+import { relationType } from "../domain/make-relations";
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 const UPDATE = ModelFactory.EventTypes.UPDATE;
 const CREATE = ModelFactory.EventTypes.CREATE;
 const DELETE = ModelFactory.EventTypes.DELETE;
 
-/** @typedef {import("../datasources/datasource").default} DataSource */
-/** @typedef {import('../models/observer').Observer} Observer */
+/** @typedef {import("../domain/datasource").default} DataSource */
+/** @typedef {import('../domain/observer').Observer} Observer */
 
 /**
  *
@@ -178,7 +178,7 @@ export const cacheEventBroker = function ({ observer, getDataSource }) {
 
 /**
  * Handle internal and external events. Distributed cache.
- * @param {import('../models/observer').Observer} observer
+ * @param {import('../domain/observer').Observer} observer
  * @param {function():DataSource} getDataSource
  */
 export default function brokerEvents(observer, getDataSource) {

@@ -1,23 +1,22 @@
 "use strict";
 
 /**
- * @typedef {import('../models').Model} Model
+ * @typedef {import('.').Model} Model
  */
-import { Transaction } from "./transaction";
-import ModelFactory from "../models";
-import * as adapters from "./adapters";
+import ModelFactory from ".";
+import * as adapters from "../datasources/adapters";
 
 const adapter = process.env.DATASOURCE_ADAPTER || "DataSourceMemory";
 const DefaultDataSource = adapters[adapter];
 
 function getBaseClass(name) {
   if (name === "DataSourceFile") {
-    return require("./adapters").DataSourceFile;
+    return require("../datasources/adapters").DataSourceFile;
   }
   if (name === "DataSourceMongoDb") {
-    return require("./adapters").DataSourceMongoDb;
+    return require("../datasources/adapters").DataSourceMongoDb;
   }
-  return require("./adapters").DataSourceMemory;
+  return require("../datasources/adapters").DataSourceMemory;
 }
 
 /**
@@ -85,25 +84,12 @@ const DataSourceFactory = (() => {
     dataSources.forEach(ds => ds.close());
   }
 
-  /**
-   * Manage transaction across models and datasources
-   * @param {import("../models/index").ports} ports
-   */
-  async function executeTransaction(models, updates) {
-    const transx = Transaction(models, updates);
-    transx
-      .update()
-      .then(tx => tx.commit())
-      .catch(e => console.log(e));
-  }
-
   return Object.freeze({
     /**
      * Get `DataSource` singleton
      * @returns {import('./datasource').default} DataSource singleton
      */
     getDataSource,
-    executeTransaction,
     close,
   });
 })();

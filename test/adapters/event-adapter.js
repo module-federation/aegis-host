@@ -1,6 +1,5 @@
-
 // var assert = require('assert');
-// import Model from '../../src/models/model';
+// import Model from '../../src/domain/model';
 // import { listen } from '../../src/adapters/event-adapter';
 // import { Event } from '../services/event-service';
 

@@ -1,7 +1,7 @@
 "use strict";
 
 import portHandler from "./port-handler";
-import async from "../lib/async-error";
+import async from "../util/async-error";
 import domainEvents from "./domain-events";
 import CircuitBreaker from "./circuit-breaker";
 
@@ -32,7 +32,7 @@ function getRetries(args) {
  * Recursively retry if the adapter times out.
  * @param {{
  *  portName: string,
- *  portConf: import('../models').ports,
+ *  portConf: import('.').ports,
  * }} options
  */
 function setPortTimeout(options) {

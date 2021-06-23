@@ -2,22 +2,22 @@
 
 import executeCommand from "./execute-command";
 import invokePort from "./invoke-port";
-import async from "../lib/async-error";
-import domainEvents from "../models/domain-events";
+import async from "../util/async-error";
+import domainEvents from "../domain/domain-events";
 
 /**
  * @typedef {Object} ModelParam
  * @property {String} modelName
- * @property {import('../models/model-factory').ModelFactory} models
+ * @property {import('../domain/model-factory').ModelFactory} models
  * @property {import('../datasources/datasource').default} repository
- * @property {import('../models/observer').Observer} observer
+ * @property {import('../domain/observer').Observer} observer
  * @property {Function[]} handlers
  */
 
 /**
- * @typedef {function(ModelParam):Promise<import("../models").Model>} editModel
+ * @typedef {function(ModelParam):Promise<import("../domain").Model>} editModel
  * @param {ModelParam} param0
- * @returns {function():Promise<import("../models/model").Model>}
+ * @returns {function():Promise<import("../domain/model").Model>}
  */
 export default function makeEditModel({
   modelName,

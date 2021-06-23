@@ -6,7 +6,7 @@ import Event from "./event";
 /** @typedef {'CREATE' | 'UPDATE' | 'DELETE'} EventType */
 /** @typedef {import('./index').ModelSpecification} ModelSpecification */
 /** @typedef {import('./observer').Observer} Observer */
-/** @typedef {import('../datasources/datasource').default} Datasource */
+/** @typedef {import('./datasource').default} Datasource */
 
 /**
  * @typedef {Object} ModelFactory
@@ -122,7 +122,7 @@ const ModelFactory = {
    * @param {String} modelName - model's name
    * @param {*[]} args - input sent in the request
    * @param {import('./observer').Observer} observer - send & receive events
-   * @param {import('../datasources/datasource').default} datasource - persistence/cache
+   * @param {import('./datasource').default} datasource - persistence/cache
    * @returns {Promise<Readonly<Model>>} the model instance
    */
   createModel: async function (observer, datasource, modelName, ...args) {

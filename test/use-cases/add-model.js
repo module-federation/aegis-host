@@ -4,7 +4,7 @@
 
 // import addModelFactory from '../../src/use-cases/add-model'
 // import DataSourceFactory from '../../src/datasources'
-// import ModelFactory from '../../src/models';
+// import ModelFactory from '../../src/domain';
 // import ObserverFactory from '../../src/lib/observer';
 
 // describe('Use-Cases', function () {

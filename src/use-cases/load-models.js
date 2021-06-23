@@ -1,12 +1,12 @@
 "use strict";
 
 import { env } from "process";
-import Serializer from "../lib/serializer";
+import Serializer from "../util/serializer";
 import resumeWorkflow from "./resume-workflow";
 
 /**
- * @param {function(import("../models").Model)} loadModel
- * @param {import("../models/observer").Observer} observer
+ * @param {function(import("../domain").Model)} loadModel
+ * @param {import("../domain/observer").Observer} observer
  * @param {import("../datasources/datasource").default} repository
  * @returns {function(Map<string,Model>|Model)}
  */
@@ -44,10 +44,10 @@ function handleRestart(repository) {
 
 /**
  * Returns factory function to unmarshal deserialized models.
- * @typedef {import('../models').Model} Model
+ * @typedef {import('../domain').Model} Model
  * @param {{
- *  models:import('../models/model-factory').ModelFactory,
- *  observer:import('../models/observer').Observer,
+ *  models:import('../domain/model-factory').ModelFactory,
+ *  observer:import('../domain/observer').Observer,
  *  repository:import('../datasources/datasource').default,
  *  modelName:string
  * }} options
