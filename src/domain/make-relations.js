@@ -43,16 +43,13 @@ export const relationType = {
   },
 };
 
-// function isLocalObject(modelName) {
-//   if (!ModelFactory.getModelSpec(modelName)) {
-//     console.warn("non-local or invalid model", modelName);
-//     return false;
-//   }
-//   return true;
-// }
-
 /**
  * Retrieve a remote object from the distributed cache.
+ * Sends a request message and receives a response from
+ * the cache manager.
+ *
+ * a response event.
+ *
  * If a relation specifies an object we don't have locally,
  * broadcast a global event that includes the relation details.
  * Other hosts subscribed to the relevant cache events will run
@@ -64,7 +61,7 @@ export const relationType = {
  * @param {import("./observer").Observer} observer
  * @returns
  */
-function requireRemoteObject(model, relation, observer) {
+export function requireRemoteObject(model, relation, observer) {
   const request = domainEvents.cacheLookupRequest(relation.modelName);
   const results = domainEvents.cacheLookupResults(relation.modelName);
   const execute = fn => () => fn();
