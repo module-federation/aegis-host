@@ -84,6 +84,7 @@ const DistributedCacheManager = function ({
       }
 
       if (event.eventName.startsWith(DELETE)) {
+        const datasource = getDataSource(event.modelName);
         console.debug("deleting from cache", event.modelName, event.modelId);
         return datasource.delete(event.modelId);
       }

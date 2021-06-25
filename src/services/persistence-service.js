@@ -1,6 +1,6 @@
 "use strict";
 
-import DataSource from "../domain/datasource";
+import DataSource from "../domain/datasource-factory";
 
 export const Persistence = {
   async save(model) {
