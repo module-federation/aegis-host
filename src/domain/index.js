@@ -225,7 +225,7 @@ function register(model, services, adapters) {
  * @param {*} services - services on which the model depends
  * @param {*} adapters - adapters for talking to the services
  */
-async function initModels(remoteEntries, services, adapters) {
+async function importModels(remoteEntries, services, adapters) {
   const models = await importRemoteModels(remoteEntries);
 
   console.info(models.models);
@@ -243,7 +243,7 @@ let localOverrides = {};
  *
  * @param {*} overrides - override or add services and adapters
  */
-export async function initRemotes(remoteEntries, overrides = {}) {
+export async function importRemotes(remoteEntries, overrides = {}) {
   remotesConfig = remoteEntries;
   localOverrides = overrides;
 
@@ -252,7 +252,7 @@ export async function initRemotes(remoteEntries, overrides = {}) {
 
   console.info({ services, adapters, overrides });
 
-  await initModels(
+  await importModels(
     remoteEntries,
     {
       ...services,
@@ -269,7 +269,7 @@ let modelCache;
 let adapterCache;
 let serviceCache;
 
-export async function initRemoteCache(name) {
+export async function importRemoteCache(name) {
   if (!remotesConfig) {
     console.warn("distributed cache cannot be initialized");
     return;

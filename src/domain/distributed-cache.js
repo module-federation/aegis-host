@@ -1,7 +1,7 @@
 "use strict";
 
 import { relationType } from "./make-relations";
-import { initRemoteCache } from ".";
+import { importRemoteCache } from ".";
 import domainEvents from "./domain-events";
 import EventBus from "../services/event-bus";
 
@@ -55,7 +55,7 @@ const DistributedCacheManager = function ({
         if (!models.getModelSpec(modelName)) {
           console.debug("we don't, import it...");
           // Stream the code for the model
-          await initRemoteCache(modelName);
+          await importRemoteCache(modelName);
         }
 
         try {
@@ -96,7 +96,7 @@ const DistributedCacheManager = function ({
    */
   async function searchCache({ message }) {
     const event = JSON.parse(message);
-    console.debug("searchCache", event);
+    console.debug("searchCache", event.eventName);
 
     // Listen for inquiries about this model
     const model = await relationType[event.relation.type](
@@ -105,15 +105,16 @@ const DistributedCacheManager = function ({
       event.relation
     );
 
-    console.debug("result", model);
-
     if (model) {
+      console.debug("found object", model.modelName, model.getId());
       const eventName = domainEvents.remoteObjectLocated(
         event.relation.modelName
       );
       // send the results back
       await EventBus.notify(BROADCAST, JSON.stringify({ eventName, model }));
+      return;
     }
+    console.warn("no object found");
   }
 
   function consumeExternalEvents() {

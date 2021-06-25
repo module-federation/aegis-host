@@ -68,7 +68,7 @@ const Server = (() => {
     .get("./domain")
     .then(factory => {
       const Module = factory();
-      return Module.initRemotes;
+      return Module.importRemotes;
     });
 
   const getRemoteEntries = remoteEntry.microlib
@@ -184,8 +184,8 @@ const Server = (() => {
     console.time(label);
 
     return getRemoteEntries.then(remotes => {
-      return getRemoteModules.then(initRemotes => {
-        return initRemotes(remotes, overrides).then(async () => {
+      return getRemoteModules.then(importRemotes => {
+        return importRemotes(remotes, overrides).then(async () => {
           const cache = initCache();
 
           console.info(`running in ${serverMode} mode`);
