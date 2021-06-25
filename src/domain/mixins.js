@@ -1,6 +1,6 @@
 "use strict";
 
-import pipe from "../util/pipe";
+import pipe from "./util/pipe";
 
 /**
  * @callback functionalMixin
@@ -76,51 +76,57 @@ export const toSymbol = keyMap => o => {
  * @param {number[]} timestamps
  * @param {"utc"|"iso"} format
  */
-export const fromTimestamp = (timestamps, format = "utc") => o => {
-  const formats = { utc: "toUTCString", iso: "toISOString" };
-  const fn = formats[format];
+export const fromTimestamp =
+  (timestamps, format = "utc") =>
+  o => {
+    const formats = { utc: "toUTCString", iso: "toISOString" };
+    const fn = formats[format];
 
-  if (!fn) {
-    throw new Error("invalid date format");
-  }
+    if (!fn) {
+      throw new Error("invalid date format");
+    }
 
-  const stringifyTimestamps = () =>
-    timestamps
-      .map(k => (o[k] ? { [k]: new Date(o[k])[fn]() } : {}))
-      .reduce((p, c) => ({ ...c, ...p }));
+    const stringifyTimestamps = () =>
+      timestamps
+        .map(k => (o[k] ? { [k]: new Date(o[k])[fn]() } : {}))
+        .reduce((p, c) => ({ ...c, ...p }));
 
-  return {
-    ...o,
-    ...stringifyTimestamps(),
+    return {
+      ...o,
+      ...stringifyTimestamps(),
+    };
   };
-};
 
 /**
  * Adds `toJSON` method that pipes multiple serializing mixins together.
  * @param {...functionalMixin} keyMap
  */
-export const withSerializers = (...funcs) => o => {
-  return {
-    ...o,
-    toJSON() {
-      return pipe(...funcs)(this);
-    },
+export const withSerializers =
+  (...funcs) =>
+  o => {
+    return {
+      ...o,
+      toJSON() {
+        return pipe(...funcs)(this);
+      },
+    };
   };
-};
 
 /**
  * Pipes multiple deserializing mixins together.
  * @param  {...functionalMixin} funcs
  */
-export const withDeserializers = (...funcs) => o => {
-  function fromJSON() {
-    return pipe(...funcs)(o);
-  }
-  return {
-    ...o,
-    ...fromJSON(),
+export const withDeserializers =
+  (...funcs) =>
+  o => {
+    function fromJSON() {
+      return pipe(...funcs)(o);
+    }
+    return {
+      ...o,
+      ...fromJSON(),
+    };
   };
-};
 
 /**
  * Subscribe to and emit application and domain events.

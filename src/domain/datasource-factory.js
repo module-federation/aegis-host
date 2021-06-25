@@ -27,6 +27,10 @@ const DataSourceFactory = (() => {
   // References all DSes
   let dataSources;
 
+  function hasDataSource(name) {
+    return dataSources.has(name);
+  }
+
   /**
    * Get datasource from model spec or return default for server.
    * @param {*} ds
@@ -90,6 +94,7 @@ const DataSourceFactory = (() => {
      * @returns {import('./datasource').default} DataSource singleton
      */
     getDataSource,
+    hasDataSource,
     close,
   });
 })();

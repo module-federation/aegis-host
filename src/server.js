@@ -167,10 +167,10 @@ const Server = (() => {
   }
 
   /**
-   * Import federated modules {@see module:src/domain/index.initRemotes}. Then, generate routes for each
-   * controller method and model. If running as a serverless function, store the routes
-   * and controllers for direct invocation via the {@link control}
-   * method.
+   * Import federated modules, see {@link getRemoteModules}. Then, generate
+   * routes for each controller method and model. If running as a serverless
+   * function, tore the routes and controllers for direct invocation via the
+   * {@link control} method.
    *
    * @param {import("express").Router} router - express app/router
    * @param {boolean} serverless - set to true if running as a servless function

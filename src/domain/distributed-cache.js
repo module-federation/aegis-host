@@ -98,7 +98,7 @@ const DistributedCacheManager = function ({
     const event = JSON.parse(message);
     console.debug("searchCache", event.eventName);
 
-    // Listen for inquiries about this model
+    // find the requested object
     const model = await relationType[event.relation.type](
       event.model,
       getDataSource(event.relation.modelName),
@@ -133,6 +133,9 @@ const DistributedCacheManager = function ({
     console.debug({ modelNames, modelCache });
 
     [...new Set(modelCache)].forEach(function (modelName) {
+      observer.on(domainEvents.cacheLookupRequest(modelName), async event =>
+        EventBus.notify(BROADCAST, JSON.stringify(event))
+      );
       [
         models.getEventName(CREATE, modelName),
         models.getEventName(UPDATE, modelName),
@@ -155,14 +158,14 @@ const DistributedCacheManager = function ({
         topic: BROADCAST,
         once: false,
         filters: [domainEvents.cacheLookupRequest(spec.modelName)],
-        id: Date.now() + spec.modelName,
+        id: uuid(),
         callback: searchCache,
       })
     );
   }
 
   function publishInternalEvents() {
-    observer.on(/CREATE|UPDATE|DELETE|cacheLookup/, async event =>
+    observer.on(/CREATE|UPDATE|DELETE/, async event =>
       EventBus.notify(BROADCAST, JSON.stringify(event))
     );
   }

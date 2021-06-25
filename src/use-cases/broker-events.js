@@ -1,6 +1,6 @@
 import publishEvent from "../services/publish-event";
 import DistributedCacheManager from "../domain/distributed-cache";
-import uuid from "../util/uuid";
+import uuid from "../domain/util/uuid";
 
 /** @typedef {import("../domain/datasource").default} DataSource */
 /** @typedef {import('../domain/observer').Observer} Observer */

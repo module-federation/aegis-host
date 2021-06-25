@@ -24,7 +24,8 @@ export class DataSourceFile extends DataSourceMemory {
    * }} param0
    */
   async load({ hydrate, serializer }) {
-    this.file = path.join(directoryPath, this.name.concat(".json"));
+    this.file =
+      path.join(directoryPath, this.name.concat(".json")) || this.name + ".js";
     this.serializer = serializer;
     this.dataSource = this.readFile(hydrate);
   }

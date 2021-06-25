@@ -1,7 +1,7 @@
 "use strict";
 
 import portHandler from "./port-handler";
-import async from "../util/async-error";
+import async from "./util/async-error";
 import domainEvents from "./domain-events";
 import CircuitBreaker from "./circuit-breaker";
 

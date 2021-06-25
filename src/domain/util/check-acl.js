@@ -1,6 +1,6 @@
 "use strict";
 
-import makeArray from "../util/make-array";
+import makeArray from "./make-array";
 
 export default function checkAcl(requirement, allow, deny = []) {
   console.log({ func: checkAcl.name, requirement, allow });

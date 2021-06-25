@@ -1,6 +1,6 @@
 "use strict";
 
-import async from "../util/async-error";
+import async from "../domain/util/async-error";
 
 /**
  * Check `portFlow` history and resume any workflow

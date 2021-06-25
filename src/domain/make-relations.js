@@ -94,12 +94,18 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation]() {
-            let ds = dataSource.getFactory().getDataSource(rel.modelName);
+            let ds;
             let tried = false;
 
-            if (!ds) {
+            if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
+              ds = await dataSource
+                .getFactory()
+                .getDataSource(rel.modelName, true); // memory only
+
               await requireRemoteObject(this, rel, observer);
-              ds = await dataSource.getFactory().getDataSource(rel.modelName);
+              tried = true;
+            } else {
+              ds = dataSource.getFactory().getDataSource(rel.modelName);
             }
 
             const model = await relationType[rel.type](this, ds, rel);

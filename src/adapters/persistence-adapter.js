@@ -1,6 +1,6 @@
 "use strict";
 
-import async from "../util/async-error";
+import async from "../domain/util/async-error";
 
 export function save(service) {
   return async function ({ model }) {
