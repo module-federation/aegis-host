@@ -15,7 +15,8 @@ import brokerEvents from "./broker-events";
 export function registerCacheEvents() {
   brokerEvents(
     ObserverFactory.getInstance(),
-    name => DataSourceFactory.getDataSource(name, true),
+    //name => DataSourceFactory.getDataSource(name, true),
+    DataSourceFactory.getDataSource,
     ModelFactory
   );
 }

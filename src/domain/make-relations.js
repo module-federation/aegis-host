@@ -11,6 +11,7 @@ export const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
+    console.debug({ model, ds, rel });
     const pk = model.id || model.getId();
     return ds.list({ [rel.foreignKey]: pk });
   },
@@ -20,7 +21,10 @@ export const relationType = {
    * @param {import("./datasource").default} ds
    * @param {import("./index").relations[relation]} config
    */
-  manyToOne: async (model, ds, rel) => await ds.find(model[rel.foreignKey]),
+  manyToOne: async (model, ds, rel) => {
+    console.debug({ model, ds, rel });
+    return await ds.find(model[rel.foreignKey]);
+  },
   /**
    * Same as many to one as far as the lookup.
    * @param {*} model

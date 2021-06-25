@@ -75,7 +75,7 @@ const DistributedCacheManager = function ({
           await datasource.save(model.getId(), model);
 
           await observer.notify(
-            domainEvents.remoteObjectLocated(modelName),
+            domainEvents.cacheLookupResults(modelName),
             event
           );
         } catch (e) {
@@ -99,20 +99,18 @@ const DistributedCacheManager = function ({
     console.debug("searchCache", event);
 
     // Listen for inquiries about this model
-    const result = await relationType[event.relation.type](
+    const model = await relationType[event.relation.type](
       event.model,
-      getDataSource(event.model.modelName),
+      getDataSource(event.relation.modelName),
       event.relation
     );
 
-    console.debug({ event, result });
+    console.debug("result", model);
 
-    if (result) {
+    if (model) {
+      const eventName = domainEvents.remoteObjectLocated(event.model.modelName);
       // send the results back
-      await EventBus.notify(
-        domainEvents.remoteObjectLocated(event.model.modelName),
-        JSON.stringify(result)
-      );
+      await EventBus.notify(eventName, JSON.stringify({ eventName, model }));
     }
   }
 
