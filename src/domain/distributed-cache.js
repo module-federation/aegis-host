@@ -108,9 +108,11 @@ const DistributedCacheManager = function ({
     console.debug("result", model);
 
     if (model) {
-      const eventName = domainEvents.remoteObjectLocated(event.model.modelName);
+      const eventName = domainEvents.remoteObjectLocated(
+        event.relation.modelName
+      );
       // send the results back
-      await EventBus.notify(eventName, JSON.stringify({ eventName, model }));
+      await EventBus.notify(BROADCAST, JSON.stringify({ eventName, model }));
     }
   }
 
