@@ -35,3 +35,6 @@ lambda.out
 .aws/credentials
 nohup.out
 public/user.json
+public/order.json
+public/customer.json
+public/product.json
