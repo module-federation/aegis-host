@@ -86,6 +86,7 @@ export class DataSourceMongoDb extends DataSourceMemory {
       await this.checkConnection("document not found");
       return model;
     }
+    // add to the cache and return it
     return super.save(id, this.hydrate(model));
   }
 

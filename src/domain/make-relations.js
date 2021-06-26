@@ -11,6 +11,7 @@ export const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
+    console.log({ modelName: model.modelName, ds, rel });
     const pk = model.id || model.getId();
     return ds.list({ [rel.foreignKey]: pk });
   },
@@ -47,8 +48,6 @@ export const relationType = {
  * Retrieve a remote object from the distributed cache.
  * Sends a request message and receives a response from
  * the cache manager.
- *
- * a response event.
  *
  * If a relation specifies an object we don't have locally,
  * broadcast a global event that includes the relation details.
@@ -98,6 +97,8 @@ export default function makeRelations(relations, dataSource, observer) {
             let tried = false;
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
+              console.warn("possible cache miss, check for remote object");
+              
               ds = await dataSource
                 .getFactory()
                 .getDataSource(rel.modelName, true); // memory only

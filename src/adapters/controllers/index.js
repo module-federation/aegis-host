@@ -17,12 +17,11 @@ import getModelsFactory from "./get-models";
 import getModelByIdFactory from "./get-model-by-id";
 import deleteModelFactory from "./delete-model";
 import getConfigFactory from "./get-config";
-import hash from "../../domain/util/hash";
 
 function make(useCases, controllerFactory) {
   return useCases().map(uc => ({
     endpoint: uc.endpoint,
-    fn: controllerFactory(uc.fn, hash),
+    fn: controllerFactory(uc.fn),
   }));
 }
 

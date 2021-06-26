@@ -3,7 +3,7 @@
  * @param {import("../../use-cases/edit-model").editModel} editModel
  * @returns {import("../http-adapter").httpController}
  */
-export default function patchModelFactory(editModel, hash) {
+export default function patchModelFactory(editModel) {
   return async function patchModel(httpRequest) {
     try {
       httpRequest.log(patchModel.name);
@@ -18,10 +18,8 @@ export default function patchModelFactory(editModel, hash) {
         headers: {
           "Content-Type": "application/json",
           "Last-Modified": new Date().toUTCString(),
-          ETag: hash(JSON.stringify(model)),
         },
         statusCode: 201,
-        body: { modelId: model.getId() },
       };
     } catch (e) {
       console.error(e);

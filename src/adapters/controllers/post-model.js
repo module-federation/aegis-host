@@ -6,7 +6,7 @@
  * @param {function():string} hash
  * @returns {import("../adapters/http-adapter").httpController}
  */
-export default function postModelFactory(addModel, hash) {
+export default function postModelFactory(addModel) {
   return async function postModel(httpRequest) {
     try {
       httpRequest.log(postModel.name);
@@ -19,7 +19,6 @@ export default function postModelFactory(addModel, hash) {
         headers: {
           "Content-Type": "application/json",
           "Last-Modified": new Date().toUTCString(),
-          ETag: hash(JSON.stringify(model)),
         },
         statusCode: 201,
         body: { modelId: model.getId() },

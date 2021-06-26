@@ -3,7 +3,7 @@
  * @param {import("../use-cases/remove-model").removeModel} removeModel
  * @returns {import("../adapters/http-adapter").httpController}
  */
-export default function deleteModelFactory(removeModel, hash) {
+export default function deleteModelFactory(removeModel) {
   return async function deleteModel(httpRequest) {
     try {
       httpRequest.log(deleteModel.name);
@@ -14,7 +14,6 @@ export default function deleteModelFactory(removeModel, hash) {
         headers: {
           "Content-Type": "application/json",
           "Last-Modified": new Date().toUTCString(),
-          ETag: hash(JSON.stringify(model)),
         },
         statusCode: 201,
         body: { modelId: model.getId() },
