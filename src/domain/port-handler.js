@@ -67,7 +67,7 @@ export default async function portHandler(options = {}, payload = {}) {
   const { model, port } = options;
   const spec = model.getSpec();
 
-  if (spec?.ports && spec.ports[port]) {
+  if (spec && spec.ports && spec.ports[port]) {
     const keys = spec.ports[port].keys;
 
     if (keys) {

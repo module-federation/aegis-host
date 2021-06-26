@@ -11,7 +11,7 @@ export const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
-    console.log({ modelName: model.modelName, ds, rel });
+    console.log({ model, ds, rel });
     const pk = model.id || model.getId();
     return ds.list({ [rel.foreignKey]: pk });
   },
@@ -65,10 +65,12 @@ export function requireRemoteObject(model, relation, observer) {
   const results = domainEvents.cacheLookupResults(relation.modelName);
   const execute = fn => () => fn();
 
-  return new Promise(function (resolve) {
+  return new Promise(async function (resolve) {
     setTimeout(resolve, 10000);
     observer.on(results, execute(resolve));
-    return observer.notify(request, { eventName: request, relation, model });
+    await observer.notify(request, { eventName: request, relation, model });
+    console.debug("sent event", request)
+    return request;
   });
 }
 
@@ -93,25 +95,24 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation]() {
+            let request;
             let ds;
-            let tried = false;
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
               console.warn("possible cache miss, check for remote object");
-              
+
               ds = await dataSource
                 .getFactory()
                 .getDataSource(rel.modelName, true); // memory only
 
-              await requireRemoteObject(this, rel, observer);
-              tried = true;
+              request = await requireRemoteObject(this, rel, observer);
             } else {
               ds = dataSource.getFactory().getDataSource(rel.modelName);
             }
 
             const model = await relationType[rel.type](this, ds, rel);
 
-            if (!model && !tried) {
+            if (!model && !request) {
               await requireRemoteObject(this, rel, observer);
             }
 

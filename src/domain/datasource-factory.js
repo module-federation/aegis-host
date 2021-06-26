@@ -41,7 +41,7 @@ const DataSourceFactory = (() => {
   function getSpecDataSource(ds, factory, name) {
     const spec = ModelFactory.getModelSpec(name);
 
-    if (spec?.datasource) {
+    if (spec && spec.datasource) {
       const url = spec.datasource.url;
       const cacheSize = spec.datasource.cacheSize;
       const adapterFactory = spec.datasource.factory;

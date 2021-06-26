@@ -3,12 +3,12 @@
 var assert = require("assert");
 
 import addModelFactory from "../../src/use-cases/add-model";
-import postModelFactory from "../../src/domain/controllers/post-model";
+import postModelFactory from "../../src/adapters/controllers/post-model";
 
-import DataSourceFactory from "../../src/domain/datasources";
+import DataSourceFactory from "../../src/domain/datasource-factory";
 import ModelFactory from "../../src/domain";
 import ObserverFactory from "../../src/domain/observer";
-import hash from "../../src/util/hash";
+import hash from "../../src/domain/util/hash";
 
 describe("Controllers", function () {
   describe("postModel()", function () {
@@ -30,15 +30,13 @@ describe("Controllers", function () {
         repository: DataSourceFactory.getDataSource("ABC"),
         observer: ObserverFactory.getInstance(),
       });
-      const resp = await postModelFactory(
-        addModel,
-        ModelFactory.getModelId,
-        hash
-      )({
+      const resp = await postModelFactory(addModel)({
         body: { a: "a" },
         headers: { "User-Agent": "test" },
         ip: "127.0.0.1",
+        log: ()=>1,
       });
+      console.log("resp.status", resp.statusCode);
       assert.strictEqual(resp.statusCode, 201);
     });
   });

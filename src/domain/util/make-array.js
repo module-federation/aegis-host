@@ -1,5 +1,5 @@
 "use script";
 
-export default function makeArray(v) {
+module.exports.makeArray = function (v) {
   return Array.isArray(v) ? v : [v];
-}
+};
