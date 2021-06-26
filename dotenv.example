@@ -2,7 +2,7 @@
 # Example .env file
 
 # Target environment: e.g. local, dev, test, prod
-# NODE_ENV=dev
+NODE_ENV=localhost
 
 # Run in serverless mode (no webserver)
 SERVERLESS=false
@@ -30,16 +30,6 @@ DATASOURCE_FILE_DIRECTORY=../public
 
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000
-
-#######################################
-# If streaming from GitHub, set to path 
-# of your remoteEntry.js and bundles.
-# ------------------------------------
-GITHUB_BRANCH=order-server
-GITHUB_REPO=MicroLib-Example
-GITHUB_OWNER=module-federations
-GITHUB_PATH=dist
-######################################
 
 # URL root level path
 API_ROOT=/microlib/api
