@@ -1,16 +1,14 @@
-const cache = require("./remote-entries-cache-github");
-
 module.exports = [
   {
-    name: "microservices",
+    name: "distributed-cache",
     url: "https://api.github.com",
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "test-customer",
+    branch: "cache-test",
     path: __dirname,
     type: "model",
-    importRemote: async () => import("microservices/models"),
+    importRemote: async () => import("distributed-cache/models"),
   },
   {
     name: "adapters",
@@ -18,10 +16,10 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "test-customer",
+    branch: "cache-test",
     path: __dirname,
     type: "adapter",
-    importRemote: async () => import("microservices/adapters"),
+    importRemote: async () => import("distributed-cache/adapters"),
   },
   {
     name: "services",
@@ -29,9 +27,9 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "test-customer",
+    branch: "cache-test",
     path: __dirname,
     type: "service",
-    importRemote: async () => import("microservices/services"),
+    importRemote: async () => import("distributed-cache/services"),
   },
 ].concat(cache);
