@@ -32,4 +32,4 @@ module.exports = [
     type: "service",
     importRemote: async () => import("distributed-cache/services"),
   },
-].concat(cache);
+];
