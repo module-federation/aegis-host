@@ -11,7 +11,7 @@ module.exports = [
     importRemote: async () => import("distributed-cache/models"),
   },
   {
-    name: "adapters",
+    name: "adapter-cache",
     url: "https://api.github.com",
     repo: "microlib-example",
     owner: "module-federation",
@@ -22,7 +22,7 @@ module.exports = [
     importRemote: async () => import("distributed-cache/adapters"),
   },
   {
-    name: "services",
+    name: "service-cache",
     url: "https://api.github.com",
     repo: "microlib-example",
     owner: "module-federation",
