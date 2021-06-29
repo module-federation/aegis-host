@@ -46,12 +46,11 @@ export default class DataSource {
    * Upsert model instance
    * @param {*} id
    * @param {*} data
+   * @param {boolean} sync - sync cluster nodes, defaults to true
    */
-  async save(id, data) {
+  async save(id, data, sync = true) {
     throw new Error("abstract method not implemented");
   }
-
-  async clusterSave(id, data) {}
 
   /**
    * Find model instance by ID
@@ -73,11 +72,15 @@ export default class DataSource {
 
   listSync(query) {}
 
-  async delete(id) {
+  /**
+   *
+   * @param {*} id
+   * @param {*} sync sync cluster nodes, defaults to true
+   */
+  async delete(id, sync = true) {
     throw new Error("abstract method not implemented");
   }
 
-  async clusterDelete(id) {}
   /**
    *
    * @param {*} options

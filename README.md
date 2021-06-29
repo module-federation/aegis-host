@@ -2,10 +2,12 @@
 
 # MicroLib <sub><sup>codename _ÆGIS_</sup></sub>
 
-### Federated Microservices
 
-![federated-micoservices](https://user-images.githubusercontent.com/38910830/121280415-de4ce700-c89b-11eb-9854-3ad921503743.gif)
-
+## Federated Microservices
+- loaded from multiple network locations and repositories at runtime;
+- run together in a single process;
+- can be reloaded at any time without restarting the process or interrupting other components running in the process;
+- are _not_ _installed_ on the server but _streamed_ over the network as needed.
 ## TL;DR
 
 ```shell
@@ -19,9 +21,7 @@ npm run demo
 ```
 
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
-modules directly from GitHub. If you want to update any of the sample services, fork the MicroLib-Example repo. Update
-the webpack/remoteEntries.js file on the host so `entry.url` points at your repo. Update .env GITHUB\_\* props to reflect your repo owner, name, branch and path of directory containing build output (location of remoteEntry.js and bundles). Clone your fork, etc. make your changes, build the webpack bundles, commit and push. In order for the host to see your changes, either configure a webhook in your repo that points at http://your-aegis-server:8070/microlib/reload, hit the url manually or run the hot reload script. `npm run hot-reload`.
-
+modules directly from GitHub. To import your own app, update the `webpack/remote-entries.js` to point to your remoteEntry.js file. If you point to a GitHub repo, be sure to specify, owner, repo, filedir, and branch. 
 ## Purpose
 
 Stop paying the "microservices premium".

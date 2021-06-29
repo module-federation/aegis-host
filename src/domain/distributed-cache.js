@@ -3,7 +3,6 @@
 import { relationType } from "./make-relations";
 import { importRemoteCache } from ".";
 import domainEvents from "./domain-events";
-import EventBus from "../services/event-bus";
 
 /**
  * Implement distributed object cache. Find any model
@@ -16,24 +15,20 @@ import EventBus from "../services/event-bus";
  *
  * @param {{observer:Observer,getDataSource:function():DataSource}} options
  */
-const DistributedCacheManager = function ({
+export default function DistributedCacheManager({
   models,
   observer,
   getDataSource,
-  uuid,
+  listen,
+  notify,
 }) {
-  const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
-  const UPDATE = models.EventTypes.UPDATE;
-  const CREATE = models.EventTypes.CREATE;
-  const DELETE = models.EventTypes.DELETE;
-
   /**
    * Returns the callback run by the external event service when a message arrives.
    *
    * @param {{observer:Observer,datasource:DataSource}} param0
    * @returns {function({message}):Promise<string>}
    */
-  function updateCache({ modelName }) {
+  function updateCache({ modelName, callback }) {
     return async function ({ message }) {
       const event = JSON.parse(message);
 
@@ -45,48 +40,42 @@ const DistributedCacheManager = function ({
       console.debug("handle cache event", event.eventName);
 
       if (
-        event.eventName.startsWith(CREATE) ||
-        event.eventName.startsWith(UPDATE) ||
-        event.eventName === domainEvents.remoteObjectLocated(modelName)
+        event.eventName ===
+        models.getEventName(models.EventTypes.DELETE, modelName)
       ) {
-        console.debug("check if we have the code for this object...");
-        const datasource = getDataSource(modelName);
-
-        if (!models.getModelSpec(modelName)) {
-          console.debug("we don't, import it...");
-          // Stream the code for the model
-          await importRemoteCache(modelName);
-        }
-
-        try {
-          console.debug(
-            "unmarshal deserialized model",
-            modelName,
-            event.model.id
-          );
-
-          const model = models.loadModel(
-            observer,
-            datasource,
-            event.model,
-            modelName
-          );
-
-          await datasource.save(model.getId(), model);
-
-          await observer.notify(
-            domainEvents.cacheLookupResults(modelName),
-            event
-          );
-        } catch (e) {
-          console.error("distributed cache", e);
-        }
-      }
-
-      if (event.eventName.startsWith(DELETE)) {
         const datasource = getDataSource(event.modelName);
         console.debug("deleting from cache", event.modelName, event.modelId);
         return datasource.delete(event.modelId);
+      }
+
+      console.debug("check if we have the code for this object...");
+      const datasource = getDataSource(modelName);
+
+      if (!models.getModelSpec(modelName)) {
+        console.debug("we don't, import it...");
+        // Stream the code for the model
+        await importRemoteCache(modelName);
+      }
+
+      try {
+        console.debug(
+          "unmarshal deserialized model",
+          modelName,
+          event.eventData.id
+        );
+
+        const model = models.loadModel(
+          observer,
+          datasource,
+          event.eventData,
+          modelName
+        );
+
+        await datasource.save(model.getId(), model);
+
+        if (callback) callback();
+      } catch (e) {
+        console.error("distributed cache", e);
       }
     };
   }
@@ -95,97 +84,92 @@ const DistributedCacheManager = function ({
    *
    * @param {*} param0
    */
-  async function searchCache({ message }) {
-    const event = JSON.parse(message);
-    console.debug("searchCache", event.eventName);
+  function searchCache({ callback }) {
+    return async function ({ message }) {
+      const event = JSON.parse(message);
+      const eventData = event.eventData;
 
-    // find the requested object
-    const model = await relationType[event.relation.type](
-      event.model,
-      getDataSource(event.relation.modelName),
-      event.relation
-    );
-
-    if (model) {
-      console.debug("found object", model.modelName, model.getId());
-      const eventName = domainEvents.remoteObjectLocated(
-        event.relation.modelName
+      // find the requested object
+      const model = await relationType[eventData.relation.type](
+        eventData.model,
+        getDataSource(eventData.relation.modelName),
+        eventData.relation
       );
-      // send the results back
-      await EventBus.notify(BROADCAST, JSON.stringify({ eventName, model }));
-      return;
-    }
-    console.warn("no object found");
+
+      if (model) {
+        console.info("found object", model.modelName, model.getId());
+        //if (callback) {
+        callback(model);
+        //}
+        return;
+      }
+      console.warn("no object found");
+    };
   }
 
-  function consumeExternalEvents() {
+  /**
+   * Subcribe to external CRUD events for related models.
+   * Also listen for request and response events for locally
+   * and remotely cached data.
+   */
+  function startListening() {
     const modelSpecs = models.getModelSpecs();
-    const modelNames = modelSpecs.map(m => m.modelName);
-    const modelCache = modelSpecs
-      .filter(m => m.relations) // only models with relations
-      .map(m =>
-        Object.keys(m.relations).filter(
-          // filter out existing local models
-          k => !modelNames.includes(m.relations[k].modelName)
-        )
-      )
-      .reduce((a, b) => a.concat(b));
+    const registeredModels = modelSpecs.map(m => m.modelName);
+    const unregisteredModels = [
+      ...new Set( // deduplicate
+        modelSpecs
+          .filter(m => m.relations) // only models with relations
+          .map(m =>
+            Object.keys(m.relations).filter(
+              // filter out existing local models
+              k => !registeredModels.includes(m.relations[k].modelName)
+            )
+          )
+          .reduce((a, b) => a.concat(b))
+      ),
+    ];
 
-    console.debug({ modelNames, modelCache });
-
-    [...new Set(modelCache)].forEach(function (modelName) {
-      observer.on(domainEvents.cacheLookupRequest(modelName), async event =>
-        EventBus.notify(BROADCAST, JSON.stringify(event))
-      );
-      [
-        models.getEventName(CREATE, modelName),
-        models.getEventName(UPDATE, modelName),
-        models.getEventName(DELETE, modelName),
-        domainEvents.remoteObjectLocated(modelName),
-      ].forEach(event =>
-        EventBus.listen({
-          topic: BROADCAST,
-          id: uuid(),
-          callback: updateCache({ modelName }),
-          once: false,
-          filters: [event],
+    unregisteredModels.forEach(modelName => {
+      observer.on(domainEvents.internalCacheRequest(modelName), eventData =>
+        notify(domainEvents.externalCacheRequest(modelName), {
+          ...eventData,
+          eventName: domainEvents.externalCacheRequest(modelName),
         })
       );
+
+      listen(
+        domainEvents.externalCacheResponse(modelName),
+        updateCache({
+          modelName,
+          callback: () =>
+            observer.notify(domainEvents.internalCacheResponse(modelName)),
+        })
+      );
+
+      [
+        models.getEventName(models.EventTypes.UPDATE, modelName),
+        models.getEventName(models.EventTypes.CREATE, modelName),
+        models.getEventName(models.EventTypes.DELETE, modelName),
+      ].forEach(eventName => listen(eventName, updateCache({ modelName })));
     });
 
-    // Listen for external requests to find model instances we've created
-    modelSpecs.forEach(spec =>
-      EventBus.listen({
-        topic: BROADCAST,
-        once: false,
-        filters: [domainEvents.cacheLookupRequest(spec.modelName)],
-        id: uuid(),
-        callback: searchCache,
-      })
-    );
-  }
-
-  function publishInternalEvents() {
-    observer.on(/CREATE|UPDATE|DELETE/, async event =>
-      EventBus.notify(BROADCAST, JSON.stringify(event))
+    registeredModels.forEach(modelName =>
+      listen(
+        domainEvents.externalCacheRequest(modelName),
+        searchCache({
+          callback: eventData => {
+            console.debug(eventData);
+            return notify(
+              domainEvents.externalCacheResponse(modelName),
+              eventData
+            );
+          },
+        })
+      )
     );
   }
 
   return {
-    /**
-     * Forward local CRUD write events to event bus.
-     */
-    publishInternalEvents,
-
-    /**
-     * Subscribe to the event bus to receive remote CRUD events for
-     * related models.
-     *
-     * Create listeners for each model we are running, so we
-     * provide that service to the cache.
-     */
-    consumeExternalEvents,
+    listen: startListening,
   };
-};
-
-export default DistributedCacheManager;
+}

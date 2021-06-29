@@ -1,12 +1,15 @@
 import publishEvent from "../services/publish-event";
 import DistributedCacheManager from "../domain/distributed-cache";
 import uuid from "../domain/util/uuid";
+import EventBus from "../services/event-bus";
+
+const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 
 /** @typedef {import("../domain/datasource").default} DataSource */
 /** @typedef {import('../domain/observer').Observer} Observer */
 
 /**
- * Handle internal and external events. Distributed cache.
+ * Handle internal and external events.
  * @param {import('../domain/observer').Observer} observer
  * @param {function():DataSource} getDataSource
  */
@@ -15,17 +18,27 @@ export default function brokerEvents(observer, getDataSource, models) {
 
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
+    const notify = (eventName, eventData) =>
+      EventBus.notify(BROADCAST, JSON.stringify({ eventName, eventData }));
+
+    const listen = (eventName, callback) =>
+      EventBus.listen({
+        topic: BROADCAST,
+        id: uuid(),
+        once: false,
+        filters: [eventName],
+        callback,
+      });
+      
     const broker = DistributedCacheManager({
       observer,
       getDataSource,
       models,
-      uuid,
+      notify,
+      listen,
     });
-    // do this later; let startup continue
-    setTimeout(() => {
-      broker.consumeExternalEvents();
-      broker.publishInternalEvents();
-    }, 1000);
+
+    broker.listen();
   }
 
   /**
@@ -37,13 +50,13 @@ export default function brokerEvents(observer, getDataSource, models) {
     if (cmd && id && data && process.pid !== pid) {
       if (cmd === "saveCommand") {
         const ds = getDataSource(name);
-        ds.clusterSave(id, data);
+        ds.save(id, data, false);
         return;
       }
 
       if (cmd === "deleteCommand") {
         const ds = getDataSource(name);
-        ds.clusterDelete(id);
+        ds.delete(id, false);
         return;
       }
     }

@@ -1,10 +1,10 @@
 "use strict";
 
 const domainEvents = {
-  cacheLookupRequest: modelName => `cacheLookupRequest_${modelName}`,
-  cacheLookupResults: modelName => `cacheLookupResponse_${modelName}`,
-  remoteObjectInquiry: modelName => `remoteObjectInquiry_${modelName}`,
-  remoteObjectLocated: modelName => `remoteObjectLocated_${modelName}`,
+  internalCacheRequest: modelName => `internalCacheRequest_${modelName}`,
+  externalCacheRequest: modelName => `externalCacheRequest_${modelName}`,
+  internalCacheResponse: modelName => `internalCacheResponse_${modelName}`,
+  externalCacheResponse: modelName => `externalCacheResponse_${modelName}`,
   portTimeout: (model, port) => `portTimeout_${port}_${model.getName()}`,
   portRetryFailed: (model, port) =>
     `portRetryFailed_${port}_${model.getName()}`,

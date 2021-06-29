@@ -16,7 +16,6 @@ export function registerCacheEvents() {
   brokerEvents(
     ObserverFactory.getInstance(),
     name => DataSourceFactory.getDataSource(name, true),
-    //DataSourceFactory.getDataSource,
     ModelFactory
   );
 }

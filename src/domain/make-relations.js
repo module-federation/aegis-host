@@ -2,6 +2,8 @@
 
 import domainEvents from "./domain-events";
 
+const maxwait = process.env.REMOTE_OBJECT_MAXWAIT || 10000;
+
 export const relationType = {
   /**
    * @todo implement cache miss for distributed cache
@@ -61,15 +63,15 @@ export const relationType = {
  * @returns
  */
 export function requireRemoteObject(model, relation, observer) {
-  const request = domainEvents.cacheLookupRequest(relation.modelName);
-  const results = domainEvents.cacheLookupResults(relation.modelName);
+  const request = domainEvents.internalCacheRequest(relation.modelName);
+  const results = domainEvents.internalCacheResponse(relation.modelName);
   const execute = fn => () => fn();
 
   return new Promise(async function (resolve) {
-    setTimeout(resolve, 10000);
+    setTimeout(resolve, maxwait);
     observer.on(results, execute(resolve));
     await observer.notify(request, { eventName: request, relation, model });
-    console.debug("sent event", request)
+    console.debug("sent event", request);
     return request;
   });
 }
@@ -95,24 +97,22 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation]() {
-            let request;
+            let requested;
             let ds;
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
-              console.warn("possible cache miss, check for remote object");
-
+              console.warn("possible cache miss, check remote cache");
               ds = await dataSource
                 .getFactory()
                 .getDataSource(rel.modelName, true); // memory only
 
-              request = await requireRemoteObject(this, rel, observer);
+              requested = await requireRemoteObject(this, rel, observer);
             } else {
               ds = dataSource.getFactory().getDataSource(rel.modelName);
             }
 
             const model = await relationType[rel.type](this, ds, rel);
-
-            if (!model && !request) {
+            if (!model && !requested) {
               await requireRemoteObject(this, rel, observer);
             }
 

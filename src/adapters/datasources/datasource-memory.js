@@ -11,12 +11,18 @@ export class DataSourceMemory extends DataSource {
   }
 
   /**
+   * @override
+   * 
    * Update cache and datasource. Sync cache of other
    * cluster members if running in cluster mode.
-   * @override
+   * 
+   * @param {*} id 
+   * @param {*} data 
+   * @param {*} sync - sync cluster nodes, true by default
+   * @returns 
    */
-  async save(id, data) {
-    if (process.send === "function") {
+  async save(id, data, sync = true) {
+    if (sync && process.send === "function") {
       /** send data to cluster members */
       process.send({
         cmd: "saveBroadcast",
@@ -26,10 +32,6 @@ export class DataSourceMemory extends DataSource {
         id,
       });
     }
-    return this.dataSource.set(id, data).get(id);
-  }
-
-  async clusterSave(id, data) {
     return this.dataSource.set(id, data).get(id);
   }
 
@@ -74,8 +76,8 @@ export class DataSourceMemory extends DataSource {
   /**
    * @override
    */
-  async delete(id) {
-    if (process.send === "function") {
+  async delete(id, sync = true) {
+    if (sync && process.send === "function") {
       process.send({
         cmd: "deleteBroadcast",
         pid: process.pid,
@@ -83,10 +85,6 @@ export class DataSourceMemory extends DataSource {
         id,
       });
     }
-    this.dataSource.delete(id);
-  }
-
-  async clusterDelete(id) {
     this.dataSource.delete(id);
   }
 }
