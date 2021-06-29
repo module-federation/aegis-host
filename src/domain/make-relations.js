@@ -97,8 +97,7 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation]() {
-            let requested;
-            let ds;
+            let ds, requested;
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
               console.warn("possible cache miss, check remote cache");
@@ -107,9 +106,8 @@ export default function makeRelations(relations, dataSource, observer) {
                 .getDataSource(rel.modelName, true); // memory only
 
               requested = await requireRemoteObject(this, rel, observer);
-            } else {
-              ds = dataSource.getFactory().getDataSource(rel.modelName);
             }
+            ds = dataSource.getFactory().getDataSource(rel.modelName);
 
             const model = await relationType[rel.type](this, ds, rel);
             if (!model && !requested) {

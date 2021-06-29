@@ -13,7 +13,8 @@ import domainEvents from "./domain-events";
  * they haven't been already, then rehydrate and save
  * the model instance to the cache.
  *
- * @param {{observer:Observer,getDataSource:function():DataSource}} options
+ * @param {{observer:import("./observer").Observer,
+ * ,getDataSource:function():import("./datasource").default}} options
  */
 export default function DistributedCacheManager({
   models,
@@ -61,13 +62,13 @@ export default function DistributedCacheManager({
         console.debug(
           "unmarshal deserialized model",
           modelName,
-          event.eventData.id
+          event.eventData ? event.eventData.id : event.model.id
         );
 
         const model = models.loadModel(
           observer,
           datasource,
-          event.eventData,
+          event.eventData ? event.eventData : event.model,
           modelName
         );
 
@@ -153,20 +154,23 @@ export default function DistributedCacheManager({
       ].forEach(eventName => listen(eventName, updateCache({ modelName })));
     });
 
-    registeredModels.forEach(modelName =>
+    registeredModels.forEach(modelName => {
       listen(
         domainEvents.externalCacheRequest(modelName),
         searchCache({
-          callback: eventData => {
-            console.debug(eventData);
-            return notify(
-              domainEvents.externalCacheResponse(modelName),
-              eventData
-            );
-          },
+          callback: eventData =>
+            notify(domainEvents.externalCacheResponse(modelName), eventData),
         })
-      )
-    );
+      );
+
+      [
+        models.getEventName(models.EventTypes.UPDATE, modelName),
+        models.getEventName(models.EventTypes.CREATE, modelName),
+        models.getEventName(models.EventTypes.DELETE, modelName),
+      ].forEach(eventName =>
+        observer.on(eventName, eventData => notify(eventName, eventData))
+      );
+    });
   }
 
   return {
