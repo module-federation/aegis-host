@@ -1,4 +1,4 @@
-const cache = require("./remote-entries-cache");
+const cache = require("./remote-entries-cache-github");
 
 module.exports = [
   {
