@@ -2,6 +2,6 @@
 
 export default function listConfigsFactory({ models } = {}) {
   return async function listConfigs() {
-    return models.getRemoteModels();
+    return models.getModelSpecs().filter(spec => !spec.isCached);
   };
 }

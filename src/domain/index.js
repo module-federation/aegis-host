@@ -157,7 +157,7 @@ import {
   importModelCache,
   importAdapterCache,
   importServiceCache,
-} from "../services/federation-service";
+} from "./import-remotes";
 
 /**
  *
@@ -182,7 +182,7 @@ const deleteEvent = model => ({
   model: model,
 });
 
-function register(model, services, adapters) {
+function register(model, services, adapters, isCached = false) {
   if (model.modelName && model.endpoint && model.factory) {
     const serviceAdapters = makeAdapters(model.ports, adapters, services);
 
@@ -195,7 +195,7 @@ function register(model, services, adapters) {
       ...model,
       dependencies,
       factory: model.factory(dependencies),
-      isRemote: true,
+      isCached,
     });
 
     ModelFactory.registerEvent(
@@ -305,7 +305,7 @@ export async function importRemoteCache(name) {
     console.error("could not find model in cache", name);
     return;
   }
-  register(model, serviceCache, adapterCache);
+  register(model, serviceCache, adapterCache, true);
 }
 
 export default ModelFactory;

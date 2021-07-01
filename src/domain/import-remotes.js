@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * @returns {Promise<import('../domain').ModelSpecification[]>}
+ * @returns {Promise<import('.').ModelSpecification[]>}
  */
 export async function importRemoteModels(remoteEntries) {
   const startTime = Date.now();

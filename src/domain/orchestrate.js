@@ -1,16 +1,14 @@
 "use strict";
 
-import async from "../domain/util/async-error";
+import async from "./util/async-error";
 
 /**
  * Check `portFlow` history and resume any workflow
  * that was running before we shut down.
  *
- * @param {function(Model):string[]} getPortFlow history of port calls
- * @param {import("../domain").ports} ports
- * @returns {function(Map<string,Model>)}
+ * @param {Array<import("../domain").Model>} list
  */
-export default async function resumeWorkflow(list) {
+export async function resumeWorkflow(list) {
   if (list?.length > 0) {
     await Promise.all(
       list.map(async function (model) {

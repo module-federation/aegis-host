@@ -1,7 +1,7 @@
 "use strict";
 
 import Serializer from "../domain/serializer";
-import resumeWorkflow from "./resume-workflow";
+import { resumeWorkflow } from "../domain/orchestrate";
 
 /**
  * @param {function(import("../domain").Model)} loadModel

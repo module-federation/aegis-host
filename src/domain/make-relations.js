@@ -13,7 +13,6 @@ export const relationType = {
    * @param {import("./index").relations[relation]} rel
    */
   oneToMany: async (model, ds, rel) => {
-    console.log({ model, ds, rel });
     const pk = model.id || model.getId();
     return ds.list({ [rel.foreignKey]: pk });
   },
