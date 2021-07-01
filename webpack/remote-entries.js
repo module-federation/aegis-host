@@ -34,4 +34,4 @@ module.exports = [
     type: "service",
     importRemote: async () => import("microservices/services"),
   },
-].concat(cache);
+];
