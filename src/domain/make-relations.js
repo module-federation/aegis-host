@@ -44,7 +44,10 @@ export const relationType = {
 export function requireRemoteObject(model, relation, observer, ...args) {
   const request = domainEvents.internalCacheRequest(relation.modelName);
   const results = domainEvents.internalCacheResponse(relation.modelName);
-  const execute = fn => () => fn();
+  const execute = resolve => async eventData => {
+    const merge = { ...model, ...eventData.sourceModel };
+    resolve(merge);
+  };
 
   return new Promise(async function (resolve) {
     setTimeout(resolve, maxwait);
@@ -56,7 +59,6 @@ export function requireRemoteObject(model, relation, observer, ...args) {
       args,
     });
     console.debug(requireRemoteObject.name, request);
-    return request;
   });
 }
 
@@ -81,7 +83,8 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation](...args) {
-            let ds, requested;
+            let ds;
+            let updated = this;
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
               console.warn("possible cache miss, check remote cache");
@@ -89,22 +92,21 @@ export default function makeRelations(relations, dataSource, observer) {
                 .getFactory()
                 .getDataSource(rel.modelName, true); // memory only
 
-              requested = await requireRemoteObject(
-                this,
-                rel,
-                observer,
-                ...args
-              );
+              updated = await requireRemoteObject(this, rel, observer, ...args);
+              console.debug("updated", updated);
+              dataSource.save(updated.getId(), updated);
             }
             ds = dataSource.getFactory().getDataSource(rel.modelName);
 
             const model = await relationType[rel.type](this, ds, rel);
-            if (!model && !requested) {
-              await requireRemoteObject(this, rel, observer, ...args);
+            if (!model && !updated) {
+              updated = await requireRemoteObject(this, rel, observer, ...args);
+              dataSource.save(updated.getId(), updated);
+              console.debug("2nd updated", updated);
             }
 
             if (!model) {
-              return relationType[rel.type](this, ds, rel);
+              return relationType[rel.type](updated, ds, rel);
             }
 
             return model;

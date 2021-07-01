@@ -82,7 +82,7 @@ export default function DistributedCacheManager({
 
         await datasource.save(model.getId(), model);
 
-        if (callback) await callback();
+        if (callback) await callback({ ...event, model });
       } catch (e) {
         console.error("distributed cache", e);
       }
@@ -95,39 +95,42 @@ export default function DistributedCacheManager({
     }
 
     try {
-      console.debug({ model: event.model, args: event.args });
-
-      const modelArr = [];
       const dataSource = getDataSource(event.relation.modelName);
 
-      event.args.forEach(async arg => {
-        try {
-          const model = await models.createModel(
-            observer,
-            dataSource,
-            event.relation.modelName,
-            arg
-          );
-          modelArr.push(model);
-        } catch (e) {
-          console.warn(evaluateSourceModel.name, e);
-        }
-      });
+      const modelArr = await Promise.all(
+        event.args.map(async arg => {
+          try {
+            return await models.createModel(
+              observer,
+              dataSource,
+              event.relation.modelName,
+              arg
+            );
+          } catch (e) {
+            console.warn(evaluateSourceModel.name, e);
+            throw new Error("create models", e);
+          }
+        })
+      );
 
       if (!modelArr[0]) {
         console.warn("no model instance created");
         return event.model;
       }
 
+      const saved = await Promise.all(
+        modelArr.map(async model => await dataSource.save(model.getId(), model))
+      );
+
       if (event.relation.type === "manyToOne") {
         return {
           ...event.model,
-          [event.relation.foreignKey]: modelArr[0].getId(),
+          [event.relation.foreignKey]: saved[0].getId(),
         };
       }
 
       if (event.relation.type === "oneToMany") {
-        modelArr.forEach(
+        saved.forEach(
           async model =>
             await model.update({ [event.relation.foreignKey]: event.model.id })
         );
@@ -153,22 +156,31 @@ export default function DistributedCacheManager({
         return;
       }
 
-      const sourceModel = await evaluateSourceModel(event);
+      try {
+        const sourceModel = await evaluateSourceModel(event);
+        // find the requested object
+        const model = await relationType[event.relation.type](
+          sourceModel,
+          getDataSource(event.relation.modelName),
+          event.relation
+        );
 
-      // find the requested object
-      const model = await relationType[event.relation.type](
-        sourceModel,
-        getDataSource(event.relation.modelName),
-        event.relation
-      );
-
-      if (model) {
-        console.info("found object", model.modelName, model.getId());
-        if (callback) {
-          await callback({ model, relation: event.relation });
+        if (model) {
+          console.info("found object", model.modelName, model.getId());
+          if (callback) {
+            await callback({
+              model,
+              relation: event.relation,
+              sourceModel,
+            });
+          }
+          return;
         }
+      } catch (error) {
+        console.warn(error);
         return;
       }
+
       console.warn("no object found");
     };
   }
