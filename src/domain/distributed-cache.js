@@ -156,8 +156,6 @@ export default function DistributedCacheManager({
         })
       );
 
-      listen("CREATE" + modelName.toUpperCase(), updateCache({ modelName }));
-
       [
         models.getEventName(models.EventTypes.UPDATE, modelName),
         models.getEventName(models.EventTypes.CREATE, modelName),

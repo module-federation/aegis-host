@@ -2,7 +2,7 @@
  * Serverless test harness.
  */
 
-const microlib = require("./dist");
+const microlib = require("../../../dist");
 
 function awsEvent(method, path) {
   return {
