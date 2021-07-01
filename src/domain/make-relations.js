@@ -23,26 +23,6 @@ export const relationType = {
    * @param {import("./index").relations[relation]} config
    */
   manyToOne: async (model, ds, rel) => await ds.find(model[rel.foreignKey]),
-  /**
-   * Same as many to one as far as the lookup.
-   * @param {*} model
-   * @param {*} ds
-   * @param {*} rel
-   * @returns
-   */
-  oneToOne(model, ds, rel) {
-    return this.manyToOne(model, ds, rel);
-  },
-  /**
-   * Used for transparent integration.
-   * @param {*} model
-   * @param {*} ds
-   * @param {*} rel
-   * @returns
-   */
-  oneToAny(model, ds, rel) {
-    return ds.list({ count: 1 });
-  },
 };
 
 /**
@@ -61,7 +41,7 @@ export const relationType = {
  * @param {import("./observer").Observer} observer
  * @returns
  */
-export function requireRemoteObject(model, relation, observer) {
+export function requireRemoteObject(model, relation, observer, ...args) {
   const request = domainEvents.internalCacheRequest(relation.modelName);
   const results = domainEvents.internalCacheResponse(relation.modelName);
   const execute = fn => () => fn();
@@ -69,8 +49,13 @@ export function requireRemoteObject(model, relation, observer) {
   return new Promise(async function (resolve) {
     setTimeout(resolve, maxwait);
     observer.on(results, execute(resolve));
-    await observer.notify(request, { eventName: request, relation, model });
-    console.debug("sent event", request);
+    await observer.notify(request, {
+      eventName: request,
+      relation,
+      model,
+      args,
+    });
+    console.debug(requireRemoteObject.name, request);
     return request;
   });
 }
@@ -95,7 +80,7 @@ export default function makeRelations(relations, dataSource, observer) {
         }
 
         return {
-          async [relation]() {
+          async [relation](...args) {
             let ds, requested;
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
@@ -104,13 +89,18 @@ export default function makeRelations(relations, dataSource, observer) {
                 .getFactory()
                 .getDataSource(rel.modelName, true); // memory only
 
-              requested = await requireRemoteObject(this, rel, observer);
+              requested = await requireRemoteObject(
+                this,
+                rel,
+                observer,
+                ...args
+              );
             }
             ds = dataSource.getFactory().getDataSource(rel.modelName);
 
             const model = await relationType[rel.type](this, ds, rel);
             if (!model && !requested) {
-              await requireRemoteObject(this, rel, observer);
+              await requireRemoteObject(this, rel, observer, ...args);
             }
 
             if (!model) {

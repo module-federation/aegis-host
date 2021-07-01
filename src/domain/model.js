@@ -9,7 +9,7 @@
  * @property {function(Model,*,number):Model} Symbol_validate - run validations, see `eventMask`
  * @property {function(Model,*):Model} Symbol_onUpdate - immutable/private update function
  * @property {function(Model)} Symbol_onDelete - immutable/private delete function
- * @property {function(Object, boolean)} update - use this function to update the model -
+ * @property {function(Object, boolean)} update - {@link Model.update} use this function to update the model -
  * specify changes as properties of an object, specify false to skip validation.
  * @property {function()} toJSON - de/serialization logic
  * @property {function(eventName,function(eventName,Model):void)} addListener listen
@@ -166,7 +166,7 @@ const Model = (() => {
       /**
        * Run validation logic
        * @param {*} changes - updated values
-       * @param {eventMask} event - event type, see `eventMask`
+       * @param {eventMask} event - event type, see {@link eventMask}.
        * @returns {Model} - updated model
        */
       [VALIDATE](changes, event) {
@@ -175,7 +175,7 @@ const Model = (() => {
 
       /**
        * Return the `eventMask` key name of the value of `event`.
-       * Could potentially return multiple key names. See `eventMask`.
+       * Could potentially return multiple key names. See {@link eventMask}.
        * @param {number} event
        * @returns {string|string[]} key name: update, change, onload
        */

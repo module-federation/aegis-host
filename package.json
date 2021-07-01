@@ -17,7 +17,8 @@
     "url": "https://github.com/module-federation/microlib"
   },
   "scripts": {
-    "build": "cp webpack/remote-entries-build.js webpack/remote-entries.js && npm run clean && npm run transpile && webpack --config webpack.config.js",
+    "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
+    "build-all": "cp webpack/remote-entries-build.js webpack/remote-entries.js && npm run clean && npm run transpile && webpack --config webpack.config.js",
     "build-order": "cp webpack/remote-entries-order.js webpack/remote-entries.js && npm run build",
     "build-customer": "cp webpack/remote-entries-customer.js webpack/remote-entries.js && npm run build",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
