@@ -18,8 +18,8 @@ export default function brokerEvents(observer, getDataSource, models) {
 
   // Distributed object cache - must be explicitly enabled
   if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
-    const notify = (eventName, eventData) =>
-      EventBus.notify(BROADCAST, JSON.stringify({ eventName, eventData }));
+    const notify = eventData =>
+      EventBus.notify(BROADCAST, JSON.stringify(eventData));
 
     const listen = (eventName, callback) =>
       EventBus.listen({
@@ -29,7 +29,7 @@ export default function brokerEvents(observer, getDataSource, models) {
         filters: [eventName],
         callback,
       });
-      
+
     const broker = DistributedCacheManager({
       observer,
       getDataSource,

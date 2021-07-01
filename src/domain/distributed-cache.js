@@ -33,8 +33,8 @@ export default function DistributedCacheManager({
     return async function ({ message }) {
       const event = JSON.parse(message);
 
-      if (!event.eventName) {
-        console.warn("missing eventname", event);
+      if (!event.eventName || !event.model) {
+        console.warn("invalid message format", event);
         return;
       }
 
@@ -62,13 +62,13 @@ export default function DistributedCacheManager({
         console.debug(
           "unmarshal deserialized model",
           modelName,
-          event.eventData ? event.eventData.id : event.model.id
+          event.model.id
         );
 
         const model = models.loadModel(
           observer,
           datasource,
-          event.eventData ? event.eventData : event.model,
+          event.model,
           modelName
         );
 
@@ -88,20 +88,24 @@ export default function DistributedCacheManager({
   function searchCache({ callback }) {
     return async function ({ message }) {
       const event = JSON.parse(message);
-      const eventData = event.eventData;
+
+      if (!event || !event.relation) {
+        console.error("invalid msg format", searchCache.name, event);
+        return;
+      }
 
       // find the requested object
-      const model = await relationType[eventData.relation.type](
-        eventData.model,
-        getDataSource(eventData.relation.modelName),
-        eventData.relation
+      const model = await relationType[event.relation.type](
+        event.model,
+        getDataSource(event.relation.modelName),
+        event.relation
       );
 
       if (model) {
         console.info("found object", model.modelName, model.getId());
-        //if (callback) {
-        callback(model);
-        //}
+        if (callback) {
+          callback({ model, relation: event.relation });
+        }
         return;
       }
       console.warn("no object found");
@@ -121,10 +125,12 @@ export default function DistributedCacheManager({
         modelSpecs
           .filter(m => m.relations) // only models with relations
           .map(m =>
-            Object.keys(m.relations).filter(
-              // filter out existing local models
-              k => !registeredModels.includes(m.relations[k].modelName)
-            )
+            Object.keys(m.relations)
+              .filter(
+                // filter out existing local models
+                k => !registeredModels.includes(m.relations[k].modelName)
+              )
+              .map(k => m.relations[k].modelName)
           )
           .reduce((a, b) => a.concat(b))
       ),
@@ -132,7 +138,7 @@ export default function DistributedCacheManager({
 
     unregisteredModels.forEach(modelName => {
       observer.on(domainEvents.internalCacheRequest(modelName), eventData =>
-        notify(domainEvents.externalCacheRequest(modelName), {
+        notify({
           ...eventData,
           eventName: domainEvents.externalCacheRequest(modelName),
         })
@@ -142,10 +148,15 @@ export default function DistributedCacheManager({
         domainEvents.externalCacheResponse(modelName),
         updateCache({
           modelName,
-          callback: () =>
-            observer.notify(domainEvents.internalCacheResponse(modelName)),
+          callback: eventData =>
+            observer.notify(domainEvents.internalCacheResponse(modelName), {
+              ...eventData,
+              eventName: domainEvents.internalCacheResponse(modelName),
+            }),
         })
       );
+
+      listen("CREATE" + modelName.toUpperCase(), updateCache({ modelName }));
 
       [
         models.getEventName(models.EventTypes.UPDATE, modelName),
@@ -159,16 +170,18 @@ export default function DistributedCacheManager({
         domainEvents.externalCacheRequest(modelName),
         searchCache({
           callback: eventData =>
-            notify(domainEvents.externalCacheResponse(modelName), eventData),
+            notify({
+              ...eventData,
+              eventName: domainEvents.externalCacheResponse(modelName),
+            }),
         })
       );
-
       [
         models.getEventName(models.EventTypes.UPDATE, modelName),
         models.getEventName(models.EventTypes.CREATE, modelName),
         models.getEventName(models.EventTypes.DELETE, modelName),
       ].forEach(eventName =>
-        observer.on(eventName, eventData => notify(eventName, eventData))
+        observer.on(eventName, eventData => notify(eventData))
       );
     });
   }
