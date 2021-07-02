@@ -24,7 +24,7 @@ Note: you no longer need to run the MicroLib-Example project, as the host has be
 modules directly from GitHub. To import your own app, update the `webpack/remote-entries.js` to point to your remoteEntry.js file. If you point to a GitHub repo, be sure to specify, owner, repo, filedir, and branch. 
 ## Purpose
 
-Stop paying the "microservices premium".
+Stop paying the "microservices premium."
 
 When evaluating microservices as a candidate architecture, the most important fact to consider is that you are building a distributed application. Microservices are the components of distributed applications - and distribution is what enables their chief virtue, deployment independence. Unfortunately, relative to the traditional alternative, monoliths, distributed apps are much harder to build and manage. So much so, that many microservice implementations fail.
 
