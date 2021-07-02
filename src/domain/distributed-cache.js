@@ -158,6 +158,7 @@ export default function DistributedCacheManager({
       try {
         const sourceModel = await evaluateSourceModel(event);
         getDataSource(sourceModel.modelName).save(sourceModel.id, sourceModel);
+
         // find the requested object
         const model = await relationType[event.relation.type](
           sourceModel,
@@ -167,6 +168,7 @@ export default function DistributedCacheManager({
 
         if (model) {
           console.info("found object", model.modelName, model.getId());
+
           if (callback) {
             await callback({
               model,
@@ -241,7 +243,7 @@ export default function DistributedCacheManager({
       ].forEach(eventName => listen(eventName, updateCache({ modelName })));
     });
 
-    registeredModels.forEach(modelName => {
+    registeredModels.forEach(function (modelName) {
       listen(
         domainEvents.externalCacheRequest(modelName),
         searchCache({
@@ -252,6 +254,7 @@ export default function DistributedCacheManager({
             }),
         })
       );
+
       [
         models.getEventName(models.EventTypes.UPDATE, modelName),
         models.getEventName(models.EventTypes.CREATE, modelName),

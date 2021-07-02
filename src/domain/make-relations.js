@@ -23,6 +23,15 @@ export const relationType = {
    * @param {import("./index").relations[relation]} config
    */
   manyToOne: async (model, ds, rel) => await ds.find(model[rel.foreignKey]),
+  /**
+   *
+   * @param {*} model
+   * @param {*} ds
+   * @param {*} rel
+   */
+  oneToOne(model, ds, rel) {
+    return this.manyToOne(model, ds, rel);
+  },
 };
 
 /**
@@ -42,23 +51,14 @@ export const relationType = {
  * @returns
  */
 export function requireRemoteObject(model, relation, observer, ...args) {
-  const request = domainEvents.internalCacheRequest(relation.modelName);
+  const eventName = domainEvents.internalCacheRequest(relation.modelName);
   const results = domainEvents.internalCacheResponse(relation.modelName);
-  const execute = resolve => async eventData => {
-    const merge = { ...model, ...eventData.sourceModel };
-    resolve(merge);
-  };
+  const execute = resolve => async event => resolve(event.sourceModel);
 
   return new Promise(async function (resolve) {
     setTimeout(resolve, maxwait);
     observer.on(results, execute(resolve));
-    await observer.notify(request, {
-      eventName: request,
-      relation,
-      model,
-      args,
-    });
-    console.debug(requireRemoteObject.name, request);
+    await observer.notify(eventName, { eventName, relation, model, args });
   });
 }
 
@@ -87,23 +87,20 @@ export default function makeRelations(relations, dataSource, observer) {
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
               console.warn("possible cache miss, check remote cache");
+
               ds = await dataSource
                 .getFactory()
                 .getDataSource(rel.modelName, true); // memory only
-
               updated = await requireRemoteObject(this, rel, observer, ...args);
-              dataSource.save(updated.getId(), updated);
+              dataSource.save(updated.id, updated);
             }
             ds = dataSource.getFactory().getDataSource(rel.modelName);
-
             const model = await relationType[rel.type](this, ds, rel);
+
             if (!model && !updated) {
               updated = await requireRemoteObject(this, rel, observer, ...args);
               if (updated) {
-                setTimeout(
-                  () => dataSource.save(updated.getId(), updated),
-                  2000
-                );
+                setTimeout(() => dataSource.save(updated.id, updated), 1000);
               }
             }
 
