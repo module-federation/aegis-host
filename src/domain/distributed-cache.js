@@ -118,6 +118,8 @@ export default function DistributedCacheManager({
         return event.model;
       }
 
+      console.info("created", modelArr);
+
       const saved = await Promise.all(
         modelArr.map(async model => await dataSource.save(model.getId(), model))
       );

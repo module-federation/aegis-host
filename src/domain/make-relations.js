@@ -83,8 +83,7 @@ export default function makeRelations(relations, dataSource, observer) {
 
         return {
           async [relation](...args) {
-            let ds;
-            let updated = this;
+            let ds, updated;
 
             if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
               console.warn("possible cache miss, check remote cache");
@@ -106,7 +105,7 @@ export default function makeRelations(relations, dataSource, observer) {
             }
 
             if (!model) {
-              return relationType[rel.type](updated, ds, rel);
+              return relationType[rel.type](this, ds, rel);
             }
 
             return model;
