@@ -89,7 +89,18 @@ export default function DistributedCacheManager({
     };
   }
 
-  async function evaluateSourceModel(event) {
+  /**
+   * Creates new, related models if telation function is called
+   * with arguments, e.g.
+   * ```js
+   * const customer = await order.customer(customerDetails);
+   * const customers = await order.customer(cust1, cust2);
+   * ```
+   *
+   * @param {*} event
+   * @returns
+   */
+  async function createRelatedObject(event) {
     if (!event.args || !event.args.length > 0) {
       return event.model;
     }
@@ -107,7 +118,7 @@ export default function DistributedCacheManager({
               arg
             );
           } catch (e) {
-            throw new Error(evaluateSourceModel.name);
+            throw new Error(createRelatedObject.name);
           }
         })
       );
@@ -156,7 +167,7 @@ export default function DistributedCacheManager({
       }
 
       try {
-        const sourceModel = await evaluateSourceModel(event);
+        const sourceModel = await createRelatedObject(event);
         getDataSource(sourceModel.modelName).save(sourceModel.id, sourceModel);
 
         // find the requested object
