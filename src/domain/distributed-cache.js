@@ -107,8 +107,7 @@ export default function DistributedCacheManager({
               arg
             );
           } catch (e) {
-            console.warn(evaluateSourceModel.name, e);
-            throw new Error("create models", e);
+            throw new Error(evaluateSourceModel.name);
           }
         })
       );
@@ -117,8 +116,6 @@ export default function DistributedCacheManager({
         console.warn("no model instance created");
         return event.model;
       }
-
-      console.info("created", modelArr);
 
       const saved = await Promise.all(
         modelArr.map(async model => await dataSource.save(model.getId(), model))
@@ -160,6 +157,7 @@ export default function DistributedCacheManager({
 
       try {
         const sourceModel = await evaluateSourceModel(event);
+        getDataSource(sourceModel.modelName).save(sourceModel.id, sourceModel);
         // find the requested object
         const model = await relationType[event.relation.type](
           sourceModel,
@@ -211,7 +209,7 @@ export default function DistributedCacheManager({
       ),
     ];
 
-    unregisteredModels.forEach(modelName => {
+    unregisteredModels.forEach(function (modelName) {
       observer.on(
         domainEvents.internalCacheRequest(modelName),
         async eventData =>

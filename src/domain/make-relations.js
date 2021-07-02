@@ -92,7 +92,6 @@ export default function makeRelations(relations, dataSource, observer) {
                 .getDataSource(rel.modelName, true); // memory only
 
               updated = await requireRemoteObject(this, rel, observer, ...args);
-              console.debug("updated", updated);
               dataSource.save(updated.getId(), updated);
             }
             ds = dataSource.getFactory().getDataSource(rel.modelName);
@@ -100,8 +99,12 @@ export default function makeRelations(relations, dataSource, observer) {
             const model = await relationType[rel.type](this, ds, rel);
             if (!model && !updated) {
               updated = await requireRemoteObject(this, rel, observer, ...args);
-              dataSource.save(updated.getId(), updated);
-              console.debug("2nd updated", updated);
+              if (updated) {
+                setTimeout(
+                  () => dataSource.save(updated.getId(), updated),
+                  2000
+                );
+              }
             }
 
             if (!model) {

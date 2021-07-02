@@ -1,3 +1,5 @@
+const cache = require("./remote-entries-cache");
+
 module.exports = [
   {
     name: "microservices",
@@ -5,7 +7,7 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "master",
+    branch: "test-customer",
     path: __dirname,
     type: "model",
     importRemote: async () => import("microservices/models"),
@@ -16,7 +18,7 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "master",
+    branch: "test-customer",
     path: __dirname,
     type: "adapter",
     importRemote: async () => import("microservices/adapters"),
@@ -27,9 +29,9 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "master",
+    branch: "test-customer",
     path: __dirname,
     type: "service",
     importRemote: async () => import("microservices/services"),
   },
-];
+].concat(cache);
