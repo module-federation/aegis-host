@@ -35,25 +35,24 @@ export const relationType = {
 };
 
 /**
- * Retrieve a remote object from the distributed cache.
+ * Fetch or create a remote object from the distributed
+ * cache and store it in the local cache.
+ *
  * Sends a request message and receives a response from
  * the cache manager.
  *
- * If a relation specifies an object we don't have locally,
- * broadcast a global event that includes the relation details.
- * Other hosts subscribed to the relevant cache events will run
- * the relation to find the model instance. If found, it is sent
- * back to us in an event. The caller waits until this happens or
- * the operation times out.
+ * Returns an updated source model (this) if a new
+ * model is created and a new foreign key must be saved.
  *
  * @param {import(".").relations[x]} relation
  * @param {import("./observer").Observer} observer
- * @returns
+ * @returns {Promise<import(".").Model>} source model
  */
 export function requireRemoteObject(model, relation, observer, ...args) {
   const eventName = domainEvents.internalCacheRequest(relation.modelName);
   const results = domainEvents.internalCacheResponse(relation.modelName);
-  const execute = resolve => async event => resolve(event.sourceModel);
+  const execute = resolve => event =>
+    resolve({ ...model, ...event.sourceModel });
 
   return new Promise(async function (resolve) {
     setTimeout(resolve, maxwait);
@@ -65,9 +64,9 @@ export function requireRemoteObject(model, relation, observer, ...args) {
 /**
  * Generate functions to retrieve related domain objects.
  * @param {import("./index").relations} relations
- * @param {*} dataSource
+ * @param {*} datasource
  */
-export default function makeRelations(relations, dataSource, observer) {
+export default function makeRelations(relations, datasource, observer) {
   if (Object.getOwnPropertyNames(relations).length < 1) return;
 
   return Object.keys(relations)
@@ -82,29 +81,37 @@ export default function makeRelations(relations, dataSource, observer) {
         }
 
         return {
+          // the relation function
           async [relation](...args) {
-            let ds, updated;
+            // Get the datasource of the related object
+            // specify true in case the object is remote
+            const ds = datasource
+              .getFactory() 
+              .getDataSource(rel.modelName, true);
 
-            if (!dataSource.getFactory().hasDataSource(rel.modelName)) {
-              console.warn("possible cache miss, check remote cache");
-
-              ds = await dataSource
-                .getFactory()
-                .getDataSource(rel.modelName, true); // memory only
-              updated = await requireRemoteObject(this, rel, observer, ...args);
-              dataSource.save(updated.id, updated);
-            }
-            ds = dataSource.getFactory().getDataSource(rel.modelName);
             const model = await relationType[rel.type](this, ds, rel);
 
-            if (!model && !updated) {
-              updated = await requireRemoteObject(this, rel, observer, ...args);
-              if (updated) {
-                setTimeout(() => dataSource.save(updated.id, updated), 1000);
-              }
-            }
-
             if (!model) {
+              // couldn't find the object - try remotes
+              const updated = await requireRemoteObject(
+                this,
+                rel,
+                observer,
+                ...args
+              );
+
+              if (updated) {
+                // found it
+                setTimeout(
+                  () =>
+                    datasource
+                      .getFactory()
+                      .getDataSource(updated.getName())
+                      .save(updated.getId(), updated),
+                  1000
+                );
+              }
+
               return relationType[rel.type](this, ds, rel);
             }
 

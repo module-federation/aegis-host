@@ -32195,25 +32195,26 @@ module.exports = require("zlib");
 /******/ 		const fs = require("fs");
 /******/ 		const path = require("path");
 /******/ 		const token = process.env.GITHUB_TOKEN;
-/******/ 		const branch = process.env.GITHUB_BRANCH || "master";
-/******/ 		const repo = process.env.GITHUB_REPO || "MicroLib-Example";
-/******/ 		const owner = process.env.GITHUB_OWNER || "module-federation";
-/******/ 		const gitpath = process.env.GITHUB_PATH || "dist";
 /******/ 		
 /******/ 		const octokit = new Octokit({ auth: token });
 /******/ 		
-/******/ 		function giTit(url) {
+/******/ 		function githubFetch(url) {
+/******/ 		  console.info("github url", url);
+/******/ 		  const owner = url.searchParams.get("owner");
+/******/ 		  const repo = url.searchParams.get("repo");
+/******/ 		  const filedir = url.searchParams.get("filedir");
+/******/ 		  const branch = url.searchParams.get("branch");
 /******/ 		  return new Promise(function (resolve, reject) {
 /******/ 		    octokit
-/******/ 		    .request(
-/******/ 		      "GET /repos/{owner}/{repo}/contents/{gitpath}?ref={branch}",
-/******/ 		      {
-/******/ 		        owner,
-/******/ 		        repo,
-/******/ 		        gitpath,
-/******/ 		        branch,
-/******/ 		      }
-/******/ 		    )
+/******/ 		      .request(
+/******/ 		        "GET /repos/{owner}/{repo}/contents/{filedir}?ref={branch}",
+/******/ 		        {
+/******/ 		          owner,
+/******/ 		          repo,
+/******/ 		          filedir,
+/******/ 		          branch
+/******/ 		        }
+/******/ 		      )
 /******/ 		      .then(function (rest) {
 /******/ 		        const file = rest.data.find(d => "/" + d.name === url.pathname);
 /******/ 		        return file.sha;
@@ -32236,10 +32237,10 @@ module.exports = require("zlib");
 /******/ 		}
 /******/ 		function httpRequest(url) {
 /******/ 		  if (/github/i.test(url.hostname)) 
-/******/ 		    return giTit(url)
-/******/ 		  return httpRequestPlain(url)
+/******/ 		    return githubFetch(url)
+/******/ 		  return httpGet(url)
 /******/ 		}
-/******/ 		function httpRequestPlain(params) {
+/******/ 		function httpGet(params) {
 /******/ 		  return new Promise(function(resolve, reject) {
 /******/ 		    var req = require(params.protocol.slice(0, params.protocol.length - 1)).request(params, function(res) {
 /******/ 		      if (res.statusCode < 200 || res.statusCode >= 300) {

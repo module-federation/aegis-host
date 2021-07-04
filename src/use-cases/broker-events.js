@@ -11,9 +11,9 @@ const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 /**
  * Handle internal and external events.
  * @param {import('../domain/observer').Observer} observer
- * @param {function():DataSource} getDataSource
+ * @param {import("../domain/datasource-factory")} datasources
  */
-export default function brokerEvents(observer, getDataSource, models) {
+export default function brokerEvents(observer, datasources, models) {
   observer.on(/.*/, async event => publishEvent(event));
 
   // Distributed object cache - must be explicitly enabled
@@ -32,7 +32,7 @@ export default function brokerEvents(observer, getDataSource, models) {
 
     const broker = DistributedCacheManager({
       observer,
-      getDataSource,
+      datasources,
       models,
       notify,
       listen,
@@ -49,13 +49,13 @@ export default function brokerEvents(observer, getDataSource, models) {
   process.on("message", ({ cmd, id, pid, data, name }) => {
     if (cmd && id && data && process.pid !== pid) {
       if (cmd === "saveCommand") {
-        const ds = getDataSource(name);
+        const ds = datasources.getDataSource(name);
         ds.save(id, data, false);
         return;
       }
 
       if (cmd === "deleteCommand") {
-        const ds = getDataSource(name);
+        const ds = datasources.getDataSource(name);
         ds.delete(id, false);
         return;
       }

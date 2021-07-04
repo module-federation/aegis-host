@@ -3,9 +3,10 @@
 import { relationType } from "./make-relations";
 import { importRemoteCache } from ".";
 import domainEvents from "./domain-events";
+import e from "express";
 
 /**
- * Implement distributed object cache. Find any model
+ * Implements distributed object cache. Find any model
  * referenced by a relation that is not registered in
  * the model factory and listen for remote CRUD events
  * from it. On receipt of the event, import the remote
@@ -15,7 +16,7 @@ import domainEvents from "./domain-events";
  *
  * @param {{
  *  observer:import("./observer").Observer,
- *  getDataSource:import("./datasource").default#getDataSource,
+ *  datasources:import("./datasource-factory").DataSourceFactory,
  *  models:import("./model-factory").ModelFactory,
  *  listen:function(...args),
  *  notify:function(...args)
@@ -24,7 +25,7 @@ import domainEvents from "./domain-events";
 export default function DistributedCacheManager({
   models,
   observer,
-  getDataSource,
+  datasources,
   listen,
   notify,
 }) {
@@ -52,13 +53,11 @@ export default function DistributedCacheManager({
         event.eventName ===
         models.getEventName(models.EventTypes.DELETE, modelName)
       ) {
-        const datasource = getDataSource(event.modelName);
         console.debug("deleting from cache", event.modelName, event.modelId);
-        return datasource.delete(event.modelId);
+        return datasources.getDataSource(event.modelName).delete(event.modelId);
       }
 
       console.debug("check if we have the code for this object...");
-      const datasource = getDataSource(modelName);
 
       if (!models.getModelSpec(modelName)) {
         console.debug("we don't, import it...");
@@ -72,6 +71,8 @@ export default function DistributedCacheManager({
           modelName,
           event.model.id
         );
+
+        const datasource = datasources.getDataSource(modelName);
 
         const model = models.loadModel(
           observer,
@@ -90,7 +91,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Creates new, related models if telation function is called
+   * Creates new, related models if relation function is called
    * with arguments, e.g.
    * ```js
    * const customer = await order.customer(customerDetails);
@@ -106,33 +107,43 @@ export default function DistributedCacheManager({
     }
 
     try {
-      const dataSource = getDataSource(event.relation.modelName);
+      const datasource = datasources.getDataSource(event.relation.modelName);
 
-      const modelArr = await Promise.all(
+      const newModels = await Promise.all(
         event.args.map(async arg => {
           try {
             return await models.createModel(
               observer,
-              dataSource,
+              datasource,
               event.relation.modelName,
               arg
             );
           } catch (e) {
-            throw new Error(createRelatedObject.name);
+            console.warn(createRelatedObject.name, e);
+            return {
+              model: event.model,
+              error: e.message,
+            };
           }
         })
       );
 
-      if (!modelArr[0]) {
-        console.warn("no model instance created");
-        return event.model;
+      if (!newModels[0]) {
+        const error = "no model instance created";
+        console.warn(error);
+        return {
+          model: event.model,
+          error,
+        };
       }
 
       const saved = await Promise.all(
-        modelArr.map(async model => await dataSource.save(model.getId(), model))
+        newModels.map(async model =>
+          model ? datasource.save(model.getId(), model) : "error: no model"
+        )
       );
 
-      if (event.relation.type === "manyToOne") {
+      if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
         return {
           ...event.model,
           [event.relation.foreignKey]: saved[0].getId(),
@@ -154,7 +165,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   *
+   * Search the cache
    * @param {{callback:function()}} param0
    */
   function searchCache({ callback }) {
@@ -162,30 +173,42 @@ export default function DistributedCacheManager({
       const event = JSON.parse(message);
 
       if (!event || !event.relation) {
-        console.error("invalid msg format", searchCache.name, event);
-        return;
+        const error = "invalid message format";
+        console.error(error, searchCache.name, event);
+        return callback({
+          model: event.model,
+          relation: event.relation,
+          error,
+        });
       }
 
       try {
         const sourceModel = await createRelatedObject(event);
-        getDataSource(sourceModel.modelName).save(sourceModel.id, sourceModel);
+        if (sourceModel.error) {
+          return callback({
+            model: event.model,
+            relation: event.relation,
+            sourceModel: sourceModel.sourceModel,
+            error: sourceModel.error,
+          });
+        }
+
+        await datasources
+          .getDataSource(sourceModel.modelName, true)
+          .save(sourceModel.id, sourceModel);
 
         // find the requested object
         const model = await relationType[event.relation.type](
           sourceModel,
-          getDataSource(event.relation.modelName),
+          datasources.getDataSource(event.relation.modelName),
           event.relation
         );
 
         if (model) {
-          console.info("found object", model.modelName, model.getId());
+          console.info("found object", model.getName(), model.getId());
 
           if (callback) {
-            await callback({
-              model,
-              relation: event.relation,
-              sourceModel,
-            });
+            await callback({ model, relation: event.relation, sourceModel });
           }
           return;
         }
@@ -205,8 +228,8 @@ export default function DistributedCacheManager({
    */
   function startListening() {
     const modelSpecs = models.getModelSpecs();
-    const registeredModels = modelSpecs.map(m => m.modelName);
-    const unregisteredModels = [
+    const localModels = modelSpecs.map(m => m.modelName);
+    const remoteModels = [
       ...new Set( // deduplicate
         modelSpecs
           .filter(m => m.relations) // only models with relations
@@ -214,7 +237,7 @@ export default function DistributedCacheManager({
             Object.keys(m.relations)
               .filter(
                 // filter out existing local models
-                k => !registeredModels.includes(m.relations[k].modelName)
+                k => !localModels.includes(m.relations[k].modelName)
               )
               .map(k => m.relations[k].modelName)
           )
@@ -222,7 +245,9 @@ export default function DistributedCacheManager({
       ),
     ];
 
-    unregisteredModels.forEach(function (modelName) {
+    // Forward requests to, handle responses from remote models
+    remoteModels.forEach(function (modelName) {
+      // listen for internal requests and forward
       observer.on(
         domainEvents.internalCacheRequest(modelName),
         async eventData =>
@@ -232,6 +257,7 @@ export default function DistributedCacheManager({
           })
       );
 
+      // listen for external responses and forward internally
       listen(
         domainEvents.externalCacheResponse(modelName),
         updateCache({
@@ -248,18 +274,20 @@ export default function DistributedCacheManager({
       );
 
       [
+        // Listen for CRUD write events from related models
         models.getEventName(models.EventTypes.UPDATE, modelName),
         models.getEventName(models.EventTypes.CREATE, modelName),
         models.getEventName(models.EventTypes.DELETE, modelName),
       ].forEach(eventName => listen(eventName, updateCache({ modelName })));
     });
 
-    registeredModels.forEach(function (modelName) {
+    // Listen for cache search requests from local models.
+    localModels.forEach(function (modelName) {
       listen(
         domainEvents.externalCacheRequest(modelName),
         searchCache({
           callback: async eventData =>
-            await notify({
+            notify({
               ...eventData,
               eventName: domainEvents.externalCacheResponse(modelName),
             }),
@@ -267,11 +295,12 @@ export default function DistributedCacheManager({
       );
 
       [
+        // listen for internal CRUD write events and forward
         models.getEventName(models.EventTypes.UPDATE, modelName),
         models.getEventName(models.EventTypes.CREATE, modelName),
         models.getEventName(models.EventTypes.DELETE, modelName),
       ].forEach(eventName =>
-        observer.on(eventName, async eventData => await notify(eventData))
+        observer.on(eventName, async eventData => notify(eventData))
       );
     });
   }

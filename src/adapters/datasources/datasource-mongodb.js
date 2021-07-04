@@ -70,24 +70,25 @@ export class DataSourceMongoDb extends DataSourceMemory {
   async checkConnection(error) {
     try {
       console.error("check connection on error", error);
-      if (!this.client || !this.client.isConnected) {
-        await this.connectDb();
-        this.setCollection();
-        return this.flush();
-      }
+      await this.connectDb();
+      this.setCollection();
     } catch (error) {
       console.error(error);
     }
   }
 
   async findDb(id) {
-    const model = await this.collection.findOne({ _id: id });
-    if (!model) {
-      await this.checkConnection("document not found");
-      return model;
+    try {
+      const model = await this.collection.findOne({ _id: id });
+      if (!model) {
+        this.setCollection();
+        return model;
+      }
+      // add to the cache and return it
+      return super.save(id, this.hydrate(model));
+    } catch (error) {
+      this.checkConnection(error);
     }
-    // add to the cache and return it
-    return super.save(id, this.hydrate(model));
   }
 
   /**
@@ -183,8 +184,8 @@ export class DataSourceMongoDb extends DataSourceMemory {
   flush() {
     try {
       [...this.dataSource.values()].reduce(
-        (data, model) => data.then(this.saveDb(model.getId())),
-        Promise.resolve()
+        (a, b) => a.then(() => this.saveDb(b.getId(), b)),
+        {}
       );
     } catch (error) {
       console.error(error);
