@@ -36,11 +36,12 @@ export const relationType = {
 
 async function updateForeignKeys(model, event, relation) {
   console.log(updateForeignKeys.name, event);
+
   if (["manyToOne", "oneToOne"].includes(relation.type)) {
     await model.update({
       [relation.foreignKey]: event.modelId,
     });
-  } else if (relation.type === "oneToMany") {
+  } else if (relation.type === "oneToMany" && Array.isArray(model)) {
     await Promise.all(
       event.model.map(async m =>
         m.update({ [relation.foreignKey]: model.getId() })
@@ -112,7 +113,9 @@ export default function makeRelations(relations, datasource, observer) {
 
             const model = await relationType[rel.type](this, ds, rel);
 
-            if (!model) {
+            console.log("related", model);
+
+            if (!model || model.length < 1) {
               // couldn't find the object - try remotes
               const event = await requireRemoteObject(
                 this,

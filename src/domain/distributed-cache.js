@@ -104,7 +104,7 @@ export default function DistributedCacheManager({
     return async function (message) {
       try {
         const event = parse(message);
-        const { eventName, modelName, model } = event;
+        const { eventName, modelName, model, modelId } = event;
         console.debug("handle cache event", eventName);
 
         // if (handleDelete(eventName, modelName, event)) return;
@@ -112,7 +112,7 @@ export default function DistributedCacheManager({
         console.debug("check if we have the code for this object...");
         await streamModelCode(modelName);
 
-        console.debug("unmarshal deserialized model(s)", modelName);
+        console.debug("unmarshal deserialized model(s)", modelName, modelId);
         const datasource = datasources.getDataSource(modelName);
         const hydratedModel = hydrateModel(model, datasource, modelName);
 
@@ -126,18 +126,27 @@ export default function DistributedCacheManager({
     };
   }
 
-  async function updateForeignKeys(event, model) {
+  async function updateForeignKeys(event, model, datasource) {
     if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
+      const manyToOneDs = datasource
+        .getFactory()
+        .getDataSource(event.modelName);
+
       await saveModel(
-        hydrateModel({
-          ...event.model,
-          [event.relation.foreignKey]: model[0].getId(),
-        })
+        hydrateModel(
+          {
+            ...event.model,
+            [event.relation.foreignKey]: model[0].getId(),
+          },
+          manyToOneDs,
+          event.modelName
+        ),
+        manyToOneDs
       );
     } else if (event.relation.type === "oneToMany") {
       await Promise.all(
         model.map(async m =>
-          m.update({ [event.relation.foreignKey]: m.model.id })
+          m.update({ [event.relation.foreignKey]: model.getId() })
         )
       );
     }
@@ -182,7 +191,7 @@ export default function DistributedCacheManager({
       const newModels = createRelated(event);
       const relatedDs = datasources.getDataSource(event.relation.modelName);
       saveModel(newModels, relatedDs);
-      updateForeignKeys(event, newModels);
+      updateForeignKeys(event, relatedDs, newModels);
     } catch (e) {
       throw new Error(createRelatedObject.name, e.message);
     }
@@ -203,7 +212,7 @@ export default function DistributedCacheManager({
           await createRelatedObject(event);
         }
 
-        // find the requessted object
+        // find the requessted object(s)
         const related = await relationType[event.relation.type](
           event.model,
           datasources.getDataSource(event.relation.modelName),
@@ -212,11 +221,13 @@ export default function DistributedCacheManager({
 
         if (related) {
           console.log("found object(s)", related);
+          const rel = Array.isArray(related) ? related[0] : related;
+
           await router({
             ...event,
-            model: related,
-            modelName: related.getName(),
-            modelId: related.getId(),
+            model: rel,
+            modelName: rel.getName(),
+            modelId: rel.getId(),
           });
           return;
         }
@@ -237,7 +248,18 @@ export default function DistributedCacheManager({
     }
   }
 
-  async function subscribe(requestName, responseName) {
+  function subscribeResponse(responseName, internalResponseName) {
+    const callback = updateCache(event =>
+      observer.notify(internalResponseName, event)
+    );
+    if (useWebswitch) {
+      observer.on(responseName, callback);
+    } else {
+      listen(responseName, callback);
+    }
+  }
+
+  function subscribeRequest(requestName, responseName) {
     const eventName = responseName;
     console.debug("eventName", eventName);
 
@@ -299,11 +321,16 @@ export default function DistributedCacheManager({
       );
 
       // listen for external responses and forward internally
-      observer.on(
+      // observer.on(
+      //   domainEvents.externalCacheResponse(modelName),
+      //   updateCache(event =>
+      //     observer.notify(domainEvents.internalCacheResponse(modelName), event)
+      //   )
+      // );
+
+      subscribeResponse(
         domainEvents.externalCacheResponse(modelName),
-        updateCache(event =>
-          observer.notify(domainEvents.internalCacheResponse(modelName), event)
-        )
+        domainEvents.internalCacheResponse(modelName)
       );
 
       [
@@ -316,7 +343,7 @@ export default function DistributedCacheManager({
 
     // Listen for cache search requests from external models.
     localModels.forEach(function (modelName) {
-      subscribe(
+      subscribeRequest(
         domainEvents.externalCacheRequest(modelName),
         domainEvents.externalCacheResponse(modelName)
       );
