@@ -25,7 +25,7 @@ yarn run demo
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
 modules directly from GitHub. 
 
-[Importing your own app](#importing-your-own-app)
+[Importing your own app](#importing-your-own-repo)
 
 ## Purpose
 
