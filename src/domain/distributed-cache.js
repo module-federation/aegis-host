@@ -40,8 +40,7 @@ export default function DistributedCacheManager({
       const model = event.model;
       const modelId = event.model.id;
       const relation = event.relation; // optional
-
-      console.debug(eventName, modelName, model, modelId);
+      const args = event.args ? event.args : null / optional;
 
       if (!eventName || !modelName || !modelId || !model)
         throw new Error("invalid message format", message);
@@ -52,6 +51,7 @@ export default function DistributedCacheManager({
         model,
         modelId,
         relation,
+        args,
       };
     } catch (e) {
       console.error("could not parse message", message);
@@ -126,22 +126,18 @@ export default function DistributedCacheManager({
     };
   }
 
-  async function updateForeignKeys(event, model, datasource) {
+  async function updateForeignKeys(event, datasource, model) {
     if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
-      const manyToOneDs = datasource
-        .getFactory()
-        .getDataSource(event.modelName);
-
       await saveModel(
         hydrateModel(
           {
-            ...event.model,
-            [event.relation.foreignKey]: model[0].getId(),
+            ...model,
+            [event.relation.foreignKey]: model.id,
           },
-          manyToOneDs,
+          datasource,
           event.modelName
         ),
-        manyToOneDs
+        datasource
       );
     } else if (event.relation.type === "oneToMany") {
       await Promise.all(
@@ -167,6 +163,7 @@ export default function DistributedCacheManager({
         }
       })
     );
+    console.debug("new model(s)", newModels);
     return newModels;
   }
 
@@ -183,15 +180,15 @@ export default function DistributedCacheManager({
    * Updated source model (model that defines the relation)
    */
   async function createRelatedObject(event) {
-    if (!event.relation || !event.args || !event.args.length < 1) {
+    if (!event.relation || !event.args || event.args.length < 1) {
       console.info(createRelatedObject.name, "no relation or args", event);
       return event;
     }
     try {
-      const newModels = createRelated(event);
+      const newModels = await createRelated(event);
       const relatedDs = datasources.getDataSource(event.relation.modelName);
-      saveModel(newModels, relatedDs);
-      updateForeignKeys(event, relatedDs, newModels);
+      await saveModel(newModels, relatedDs);
+      await updateForeignKeys(event, relatedDs, newModels);
     } catch (e) {
       throw new Error(createRelatedObject.name, e.message);
     }
@@ -209,6 +206,7 @@ export default function DistributedCacheManager({
         const event = parse(message);
 
         if (event.args) {
+          console.debug("creating object/s");
           await createRelatedObject(event);
         }
 

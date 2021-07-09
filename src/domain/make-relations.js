@@ -8,7 +8,7 @@ export const relationType = {
   /**
    * @todo implement cache miss for distributed cache
    *
-   * @param {import("./model-factory").Model} model
+   * @param {import("./model").Model} model
    * @param {import("./datasource").default} ds
    * @param {import("./index").relations[relation]} rel
    */
@@ -34,17 +34,31 @@ export const relationType = {
   },
 };
 
-async function updateForeignKeys(model, event, relation) {
+async function updateForeignKeys(model, event, relation, datasource) {
   console.log(updateForeignKeys.name, event);
 
-  if (["manyToOne", "oneToOne"].includes(relation.type)) {
+  if (
+    [relationType.manyToOne.name, relationType.oneToOne.name].includes(
+      relation.type
+    )
+  ) {
     await model.update({
       [relation.foreignKey]: event.modelId,
     });
-  } else if (relation.type === "oneToMany" && Array.isArray(model)) {
+  } else if (
+    relation.type === relationType.oneToMany.name &&
+    Array.isArray(model) &&
+    event.args
+  ) {
+    const relatedDs = datasource.datasource
+      .getFactory()
+      .getDataSource(event.modelName);
+
     await Promise.all(
       event.model.map(async m =>
-        m.update({ [relation.foreignKey]: model.getId() })
+        (
+          await relatedDs.find(m.id)
+        ).update({ [relation.foreignKey]: model.getId() })
       )
     );
   }
@@ -123,7 +137,7 @@ export default function makeRelations(relations, datasource, observer) {
                 observer,
                 ...args
               );
-              await updateForeignKeys(this, event, rel);
+              await updateForeignKeys(this, event, rel, datasource);
               return relationType[rel.type](this, ds, rel);
             }
             return model;
