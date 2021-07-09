@@ -22,9 +22,10 @@ yarn build
 yarn start
 yarn run demo
 ```
-
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
-modules directly from GitHub. To import your own app, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and update owner, repo, filedir, and branch, if using GitHub as a remote. You must specify these same attributes in your remote repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). You also need the same version of webpack as in that repo and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack). 
+modules directly from GitHub. 
+
+[Importing your own app](#importing-your-own-app)
 
 ## Purpose
 
@@ -160,8 +161,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Running the Application
 
-s
-See above TLDS; section for a simplied install. Get up and running in about 60 seconds.
+See above TL;DS section for a simplied install. Get up and running in about 60 seconds.
 
 To demonstrate that polyrepo code sharing is a reality, you will clone two repos. The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote. The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
 
@@ -261,6 +261,9 @@ cert
 ```shell
 SSL_ENABLED=true
 ```
+### Importing your own repo
+
+To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). Also from microlib-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack). 
 
 ### Installation
 
