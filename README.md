@@ -17,10 +17,10 @@
 git clone https://github.com/module-federation/MicroLib
 cd MicroLib
 cp dotenv.example .env
-npm ci
-npm run build
-npm start
-npm run demo
+yarn install --frozen-lockfile
+yarn build
+yarn start
+yarn run demo
 ```
 
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
