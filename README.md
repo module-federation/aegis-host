@@ -24,7 +24,7 @@ yarn run demo
 ```
 
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
-modules directly from GitHub. To import your own app, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and update owner, repo, filedir, and branch, if using GitHub as a remote. You must specify these same attributes in your remote repo, only in the webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js).
+modules directly from GitHub. To import your own app, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and update owner, repo, filedir, and branch, if using GitHub as a remote. You must specify these same attributes in your remote repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). You also need the same version of webpack as in that repo and the extensions in the webpack dir. 
 
 ## Purpose
 
