@@ -11,13 +11,18 @@ const DefaultDataSource = adapters[defaultAdapter];
 
 /**
  * @todo handle all state same way
- * @typedef {{getDataSource:function():import("./datasource").default}} DataSourceFactory
+ * @typedef {{getDataSource:function(string):import("./datasource").default}} DataSourceFactory
  * @type {DataSourceFactory}
  */
 const DataSourceFactory = (() => {
   // References all DSes
   let dataSources;
 
+  /**
+   * @method
+   * @param {*} name
+   * @returns
+   */
   function hasDataSource(name) {
     return dataSources.has(name);
   }
@@ -82,6 +87,7 @@ const DataSourceFactory = (() => {
   return Object.freeze({
     /**
      * Get `DataSource` singleton
+     * @method
      * @returns {import('./datasource').default} DataSource singleton
      */
     getDataSource,

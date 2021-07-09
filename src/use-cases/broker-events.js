@@ -1,9 +1,11 @@
-import publishEvent from "../services/publish-event";
 import DistributedCacheManager from "../domain/distributed-cache";
 import uuid from "../domain/util/uuid";
 import EventBus from "../services/event-bus";
+import webswitch from "../services/webswitch";
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
+const useDistCache = /true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED);
+const useWebswitch = /true/i.test(process.env.WEBSWITCH_ENABLED);
 
 /** @typedef {import("../domain/datasource").default} DataSource */
 /** @typedef {import('../domain/observer').Observer} Observer */
@@ -14,13 +16,12 @@ const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
  * @param {import("../domain/datasource-factory")} datasources
  */
 export default function brokerEvents(observer, datasources, models) {
-  observer.on(/.*/, async event => publishEvent(event));
+  //observer.on(/.*/, async event => webswitch(event, observer));
 
   // Distributed object cache - must be explicitly enabled
-  if (/true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED)) {
-    const notify = eventData =>
-      EventBus.notify(BROADCAST, JSON.stringify(eventData));
-
+  if (useDistCache) {
+    const socket = event => webswitch(event, observer);
+    const notify = event => EventBus.notify(BROADCAST, JSON.stringify(event));
     const listen = (eventName, callback) =>
       EventBus.listen({
         topic: BROADCAST,
@@ -36,9 +37,14 @@ export default function brokerEvents(observer, datasources, models) {
       models,
       notify,
       listen,
+      webswitch: socket,
     });
 
-    broker.listen();
+    if (useWebswitch) {
+      broker.initWebswitch();
+    }
+
+    broker.start();
   }
 
   /**

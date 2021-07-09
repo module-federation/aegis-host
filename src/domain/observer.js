@@ -69,9 +69,9 @@ class ObserverImpl extends Observer {
    */
   on(eventName, handler, allowMultiple = true) {
     if (!eventName || typeof handler !== "function") {
+      console.debug(eventName, handler.toString());
       throw new Error("eventName or handler invalid");
     }
-
     if (this.handlers.has(eventName)) {
       if (allowMultiple) {
         this.handlers.get(eventName).push(handler);

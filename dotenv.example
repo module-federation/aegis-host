@@ -2,7 +2,7 @@
 # Example .env file
 
 # Target environment: e.g. local, dev, test, prod
-NODE_ENV=localhost
+NODE_ENV=local
 
 # Run in serverless mode (no webserver)
 SERVERLESS=false
@@ -21,15 +21,26 @@ SSL_PORT=8071
 PORT=8070
 
 # Default datasource for models that do not specify one
-# DATASOURCE_ADAPTER=DataSourceMongoDb
+#DATASOURCE_ADAPTER=DataSourceMemory
+#DATASOURCE_ADAPTER=DataSourceMongoDb
 DATASOURCE_ADAPTER=DataSourceFile
-# DATASOURCE_ADAPTER=DataSourceMemory
 
-# write files to web server dir, so they can be downloaded
+# If using file system storage, choose directory.
 DATASOURCE_FILE_DIRECTORY=../public
 
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000
+CACHE_ALGO=LRU
+
+# Enable cache events for transparent integration
+DISTRIBUTED_CACHE_ENABLED=false
+
+# Common websocket server which aegis instances use for eventing
+WEBSWITCH_ENABLED=false
+WEBSWITCH_HOST=webswitch.aegis.dev
+
+# Don't re/start workflow - always false in prod
+RESUME_WORKFLOW_DISABLED=true
 
 # URL root level path
 API_ROOT=/microlib/api
@@ -38,10 +49,13 @@ API_ROOT=/microlib/api
 ENCRYPTION_PWD=secret
 
 # Cloud serverless provider name
-# See src/serverless-messages.js
+# See src/message.js
 # PROVIDER_NAME=azure
 # PROVIDER_NAME=google
 PROVIDER_NAME=aws
+
+# Get external IP
+CHECK_IP=https://checkip.amazonaws.com
 
 # Required by 3rd party client APIs
 MONGODB_URL=mongodb://localhost:27017

@@ -47,6 +47,7 @@ export default class DataSource {
    * @param {*} id
    * @param {*} data
    * @param {boolean} sync - sync cluster nodes, defaults to true
+   * @returns {Promise<object>}
    */
   async save(id, data, sync = true) {
     throw new Error("abstract method not implemented");
@@ -75,7 +76,7 @@ export default class DataSource {
   /**
    *
    * @param {*} id
-   * @param {*} sync sync cluster nodes, defaults to true
+   * @param {boolean} sync sync cluster nodes, true by default
    */
   async delete(id, sync = true) {
     throw new Error("abstract method not implemented");
@@ -87,6 +88,10 @@ export default class DataSource {
    */
   async load(options) {}
 
+  /**
+   *
+   * @returns {import("./datasource-factory").DataSourceFactory}
+   */
   getFactory() {
     return this.factory;
   }

@@ -13,17 +13,21 @@ function hydrateModels(loadModel, observer, repository) {
   return function (saved) {
     if (!saved) return;
 
-    if (saved instanceof Map) {
-      return new Map(
-        [...saved].map(function ([k, v]) {
-          const model = loadModel(observer, repository, v, v.modelName);
-          return [k, model];
-        })
-      );
-    }
+    try {
+      if (saved instanceof Map) {
+        return new Map(
+          [...saved].map(function ([k, v]) {
+            const model = loadModel(observer, repository, v, v.modelName);
+            return [k, model];
+          })
+        );
+      }
 
-    if (Object.getOwnPropertyNames(saved).includes("modelName")) {
-      return loadModel(observer, repository, saved, saved.modelName);
+      if (Object.getOwnPropertyNames(saved).includes("modelName")) {
+        return loadModel(observer, repository, saved, saved.modelName);
+      }
+    } catch (error) {
+      console.warn(loadModel.name, error.message);
     }
   };
 }
