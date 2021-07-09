@@ -54,7 +54,7 @@ export default function DistributedCacheManager({
         args,
       };
     } catch (e) {
-      console.error("could not parse message", message);
+      console.error("could not parse message", e.message, message);
     }
   }
 
@@ -69,8 +69,11 @@ export default function DistributedCacheManager({
     console.debug("not deleting");
     return false;
   }
-
-  async function streamModelCode(modelName) {
+  /**
+   * Fetch modelspec modules for `modelName` from repo.
+   * @param {string} modelName
+   */
+  async function streamRemoteModules(modelName) {
     if (!models.getModelSpec(modelName)) {
       console.debug("we don't, import it...");
       // Stream the code for the model
@@ -78,15 +81,29 @@ export default function DistributedCacheManager({
     }
   }
 
+  /**
+   * Unmarshal deserialized JSON object.
+   * Checks if model is an array or object
+   * @param {import("./model").Model|Array<import("./model").Model>} model
+   * @param {import("./datasource").default} datasource
+   * @param {string} modelName
+   * @returns {import("./model").Model|Array<import("./model").Model>}
+   */
   function hydrateModel(model, datasource, modelName) {
     if (Array.isArray(model)) {
-      return model.map(model =>
-        models.loadModel(observer, datasource, model, modelName)
+      return model.map(m =>
+        models.loadModel(observer, datasource, m, modelName)
       );
     }
     return models.loadModel(observer, datasource, model, modelName);
   }
 
+  /**
+   * Save model to cache.
+   * Checks if model is an array or object
+   * @param {*} model
+   * @param {*} datasource
+   */
   async function saveModel(model, datasource) {
     if (Array.isArray(model))
       await Promise.all(model.map(m => datasource.save(m.getId(), m)));
@@ -110,7 +127,7 @@ export default function DistributedCacheManager({
         // if (handleDelete(eventName, modelName, event)) return;
 
         console.debug("check if we have the code for this object...");
-        await streamModelCode(modelName);
+        await streamRemoteModules(modelName);
 
         console.debug("unmarshal deserialized model(s)", modelName, modelId);
         const datasource = datasources.getDataSource(modelName);
@@ -126,25 +143,10 @@ export default function DistributedCacheManager({
     };
   }
 
-  async function updateForeignKeys(event, datasource, model) {
+  async function updateForeignKeys(event, model) {
     if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
-      await saveModel(
-        hydrateModel(
-          {
-            ...model,
-            [event.relation.foreignKey]: model.id,
-          },
-          datasource,
-          event.modelName
-        ),
-        datasource
-      );
-    } else if (event.relation.type === "oneToMany") {
-      await Promise.all(
-        model.map(async m =>
-          m.update({ [event.relation.foreignKey]: model.getId() })
-        )
-      );
+      const ds = datasources.getDataSource(event.modelName, true);
+      event.model[event.relation.foreignKey] == model.getId();
     }
   }
 
@@ -176,12 +178,12 @@ export default function DistributedCacheManager({
    * ```
    *
    * @param {*} event
-   * @returns {Promise<{srcModel: import("./model").Model, error:Error}>}
+   * @returns {Promise<{import("./model").Model, error:Error}>}
    * Updated source model (model that defines the relation)
    */
   async function createRelatedObject(event) {
     if (!event.relation || !event.args || event.args.length < 1) {
-      console.info(createRelatedObject.name, "no relation or args", event);
+      console.info(createRelatedObject.name, "invalid format");
       return event;
     }
     try {
