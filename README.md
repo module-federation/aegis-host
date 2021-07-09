@@ -2,12 +2,15 @@
 
 # MicroLib <sub><sup>codename _ÆGIS_</sup></sub>
 
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/microlib)
 
 ## Federated Microservices
+
 - loaded from multiple network locations and repositories at runtime;
 - run together in a single process;
 - can be reloaded at any time without restarting the process or interrupting other components running in the process;
 - are _not_ _installed_ on the server but _streamed_ over the network as needed.
+
 ## TL;DR
 
 ```shell
@@ -16,12 +19,13 @@ cd MicroLib
 cp dotenv.example .env
 npm ci
 npm run build
-npm start 
+npm start
 npm run demo
 ```
 
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
-modules directly from GitHub. To import your own app, update the `webpack/remote-entries.js` to point to your remoteEntry.js file. If you point to a GitHub repo, be sure to specify, owner, repo, filedir, and branch. 
+modules directly from GitHub. To import your own app, update the `webpack/remote-entries.js` to point to your remoteEntry.js file. If you point to a GitHub repo, be sure to specify, owner, repo, filedir, and branch.
+
 ## Purpose
 
 Stop paying the "microservices premium."
