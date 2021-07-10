@@ -5,7 +5,7 @@ import webswitch from "../services/webswitch";
 
 const BROADCAST = process.env.TOPIC_BROADCAST || "broadcastChannel";
 const useDistCache = /true/i.test(process.env.DISTRIBUTED_CACHE_ENABLED);
-const useWebswitch = /true/i.test(process.env.WEBSWITCH_ENABLED);
+const useWebSwitch = /true/i.test(process.env.WEBSWITCH_ENABLED);
 
 /** @typedef {import("../domain/datasource").default} DataSource */
 /** @typedef {import('../domain/observer').Observer} Observer */
@@ -40,8 +40,8 @@ export default function brokerEvents(observer, datasources, models) {
       webswitch: socket,
     });
 
-    if (useWebswitch) {
-      broker.initWebswitch();
+    if (useWebSwitch) {
+      broker.initWebSwitch();
     }
 
     broker.start();
