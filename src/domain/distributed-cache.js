@@ -31,11 +31,11 @@ export default function DistributedCacheManager({
   notify,
   webswitch,
 }) {
-  let useWebswitch = true;
+  let useWebswitch = false;
 
   function parse(message) {
     try {
-      const event = useWebswitch ? message : JSON.parse(message);
+      const event = useWebswitch ? message : JSON.parse(message.message);
       const eventName = event.eventName;
       const modelName = event.modelName;
       const model = event.model;
@@ -55,7 +55,7 @@ export default function DistributedCacheManager({
         args,
       };
     } catch (e) {
-      console.error("could not parse message", message);
+      console.error("could not parse message", e.message, message);
     }
   }
 
@@ -163,8 +163,8 @@ export default function DistributedCacheManager({
             event.relation.modelName,
             arg
           );
-        } catch (e) {
-          throw new Error(createRelated.name, e.message);
+        } catch (error) {
+          throw new Error(createRelated.name, error.message);
         }
       })
     );
@@ -201,6 +201,7 @@ export default function DistributedCacheManager({
     } catch (e) {
       throw new Error(createRelatedObject.name, e.message);
     }
+    ``;
   }
 
   /**
