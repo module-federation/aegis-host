@@ -1,8 +1,9 @@
 "use strict";
 
 import { relationType } from "./make-relations";
-import ModelFactory, { importRemoteCache } from ".";
+import { importRemoteCache } from ".";
 import domainEvents from "./domain-events";
+import makeArray from "./util/make-array";
 
 /**
  * Implements distributed object cache. Find any model
@@ -38,12 +39,12 @@ export default function DistributedCacheManager({
       const eventName = event.eventName;
       const modelName = event.modelName;
       const model = event.model;
-      const modelId = event.model.id;
+      const modelId = event.id || event.modelId;
       const relation = event.relation; // optional
-      const args = event.args ? event.args : null / optional;
+      const args = event.args; // optional;
 
       if (!eventName || !modelName || !modelId || !model)
-        throw new Error("invalid message format", message);
+        throw new Error("invalid message format");
 
       return {
         eventName,
@@ -54,7 +55,7 @@ export default function DistributedCacheManager({
         args,
       };
     } catch (e) {
-      console.error("could not parse message", e.message, message);
+      console.error("could not parse message", message);
     }
   }
 
@@ -120,11 +121,12 @@ export default function DistributedCacheManager({
   function updateCache(router) {
     return async function (message) {
       try {
+        console.log(message);
         const event = parse(message);
         const { eventName, modelName, model, modelId } = event;
         console.debug("handle cache event", eventName);
 
-        // if (handleDelete(eventName, modelName, event)) return;
+        if (await handleDelete(eventName, modelName, event)) return;
 
         console.debug("check if we have the code for this object...");
         await streamRemoteModules(modelName);
@@ -138,15 +140,16 @@ export default function DistributedCacheManager({
 
         if (router) router({ ...event, model: hydratedModel });
       } catch (e) {
-        console.error("distributed cache error", e.message, message);
+        console.error("distributed cache error", e.message);
       }
     };
   }
 
-  async function updateForeignKeys(event, model) {
+  async function updateForeignKeys(event, datasrc, newModel) {
     if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
-      const ds = datasources.getDataSource(event.modelName, true);
-      event.model[event.relation.foreignKey] == model.getId();
+      event.model[event.relation.foreignKey] == newModel.getId();
+      const hydrated = hydrateModel(event.model, ds, event.model.modelName);
+      datasrc.save(hydrated.getId(), hydrated);
     }
   }
 
@@ -165,7 +168,6 @@ export default function DistributedCacheManager({
         }
       })
     );
-    console.debug("new model(s)", newModels);
     return newModels;
   }
 
@@ -182,15 +184,15 @@ export default function DistributedCacheManager({
    * Updated source model (model that defines the relation)
    */
   async function createRelatedObject(event) {
-    if (!event.relation || !event.args || event.args.length < 1) {
-      console.info(createRelatedObject.name, "invalid format");
+    if (!event.args || event.args.length < 1) {
       return event;
     }
     try {
       const newModels = await createRelated(event);
       const relatedDs = datasources.getDataSource(event.relation.modelName);
+      const requestDs = datasources.getDataSource(event.modelName);
       await saveModel(newModels, relatedDs);
-      await updateForeignKeys(event, relatedDs, newModels);
+      await updateForeignKeys(event, requestDs, newModels);
     } catch (e) {
       throw new Error(createRelatedObject.name, e.message);
     }
@@ -208,7 +210,6 @@ export default function DistributedCacheManager({
         const event = parse(message);
 
         if (event.args) {
-          console.debug("creating object/s");
           await createRelatedObject(event);
         }
 
@@ -219,31 +220,26 @@ export default function DistributedCacheManager({
           event.relation
         );
 
-        if (related) {
-          console.log("found object(s)", related);
-          const rel = Array.isArray(related) ? related[0] : related;
+        const rel = makeArray(related);
+        if (!rel[0]) return;
 
-          await router({
-            ...event,
-            model: rel,
-            modelName: rel.getName(),
-            modelId: rel.getId(),
-          });
-          return;
-        }
-        console.log("no object(s) found");
+        console.log("object(s) found");
+
+        await router({
+          model: rel.length < 2 ? rel[0] : rel,
+          modelName: event.relation.modelName,
+          modelId: rel[0].id || rel[0].getId(),
+        });
       } catch (error) {
-        console.warn(searchCache.name, error, message);
+        console.warn(searchCache.name, error);
       }
     };
   }
 
   async function send(event) {
     if (useWebswitch) {
-      console.debug("sending via webswitch");
       await webswitch(event);
     } else {
-      console.debug("sending via event bus");
       await notify(event);
     }
   }
@@ -261,7 +257,6 @@ export default function DistributedCacheManager({
 
   function subscribeRequest(requestName, responseName) {
     const eventName = responseName;
-    console.debug("eventName", eventName);
 
     if (useWebswitch) {
       observer.on(
@@ -275,6 +270,11 @@ export default function DistributedCacheManager({
       );
     }
   }
+
+  const subscribeCrud = eventName =>
+    useWebswitch
+      ? observer.on(eventName, updateCache())
+      : listen(eventName, updateCache());
 
   /**
    * connect to webswitch server and authenticate so we are listening
@@ -320,14 +320,6 @@ export default function DistributedCacheManager({
         })
       );
 
-      // listen for external responses and forward internally
-      // observer.on(
-      //   domainEvents.externalCacheResponse(modelName),
-      //   updateCache(event =>
-      //     observer.notify(domainEvents.internalCacheResponse(modelName), event)
-      //   )
-      // );
-
       subscribeResponse(
         domainEvents.externalCacheResponse(modelName),
         domainEvents.internalCacheResponse(modelName)
@@ -338,7 +330,7 @@ export default function DistributedCacheManager({
         models.getEventName(models.EventTypes.UPDATE, modelName),
         models.getEventName(models.EventTypes.CREATE, modelName),
         models.getEventName(models.EventTypes.DELETE, modelName),
-      ].forEach(eventName => observer.on(eventName, updateCache()));
+      ].forEach(subscribeCrud);
     });
 
     // Listen for cache search requests from external models.

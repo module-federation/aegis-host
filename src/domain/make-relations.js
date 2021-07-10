@@ -137,7 +137,9 @@ export default function makeRelations(relations, datasource, observer) {
                 observer,
                 ...args
               );
-              await updateForeignKeys(this, event, rel, datasource);
+              if (event) {
+                await updateForeignKeys(this, event, rel, datasource);
+              }
               return relationType[rel.type](this, ds, rel);
             }
             return model;
