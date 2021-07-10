@@ -184,7 +184,12 @@ export default function DistributedCacheManager({
    * Updated source model (model that defines the relation)
    */
   async function createRelatedObject(event) {
-    if (!event.args || event.args.length < 1) {
+    if (
+      !event.args ||
+      event.args.length < 1 ||
+      !event.relation ||
+      !event.modelName
+    ) {
       return event;
     }
     try {
