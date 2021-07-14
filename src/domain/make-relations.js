@@ -1,6 +1,7 @@
 "use strict";
 
 import domainEvents from "./domain-events";
+import makeArray from "./util/make-array";
 
 const maxwait = process.env.REMOTE_OBJECT_MAXWAIT || 10000;
 
@@ -42,13 +43,17 @@ async function updateForeignKeys(model, event, relation, datasource) {
       relation.type
     )
   ) {
-    await model.update({
-      [relation.foreignKey]: event.modelId,
-    });
+    await model.update(
+      {
+        [relation.foreignKey]: event.modelId,
+      },
+      false,
+      true
+    );
+    model[relation.foreignKey] = event.modelId;
   } else if (
     relation.type === relationType.oneToMany.name &&
-    Array.isArray(model) &&
-    event.args
+    Array.isArray(model)
   ) {
     const relatedDs = datasource.datasource
       .getFactory()
@@ -58,7 +63,7 @@ async function updateForeignKeys(model, event, relation, datasource) {
       event.model.map(async m =>
         (
           await relatedDs.find(m.id)
-        ).update({ [relation.foreignKey]: model.getId() })
+        ).update({ [relation.foreignKey]: model.modelId })
       )
     );
   }
@@ -137,9 +142,11 @@ export default function makeRelations(relations, datasource, observer) {
                 observer,
                 ...args
               );
-              if (event) {
+
+              if (event && event.model && event.args.length > 0) {
                 await updateForeignKeys(this, event, rel, datasource);
               }
+
               return relationType[rel.type](this, ds, rel);
             }
             return model;

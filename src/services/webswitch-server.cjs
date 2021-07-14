@@ -31,7 +31,6 @@ server.on("connection", function (client) {
         return;
       }
       const msg = JSON.parse(message.toString());
-      console.log("msg", msg);
       if (msg === "webswitch") {
         console.log("client initialized");
         client.webswitchInit = true;
@@ -42,6 +41,6 @@ server.on("connection", function (client) {
     }
 
     client.terminate();
-    console.log("terminated potential imposter client", client.webswitchId);
+    console.log("terminated client", client.webswitchId);
   });
 });

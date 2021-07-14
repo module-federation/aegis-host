@@ -20,7 +20,8 @@ import makeArray from "./util/make-array";
  *  datasources:import("./datasource-factory").DataSourceFactory,
  *  models:import("./model-factory").ModelFactory,
  *  listen:function(...args),
- *  notify:function(...args)
+ *  notify:function(...args),
+ *  webswitch:function(...args)
  * }} param0
  */
 export default function DistributedCacheManager({
@@ -42,8 +43,7 @@ export default function DistributedCacheManager({
       const modelId = event.id || event.modelId;
       const relation = event.relation; // optional
       const args = event.args; // optional;
-
-      if (!eventName || !modelName || !modelId || !model)
+      if (!eventName || !modelName || !modelId)
         throw new Error("invalid message format");
 
       return {
@@ -59,6 +59,13 @@ export default function DistributedCacheManager({
     }
   }
 
+  /**
+   *
+   * @param {*} eventName
+   * @param {*} modelName
+   * @param {*} event
+   * @returns
+   */
   async function handleDelete(eventName, modelName, event) {
     if (
       eventName === models.getEventName(models.EventTypes.DELETE, modelName)
@@ -101,14 +108,14 @@ export default function DistributedCacheManager({
 
   /**
    * Save model to cache.
-   * Checks if model is an array or object
+   * Checks if model is an array or objec
    * @param {*} model
    * @param {*} datasource
    */
-  async function saveModel(model, datasource) {
+  async function saveModel(model, datasource, id = m => m.id) {
     if (Array.isArray(model))
-      await Promise.all(model.map(m => datasource.save(m.getId(), m)));
-    await datasource.save(model.id, model);
+      await Promise.all(model.map(async m => datasource.save(id(m), m)));
+    await datasource.save(id(model), model);
   }
 
   /**
@@ -144,11 +151,47 @@ export default function DistributedCacheManager({
     };
   }
 
-  async function updateForeignKeys(event, datasrc, newModel) {
-    if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
-      event.model[event.relation.foreignKey] == newModel.getId();
-      const hydrated = hydrateModel(event.model, datasrc, event.modelName);
-      datasrc.save(hydrated.getId(), hydrated);
+  /**
+   *
+   * @param {*} relatedModel
+   * @param {*} model
+   * @param {*} event
+   */
+  // async function updateForeignKeys(relatedModel, model, event) {
+  //   const modelArr = makeArray(relatedModel);
+
+  //   if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
+  //     await model.update({
+  //       [event.relation.foreignKey]: modelArr[0].getId(),
+  //     });
+  //   } else if (event.relation.type === "oneToMany") {
+  //     await Promise.all(
+  //       modelArr.map(async m =>
+  //         m.update({ [event.relation.foreignKey]: model.getId() })
+  //       )
+  //     );
+  //   }
+  // }
+
+  async function updateForeignKeys(event, newModel) {
+    try {
+      if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
+        event.model[event.relation.foreignKey] = newModel[0].getId();
+        const datasource = datasources.getDataSource(event.modelName, true);
+
+        if (!models.getModelSpec(event.modelName)) {
+          await streamRemoteModules(event.modelName);
+        }
+
+        const hydratedModel = hydrateModel(
+          event.model,
+          datasource,
+          event.modelName
+        );
+        await saveModel(hydratedModel, datasource, m => m.getId());
+      }
+    } catch (error) {
+      console.error(updateForeignKeys.name, error);
     }
   }
 
@@ -170,6 +213,24 @@ export default function DistributedCacheManager({
     return newModels;
   }
 
+  function formatResponse(event, related) {
+    if (!related || related.length < 1) {
+      console.debug("related is null");
+      return {
+        ...event,
+        model: null,
+      };
+    }
+    const rel = makeArray(related);
+
+    return {
+      ...event,
+      model: rel.length < 2 ? rel[0] : rel,
+      modelName: event.relation.modelName,
+      modelId: rel[0].id || rel[0].getId(),
+    };
+  }
+
   /**
    * Creates new, related models if relation function is called
    * with arguments, e.g.
@@ -183,22 +244,21 @@ export default function DistributedCacheManager({
    * Updated source model (model that defines the relation)
    */
   async function createRelatedObject(event) {
-    if (
-      !event.args ||
-      event.args.length < 1 ||
-      !event.relation ||
-      !event.modelName
-    ) {
+    if (event.args.length < 1 || !event.relation || !event.modelName) {
+      console.log("missing required params", event);
       return event;
     }
     try {
       const newModels = await createRelated(event);
-      const relatedDs = datasources.getDataSource(event.relation.modelName);
-      const requestDs = datasources.getDataSource(event.modelName, true);
-      await saveModel(newModels, relatedDs);
-      await updateForeignKeys(event, requestDs, newModels);
+      console.debug("new models", newModels);
+      const datasource = datasources.getDataSource(newModels[0].getName());
+      await Promise.all(
+        newModels.map(async m => datasource.save(m.getId(), m))
+      );
+      return newModels;
     } catch (error) {
-      throw new Error(createRelatedObject.name, error.message);
+      console.error(error);
+      throw new Error(createRelatedObject.name, error);
     }
   }
 
@@ -213,34 +273,27 @@ export default function DistributedCacheManager({
       try {
         const event = parse(message);
 
-        if (event.args) {
-          await createRelatedObject(event);
+        if (event.args.length > 0) {
+          console.log("creating new related object");
+          const newModel = await createRelatedObject(event);
+          await router(formatResponse(event, newModel));
+          return;
         }
 
-        // find the requessted object(s)
+        // find the requested object(s)
         const related = await relationType[event.relation.type](
           event.model,
           datasources.getDataSource(event.relation.modelName),
           event.relation
         );
-
-        const rel = makeArray(related);
-        if (!rel[0]) return;
-
-        console.log("object(s) found");
-
-        await router({
-          model: rel.length < 2 ? rel[0] : rel,
-          modelName: event.relation.modelName,
-          modelId: rel[0].id || rel[0].getId(),
-        });
+        await router(formatResponse(event, related));
       } catch (error) {
         console.warn(searchCache.name, error.message);
       }
     };
   }
 
-  async function send(event) {
+  async function publish(event) {
     if (useWebSwitch) {
       await webswitch(event);
     } else {
@@ -250,11 +303,13 @@ export default function DistributedCacheManager({
 
   /**
    * Handle response to search request.
-   * @param {*} responseName 
-   * @param {*} internalName 
+   * @param {*} responseName
+   * @param {*} internalName
    */
   function handleResponse(responseName, internalName) {
-    const callback = updateCache(event => observer.notify(internalName, event));
+    const callback = updateCache(async event =>
+      observer.notify(internalName, event)
+    );
     if (useWebSwitch) {
       observer.on(responseName, callback);
     } else {
@@ -273,12 +328,12 @@ export default function DistributedCacheManager({
     if (useWebSwitch) {
       observer.on(
         requestName,
-        searchCache(event => webswitch({ ...event, eventName }))
+        searchCache(async event => webswitch({ ...event, eventName }))
       );
     } else {
       listen(
         requestName,
-        searchCache(event => notify({ ...event, eventName }))
+        searchCache(async event => notify({ ...event, eventName }))
       );
     }
   }
@@ -288,9 +343,9 @@ export default function DistributedCacheManager({
    * @param {*} internalEvent
    * @param {*} externalEvent
    */
-  function sendRequest(internalEvent, externalEvent) {
-    observer.on(internalEvent, event =>
-      send({ ...event, eventName: externalEvent })
+  function forwardRequest(internalEvent, externalEvent) {
+    observer.on(internalEvent, async event =>
+      publish({ ...event, eventName: externalEvent })
     );
   }
 
@@ -343,7 +398,7 @@ export default function DistributedCacheManager({
     // Forward requests to, handle responses from, remote models
     remoteModels.forEach(function (modelName) {
       // listen for internal requests and forward
-      sendRequest(
+      forwardRequest(
         domainEvents.internalCacheRequest(modelName),
         domainEvents.externalCacheRequest(modelName)
       );
@@ -374,7 +429,7 @@ export default function DistributedCacheManager({
         models.getEventName(models.EventTypes.CREATE, modelName),
         models.getEventName(models.EventTypes.DELETE, modelName),
       ].forEach(eventName =>
-        observer.on(eventName, async event => send(event))
+        observer.on(eventName, async event => publish(event))
       );
     });
   }
