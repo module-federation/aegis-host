@@ -150,51 +150,7 @@ export default function DistributedCacheManager({
       }
     };
   }
-
-  /**
-   *
-   * @param {*} relatedModel
-   * @param {*} model
-   * @param {*} event
-   */
-  // async function updateForeignKeys(relatedModel, model, event) {
-  //   const modelArr = makeArray(relatedModel);
-
-  //   if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
-  //     await model.update({
-  //       [event.relation.foreignKey]: modelArr[0].getId(),
-  //     });
-  //   } else if (event.relation.type === "oneToMany") {
-  //     await Promise.all(
-  //       modelArr.map(async m =>
-  //         m.update({ [event.relation.foreignKey]: model.getId() })
-  //       )
-  //     );
-  //   }
-  // }
-
-  async function updateForeignKeys(event, newModel) {
-    try {
-      if (["manyToOne", "oneToOne"].includes(event.relation.type)) {
-        event.model[event.relation.foreignKey] = newModel[0].getId();
-        const datasource = datasources.getDataSource(event.modelName, true);
-
-        if (!models.getModelSpec(event.modelName)) {
-          await streamRemoteModules(event.modelName);
-        }
-
-        const hydratedModel = hydrateModel(
-          event.model,
-          datasource,
-          event.modelName
-        );
-        await saveModel(hydratedModel, datasource, m => m.getId());
-      }
-    } catch (error) {
-      console.error(updateForeignKeys.name, error);
-    }
-  }
-
+  
   async function createRelated(event) {
     const newModels = await Promise.all(
       event.args.map(async arg => {
