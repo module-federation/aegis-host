@@ -43,13 +43,7 @@ async function updateForeignKeys(model, event, relation, datasource) {
       relation.type
     )
   ) {
-    await model.update(
-      {
-        [relation.foreignKey]: event.modelId,
-      },
-      false,
-      true
-    );
+    await model.update({ [relation.foreignKey]: event.modelId }, false);
     model[relation.foreignKey] = event.modelId;
   } else if (
     relation.type === relationType.oneToMany.name &&

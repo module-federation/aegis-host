@@ -142,17 +142,17 @@ export default function DistributedCacheManager({
         const hydratedModel = hydrateModel(model, datasource, modelName);
 
         console.debug("save model(s)");
-        await saveModel(hydratedModel, datasource);
+        await saveModel(hydratedModel, datasource, m => m.getId());
 
-        if (router) router({ ...event, model: hydratedModel });
+        if (router) await router({ ...event, model: hydratedModel });
       } catch (error) {
         console.error("distributed cache error", error.message);
       }
     };
   }
-  
+
   async function createRelated(event) {
-    const newModels = await Promise.all(
+    return Promise.all(
       event.args.map(async arg => {
         try {
           return await models.createModel(
@@ -166,25 +166,6 @@ export default function DistributedCacheManager({
         }
       })
     );
-    return newModels;
-  }
-
-  function formatResponse(event, related) {
-    if (!related || related.length < 1) {
-      console.debug("related is null");
-      return {
-        ...event,
-        model: null,
-      };
-    }
-    const rel = makeArray(related);
-
-    return {
-      ...event,
-      model: rel.length < 2 ? rel[0] : rel,
-      modelName: event.relation.modelName,
-      modelId: rel[0].id || rel[0].getId(),
-    };
   }
 
   /**
@@ -205,17 +186,32 @@ export default function DistributedCacheManager({
       return event;
     }
     try {
-      const newModels = await createRelated(event);
-      console.debug("new models", newModels);
-      const datasource = datasources.getDataSource(newModels[0].getName());
-      await Promise.all(
-        newModels.map(async m => datasource.save(m.getId(), m))
-      );
-      return newModels;
+      const related = await createRelated(event);
+      const datasource = datasources.getDataSource(related[0].getName());
+      await Promise.all(related.map(async m => datasource.save(m.getId(), m)));
+      return related;
     } catch (error) {
       console.error(error);
       throw new Error(createRelatedObject.name, error);
     }
+  }
+
+  function formatResponse(event, related) {
+    if (!related || related.length < 1) {
+      console.debug("related is null");
+      return {
+        ...event,
+        model: null,
+      };
+    }
+    const rel = makeArray(related);
+
+    return {
+      ...event,
+      model: rel.length < 2 ? rel[0] : rel,
+      modelName: event.relation.modelName,
+      modelId: rel[0].id || rel[0].getId(),
+    };
   }
 
   /**
@@ -249,6 +245,10 @@ export default function DistributedCacheManager({
     };
   }
 
+  /**
+   * Send event to external system.
+   * @param {*} event
+   */
   async function publish(event) {
     if (useWebSwitch) {
       await webswitch(event);
@@ -258,7 +258,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Handle response to search request.
+   * Listen for response to search request and notify requester.
    * @param {*} responseName
    * @param {*} internalName
    */
@@ -274,8 +274,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Handle search request from remote system and respond
-   * with any related or newly created models.
+   * Listen for search request from remote system, search and send response.
    *
    * @param {*} requestName
    * @param {*} eventName
@@ -295,7 +294,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Listen for internal event requesting remote cache lookup.
+   * Listen for internal events requesting cache search and send to remote systems.
    * @param {*} internalEvent
    * @param {*} externalEvent
    */
@@ -306,8 +305,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Listen for CRUD events from remote
-   * systemms and update local cache.
+   * Listen for CRUD events from remote systems and update local cache.
    *
    * @param {*} eventName
    * @returns
@@ -318,7 +316,7 @@ export default function DistributedCacheManager({
       : listen(eventName, updateCache());
 
   /**
-   * connect to webswitch server and authenticate so we are listening
+   * authenticate to webswitch server so we are connected and listening
    */
   function initWebSwitch() {
     useWebSwitch = true;
