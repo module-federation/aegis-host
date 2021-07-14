@@ -132,6 +132,12 @@ export default function DistributedCacheManager({
         const { eventName, modelName, model, modelId } = event;
         console.debug("handle cache event", eventName);
 
+        if (!model) {
+          // no model found
+          if (router) await router(event);
+          return;
+        }
+
         if (await handleDelete(eventName, modelName, event)) return;
 
         console.debug("check if we have the code for this object...");
@@ -146,7 +152,7 @@ export default function DistributedCacheManager({
 
         if (router) await router({ ...event, model: hydratedModel });
       } catch (error) {
-        console.error("distributed cache error", error.message);
+        console.error(updateCache.name, error.message);
       }
     };
   }
@@ -240,7 +246,7 @@ export default function DistributedCacheManager({
         );
         await router(formatResponse(event, related));
       } catch (error) {
-        console.warn(searchCache.name, error.message);
+        console.error(searchCache.name, error.message);
       }
     };
   }
@@ -321,6 +327,7 @@ export default function DistributedCacheManager({
   function initWebSwitch() {
     useWebSwitch = true;
     webswitch("webswitch");
+    observer.on("webswitch-reconnect", () => webswitch("webswitch"));
   }
 
   /**

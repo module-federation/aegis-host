@@ -20,6 +20,7 @@ export default function patchModelFactory(editModel) {
           "Last-Modified": new Date().toUTCString(),
         },
         statusCode: 201,
+        body: { modelId: model.getId() },
       };
     } catch (e) {
       console.error(e);

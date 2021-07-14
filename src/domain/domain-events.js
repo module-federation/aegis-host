@@ -14,8 +14,8 @@ const     domainEvents = {
   undoFailed: model => `undoFailed_${model.getName()}`,
   undoWorked: model => `undoWorked_${model.getName()}`,
   unauthorizedCommand: model => `unauthorizedCommand_${model.getName()}`,
-  addModel: eventName => `addModel_${eventName}`,
-  editModel: eventName => `editModel_${eventName}`,
+  addModel: modelName => `addModel_${modelName}`,
+  editModel: modelName => `editModel_${modelName}`,
 };
 
 export default domainEvents;
