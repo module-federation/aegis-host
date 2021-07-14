@@ -7,6 +7,7 @@
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
 - loaded from multiple network locations and repositories at runtime;
+- developed by multiple teams;
 - run together in a single process;
 - can be reloaded at any time without restarting the process or interrupting other components running in the process;
 - are _not_ _installed_ on the server but _streamed_ over the network as needed.
