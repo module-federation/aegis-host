@@ -45,11 +45,13 @@ export default function DistributedCacheManager({
    *    type:string,
    *    modelName:string,
    *    foreignKey:string}
-   * }} Event
+   * }} Event the unit of data for tramsmission of cached data
    */
 
+  /** @typedef {import("./").ModelSpecification} ModelSpecification*/
+
   /**
-   * parse event
+   * parse input into {@link Event}
    * @param {Event|string} payload
    * @returns {Event}
    */
@@ -82,7 +84,7 @@ export default function DistributedCacheManager({
    *
    * @param {*} eventName
    * @param {*} modelName
-   * @param {*} event
+   * @param {Event} event
    * @returns
    */
   async function handleDelete(eventName, modelName, event) {
@@ -97,7 +99,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Fetch modelspec modules for `modelName` from repo.
+   * Fetch {@link ModelSpecification} modules for `modelName` from repo.
    * @param {string} modelName
    */
   async function streamRemoteModules(modelName) {
@@ -114,7 +116,7 @@ export default function DistributedCacheManager({
    * @param {import("./model").Model|Array<import("./model").Model>} model
    * @param {import("./datasource").default} datasource
    * @param {string} modelName
-   * @returns {import("./model").Model|Array<import("./model").Model>}
+   * @returns {import("./model").Model|import("./model").Model[]>}
    */
   function hydrateModel(model, datasource, modelName) {
     if (Array.isArray(model)) {
@@ -128,8 +130,9 @@ export default function DistributedCacheManager({
   /**
    * Save model to cache.
    * Checks if model is an array or objec
-   * @param {*} model
-   * @param {*} datasource
+   * @param {import(".").Model}} model
+   * @param {import("./datasource").default} datasource
+   * @param {function(m)=>m.id} return id to save
    */
   async function saveModel(model, datasource, id = m => m.id) {
     if (Array.isArray(model))
@@ -141,7 +144,7 @@ export default function DistributedCacheManager({
    * Returns the callback run by the external event service.
    *
    * @param {function(string):string} parser
-   * @param {function(object)} route
+   * @param {function(object)} route what to do after updating
    * @returns {function(message):Promise<void>}
    */
   function updateCache(route) {
@@ -177,6 +180,12 @@ export default function DistributedCacheManager({
     };
   }
 
+  /**
+   *
+   * @param {Event} event
+   * @returns {Promise<import(".").Model[]>}
+   * @throws
+   */
   async function createRelated(event) {
     return Promise.all(
       event.args.map(async arg => {
@@ -202,8 +211,8 @@ export default function DistributedCacheManager({
    * const customers = await order.customer(cust1, cust2);
    * ```
    *
-   * @param {*} event
-   * @returns {Promise<import("./model").Model>} Updated source model
+   * @param {Event} event
+   * @returns {Promise<import("./model").Model | import("./model").Model[]>} Updated source model
    * (model that defines the relation)
    * @throws
    */
@@ -223,6 +232,12 @@ export default function DistributedCacheManager({
     }
   }
 
+  /**
+   *
+   * @param {Event} event
+   * @param {import(".").Model|import(".").Model[]} related
+   * @returns {Event} w/ updated model, modelId, modelName
+   */
   function formatResponse(event, related) {
     if (!related || related.length < 1) {
       console.debug("related is null");
@@ -274,7 +289,8 @@ export default function DistributedCacheManager({
 
   /**
    * Send event to external system.
-   * @param {*} event
+   * @param {Event} event
+   * @returns {Promise<void>}
    */
   async function publish(event) {
     if (useWebSwitch) {
@@ -417,7 +433,7 @@ export default function DistributedCacheManager({
   }
 
   return {
-    /** Connect to the server*/
+    /** Connect to the webswitch server*/
     initWebSwitch,
     start,
   };

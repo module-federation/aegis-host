@@ -122,8 +122,6 @@ export default function makeRelations(relations, datasource, observer) {
 
             const model = await relationType[rel.type](this, ds, rel);
 
-            console.log("related", model);
-
             if (!model || model.length < 1) {
               // couldn't find the object - try remotes
               const event = await requireRemoteObject(
