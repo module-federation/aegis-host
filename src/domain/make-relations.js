@@ -34,7 +34,7 @@ export const relationType = {
   },
 };
 
-async function updateForeignKeys(model, event, relation, datasource) {
+async function updateForeignKeys(model, event, relation, ds) {
   console.log(updateForeignKeys.name, event);
 
   if (
@@ -48,15 +48,9 @@ async function updateForeignKeys(model, event, relation, datasource) {
     relation.type === relationType.oneToMany.name &&
     Array.isArray(model)
   ) {
-    const relatedDs = datasource.datasource
-      .getFactory()
-      .getDataSource(event.modelName);
-
     await Promise.all(
       event.model.map(async m =>
-        (
-          await relatedDs.find(m.id)
-        ).update({ [relation.foreignKey]: model.modelId })
+        (await ds.find(m.id)).update({ [relation.foreignKey]: model.modelId })
       )
     );
   }
@@ -131,8 +125,8 @@ export default function makeRelations(relations, datasource, observer) {
                 ...args
               );
 
-              if (event && event.model && event.args.length > 0) {
-                await updateForeignKeys(this, event, rel, datasource);
+              if (event?.args.length > 0) {
+                await updateForeignKeys(this, event, rel, ds);
               }
 
               return relationType[rel.type](this, ds, rel);
