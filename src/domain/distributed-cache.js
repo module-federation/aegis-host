@@ -122,10 +122,10 @@ export default function DistributedCacheManager({
    * Returns the callback run by the external event service when a message arrives.
    *
    * @param {function(string):string} parser
-   * @param {function(object)} router
+   * @param {function(object)} route
    * @returns {function(message):Promise<void>}
    */
-  function updateCache(router) {
+  function updateCache(route) {
     return async function (message) {
       try {
         const event = parse(message);
@@ -134,7 +134,7 @@ export default function DistributedCacheManager({
 
         if (!model) {
           // no model found
-          if (router) await router(event);
+          if (route) await route(event);
           return;
         }
 
@@ -150,7 +150,7 @@ export default function DistributedCacheManager({
         console.debug("save model(s)");
         await saveModel(hydratedModel, datasource, m => m.getId());
 
-        if (router) await router({ ...event, model: hydratedModel });
+        if (route) await route({ ...event, model: hydratedModel });
       } catch (error) {
         console.error(updateCache.name, error.message);
       }
@@ -183,8 +183,9 @@ export default function DistributedCacheManager({
    * ```
    *
    * @param {*} event
-   * @returns {Promise<{import("./model").Model, error:Error}>}
-   * Updated source model (model that defines the relation)
+   * @returns {Promise<import("./model").Model>} Updated source model
+   * (model that defines the relation)
+   * @throws
    */
   async function createRelatedObject(event) {
     if (event.args.length < 1 || !event.relation || !event.modelName) {
@@ -223,10 +224,10 @@ export default function DistributedCacheManager({
   /**
    * Returns function to search the cache.
    * @param {function(string):string} parser
-   * @param {function(object)} router
+   * @param {function(object)} route
    * @returns {function(message):Promise<void>} function that searches the cache
    */
-  function searchCache(router) {
+  function searchCache(route) {
     return async function (message) {
       try {
         const event = parse(message);
@@ -234,7 +235,7 @@ export default function DistributedCacheManager({
         if (event.args.length > 0) {
           console.log("creating new related object");
           const newModel = await createRelatedObject(event);
-          await router(formatResponse(event, newModel));
+          await route(formatResponse(event, newModel));
           return;
         }
 
@@ -244,7 +245,7 @@ export default function DistributedCacheManager({
           datasources.getDataSource(event.relation.modelName),
           event.relation
         );
-        await router(formatResponse(event, related));
+        await route(formatResponse(event, related));
       } catch (error) {
         console.error(searchCache.name, error.message);
       }
