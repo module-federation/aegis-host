@@ -1,7 +1,6 @@
 "use strict";
 
 import domainEvents from "./domain-events";
-import makeArray from "./util/make-array";
 
 const maxwait = process.env.REMOTE_OBJECT_MAXWAIT || 10000;
 
@@ -69,9 +68,6 @@ async function updateForeignKeys(model, event, relation, datasource) {
  *
  * Sends a request message and receives a response from
  * the cache manager.
- *
- * Returns an updated source model (this) if a new
- * model is created and a new foreign key must be saved.
  *
  * @param {import(".").relations[x]} relation
  * @param {import("./observer").Observer} observer

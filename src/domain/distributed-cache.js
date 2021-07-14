@@ -34,6 +34,25 @@ export default function DistributedCacheManager({
 }) {
   let useWebSwitch = false;
 
+  /**
+   * @typedef {{
+   *  eventName:string,
+   *  modelName:string,
+   *  modelId:string,
+   *  model:import("./model").Model,
+   *  args:[],
+   *  related:{
+   *    type:string,
+   *    modelName:string,
+   *    foreignKey:string}
+   * }} Event
+   */
+
+  /**
+   * parse event
+   * @param {Event|string} payload
+   * @returns {Event}
+   */
   function parse(payload) {
     try {
       const event = useWebSwitch ? payload : JSON.parse(payload.message);
@@ -119,7 +138,7 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Returns the callback run by the external event service when a message arrives.
+   * Returns the callback run by the external event service.
    *
    * @param {function(string):string} parser
    * @param {function(object)} route
@@ -130,6 +149,7 @@ export default function DistributedCacheManager({
       try {
         const event = parse(message);
         const { eventName, modelName, model, modelId } = event;
+
         console.debug("handle cache event", eventName);
 
         if (!model) {
