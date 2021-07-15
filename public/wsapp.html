@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="microlib.png">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+  <title>MicroLib WebSwitch Listener</title>
+</head>
+
+<body style="background-color:black">
+
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
+    </script>
+
+  <nav class="navbar navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="microlib.png" alt="MicroLib" width="30" height="24">
+        <span class="navbar-brand mb-0 h1 text-warning">MicroLib</span>
+        <span class="navbar-brand text-muted mb-0">WebSwitch Event Listener</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <div class="col">
+
+        <div class="mb-3">
+        <!-- <button id="login" class="btn btn-outline-light" title="post">Log in</button>-->
+          <button id="wsButton" class="btn btn-outline-light" title="patch">Open WebSocket</button> 
+        <!-- <button id="logout" class="btn btn-outline-light" title="get">Log out</button>-->
+          <button id="clear" class="btn btn-outline-light" title="delete">Clear</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <pre id="messages" class="text-light mb-3 overflow-scroll"
+          style="height: 420px; "><code id="jsonCode" class="line-nowrap"></code></pre>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="wsapp.js"></script>
+
+</body>
+
+</html>
