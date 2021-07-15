@@ -223,7 +223,9 @@
     // if enabled, request fresh access token and store in auth header
     await refreshAccessToken();
     // get list of all models and add to datalist for model input control
-    const data = await fetch("microlib/api/config", { headers: getHeaders() });
+    const data = await fetch("microlib/api/config?isCached=false", {
+      headers: getHeaders(),
+    });
     const models = await data.json();
     models.forEach(m => modelList.appendChild(new Option(m.endpoint)));
   });

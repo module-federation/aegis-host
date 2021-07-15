@@ -99,18 +99,6 @@ export default function DistributedCacheManager({
   }
 
   /**
-   * Fetch {@link ModelSpecification} modules for `modelName` from repo.
-   * @param {string} modelName
-   */
-  async function streamRemoteModules(modelName) {
-    if (!models.getModelSpec(modelName)) {
-      console.debug("we don't, import it...");
-      // Stream the code for the model
-      await importRemoteCache(modelName);
-    }
-  }
-
-  /**
    * Unmarshal deserialized JSON object.
    * Checks if model is an array or object
    * @param {import("./model").Model|Array<import("./model").Model>} model
@@ -140,6 +128,17 @@ export default function DistributedCacheManager({
     await datasource.save(id(model), model);
   }
 
+  /**
+   * Fetch {@link ModelSpecification} modules for `modelName` from repo.
+   * @param {string} modelName
+   */
+  async function streamRemoteModules(modelName) {
+    if (!models.getModelSpec(modelName)) {
+      console.debug("we don't, import it...");
+      // Stream the code for the model
+      await importRemoteCache(modelName);
+    }
+  }
   /**
    * Returns the callback run by the external event service.
    *

@@ -8,10 +8,15 @@
  */
 export default function listConfigsFactory({ models, data } = {}) {
   return async function listConfigs(query) {
-    console.log(query);
     if (query && query.details === "data") {
-      return JSON.stringify(data.listDataSources().map(([k]) => [k]));
+      return JSON.stringify(data.listDataSources().map(([k]) => k));
+    } else if (query) {
+      const prop = Object.keys(query)[0];
+      const val = query[prop];
+      return models
+        .getModelSpecs()
+        .filter(spec => !(spec[prop] && Boolean(val)));
     }
-    return models.getModelSpecs().filter(spec => !spec.isCache);
+    return models.getModelSpecs();
   };
 }
