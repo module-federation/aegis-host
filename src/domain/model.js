@@ -121,6 +121,9 @@ const Model = (() => {
     const {
       model,
       spec: {
+        onUpdate = defaultOnUpdate,
+        onDelete = defaultOnDelete,
+        validate = defaultValidate,
         ports,
         observer,
         modelName,
@@ -128,9 +131,6 @@ const Model = (() => {
         mixins = [],
         dependencies,
         relations = {},
-        onUpdate = defaultOnUpdate,
-        onDelete = defaultOnDelete,
-        validate = defaultValidate,
       },
     } = modelInfo;
 
