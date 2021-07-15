@@ -50,7 +50,6 @@ export default function makeEditModel({
       await repository.save(id, updated);
       await observer.notify(event.eventName, event);
     } catch (error) {
-      await repository.save(id, model);
       throw new Error(error);
     }
 

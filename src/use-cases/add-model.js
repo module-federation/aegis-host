@@ -43,7 +43,6 @@ export default function makeAddModel({
       await repository.save(model.getId(), model);
       await observer.notify(event.eventName, event);
     } catch (error) {
-      await repository.delete(model.getId());
       throw new Error(error);
     }
 

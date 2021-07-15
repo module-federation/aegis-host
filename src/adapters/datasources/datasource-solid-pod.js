@@ -1,53 +1,49 @@
-import { writeFile } from "fs/promises";
-import {
-  getFile,
-  isRawData,
-  getContentType,
-  getSourceUrl,
-} from "@inrupt/solid-client";
+import { DataSourceFile } from ".";
+// import auth from "solid-auth-cli";
+// import FC from "solid-file-client";
 
-// Read file from Pod and save to local file
-async function readFileFromPod(fileURL, fetch, saveAsFilename) {
-  try {
-    const file = await getFile(
-      fileURL, // File in Pod to Read
-      { fetch: fetch } // fetch from authenticated session
-    );
+const credentials = {
+  idp: process.env.SOLID_POD_IDP, // "https://pod.inrupt.com",
+  username: process.env.SOLID_POD_USER,
+  password: process.env.SOLID_POD_PASS,
+};
 
-    console.log(
-      `Fetched a ${getContentType(file)} file from ${getSourceUrl(file)}.`
-    );
-    console.log(`The file is ${isRawData(file) ? "not " : ""}a dataset.`);
+// const fc = new FC(auth);
 
-    const arrayBuffer = await file.arrayBuffer();
-    writeFile(saveAsFilename, new Uint8Array(arrayBuffer));
-  } catch (err) {
-    console.log(err);
-  }
+const PODURL = "https://pod.inrupt.com/tysonrm/models/";
+
+async function login() {
+  // let session = await auth.currentSession();
+  // if (!session) {
+  //   session = await auth.login(credentials);
+  // }
+  // console.log(`Logged in as ${session.webId}.`);
 }
-``;
 
-/*
- *
+/**
  * Get data stored on a SOLID POD, {@link https://solidproject.org/}
- * */
-
-export class DataSourceSolidPod extends DataSourceMemory {
+ */
+export class DataSourceSolidPod extends DataSourceFile {
   // ... import statement for authentication, which includes the fetch function, is omitted for brevity.
+  constructor(dataSource, factory, name) {
+    super(dataSource, factory, name);
+    // this.file = PODURL + name + ".json";
+    // console.log(this.file);
+    // login().then(() => console.log(`logged into pod ${PODURL}`));
+  }
 
-  constructor() {
-    const MY_POD_URL = "https://example.com/mypod/";
+  readFile(hydrate) {
+    // try {
+    //   if (fc.itemExists(this.file)) {
+    //     const data = fc.readFile(this.file);
+    //     return hydrate(new Map(JSON.parse(data), this.revive));
+    //   }
+    // } catch (e) {
+    //   console.error(e);
+    // }
+  }
 
-    const session = new Session();
-
-    // ... Various logic, including login logic, omitted for brevity.
-
-    if (session.info.isLoggedIn) {
-      readFileFromPod(
-        `${MY_POD_URL}mypics/pigeon.jpg`,
-        session.fetch,
-        "./downloaded-pigeon.jpg"
-      );
-    }
+  writeFile() {
+    //fc.writeFile(this.file, JSON.stringify([...this.dataSet]));
   }
 }
