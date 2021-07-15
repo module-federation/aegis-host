@@ -59,7 +59,7 @@ export default function DistributedCacheManager({
     try {
       const event = useWebSwitch ? payload : JSON.parse(payload.message);
       const eventName = event.eventName;
-      const modelName = event.modelName;
+      const modelName = event.modelName.toLowerCase();
       const model = event.model;
       const modelId = event.id || event.modelId;
       const relation = event.relation; // optional
@@ -309,6 +309,7 @@ export default function DistributedCacheManager({
     const callback = updateCache(async event =>
       observer.notify(internalName, event)
     );
+
     if (useWebSwitch) {
       observer.on(responseName, callback);
     } else {

@@ -11,7 +11,7 @@ const DefaultDataSource = adapters[defaultAdapter];
 
 /**
  * @todo handle all state same way
- * @typedef {{getDataSource:function(string):import("./datasource").default}} DataSourceFactory
+ * @typedef {{getDataSource:function(string):import("./datasource").default,listDataSources:Map[]}} DataSourceFactory
  * @type {DataSourceFactory}
  */
 const DataSourceFactory = (() => {
@@ -25,6 +25,10 @@ const DataSourceFactory = (() => {
    */
   function hasDataSource(name) {
     return dataSources.has(name);
+  }
+
+  function listDataSources() {
+    return [...dataSources];
   }
 
   /**
@@ -92,6 +96,7 @@ const DataSourceFactory = (() => {
      */
     getDataSource,
     hasDataSource,
+    listDataSources,
     close,
   });
 })();

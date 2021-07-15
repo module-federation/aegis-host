@@ -44,4 +44,5 @@ export const listModels = () => make(makeListModels);
 export const findModels = () => make(makeFindModel);
 export const removeModels = () => make(makeRemoveModel);
 export const loadModels = () => make(makeLoadModels);
-export const listConfigs = () => makeListConfig({ models: ModelFactory });
+export const listConfigs = () =>
+  makeListConfig({ models: ModelFactory, data: DataSourceFactory });

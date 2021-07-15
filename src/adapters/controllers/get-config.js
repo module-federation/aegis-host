@@ -5,7 +5,7 @@ export default function getConfigFactory(listConfigs) {
     try {
       httpRequest.log(getConfig.name);
 
-      const configs = await listConfigs();
+      const configs = await listConfigs(httpRequest.query);
 
       return {
         headers: {
