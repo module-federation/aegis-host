@@ -2,6 +2,7 @@ require("dotenv").config();
 const path = require("path");
 const ModuleFederationPlugin =
   require("webpack").container.ModuleFederationPlugin;
+const nodeExternals = require("webpack-node-externals");
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
 const port = process.env.PORT || 8070;
@@ -20,6 +21,7 @@ module.exports = env => {
     fetchRemotes(remoteEntries).then(remotes => {
       console.info(remotes);
       resolve({
+        externals: [nodeExternals()],
         target: "async-node",
         mode: "development",
         devtool: "source-map",

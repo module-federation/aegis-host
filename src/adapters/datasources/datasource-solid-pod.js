@@ -24,14 +24,15 @@ async function readFileFromPod(fileURL, fetch, saveAsFilename) {
   } catch (err) {
     console.log(err);
   }
-}``
+}
+``;
 
 /*
  *
  * Get data stored on a SOLID POD, {@link https://solidproject.org/}
  * */
 
-export class DataSourcePod extends DataSourceMemory {
+export class DataSourceSolidPod extends DataSourceMemory {
   // ... import statement for authentication, which includes the fetch function, is omitted for brevity.
 
   constructor() {
