@@ -1,9 +1,7 @@
 (function () {
   const messages = document.querySelector("#messages");
   const wsButton = document.querySelector("#wsButton");
-  const wsSendButton = document.querySelector("#wsSendButton");
-  // const logoutButton = document.querySelector("#logout");
-  // const loginButton = document.querySelector("#login");
+  const statusButton = document.querySelector("#status");
   const clearButton = document.querySelector("#clear");
 
   function prettifyJson(json) {
@@ -37,30 +35,6 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
-  // function handleResponse(response) {
-  //   return response.ok
-  //     ? response.json().then(data => JSON.stringify(data, null, 2))
-  //     : Promise.reject(new Error("Unexpected response"));
-  // }
-
-  // loginButton.onclick = function () {
-  //   fetch("/login", { method: "POST", credentials: "same-origin" })
-  //     .then(handleResponse)
-  //     .then(showMessage)
-  //     .catch(function (err) {
-  //       showMessage(err.message);
-  //     });
-  // };
-
-  // logoutButton.onclick = function () {
-  //   fetch("/logout", { method: "DELETE", credentials: "same-origin" })
-  //     .then(handleResponse)
-  //     .then(showMessage)
-  //     .catch(function (err) {
-  //       showMessage(err.message);
-  //     });
-  // };
-
   let ws;
 
   wsButton.onclick = function () {
@@ -75,6 +49,7 @@
     };
     ws.onopen = function () {
       showMessage("WebSocket connection established");
+      ws.send(JSON.stringify("webswitch"));
     };
     ws.onclose = function () {
       showMessage("WebSocket connection closed");
@@ -85,17 +60,12 @@
     };
   };
 
+  statusButton.onclick = function () {
+    console.log("sending status");
+    ws.send(JSON.stringify("status"));
+  };
+
   clearButton.onclick = function () {
     document.getElementById("jsonCode").innerHTML = "";
   };
-
-  // wsSendButton.onclick = function () {
-  //   if (!ws) {
-  //     showMessage("No WebSocket connection");
-  //     return;
-  //   }
-
-  //   ws.send("Hello World!");
-  //   showMessage('Sent "Hello World!"');
-  // };
 })();

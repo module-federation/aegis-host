@@ -2,14 +2,28 @@
 const WebSocketServer = require("ws").Server;
 const nanoid = require("nanoid").nanoid;
 const server = new WebSocketServer({ clientTracking: true, port: 8062 });
+let messagesSent = 0;
+const startTime = Date.now();
+const uptime = () => Math.round(Math.abs((Date.now() - startTime) / 1000 / 60));
 
 server.broadcast = function (data, sender) {
   server.clients.forEach(function (client) {
     if (client.OPEN && client.webswitchId !== sender.webswitchId) {
       console.debug("sending to client", client.webswitchId);
       client.send(data);
+      messagesSent++;
     }
   });
+};
+
+server.sendStatus = function (client) {
+  client.send(
+    JSON.stringify({
+      uptimeMinutes: uptime(),
+      messagesSent,
+      clientsConnected: server.clients.size,
+    })
+  );
 };
 
 server.on("connection", function (client) {
@@ -26,11 +40,15 @@ server.on("connection", function (client) {
 
   client.on("message", function (message) {
     try {
+      const msg = JSON.parse(message.toString());
       if (client.webswitchInit) {
+        if (msg == "status") {
+          return server.sendStatus(client);
+        }
         server.broadcast(message, client);
         return;
       }
-      const msg = JSON.parse(message.toString());
+
       if (msg === "webswitch") {
         console.log("client initialized");
         client.webswitchInit = true;
