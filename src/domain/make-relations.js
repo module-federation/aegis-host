@@ -6,7 +6,6 @@ const maxwait = process.env.REMOTE_OBJECT_MAXWAIT || 10000;
 
 export const relationType = {
   /**
-   * @todo implement cache miss for distributed cache
    *
    * @param {import("./model").Model} model
    * @param {import("./datasource").default} ds

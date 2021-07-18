@@ -14,7 +14,6 @@
 
 ![mono-micro-fed 001](https://user-images.githubusercontent.com/38910830/126024192-c7382bd6-bd9e-4844-b0e5-06c4c686fb5d.jpeg)
 
-
 ## TL;DR
 
 ```shell
@@ -26,10 +25,13 @@ yarn build
 yarn start
 yarn run demo
 ```
+
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
-modules directly from GitHub. 
+modules directly from GitHub.
 
 [Importing your own app](#importing-your-own-repo)
+
+[WASM Proposal](#importing-your-own-repo1)
 
 ## Purpose
 
@@ -265,9 +267,10 @@ cert
 ```shell
 SSL_ENABLED=true
 ```
+
 ### Importing your own repo
 
-To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). Also from microlib-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack). 
+To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). Also from microlib-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack).
 
 ### Installation
 
@@ -298,3 +301,9 @@ MicroLib prevents vendor lock-in by providing a layer of abstraction on top of v
 [Microservice Library Videos](https://www.youtube.com/channel/UCT-3YJ2Ilgcjebqvs40Qz2A)
 
 <img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=MicroLIb&dp=/email/MicroLib">
+
+# WebAssembly Proposal for Polyglossia and
+
+### Importing your own repo1
+
+Parts of the AEGIS codebase will be ported tp C++, AssemblyAScript, etc and compiled to wasm bytecode,
