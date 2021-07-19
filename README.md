@@ -24,7 +24,7 @@ cp dotenv.example .env
 yarn install --frozen-lockfile
 yarn build
 yarn start
-yarn run demo
+yarn demo
 ```
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
 modules directly from GitHub. 
