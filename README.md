@@ -12,7 +12,7 @@
 - can be reloaded at any time without restarting the process or interrupting other components running in the process;
 - are _not_ _installed_ on the server but _streamed_ over the network as needed.
 
-![mono-micro-fed 001](https://user-images.githubusercontent.com/38910830/126024192-c7382bd6-bd9e-4844-b0e5-06c4c686fb5d.jpeg)
+![mono-micro-fed 001](https://user-images.githubusercontent.com/38910830/126571702-0cd570fd-2a94-4560-86b0-18d514d7cb65.jpeg)
 
 
 ## TL;DR
