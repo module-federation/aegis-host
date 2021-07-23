@@ -3,7 +3,7 @@
 import portHandler from "./port-handler";
 import async from "./util/async-error";
 import domainEvents from "./domain-events";
-import CircuitBreaker from "./circuit-breaker";
+import CircuitBreaker from "@module-federation/aegis/lib/domain/circuit-breaker";
 
 const TIMEOUTSECONDS = 60;
 const MAXRETRY = 5;

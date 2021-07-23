@@ -30,7 +30,7 @@
     "restart-order": "npm run build-order && npm start",
     "restart-customer": "npm run build-customer && npm start 8072",
     "start-webswitch": "node src/services/webswitch-server.cjs",
-    "transpile": "babel src/index.js src/cluster.js src/auth.js src/message.js src/server-less.js -d dist",
+    "transpile": "babel src/index.js src/server-less.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test-mocha": "mocha --recursive -r esm",

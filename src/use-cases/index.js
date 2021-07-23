@@ -9,7 +9,7 @@ import makeLoadModels from "./load-models";
 import makeListConfig from "./list-configs";
 import DataSourceFactory from "../domain/datasource-factory";
 import ObserverFactory from "../domain/observer";
-import ModelFactory from "../domain";
+import ModelFactory from "@module-federation/aegis/lib/domain";
 import brokerEvents from "./broker-events";
 
 export function registerCacheEvents() {

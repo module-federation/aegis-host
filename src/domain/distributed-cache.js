@@ -1,7 +1,7 @@
 "use strict";
 
 import { relationType } from "./make-relations";
-import { importRemoteCache } from ".";
+import { importRemoteCache } from "@module-federation/aegis/lib/domain";
 import domainEvents from "./domain-events";
 import makeArray from "./util/make-array";
 

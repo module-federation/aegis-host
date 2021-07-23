@@ -2,7 +2,7 @@
 
 /** @typedef {import('.').Model} Model */
 
-import ModelFactory from ".";
+import ModelFactory from "@module-federation/aegis/lib/domain";
 import * as adapters from "../adapters/datasources";
 import config from "../adapters/datasources";
 

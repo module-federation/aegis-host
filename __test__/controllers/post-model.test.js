@@ -6,7 +6,7 @@ import addModelFactory from "../../src/use-cases/add-model";
 import postModelFactory from "../../src/adapters/controllers/post-model";
 
 import DataSourceFactory from "../../src/domain/datasource-factory";
-import ModelFactory from "../../src/domain";
+import ModelFactory from "@module-federation/aegis/lib/domain";
 import ObserverFactory from "../../src/domain/observer";
 import hash from "../../src/domain/util/hash";
 
