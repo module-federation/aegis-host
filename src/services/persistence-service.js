@@ -1,6 +1,6 @@
 "use strict";
 
-import DataSource from "../domain/datasource-factory";
+import DataSource from "@module-federation/aegis/lib/domain/datasource-factory";
 
 export const Persistence = {
   async save(model) {

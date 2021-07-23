@@ -1,6 +1,6 @@
 "use strict";
 
-import DataSource from "../../domain/datasource";
+import DataSource from "@module-federation/aegis/lib/domain/datasource";
 
 /**
  * Temporary in-memory storage.

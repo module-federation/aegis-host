@@ -1,5 +1,5 @@
-import DistributedCacheManager from "../domain/distributed-cache";
-import uuid from "../domain/util/uuid";
+import DistributedCacheManager from "@module-federation/aegis/lib/domain/distributed-cache";
+import uuid from "@module-federation/aegis/lib/domain/util/uuid";
 import EventBus from "../services/event-bus";
 import webswitch from "../services/webswitch";
 

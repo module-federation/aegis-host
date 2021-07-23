@@ -4,7 +4,7 @@ var assert = require("assert");
 process.env.DATASOURCE_ADAPTER = "DataSourceFile";
 const {
   default: DataSourceFactory,
-} = require("../../src/domain/datasource-factory");
+} = require("@module-federation/aegis/lib/domain/datasource-factory");
 
 describe("datasources", function () {
   var ds = DataSourceFactory.getDataSource("test");

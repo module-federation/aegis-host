@@ -4,11 +4,11 @@ import makeAddModel from "./add-model";
 import makeEditModel from "./edit-model";
 import makeListModels from "./list-models";
 import makeFindModel from "./find-model";
-import makeRemoveModel from "./remove-model";
-import makeLoadModels from "./load-models";
+import makeRemoveModel from "@module-federation/aegis/lib/use-cases/remove-model";
+import makeLoadModels from "@module-federation/aegis/lib/use-cases/load-models";
 import makeListConfig from "./list-configs";
-import DataSourceFactory from "../domain/datasource-factory";
-import ObserverFactory from "../domain/observer";
+import DataSourceFactory from "@module-federation/aegis/lib/domain/datasource-factory";
+import ObserverFactory from "@module-federation/aegis/lib/domain/observer";
 import ModelFactory from "@module-federation/aegis/lib/domain";
 import brokerEvents from "./broker-events";
 

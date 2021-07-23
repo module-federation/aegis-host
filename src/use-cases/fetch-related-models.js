@@ -1,6 +1,6 @@
 "use strict";
 
-import async from "../domain/util/async-error";
+import async from "@module-federation/aegis/lib/domain/util/async-error";
 
 /**
  * @param {import("../domain/model").Model} model

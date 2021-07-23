@@ -5,10 +5,10 @@ var assert = require("assert");
 import addModelFactory from "../../src/use-cases/add-model";
 import postModelFactory from "../../src/adapters/controllers/post-model";
 
-import DataSourceFactory from "../../src/domain/datasource-factory";
+import DataSourceFactory from "@module-federation/aegis/lib/domain/datasource-factory";
 import ModelFactory from "@module-federation/aegis/lib/domain";
-import ObserverFactory from "../../src/domain/observer";
-import hash from "../../src/domain/util/hash";
+import ObserverFactory from "@module-federation/aegis/lib/domain/observer";
+import hash from "@module-federation/aegis/lib/domain/util/hash";
 
 describe("Controllers", function () {
   describe("postModel()", function () {
