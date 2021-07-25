@@ -2,8 +2,8 @@
 
 var assert = require("assert");
 
-import addModelFactory from "../../src/use-cases/add-model";
-import postModelFactory from "../../src/adapters/controllers/post-model";
+import addModelFactory from "@module-federation/aegis/lib/use-cases/add-model";
+import postModelFactory from "@module-federation/aegis/lib/adapters/controllers/post-model";
 
 import DataSourceFactory from "@module-federation/aegis/lib/domain/datasource-factory";
 import ModelFactory from "@module-federation/aegis/lib/domain";

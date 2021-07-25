@@ -9,7 +9,7 @@ import {
   loadModels,
   listConfigs,
   registerCacheEvents,
-} from "../../use-cases";
+} from "@module-federation/aegis/lib/use-cases";
 
 import postModelFactory from "./post-model";
 import patchModelFactory from "./patch-model";
