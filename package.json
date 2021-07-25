@@ -29,7 +29,7 @@
     "start-8072": "npm start 8072",
     "restart-order": "npm run build-order && npm start",
     "restart-customer": "npm run build-customer && npm start 8072",
-    "start-webswitch": "node src/services/webswitch-server.cjs",
+    "start-webswitch": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-server.js",
     "transpile": "babel src/index.js src/server-less.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
