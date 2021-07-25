@@ -8,7 +8,7 @@ import {
   deleteModels,
   initCache,
   getConfig,
-} from "./adapters/controllers";
+} from "@module-federation/aegis/lib/adapters/controllers";
 
 import { Persistence } from "./services/persistence-service";
 import { save, find, close } from "@module-federation/aegis/lib/adapters/persistence-adapter";
