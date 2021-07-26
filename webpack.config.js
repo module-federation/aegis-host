@@ -60,7 +60,7 @@ module.exports = env => {
             remotes,
             exposes: {
               "./server": "./src/server",
-              "./domain": "./src/domain",
+              "./domain": "@module-federation/aegis/lib/domain",
               "./remoteEntries": "./webpack/remote-entries",
             },
           }),

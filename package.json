@@ -29,8 +29,8 @@
     "start-8072": "npm start 8072",
     "restart-order": "npm run build-order && npm start",
     "restart-customer": "npm run build-customer && npm start 8072",
-    "start-webswitch": "node src/services/webswitch-server.cjs",
-    "transpile": "babel src/index.js src/cluster.js src/auth.js src/message.js src/server-less.js -d dist",
+    "start-webswitch": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-server.js",
+    "transpile": "babel src/index.js src/server-less.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test-mocha": "mocha --recursive -r esm",
@@ -56,6 +56,7 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
+    "@module-federation/aegis": "^0.0.1-alpha.18",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "ci": "^2.1.1",

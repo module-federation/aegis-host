@@ -7,11 +7,11 @@ const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const express = require("express");
-const cluster = require("./cluster");
+const cluster = require("@module-federation/aegis/lib/cluster");
 const graceful = require("express-graceful-shutdown");
-const authorization = require("./auth");
-const messageParser = require("./message").parsers;
-const { ServerlessAdapter } = require("./server-less");
+const authorization = require("@module-federation/aegis/lib/auth");
+const messageParser = require("@module-federation/aegis/lib/message").parsers;
+const { ServerlessAdapter } = require("@module-federation/aegis/lib/server-less");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 8070;

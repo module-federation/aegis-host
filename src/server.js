@@ -8,12 +8,12 @@ import {
   deleteModels,
   initCache,
   getConfig,
-} from "./adapters/controllers";
+} from "@module-federation/aegis/lib/adapters/controllers";
 
-import { Persistence } from "./services/persistence-service";
-import { save, find, close } from "./adapters/persistence-adapter";
-import http from "./adapters/http-adapter";
-import ModelFactory from "./domain";
+import { Persistence } from "@module-federation/aegis/lib/services/persistence-service";
+import { save, find, close } from "@module-federation/aegis/lib/adapters/persistence-adapter";
+import http from "@module-federation/aegis/lib/adapters/http-adapter";
+import ModelFactory from "@module-federation/aegis/lib/domain";
 
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const modelPath = `${apiRoot}/models`;

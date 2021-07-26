@@ -2,8 +2,8 @@
 
 var assert = require("assert");
 
-import CircuitBreaker from "../../src/domain/circuit-breaker";
-import Model from "../../src/domain/circuit-breaker";
+import CircuitBreaker from "@module-federation/aegis/lib/domain/circuit-breaker";
+import Model from "@module-federation/aegis/lib/domain/circuit-breaker";
 
 describe("Model", function () {
   const breaker = CircuitBreaker(
