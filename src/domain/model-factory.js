@@ -189,12 +189,6 @@ const ModelFactory = {
 
   /**
    * Get federated models imported from remote server
-   * @deprecated
-   */
-  getRemoteModels: () => [...modelFactories.values()],
-
-  /**
-   * Get federated models imported from remote server
    * @returns
    */
   getModelSpecs: () => [...modelFactories.values()],

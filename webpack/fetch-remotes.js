@@ -115,12 +115,14 @@ module.exports = async remoteEntry => {
       return new Promise(async function (resolve) {
         const resolvePath = () => resolve({ [entry.name]: path });
 
-        if (/^https:\/\/api.github.com.*/i.test(entry.url)) {
-          // Download from github.
-          await githubFetch(entry, path);
-          resolvePath();
-        } else {
-          httpGet(entry, path, resolvePath);
+        if (entry.type !== "wasm") {
+          if (/^https:\/\/api.github.com.*/i.test(entry.url)) {
+            // Download from github.
+            await githubFetch(entry, path);
+            resolvePath();
+          } else {
+            httpGet(entry, path, resolvePath);
+          }
         }
       });
     })

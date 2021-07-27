@@ -1,5 +1,7 @@
 "use strict";
 
+s;
+
 /**
  * @returns {Promise<import('.').ModelSpecification[]>}
  */
@@ -15,9 +17,7 @@ export async function importRemoteModels(remoteEntries) {
         remoteModels.push(models);
       }
     }
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
   console.info("model import took %d ms", Date.now() - startTime);
 

@@ -4,7 +4,17 @@ const nanoid = require("nanoid").nanoid;
 const server = new WebSocketServer({ clientTracking: true, port: 8062 });
 let messagesSent = 0;
 const startTime = Date.now();
-const uptime = () => Math.round(Math.abs((Date.now() - startTime) / 1000 / 60));
+
+function uptime() {
+  const minutes = Math.round(Math.abs((Date.now() - startTime) / 1000 / 60));
+  const hours = minutes > 60 ? (minutes / 60).toFixed(1) : 0;
+  const days = minutes > 60 * 24 ? (minutes / (60 * 24)).toFixed(1) : 0;
+  return {
+    minutes,
+    hours,
+    days,
+  };
+}
 
 server.broadcast = function (data, sender) {
   server.clients.forEach(function (client) {
@@ -19,7 +29,7 @@ server.broadcast = function (data, sender) {
 server.sendStatus = function (client) {
   client.send(
     JSON.stringify({
-      uptimeMinutes: uptime(),
+      uptime: uptime(),
       messagesSent,
       clientsConnected: server.clients.size,
     })
@@ -60,5 +70,10 @@ server.on("connection", function (client) {
 
     client.terminate();
     console.log("terminated client", client.webswitchId);
+  });
+
+  process.on("SIGTERM", () => {
+    console.info("Shuttiing down. Closing clients.");
+    server.clients.forEach(client => client.close("SIGTERM"));
   });
 });

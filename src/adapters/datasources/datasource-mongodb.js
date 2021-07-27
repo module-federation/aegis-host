@@ -181,11 +181,13 @@ export class DataSourceMongoDb extends DataSourceMemory {
   /**
    * Flush the cache to disk.
    */
-  flush() {
+  async flush() {
     try {
-      [...this.dataSource.values()].reduce(
-        (a, b) => a.then(() => this.saveDb(b.getId(), b)),
-        {}
+      await Promise.allSettled(
+        [...this.dataSources].reduce(
+          async (a, b) => a.then(() => this.saveDb(b.getId(), b)),
+          Promise.resolve([...this.dataSources][0][1])
+        )
       );
     } catch (error) {
       console.error(error);
@@ -196,8 +198,9 @@ export class DataSourceMongoDb extends DataSourceMemory {
    * Process terminating, flush cache, close connections.
    * @override
    */
-  close() {
-    this.flush();
+  async close() {
+    await this.flush();
+    this.dataSource.clear();
     this.client.close();
   }
 }

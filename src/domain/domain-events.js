@@ -1,6 +1,6 @@
 "use strict";
 
-const     domainEvents = {
+const domainEvents = {
   internalCacheRequest: modelName => `internalCacheRequest_${modelName}`,
   externalCacheRequest: modelName => `externalCacheRequest_${modelName}`,
   internalCacheResponse: modelName => `internalCacheResponse_${modelName}`,

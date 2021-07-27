@@ -72,7 +72,6 @@ export async function publishEvent(event) {
       ws.on("message", function (message) {
         console.debug(message);
         const event = JSON.parse(message);
-        // console.debug(event);
       });
 
       ws.on("open", function () {

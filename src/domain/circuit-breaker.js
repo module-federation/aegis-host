@@ -2,6 +2,7 @@
 
 /**
  * State of the breaker.
+ * @enum {symbol}
  */
 const State = {
   /** Breaker tripped. Error threshold breached. Client call suppressed. */
@@ -12,6 +13,9 @@ const State = {
   HalfOpen: Symbol(),
 };
 
+/**
+ * @type {import("./index").circuitBreaker[x]}
+ */
 const DefaultThreshold = {
   /** Percentage of requests that failed within `intervalMs`. */
   errorRate: 20,
@@ -26,6 +30,7 @@ const DefaultThreshold = {
 /**
  * Circuit history
  * @todo handle all state same way
+ * @type {Map<string, {state:State,time:number,error:Error|null}[]}
  */
 const logs = new Map();
 
@@ -44,6 +49,7 @@ function fetchLog(id) {
 /**
  * Get last known status of breaker
  * @returns {symbold} breaker state
+ * @returns {State}
  */
 function getState(log) {
   if (log.length > 0) {
@@ -64,19 +70,22 @@ function getState(log) {
  */
 
 /**
- * @param {*} error,
+ * Get threahold based on error
+ * @param {Error} error,
  * @param {thresholds} thresholds
+ * @returns {thresholds[x]}
  */
 function getThreshold(error, thresholds) {
-  return thresholds[error.name] || thresholds.default || DefaultThreshold;
+  const specific = error ? thresholds[error.name] : null;
+  return specific || thresholds.default || DefaultThreshold;
 }
 
 /**
- * @param
- * @param {*} id
+ * Check if any threshold for this circuit (function) is exceeded
+ * @param {*} log
  * @param {*} error
  * @param {thresholds} thresholds
- * @returns
+ * @returns {boolean} has it been breached?
  */
 function thresholdBreached(log, error, thresholds) {
   if (log.length < 1) return false;
@@ -90,6 +99,13 @@ function thresholdBreached(log, error, thresholds) {
   return callVolume > threshold.callVolume && errorRate > threshold.errorRate;
 }
 
+/**
+ * Record the error and trip the breaker if necessary.
+ * @param {*} log
+ * @param {*} error
+ * @param {*} options
+ * @returns
+ */
 function setStateOnError(log, error, options) {
   const state = getState(log);
   if (
@@ -102,7 +118,7 @@ function setStateOnError(log, error, options) {
 }
 
 /**
- * log error and run thru breaker logic.
+ * log error and set new state if needed.
  * @param {string} id name of protected function
  * @param {string} error
  */
@@ -114,9 +130,9 @@ export function logError(id, error, thresholds) {
 }
 
 /**
- *
+ * Has the wait period elapsed?
  * @param {*} id
- * @returns
+ * @returns {boolean}
  */
 function readyToTest(log) {
   if (log.length < 1) return true;
@@ -133,7 +149,7 @@ const Switch = function (id, thresholds) {
   const log = fetchLog(id);
 
   return {
-    /** current state of the braker */
+    /** @type {State}  current state of the braker */
     state: getState(log),
     /**
      * Breaker closed. Normal function. Requests allowed.
@@ -223,6 +239,7 @@ const Switch = function (id, thresholds) {
  * transaction succeeds, it resets (closes) ands transactions can proceed
  * as normal. If it fails, the breaker trips again.
  *
+ * @class
  * @param {string} id function name or other unique name
  * @param {function()} protectedCall client function to protect
  * @param {{
@@ -236,9 +253,14 @@ const Switch = function (id, thresholds) {
  * @returns {breaker}
  */
 const CircuitBreaker = function (id, protectedCall, thresholds) {
+  const events = [];
   return {
     // wrap client call
     async invoke(...args) {
+      events.forEach(e =>
+        this.addListener(e, () => logError(id, e, thresholds))
+      );
+
       const breaker = Switch(id, thresholds);
       breaker.appendLog();
 
@@ -247,10 +269,11 @@ const CircuitBreaker = function (id, protectedCall, thresholds) {
         try {
           return await protectedCall.apply(this, args);
         } catch (error) {
+          breaker.appendLog(error);
+
           if (breaker.thresholdBreached(error)) {
             breaker.trip();
           }
-          breaker.appendLog(error);
           return this;
         }
       }
@@ -278,15 +301,10 @@ const CircuitBreaker = function (id, protectedCall, thresholds) {
 
     /**
      * Listen for async / unthrown errors
-     * @param {*} event
+     * @param {Error} event
      */
     errorListener(event) {
-      if (this.addListener) {
-        this.addListener(event, ({ eventName }) =>
-          logError(id, eventName, thresholds)
-        );
-      }
-      console.error("not supported");
+      events.push(event);
     },
   };
 };

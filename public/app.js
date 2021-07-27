@@ -202,7 +202,6 @@
 
   clearParamButton.addEventListener("click", function () {
     document.getElementById("parameter").value = "";
-    document.getElementById("modelId").value = "";
     document.getElementById("query").value = "";
     getUrl();
   });

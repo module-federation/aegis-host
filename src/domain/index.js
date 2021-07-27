@@ -246,6 +246,9 @@ let localOverrides = {};
 export async function importRemotes(remoteEntries, overrides = {}) {
   remotesConfig = remoteEntries;
   localOverrides = overrides;
+  try {
+    WebAssembly.instantiate();
+  } catch {}
 
   const services = await importRemoteServices(remoteEntries);
   const adapters = await importRemoteAdapters(remoteEntries);
@@ -306,6 +309,9 @@ export async function importRemoteCache(name) {
     return;
   }
   register(model, serviceCache, adapterCache, true);
+}
+async function importWasm() {
+  const wasm = WebAssembly.instantiate(
 }
 
 export default ModelFactory;

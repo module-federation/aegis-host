@@ -11,9 +11,10 @@ import {
 } from "./adapters/controllers";
 
 import { Persistence } from "./services/persistence-service";
-import { save, find, close } from "./adapters/persistence-adapter";
+import { save, find } from "./adapters/persistence-adapter";
 import http from "./adapters/http-adapter";
 import ModelFactory from "./domain";
+import DataSourceFactory from "./domain/datasource-factory";
 
 const apiRoot = process.env.API_ROOT || "/microlib/api";
 const modelPath = `${apiRoot}/models`;
@@ -149,13 +150,13 @@ const Server = (() => {
    * everything bundled by remoteEntry.js (models
    * & remoteEntry config), which includes all the
    * user code downloaded from the remote. This is
-   * the code that needs to be disposed of & reimported.
+   * the code that needs to be disposed of & reimported.                                                                                                                           VBC
    */
-  function clear() {
+  async function clear() {
     try {
-      close();
-      routes.clear();
+      await DataSourceFactory.close();
       ModelFactory.clearModels();
+      routes.clear();
 
       Object.keys(__non_webpack_require__.cache).forEach(k => {
         console.log("deleting cached module", k);
@@ -201,7 +202,12 @@ const Server = (() => {
           console.timeEnd(label);
           console.info(routes);
 
-          process.on("sigterm", () => shutdown(() => close()));
+          process.on("sigterm", () =>
+            shutdown(() => getDataSourceFactory().close())
+          );
+          process.on("uncaughtException", err => {
+            console.error("There was an uncaught error", err);
+          });
           await cache.load();
           return control;
         });

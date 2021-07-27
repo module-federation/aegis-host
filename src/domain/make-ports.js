@@ -212,6 +212,7 @@ export default function makePorts(ports, adapters, observer) {
 
         if (timer.enabled && timer.expired()) {
           // This means we hit max retries
+          console.warn("timeout expired", )
           return this;
         }
 

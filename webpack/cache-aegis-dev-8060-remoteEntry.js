@@ -31671,7 +31671,7 @@ var moduleMap = {
 		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./service-cache": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+		return Promise.all([__webpack_require__.e("vendors-node_modules_nanoid_index_js-node_modules_ws_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./event-bus": () => {
 		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_event-bus_js")]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
@@ -31725,6 +31725,19 @@ module.exports = require("assert");
 
 "use strict";
 module.exports = require("crypto");
+
+/***/ }),
+
+/***/ "dns/promises":
+/*!*******************************!*\
+  !*** external "dns/promises" ***!
+  \*******************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("dns/promises");
 
 /***/ }),
 

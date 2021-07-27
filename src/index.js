@@ -56,7 +56,7 @@ async function startMicroLib({ hot = false, serverless = false } = {}) {
     // clear stale routes
     clearRoutes();
     // clear cache on hot reload
-    serverModule.default.clear();
+    await serverModule.default.clear();
   }
   await serverModule.default.start(app, serverless);
   return serverModule.default.control;
@@ -73,14 +73,14 @@ function reloadCallback() {
   });
 
   if (clusterEnabled) {
-    app.use(reloadPath, async function (req, res) {
+    app.use(reloadPath, async function (_req, res) {
       res.send("<h1>starting cluster reload</h1>");
       process.send({ cmd: "reload" });
     });
     return;
   }
 
-  app.use(reloadPath, async function (req, res) {
+  app.use(reloadPath, async function (_req, res) {
     try {
       await startMicroLib({ hot: true });
       res.send("<h1>hot reload complete</h1>");

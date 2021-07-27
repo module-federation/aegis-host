@@ -17,45 +17,39 @@ export default async function compensate(model) {
       "undo starting"
     );
 
-    const undoneModel = await Promise.resolve(
+    const undoModel = await Promise.resolve(
       portFlow.reduceRight(async function (model, port, index, arr) {
         if (ports[port].undo) {
           console.log("calling undo on port: ", port);
+
           try {
-            const undone = (await ports[port].undo(model)) || model;
-            return undone.then(model =>
-              model.update({
-                [undone.getKey("portFlow")]: arr.splice(0, index),
-              })
-            );
+            return model.then(async function (model) {
+              await ports[port].undo(model);
+
+              return model.update({
+                [model.getKey("portFlow")]: arr.splice(0, index),
+              });
+            });
           } catch (error) {
             console.error(error);
-            return model;
           }
         }
         return model;
-      }, updatedModel)
+      }, Promise.resolve(updatedModel))
     );
 
-    if (undoneModel.getPortFlow().length > 0) {
-      const lastPort = undoneModel.getPortFlow();
-      const msg = "undo incomplete, last port compensated " + lastPort;
-
-      const model = await undoneModel.update({
-        lastPort,
+    if (undoModel.getPortFlow().length > 0) {
+      await model.emit(domainEvents.undoFailed(model), msg);
+      const model = await undoModel.update({
         compensateResult: "INCOMPLETE",
       });
-
-      await model.emit(domainEvents.undoFailed(model), msg);
-      console.error(msg, updatedModel);
       return;
     }
 
-    const compensateResult = "COMPLETE";
-    await undoneModel.emit(domainEvents.undoWorked(model), compensateResult);
-    await undoneModel.update({ compensateResult });
+    await undoModel.update({ compensateResult: "COMPLETE" });
+    await undoModel.emit(domainEvents.undoWorked(model), compensateResult);
   } catch (error) {
-    console.error(error);
     await model.emit(domainEvents.undoFailed(model), error.message);
+    console.error(error);
   }
 }

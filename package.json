@@ -25,7 +25,7 @@
     "hot-reload": "curl http://localhost:8070/microlib/reload",
     "hot-reload-customer": "curl http://localhost:8072/microlib/reload",
     "restart": "npm run build && npm run start",
-    "start": "node dist/index.js",
+    "start": "node --experimental-wasi-unstable-preview1 dist/index.js",
     "start-8072": "npm start 8072",
     "restart-order": "npm run build-order && npm start",
     "restart-customer": "npm run build-customer && npm start 8072",
@@ -69,7 +69,8 @@
     "mongodb-client-encryption": "^1.2.3",
     "nanoid": "^3.1.20",
     "regenerator-runtime": "^0.13.7",
-    "serverless-aws-static-file-handler": "^2.0.8"
+    "serverless-aws-static-file-handler": "^2.0.8",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",

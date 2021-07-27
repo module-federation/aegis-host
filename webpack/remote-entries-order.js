@@ -1,5 +1,5 @@
 const cache = require("./remote-entries-cache");
-
+//const wasm = require("./remote-entries-wasm");
 module.exports = [
   {
     name: "microservices",
