@@ -1,5 +1,7 @@
 ![MicroLib](doc/microlib.png)
 
+# NOTA BENE: Core code has been extracted to [aegis](https://github.com/module-federation/aegis). MicroLib server now loads from NPM.
+
 # MicroLib <sub><sup>codename _ÆGIS_</sup></sub>
 
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/microlib)
