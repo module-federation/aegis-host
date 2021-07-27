@@ -5,6 +5,7 @@ export * from "./datasource-mongodb";
 //export * from "./datasource-solid-pod";
 
 const config = {
+  /** available adapters */
   getBaseClass(name) {
     if (name === "DataSourceFile") {
       return require(".").DataSourceFile;
@@ -20,7 +21,8 @@ const config = {
     // }
     return require(".").DataSourceMemory;
   },
-  MEMORYADAPTER: "DataSourceMemory",
+  /** Used for cache */
+  MEMORY_ADAPTER: "DataSourceMemory",
 };
 
 export default config;
