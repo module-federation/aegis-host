@@ -1203,10 +1203,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@module-federation/aegis@^0.0.1-alpha.50":
-  version "0.0.1-alpha.50"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.50.tgz#5082dae9a1412f2bc251dfbabbcde55678329a3d"
-  integrity sha512-+OAZ3A085GJOZ2Kr9PsqiMyD8FMgnAtPNzhOCdBEMnhChcUMuG7fid73mROUoZe4MUR48/nRMrwqOZ59y76QpA==
+"@module-federation/aegis@^0.0.1-alpha.53":
+  version "0.0.1-alpha.53"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.53.tgz#a7c2847ace3efbe624e90ab2d4ec99458a559bd6"
+  integrity sha512-y1bH3vBEsznw3qyfrZ/bgKthRgnmMHiCHfwN+/M3D6zM8FVOgbxphpvKqF5qX+Pd32Bc4HzEfddnHpHYBhJb0Q==
   dependencies:
     "@octokit/core" "^3.4.0"
     "@octokit/rest" "^18.5.2"
