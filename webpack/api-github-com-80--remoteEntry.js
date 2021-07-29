@@ -31821,7 +31821,7 @@ var moduleMap = {
 		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(579)]).then(() => () => (__webpack_require__(/*! ./src/services/webswitch */ "./src/services/webswitch.js")));
 	},
 	"./wasm": () => {
-		return __webpack_require__.e(254).then(() => () => (__webpack_require__(/*! ./src/wasm/demo.js */ "./src/wasm/demo.js")));
+		return __webpack_require__.e(724).then(() => () => (__webpack_require__(/*! ./src/wasm/cpp-demo.wasm */ "./src/wasm/cpp-demo.wasm")));
 	}
 };
 var get = (module) => {
@@ -32084,15 +32084,12 @@ module.exports = require("zlib");
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
 /******/ 			id: moduleId,
-/******/ 			loaded: false,
+/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -32164,18 +32161,9 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/node module decorator */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nmd = (module) => {
-/******/ 			module.paths = [];
-/******/ 			if (!module.children) module.children = [];
-/******/ 			return module;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=master";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=new-customer";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
