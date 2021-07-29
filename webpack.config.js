@@ -1,7 +1,6 @@
 require("dotenv").config();
 const path = require("path");
-const ModuleFederationPlugin =
-  require("webpack").container.ModuleFederationPlugin;
+const { ModuleFederationPlugin } = require("webpack").container;
 const nodeExternals = require("webpack-node-externals");
 const fetchRemotes = require("./webpack/fetch-remotes");
 const remoteEntries = require("./webpack/remote-entries");
