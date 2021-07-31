@@ -31821,7 +31821,7 @@ var moduleMap = {
 		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(579)]).then(() => () => (__webpack_require__(/*! ./src/services/webswitch */ "./src/services/webswitch.js")));
 	},
 	"./wasm": () => {
-		return __webpack_require__.e(724).then(() => () => (__webpack_require__(/*! ./src/wasm/cpp-demo.wasm */ "./src/wasm/cpp-demo.wasm")));
+		return __webpack_require__.e(357).then(() => () => (__webpack_require__(/*! ./src/wasm */ "./src/wasm/index.js")));
 	}
 };
 var get = (module) => {
@@ -32083,7 +32083,7 @@ module.exports = require("zlib");
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
+/******/ 			// no module.id needed
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
@@ -32163,7 +32163,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=new-customer";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=master";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */

@@ -19,6 +19,7 @@
   "scripts": {
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "build-all": "cp webpack/remote-entries-build.js webpack/remote-entries.js && npm run build",
+    "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && npm run build",
     "build-order": "cp webpack/remote-entries-order.js webpack/remote-entries.js && npm run build",
     "build-customer": "cp webpack/remote-entries-customer.js webpack/remote-entries.js && npm run build",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
@@ -36,6 +37,7 @@
     "test-mocha": "mocha --recursive -r esm",
     "test": "jest",
     "demo": "open http://localhost:8070",
+    "demo-customer": "open http://localhost:8072",
     "demo-ssl": "open https://localhost:8071",
     "demo-aws": "open http://3.238.30.178:8070",
     "refresh-token": "./accessToken.sh",
@@ -59,7 +61,6 @@
     "@module-federation/aegis": "^0.0.1-alpha.53",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
-    "ci": "^2.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-graceful-shutdown": "^1.1.3",

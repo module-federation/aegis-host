@@ -8,7 +8,7 @@ module.exports = [
     branch: "master",
     path: __dirname,
     type: "model",
-    importRemote: async () => import("microservices/models"),
+    importRemote: async () => import("microservices/domain"),
   },
   {
     name: "adapters",
