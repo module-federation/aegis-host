@@ -1203,14 +1203,13 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@module-federation/aegis@^0.0.1-alpha.53":
-  version "0.0.1-alpha.53"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.53.tgz#a7c2847ace3efbe624e90ab2d4ec99458a559bd6"
-  integrity sha512-y1bH3vBEsznw3qyfrZ/bgKthRgnmMHiCHfwN+/M3D6zM8FVOgbxphpvKqF5qX+Pd32Bc4HzEfddnHpHYBhJb0Q==
+"@module-federation/aegis@^0.0.1-alpha.64":
+  version "0.0.1-alpha.63"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.63.tgz#fa8ae3944f62f927be8044aaa76cf95a82ced978"
+  integrity sha512-lNs7gDwMn+MdAYnUV26OpnVpwHzFvFEgQY9LztkV6DiFCm61TU/yHG5af11P6yYu3f+WfCfil41Edh+GDBA7Dg==
   dependencies:
     "@octokit/core" "^3.4.0"
     "@octokit/rest" "^18.5.2"
-    ci "^2.1.1"
     dotenv "^8.2.0"
     express "^4.17.1"
     express-graceful-shutdown "^1.1.3"
@@ -3076,11 +3075,6 @@ ci-info@^3.1.1:
   version "3.2.0"
   resolved "https://registry.npmjs.org/ci-info/-/ci-info-3.2.0.tgz"
   integrity sha512-dVqRX7fLUm8J6FgHJ418XuIgDLZDkYcDFTeL6TA2gt5WlIZUQrrH6EZrNClwT/H0FateUsZkGIOPRrLbP+PR9A==
-
-ci@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.npmjs.org/ci/-/ci-2.1.1.tgz"
-  integrity sha512-StBCU1G9zbhgVBqvslvOpT601zme9YfyZaUSjgXCtfnIynPuDBHX85WwnXv5cnh74bYo8S3xfPpI41yk1jZmRw==
 
 cjs-module-lexer@^1.0.0:
   version "1.2.1"
