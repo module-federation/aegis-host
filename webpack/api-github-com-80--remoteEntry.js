@@ -31803,22 +31803,25 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 "use strict";
 var moduleMap = {
 	"./models": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_mixins_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(410), __webpack_require__.e(486)]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
 	},
 	"./adapters": () => {
-		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+		return __webpack_require__.e(610).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./services": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_ws_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(610), __webpack_require__.e(662)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./validations": () => {
-		return __webpack_require__.e("src_models_mixins_js").then(() => () => (__webpack_require__(/*! ./src/models/mixins */ "./src/models/mixins.js")));
+		return __webpack_require__.e(410).then(() => () => (__webpack_require__(/*! ./src/models/mixins */ "./src/models/mixins.js")));
 	},
 	"./event-bus": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_event-bus_js")]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
+		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(778)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
 	},
 	"./webswitch": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_ws_index_js"), __webpack_require__.e("src_services_webswitch_js")]).then(() => () => (__webpack_require__(/*! ./src/services/webswitch */ "./src/services/webswitch.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(579)]).then(() => () => (__webpack_require__(/*! ./src/services/webswitch */ "./src/services/webswitch.js")));
+	},
+	"./wasm": () => {
+		return __webpack_require__.e(357).then(() => () => (__webpack_require__(/*! ./src/wasm */ "./src/wasm/index.js")));
 	}
 };
 var get = (module) => {
@@ -32337,13 +32340,13 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 		// no consumes in initial chunks
 /******/ 		var chunkMapping = {
-/******/ 			"src_adapters_index_js": [
-/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
-/******/ 			],
-/******/ 			"src_models_mixins_js": [
+/******/ 			"410": [
 /******/ 				"webpack/sharing/consume/default/nanoid/nanoid"
 /******/ 			],
-/******/ 			"src_services_index_js": [
+/******/ 			"610": [
+/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
+/******/ 			],
+/******/ 			"662": [
 /******/ 				"webpack/sharing/consume/default/nanoid/nanoid",
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			]
@@ -32458,7 +32461,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			"microservices": 0
+/******/ 			578: 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
