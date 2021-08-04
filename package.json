@@ -58,7 +58,7 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "@module-federation/aegis": "^0.0.1-alpha.70",
+    "@module-federation/aegis": "^0.0.1-alpha.71",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "dotenv": "^8.2.0",
