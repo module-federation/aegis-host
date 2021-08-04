@@ -1,3 +1,5 @@
+const cache = require("./remote-entries-cache");
+
 module.exports = [
   {
     name: "microservices",
@@ -5,7 +7,7 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "master",
+    branch: "build-customer",
     path: __dirname,
     type: "model",
     importRemote: async () => import("microservices/domain"),
@@ -16,7 +18,7 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "master",
+    branch: "build-customer",
     path: __dirname,
     type: "adapter",
     importRemote: async () => import("microservices/adapters"),
@@ -27,9 +29,20 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "master",
+    branch: "build-customer",
     path: __dirname,
     type: "service",
     importRemote: async () => import("microservices/services"),
   },
-];
+  {
+    name: "wasm",
+    url: "https://api.github.com",
+    repo: "assembly-script-aegis",
+    owner: "tysonrm",
+    filedir: "dist",
+    branch: "master",
+    path: __dirname,
+    type: "wasm",
+    importRemote: async () => import("microservices/wasm"),
+  },
+].concat(cache);

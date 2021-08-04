@@ -4,14 +4,20 @@ const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
 const token = process.env.GITHUB_TOKEN;
 
+function githubPath(entry, url) {
+  if (entry.owner)
+    return `${entry.owner}-${entry.repo}-${entry.filedir.split("/").join("-")}`;
+  return url.pathname.split("/").join("-");
+}
+
 function generateFilename(entry) {
   const url = new URL(entry.url);
   const hostpart = url.hostname.split(".").join("-");
-  const pathpart = url.pathname.split("/").join("-");
+  const pathpart = githubPath(entry, url);
   const portpart = url.port ? url.port : 80;
   if (/remoteEntry/i.test(pathpart))
-    return `${hostpart}-${portpart}${pathpart}`;
-  return `${hostpart}-${portpart}${pathpart}-remoteEntry.js`;
+    return `${hostpart}-${portpart}-${pathpart}`;
+  return `${hostpart}-${portpart}-${pathpart}-remoteEntry.js`;
 }
 
 function getPath(entry) {
@@ -75,18 +81,22 @@ function httpGet(entry, path, done) {
   );
 }
 
+function getUniqueEntry(entry) {
+  return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}`;
+}
+
 /**
  * Return each unique url just once
- * @param {{name:string,path:sting,url:string}[]} entries
+ * @param {{name:string,path:sting,filedir:string,branch:string,url:string}[]} entries
  * @returns {{[x:string]:{name:string,path:string,url:string}}}
  */
-function deduplicateUrls(entries) {
+function deduplicate(entries) {
   return entries
     .map(function (e) {
       return {
-        [e.url]: {
+        [getUniqueEntry(e)]: {
           ...e,
-          name: e.url,
+          name: getUniqueEntry(e),
         },
       };
     })
@@ -108,7 +118,7 @@ module.exports = async remoteEntry => {
   const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
 
   const remotes = await Promise.all(
-    Object.values(deduplicateUrls(entries)).map(function (entry) {
+    Object.values(deduplicate(entries)).map(function (entry) {
       const path = getPath(entry);
       console.log("downloading file to", path);
 
@@ -126,5 +136,9 @@ module.exports = async remoteEntry => {
     })
   );
 
-  return entries.map(e => ({ [e.name]: remotes.find(r => r[e.url])[e.url] }));
+  console.log(remotes);
+
+  return entries.map(e => ({
+    [e.name]: remotes.find(r => r[getUniqueEntry(e)])[getUniqueEntry(e)],
+  }));
 };
