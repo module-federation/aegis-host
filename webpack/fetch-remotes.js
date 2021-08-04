@@ -13,8 +13,8 @@ function githubPath(entry, url) {
 function generateFilename(entry) {
   const url = new URL(entry.url);
   const hostpart = url.hostname.split(".").join("-");
-  const pathpart = githubPath(entry, url);
   const portpart = url.port ? url.port : 80;
+  const pathpart = githubPath(entry, url);
   if (/remoteEntry/i.test(pathpart))
     return `${hostpart}-${portpart}-${pathpart}`;
   return `${hostpart}-${portpart}-${pathpart}-remoteEntry.js`;
