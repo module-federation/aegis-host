@@ -34,15 +34,4 @@ module.exports = [
     type: "service",
     importRemote: async () => import("microservices/services"),
   },
-  {
-    name: "wasm",
-    url: "https://api.github.com",
-    repo: "assembly-script-aegis",
-    owner: "tysonrm",
-    filedir: "dist",
-    branch: "master",
-    path: __dirname,
-    type: "wasm",
-    importRemote: async () => import("microservices/wasm"),
-  },
 ].concat(cache);

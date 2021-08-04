@@ -136,8 +136,6 @@ module.exports = async remoteEntry => {
     })
   );
 
-  console.log(remotes);
-
   return entries.map(e => ({
     [e.name]: remotes.find(r => r[getUniqueEntry(e)])[getUniqueEntry(e)],
   }));
