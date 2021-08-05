@@ -4,6 +4,12 @@ const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
 const token = process.env.GITHUB_TOKEN;
 
+/**
+ * Allow multiple entry points from different owners, repos, etc on github.
+ * @param {*} entry 
+ * @param {*} url 
+ * @returns 
+ */
 function githubPath(entry, url) {
   if (entry.owner)
     return `${entry.owner}-${entry.repo}-${entry.filedir.split("/").join("-")}`;
@@ -81,6 +87,11 @@ function httpGet(entry, path, done) {
   );
 }
 
+/**
+ * If streaming from github, owner, repo etc contribute to uniqueness.
+ * @param {*} entry 
+ * @returns 
+ */
 function getUniqueEntry(entry) {
   return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}`;
 }
