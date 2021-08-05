@@ -12,8 +12,8 @@ var wasm;wasm =
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 var moduleMap = {
-	"./index": () => {
-		return Promise.all([__webpack_require__.e(745), __webpack_require__.e(117)]).then(() => () => (__webpack_require__(/*! ./ */ "./index.js")));
+	"./domain": () => {
+		return __webpack_require__.e(920).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	}
 };
 var get = (module) => {
@@ -39,18 +39,6 @@ __webpack_require__.d(exports, {
 	init: () => init
 });
 
-/***/ }),
-
-/***/ "fs":
-/*!*********************!*\
-  !*** external "fs" ***!
-  \*********************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-module.exports = require("fs");
-
 /***/ })
 
 /******/ 	});
@@ -66,7 +54,7 @@ module.exports = require("fs");
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
+/******/ 			id: moduleId,
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
@@ -119,6 +107,17 @@ module.exports = require("fs");
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
