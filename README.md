@@ -1,4 +1,5 @@
-![MicroLib](doc/microlib.png)
+[![aegis](https://user-images.githubusercontent.com/38910830/128654405-93098731-3c31-4f52-bda0-efe95d77c5fe.png)](https://blog.federated-microservices.com)
+
 
 # NOTA BENE: Core code has been extracted to [aegis](https://github.com/module-federation/aegis). MicroLib server now loads from NPM.
 
@@ -20,10 +21,10 @@
 ## TL;DR
 
 ```shell
-git clone https://github.com/module-federation/MicroLib
-cd MicroLib
+git clone https://github.com/module-federation/microlib
+cd microlib
 cp dotenv.example .env
-yarn install --frozen-lockfile
+yarn
 yarn build
 yarn start
 yarn demo
