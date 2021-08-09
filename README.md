@@ -1,4 +1,5 @@
-![MicroLib](doc/microlib.png)
+![[aegis](https://user-images.githubusercontent.com/38910830/128654119-b11c8ef1-d763-49f2-aea0-02392b98c7f2.png)](https://blog.federated-microservices.com)
+
 
 # NOTA BENE: Core code has been extracted to [aegis](https://github.com/module-federation/aegis). MicroLib server now loads from NPM.
 
@@ -13,6 +14,7 @@
 - run together in a single process;
 - can be reloaded at any time without restarting the process or interrupting other components running in the process;
 - are _not_ _installed_ on the server but _streamed_ over the network as needed.
+
 
 ![mono-micro-fed 001](https://user-images.githubusercontent.com/38910830/126571702-0cd570fd-2a94-4560-86b0-18d514d7cb65.jpeg)
 
