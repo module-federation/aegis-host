@@ -89,6 +89,9 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
+- Automatated CA certifcate setup and renewal
+- Intial AppMesh implementation (can be used in place of event bus)
+- Inital support for WebAssembly (outside the browser) - write components in any language
 
 ---
 
