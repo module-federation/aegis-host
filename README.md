@@ -25,7 +25,7 @@
 git clone https://github.com/module-federation/MicroLib
 cd MicroLib
 cp dotenv.example .env
-yarn install --frozen-lockfile
+yarn
 yarn build
 yarn start
 yarn demo
