@@ -22,7 +22,7 @@
 
 ```shell
 git clone https://github.com/module-federation/microlib
-cd MicroLib
+cd microlib
 cp dotenv.example .env
 yarn
 yarn build
