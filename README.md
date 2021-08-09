@@ -1,4 +1,4 @@
-[![aegis](https://user-images.githubusercontent.com/38910830/128654119-b11c8ef1-d763-49f2-aea0-02392b98c7f2.png)](https://blog.federated-microservices.com)
+[![aegis](https://user-images.githubusercontent.com/38910830/128654405-93098731-3c31-4f52-bda0-efe95d77c5fe.png)](https://blog.federated-microservices.com)
 
 
 # NOTA BENE: Core code has been extracted to [aegis](https://github.com/module-federation/aegis). MicroLib server now loads from NPM.
