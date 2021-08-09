@@ -1203,7 +1203,7 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@module-federation/aegis@^0.0.1-alpha.72":
+"@module-federation/aegis@^0.0.1-alpha.0.0":
   version "0.0.1-alpha.76"
   resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.1-alpha.76.tgz#4f38ad19e11b73aeea71d85109890a216c2d6b9d"
   integrity sha512-w3g0eNfTuQhoGtUu3vTLO1dd+bYa8gFTapSax6rXdUwu+VbTgOHtoilOy4dZJTIYi9CHoT3mvoXFT1tdXY8X3g==

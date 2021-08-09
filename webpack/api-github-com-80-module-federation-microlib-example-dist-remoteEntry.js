@@ -31813,6 +31813,9 @@ var moduleMap = {
 	},
 	"./event-bus": () => {
 		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(778)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
+	},
+	"./wasm": () => {
+		return __webpack_require__.e(21).then(() => () => (__webpack_require__(/*! ./src/assemblyscript */ "./src/assemblyscript/index.js")));
 	}
 };
 var get = (module) => {
@@ -32074,7 +32077,7 @@ module.exports = require("zlib");
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
+/******/ 			id: moduleId,
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
