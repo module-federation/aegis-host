@@ -1,14 +1,15 @@
+
 module.exports = [
   {
     name: "wasm",
     url: "https://api.github.com",
-    repo: "assembly-script-aegis",
+    repo: "assembly",
     owner: "tysonrm",
-    filedir: "dist",
+    filedir: "build",
     branch: "master",
     path: __dirname,
-    type: "wasm",
-    importRemote: async () => import("wasm/domain"),
+    type: "model",
+    wasm: true,
   },
   {
     name: "microservices",

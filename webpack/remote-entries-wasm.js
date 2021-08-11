@@ -3,9 +3,9 @@ module.exports = [
   {
     name: "wasm",
     url: "https://api.github.com",
-    repo: "assembly-script-aegis",
+    repo: "assembly",
     owner: "tysonrm",
-    filedir: "dist",
+    filedir: "build",
     branch: "master",
     path: __dirname,
     type: "model",

@@ -2,13 +2,12 @@
 
 const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
-const token = process.env.GITHUB_TOKEN;
 
 /**
  * Allow multiple entry points from different owners, repos, etc on github.
- * @param {*} entry 
- * @param {*} url 
- * @returns 
+ * @param {*} entry
+ * @param {*} url
+ * @returns
  */
 function githubPath(entry, url) {
   if (entry.owner)
@@ -21,6 +20,7 @@ function generateFilename(entry) {
   const hostpart = url.hostname.split(".").join("-");
   const portpart = url.port ? url.port : 80;
   const pathpart = githubPath(entry, url);
+  const token = process.env.GIT
   if (/remoteEntry/i.test(pathpart))
     return `${hostpart}-${portpart}-${pathpart}`;
   return `${hostpart}-${portpart}-${pathpart}-remoteEntry.js`;
@@ -89,8 +89,8 @@ function httpGet(entry, path, done) {
 
 /**
  * If streaming from github, owner, repo etc contribute to uniqueness.
- * @param {*} entry 
- * @returns 
+ * @param {*} entry
+ * @returns
  */
 function getUniqueEntry(entry) {
   return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}`;
@@ -127,9 +127,10 @@ function deduplicate(entries) {
 module.exports = async remoteEntry => {
   console.info(remoteEntry);
   const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
+  const entriesNonWasm = entries.filter(e => !e.wasm);
 
   const remotes = await Promise.all(
-    Object.values(deduplicate(entries)).map(function (entry) {
+    Object.values(deduplicate(entriesNonWasm)).map(function (entry) {
       const path = getPath(entry);
       console.log("downloading file to", path);
 
@@ -147,7 +148,7 @@ module.exports = async remoteEntry => {
     })
   );
 
-  return entries.map(e => ({
+  return entriesNonWasm.map(e => ({
     [e.name]: remotes.find(r => r[getUniqueEntry(e)])[getUniqueEntry(e)],
   }));
 };

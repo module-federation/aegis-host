@@ -45,13 +45,7 @@ module.exports = env => {
                 },
               },
             },
-            {
-              test: /\.js$/,
-              loader: "esbuild-loader",
-              options: {
-                target: "es2015", // Syntax to compile to (see options below for possible values)
-              },
-            },
+            m,
           ],
         },
         plugins: [
