@@ -17,6 +17,7 @@
     "url": "https://github.com/module-federation/microlib"
   },
   "scripts": {
+    "certs": "node src/certificates.js",
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "build-all": "cp webpack/remote-entries-build.js webpack/remote-entries.js && npm run build",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && npm run build",
@@ -59,7 +60,6 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "@module-federation/aegis": "^0.0.1-alpha.0.0",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "dotenv": "^8.2.0",

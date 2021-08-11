@@ -1,3 +1,4 @@
+
 module.exports = [
   {
     name: "wasm",
@@ -7,8 +8,8 @@ module.exports = [
     filedir: "dist",
     branch: "master",
     path: __dirname,
-    type: "wasm",
-    importRemote: async () => import("wasm/domain"),
+    type: "model",
+    wasm: true,
   },
   {
     name: "microservices",
