@@ -10,7 +10,8 @@ const express = require("express");
 const cluster = require("@module-federation/aegis/lib/cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("@module-federation/aegis/lib/services/auth");
-const messageParser = require("@module-federation/aegis/lib/message").parsers;
+const messageParser =
+  require("@module-federation/aegis/lib/services/message").parsers;
 const {
   ServerlessAdapter,
 } = require("@module-federation/aegis/lib/server-less");

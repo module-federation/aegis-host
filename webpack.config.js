@@ -45,7 +45,6 @@ module.exports = env => {
                 },
               },
             },
-            m,
           ],
         },
         plugins: [

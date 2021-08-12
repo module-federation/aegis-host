@@ -20,7 +20,6 @@ function generateFilename(entry) {
   const hostpart = url.hostname.split(".").join("-");
   const portpart = url.port ? url.port : 80;
   const pathpart = githubPath(entry, url);
-  const token = process.env.GIT
   if (/remoteEntry/i.test(pathpart))
     return `${hostpart}-${portpart}-${pathpart}`;
   return `${hostpart}-${portpart}-${pathpart}-remoteEntry.js`;
@@ -35,7 +34,7 @@ function getPath(entry) {
   return basedir.concat(filename);
 }
 
-const octokit = new Octokit({ auth: token });
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 /**
  * Download remote entry from github. Will be a blob (> 1MB).
