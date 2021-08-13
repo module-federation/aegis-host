@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@assemblyscript/loader@^0.19.11":
+  version "0.19.11"
+  resolved "https://registry.yarnpkg.com/@assemblyscript/loader/-/loader-0.19.11.tgz#b9dfa96dc168b77f6c68d6b3cbbfe5fb6c9aee1e"
+  integrity sha512-LYchnZeBMkd42r1JTyh3atB3P4y/jr/9wdODVAvnaRlLha0jo1ONEHbKlETKrMvg2i0xPiKe1a4Hlcvy68Kq2w==
+
 "@babel/cli@^7.11.6":
   version "7.14.5"
   resolved "https://registry.npmjs.org/@babel/cli/-/cli-7.14.5.tgz"
@@ -1203,10 +1208,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@module-federation/aegis@^0.0.1-alpha.87":
-  version "0.0.0-alpha.95"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-alpha.95.tgz#5839a182cc658aabe220b2d495c5da818b9299c2"
-  integrity sha512-VoCg7VTJB5ZgMvgAi8gYIi4wK/drirS0CqHAkg/qy/3LSURtJhRbua5LL6foa3v+J5485x5kw4iSx809tjSr4g==
+"@module-federation/aegis@^0.0.1-alpha.96":
+  version "0.0.0-alpha.96"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-alpha.96.tgz#5e3e59105ce982d0eaca07957e465550e88b4cf4"
+  integrity sha512-owCDVP3WG27nJtWxhLjPlrc/3hpSsjw3jAzDJT1AFyIo7Y5/anrLQs86dFwglabpMnrWSCmh2QfqURc8QGM7Uw==
   dependencies:
     "@octokit/core" "^3.4.0"
     "@octokit/rest" "^18.5.2"
@@ -2326,6 +2331,14 @@ asn1@~0.2.3:
   dependencies:
     safer-buffer "~2.1.0"
 
+assemblyscript@^0.19.11:
+  version "0.19.11"
+  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.19.11.tgz#11e61d385b9f0c7cc5ed70a3536540889b0bcf5f"
+  integrity sha512-Z121H4rHkrHhOswQQ6Nvv0y3UVqBm3Z6ZSYKF7dNDoR608Axd/gJPkPLGI6fVnqZT+fH6s3/erx4P2vUseMa7w==
+  dependencies:
+    binaryen "101.0.0-nightly.20210723"
+    long "^4.0.0"
+
 assert-plus@1.0.0, assert-plus@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assert-plus/-/assert-plus-1.0.0.tgz#f12e0f3c5d77b0b1cdd9146942e4e96c1e4dd525"
@@ -3244,6 +3257,11 @@ binary-extensions@^2.0.0, binary-extensions@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
+
+binaryen@101.0.0-nightly.20210723:
+  version "101.0.0-nightly.20210723"
+  resolved "https://registry.yarnpkg.com/binaryen/-/binaryen-101.0.0-nightly.20210723.tgz#b6bb7f3501341727681a03866c0856500eec3740"
+  integrity sha512-eioJNqhHlkguVSbblHOtLqlhtC882SOEPKmNFZaDuz1hzQjolxZ+eu3/kaS10n3sGPONsIZsO7R9fR00UyhEUA==
 
 bindings@^1.5.0:
   version "1.5.0"
@@ -6841,6 +6859,11 @@ log-symbols@4.0.0:
   integrity sha512-FN8JBzLx6CzeMrB0tg6pqlGU1wCrXW+ZXGH481kfsBqer0hToTIiHdjH4Mq8xJUbvATujKCvaREGWpGUionraA==
   dependencies:
     chalk "^4.0.0"
+
+long@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
+  integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
 
 loose-envify@^1.0.0:
   version "1.4.0"
