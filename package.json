@@ -17,7 +17,7 @@
     "url": "https://github.com/module-federation/microlib"
   },
   "scripts": {
-    "certs": "node src/certificates.js",
+    "certs": "node src/services/ca-certs.js",
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "build-all": "cp webpack/remote-entries-build.js webpack/remote-entries.js && npm run build",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && npm run build",
@@ -27,6 +27,7 @@
     "hot-reload": "curl http://localhost:8070/microlib/reload",
     "hot-reload-customer": "curl http://localhost:8072/microlib/reload",
     "restart": "npm run build && npm run start",
+    "stats": "git ls-files | xargs wc -l",
     "start": "node dist/index.js",
     "start-8072": "npm start 8072",
     "restart-order": "npm run build-order && npm start",
@@ -60,7 +61,7 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "@module-federation/aegis": "^0.0.1-alpha.85",
+    "@module-federation/aegis": "^0.0.1-alpha.96",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "dotenv": "^8.2.0",
