@@ -1208,13 +1208,14 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@module-federation/aegis@^0.0.1-alpha.96":
-  version "0.0.0-alpha.96"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-alpha.96.tgz#5e3e59105ce982d0eaca07957e465550e88b4cf4"
-  integrity sha512-owCDVP3WG27nJtWxhLjPlrc/3hpSsjw3jAzDJT1AFyIo7Y5/anrLQs86dFwglabpMnrWSCmh2QfqURc8QGM7Uw==
+"@module-federation/aegis@^0.0.1-beta.0":
+  version "0.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-beta.0.tgz#5b6cc81c388bba4b622e8a9a6fff65b5396ce39b"
+  integrity sha512-bbRO4zquSVoKuW4dm6LWmctTpZ7BpE1Z5J9ufxgC3s5rqWYUHBXxkcKVtyxcmp91hiuJjc7vlb0YN3VysaX41w==
   dependencies:
     "@octokit/core" "^3.4.0"
     "@octokit/rest" "^18.5.2"
+    as-bind "^0.8.0"
     dotenv "^10.0.0"
     express "^4.17.1"
     express-graceful-shutdown "^1.1.3"
@@ -2318,6 +2319,13 @@ arrify@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
   integrity sha1-iYUI2iIm84DfkEcoRWhJwVAaSw0=
+
+as-bind@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/as-bind/-/as-bind-0.8.0.tgz#0373b341ad3863a587d60edc0668d3050e2a59d4"
+  integrity sha512-TGQ0/9LtAFmSMzafSTupLjcw3OuzmHsKg9KEI52MZsj9MzjPP59JzglsznHFQI+cMqnvxC7SivedZ/7wZChkew==
+  dependencies:
+    visitor-as "^0.5.0"
 
 asap@^2.0.0:
   version "2.0.6"
@@ -9602,6 +9610,11 @@ trim-right@^1.0.1:
   resolved "https://registry.npmjs.org/trim-right/-/trim-right-1.0.1.tgz"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
 
+ts-mixer@^5.1.0:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/ts-mixer/-/ts-mixer-5.4.1.tgz#b90db9ced48531aa17ce9184a2890d1e3c99b1e5"
+  integrity sha512-Zo9HgPCtNouDgJ+LGtrzVOjSg8+7WGQktIKLwAfaNrlOK1mWGlz1ejsAF/YqUEqAGjUTeB5fEg8gH9Aui6w9xA==
+
 tunnel-agent@^0.6.0:
   version "0.6.0"
   resolved "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.6.0.tgz"
@@ -9892,6 +9905,14 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+visitor-as@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/visitor-as/-/visitor-as-0.5.0.tgz#c0911c028df3a31218c9091ffdae172b507d536b"
+  integrity sha512-U2P13pa7BAnfj6IEbP4feS1Rci6NT4GlDcwpqkk90u7LGalc5jH9aMuWnxTC8RJJ92iZzDQ8Lea5/OnLDsgzlw==
+  dependencies:
+    lodash.clonedeep "^4.5.0"
+    ts-mixer "^5.1.0"
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
