@@ -16,6 +16,7 @@ const {
   ServerlessAdapter,
 } = require("@module-federation/aegis/lib/server-less");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
+fs.writeFileSync("PID", `${process.pid}\n`, "utf-8");
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 8070;
 const sslPort = process.env.SSL_PORT || 8071;
@@ -160,6 +161,8 @@ async function startService() {
     console.error(e);
   }
 }
+
+
 
 if (!isServerless()) {
   if (clusterEnabled) {
