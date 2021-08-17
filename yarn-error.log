@@ -1,8 +1,8 @@
 Arguments: 
-  /Users/tyson/.nvm/versions/node/v16.6.2/bin/node /Users/tyson/.nvm/versions/node/v16.6.2/bin/yarn start
+  /Users/tyson/.nvm/versions/node/v16.6.2/bin/node /Users/tyson/.nvm/versions/node/v16.6.2/bin/yarn
 
 PATH: 
-  /Users/tyson/.nvm/versions/node/v16.6.2/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+  /Users/tyson/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:/Users/tyson/.npm-global/bin:/Users/tyson/.yarn/bin:/Users/tyson/.nvm/versions/node/v16.6.2/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/tyson/bin:/usr/X11/bin:/Users/tyson/.npm-global/bin:/Users/tyson/.yarn/bin:/Users/tyson/.nvm/versions/node/v16.6.2/bin
 
 Yarn version: 
   1.22.11
@@ -14,12 +14,7 @@ Platform:
   darwin arm64
 
 Trace: 
-  SyntaxError: /Users/tyson/microlib/package.json: Unexpected token d in JSON at position 430
-      at JSON.parse (<anonymous>)
-      at /Users/tyson/.nvm/versions/node/v16.6.2/lib/node_modules/yarn/lib/cli.js:1625:59
-      at Generator.next (<anonymous>)
-      at step (/Users/tyson/.nvm/versions/node/v16.6.2/lib/node_modules/yarn/lib/cli.js:310:30)
-      at /Users/tyson/.nvm/versions/node/v16.6.2/lib/node_modules/yarn/lib/cli.js:321:13
+  Error: EINVAL: invalid argument, mkdir '/Users/tyson/microlib/node_modules/@module-federation/aegis/node_modules'
 
 npm manifest: 
   {
@@ -41,7 +36,7 @@ npm manifest:
       "url": "https://github.com/module-federation/microlib"
     },
     "scripts": {
-      d"certs": "node src/services/ca-certs.js",
+      "certs": "node src/services/ca-certs.js",
       "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
       "build-all": "cp webpack/remote-entries-build.js webpack/remote-entries.js && npm run build",
       "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && npm run build",
@@ -53,12 +48,13 @@ npm manifest:
       "restart": "npm run build && npm run start",
       "stats": "git ls-files | xargs wc -l",
       "start": "node dist/index.js",
+      "stop": "PROCESSID=`cat PID`; kill $PROCESSID",
       "start-8072": "npm start 8072",
       "restart-order": "npm run build-order && npm start",
       "restart-customer": "npm run build-customer && npm start 8072",
-      "webswitch-start": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-server.js",
+      "webswitch-start": "node ./node_modules/@module-federation/aegis/lib/services/mesh-switch.js",
       "webswitch-status": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-status.mjs",
-      "transpile": "babel src/index.js src/server-less.js -d dist",
+      "transpile": "babel src/index.js -d dist",
       "dev-start": "nodemon --watch src --exec npm restart",
       "clean": "rimraf dist",
       "test-mocha": "mocha --recursive -r esm",
@@ -86,7 +82,7 @@ npm manifest:
     "license": "MIT",
     "dependencies": {
       "@assemblyscript/loader": "^0.19.11",
-      "@module-federation/aegis": "^0.0.1-beta.0",
+      "@module-federation/aegis": "^0.0.0-beta.1",
       "@octokit/core": "^3.4.0",
       "@octokit/rest": "^18.5.2",
       "assemblyscript": "^0.19.11",
@@ -1341,10 +1337,10 @@ Lockfile:
       "@types/yargs" "^16.0.0"
       chalk "^4.0.0"
   
-  "@module-federation/aegis@^0.0.1-beta.0":
-    version "0.0.0-beta.0"
-    resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-beta.0.tgz#5b6cc81c388bba4b622e8a9a6fff65b5396ce39b"
-    integrity sha512-bbRO4zquSVoKuW4dm6LWmctTpZ7BpE1Z5J9ufxgC3s5rqWYUHBXxkcKVtyxcmp91hiuJjc7vlb0YN3VysaX41w==
+  "@module-federation/aegis@^0.0.0-beta.1":
+    version "0.0.0-beta.1"
+    resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-beta.1.tgz#43efc569bc51194539b68164969aab8eee65e6ae"
+    integrity sha512-XjpMaQx0ZsgTwd7BsxanH9ZbjOXnWAgBS8U3a8CvG/q5czeglR2snjPpRFW7si4vFRdAEjwMhyQZd1jbMKCGqA==
     dependencies:
       "@octokit/core" "^3.4.0"
       "@octokit/rest" "^18.5.2"
