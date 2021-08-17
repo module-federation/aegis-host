@@ -10,7 +10,8 @@ module.exports = [
     branch: "master",
     path: __dirname,
     type: "model",
-    importRemote() {
+    wasm: true,
+    async importRemote() {
       return importWebAssembly(this);
     }
   },
