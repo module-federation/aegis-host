@@ -1,4 +1,4 @@
-const { importWebAssembly } = require("@module-federation/aegis/lib/adapters/wasm");
+const { importWebAssembly } = require("@module-federation/aegis/lib/adapters/webassembly");
 
 module.exports = [
   {
