@@ -28,7 +28,7 @@
     "hot-reload-customer": "curl http://localhost:8072/microlib/reload",
     "restart": "npm run build && npm run start",
     "stats": "git ls-files | xargs wc -l",
-    "start": "node dist/index.js > public/aegis.log",
+    "start": "node dist/index.js",
     "stop": "PROCESSID=`cat PID`; kill $PROCESSID",
     "start-8072": "npm start 8072",
     "restart-order": "npm run build-order && npm start",

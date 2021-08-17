@@ -1,3 +1,4 @@
+const { importWebAssembly } = require("@module-federation/aegis/lib/adapters/wasm");
 
 module.exports = [
   {
@@ -9,7 +10,9 @@ module.exports = [
     branch: "master",
     path: __dirname,
     type: "model",
-    wasm: true,
+    importRemote() {
+      return importWebAssembly(this);
+    }
   },
   {
     name: "microservices",
