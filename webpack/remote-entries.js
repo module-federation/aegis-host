@@ -24,7 +24,7 @@ module.exports = [
     branch: "master",
     path: __dirname,
     type: "model",
-    importRemote: async () => import("microservices/domain"),
+    importRemote: async () => Object.values((await import("microservices/domain")).models),
   },
   {
     name: "adapters",
