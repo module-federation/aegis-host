@@ -43,7 +43,7 @@
       ws.close();
     }
 
-    ws = new WebSocket(`ws://${location.hostname}:8062`);
+    ws = new WebSocket(`${location.protocol}//${location.host}}:8062`);
     ws.onerror = function () {
       showMessage("WebSocket error");
     };
