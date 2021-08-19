@@ -9,7 +9,7 @@ module.exports = [
     branch: "cache-test",
     path: __dirname,
     type: "model",
-    importRemote: async () => import("distributed-cache/models"),
+    importRemote: async () => Object.values((await import("microservices/domain")).models),
   },
   {
     name: "adapter-cache",

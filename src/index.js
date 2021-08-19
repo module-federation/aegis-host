@@ -11,10 +11,10 @@ const cluster = require("@module-federation/aegis/lib/cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("@module-federation/aegis/lib/services/auth");
 const messageParser =
-  require("@module-federation/aegis/lib/services/message").parsers;
+  require("@module-federation/aegis/lib/adapters/serverless/message-parsers").parsers;
 const {
   ServerlessAdapter,
-} = require("@module-federation/aegis/lib/server-less");
+} = require("@module-federation/aegis/lib/adapters/serverless/serverless-adapter");
 const StaticFileHandler = require("serverless-aws-static-file-handler");
 fs.writeFileSync("PID", `${process.pid}\n`, "utf-8");
 

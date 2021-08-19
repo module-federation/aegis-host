@@ -1,4 +1,5 @@
 const { importWebAssembly } = require("@module-federation/aegis/lib/adapters/webassembly/import-wasm");
+const order = require("./remote-entries-order");
 
 module.exports = [
   {
@@ -15,37 +16,4 @@ module.exports = [
       return importWebAssembly(this);
     }
   },
-  {
-    name: "microservices",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "master",
-    path: __dirname,
-    type: "model",
-    importRemote: async () => Object.values((await import("microservices/domain")).models),
-  },
-  {
-    name: "adapters",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "master",
-    path: __dirname,
-    type: "adapter",
-    importRemote: async () => import("microservices/adapters"),
-  },
-  {
-    name: "services",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "master",
-    path: __dirname,
-    type: "service",
-    importRemote: async () => import("microservices/services"),
-  },
-];
+].concat(order);

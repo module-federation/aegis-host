@@ -1,4 +1,3 @@
-const cache = require("./remote-entries-cache");
 
 module.exports = [
   {
@@ -10,7 +9,7 @@ module.exports = [
     branch: "master",
     path: __dirname,
     type: "model",
-    importRemote: async () => import("microservices/domain"),
+    importRemote: async () => Object.values((await import("microservices/domain")).models),
   },
   {
     name: "adapters",
@@ -34,4 +33,4 @@ module.exports = [
     type: "service",
     importRemote: async () => import("microservices/services"),
   },
-].concat(cache);
+];

@@ -4861,6 +4861,171 @@ module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.21.1\",\"descri
 
 /***/ }),
 
+/***/ "./node_modules/debug/node_modules/ms/index.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/debug/node_modules/ms/index.js ***!
+  \*****************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
+/***/ ((module) => {
+
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse(val);
+  } else if (type === 'number' && isNaN(val) === false) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  if (ms >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (ms >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (ms >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (ms >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  return plural(ms, d, 'day') ||
+    plural(ms, h, 'hour') ||
+    plural(ms, m, 'minute') ||
+    plural(ms, s, 'second') ||
+    ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) {
+    return;
+  }
+  if (ms < n * 1.5) {
+    return Math.floor(ms / n) + ' ' + name;
+  }
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/debug/src/browser.js":
 /*!*******************************************!*\
   !*** ./node_modules/debug/src/browser.js ***!
@@ -5090,7 +5255,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(/*! ms */ "./node_modules/ms/index.js");
+exports.humanize = __webpack_require__(/*! ms */ "./node_modules/debug/node_modules/ms/index.js");
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -28593,167 +28758,130 @@ module.exports = (path, hash) => `${BASE_URL}/${path}${hash ? '#' + hash : ''}`
 
 /***/ }),
 
-/***/ "./node_modules/ms/index.js":
-/*!**********************************!*\
-  !*** ./node_modules/ms/index.js ***!
-  \**********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
-/***/ ((module) => {
+/***/ "./node_modules/nanoid/index.js":
+/*!**************************************!*\
+  !*** ./node_modules/nanoid/index.js ***!
+  \**************************************/
+/*! namespace exports */
+/*! export customAlphabet [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export customRandom [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export nanoid [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export random [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export urlAlphabet [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/nanoid/url-alphabet/index.js .urlAlphabet */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.n, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-/**
- * Helpers.
- */
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "nanoid": () => /* binding */ nanoid,
+/* harmony export */   "customAlphabet": () => /* binding */ customAlphabet,
+/* harmony export */   "customRandom": () => /* binding */ customRandom,
+/* harmony export */   "urlAlphabet": () => /* reexport safe */ _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__.urlAlphabet,
+/* harmony export */   "random": () => /* binding */ random
+/* harmony export */ });
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! crypto */ "crypto");
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(crypto__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./url-alphabet/index.js */ "./node_modules/nanoid/url-alphabet/index.js");
 
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
 
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
 
-module.exports = function(val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isNaN(val) === false) {
-    return options.long ? fmtLong(val) : fmtShort(val);
+
+// We reuse buffers with the same size to avoid memory fragmentations
+// for better performance.
+let buffers = {}
+let random = bytes => {
+  let buffer = buffers[bytes]
+  if (!buffer) {
+    // `Buffer.allocUnsafe()` is faster because it doesn’t flush the memory.
+    // Memory flushing is unnecessary since the buffer allocation itself resets
+    // the memory with the new bytes.
+    buffer = Buffer.allocUnsafe(bytes)
+    if (bytes <= 255) buffers[bytes] = buffer
   }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
+  return crypto__WEBPACK_IMPORTED_MODULE_0___default().randomFillSync(buffer)
+}
 
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
+let customRandom = (alphabet, size, getRandom) => {
+  // First, a bitmask is necessary to generate the ID. The bitmask makes bytes
+  // values closer to the alphabet size. The bitmask calculates the closest
+  // `2^31 - 1` number, which exceeds the alphabet size.
+  // For example, the bitmask for the alphabet size 30 is 31 (00011111).
+  let mask = (2 << (31 - Math.clz32((alphabet.length - 1) | 1))) - 1
+  // Though, the bitmask solution is not perfect since the bytes exceeding
+  // the alphabet size are refused. Therefore, to reliably generate the ID,
+  // the random bytes redundancy has to be satisfied.
 
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
+  // Note: every hardware random generator call is performance expensive,
+  // because the system call for entropy collection takes a lot of time.
+  // So, to avoid additional system calls, extra bytes are requested in advance.
+
+  // Next, a step determines how many random bytes to generate.
+  // The number of random bytes gets decided upon the ID size, mask,
+  // alphabet size, and magic number 1.6 (using 1.6 peaks at performance
+  // according to benchmarks).
+  let step = Math.ceil((1.6 * mask * size) / alphabet.length)
+
+  return () => {
+    let id = ''
+    while (true) {
+      let bytes = getRandom(step)
+      // A compact alternative for `for (var i = 0; i < step; i++)`.
+      let i = step
+      while (i--) {
+        // Adding `|| ''` refuses a random byte that exceeds the alphabet size.
+        id += alphabet[bytes[i] & mask] || ''
+        // `id.length + 1 === size` is a more compact option.
+        if (id.length === +size) return id
+      }
+    }
   }
 }
 
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
+let customAlphabet = (alphabet, size) => customRandom(alphabet, size, random)
 
-function fmtShort(ms) {
-  if (ms >= d) {
-    return Math.round(ms / d) + 'd';
+let nanoid = (size = 21) => {
+  let bytes = random(size)
+  let id = ''
+  // A compact alternative for `for (var i = 0; i < step; i++)`.
+  while (size--) {
+    // It is incorrect to use bytes exceeding the alphabet size.
+    // The following mask reduces the random byte in the 0-255 value
+    // range to the 0-63 value range. Therefore, adding hacks, such
+    // as empty string fallback or magic numbers, is unneccessary because
+    // the bitmask trims bytes down to the alphabet size.
+    id += _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__.urlAlphabet[bytes[size] & 63]
   }
-  if (ms >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (ms >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (ms >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
+  return id
 }
 
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
 
-function fmtLong(ms) {
-  return plural(ms, d, 'day') ||
-    plural(ms, h, 'hour') ||
-    plural(ms, m, 'minute') ||
-    plural(ms, s, 'second') ||
-    ms + ' ms';
-}
 
-/**
- * Pluralization helper.
- */
 
-function plural(ms, n, name) {
-  if (ms < n) {
-    return;
-  }
-  if (ms < n * 1.5) {
-    return Math.floor(ms / n) + ' ' + name;
-  }
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
+/***/ }),
+
+/***/ "./node_modules/nanoid/url-alphabet/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/nanoid/url-alphabet/index.js ***!
+  \***************************************************/
+/*! namespace exports */
+/*! export urlAlphabet [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "urlAlphabet": () => /* binding */ urlAlphabet
+/* harmony export */ });
+// This alphabet uses `A-Za-z0-9_-` symbols. The genetic algorithm helped
+// optimize the gzip compression for this alphabet.
+let urlAlphabet =
+  'ModuleSymbhasOwnPr-0123456789ABCDEFGHNRVfgctiUvz_KqYTJkLxpZXIjQW'
+
+
 
 
 /***/ }),
@@ -31654,7 +31782,7 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 /***/ }),
 
-/***/ "webpack/container/entry/distributed-cache":
+/***/ "webpack/container/entry/microservices":
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -31664,17 +31792,20 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 "use strict";
 var moduleMap = {
-	"./model-cache": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_models_index_js")]).then(() => () => (__webpack_require__(/*! ./src/models */ "./src/models/index.js")));
+	"./domain": () => {
+		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(583)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	},
-	"./adapter-cache": () => {
-		return __webpack_require__.e("src_adapters_index_js").then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+	"./adapters": () => {
+		return __webpack_require__.e(610).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
-	"./service-cache": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_nanoid_index_js-node_modules_ws_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+	"./services": () => {
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(610), __webpack_require__.e(662)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./event-bus": () => {
-		return Promise.all([__webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_event-bus_js")]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
+		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(778)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
+	},
+	"./wasm": () => {
+		return __webpack_require__.e(21).then(() => () => (__webpack_require__(/*! ./src/assemblyscript */ "./src/assemblyscript/index.js")));
 	}
 };
 var get = (module) => {
@@ -31910,7 +32041,7 @@ module.exports = require("zlib");
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
+/******/ 			id: moduleId,
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
@@ -31990,7 +32121,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "http://cache.aegis.dev:8060";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=master";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
@@ -32029,6 +32160,7 @@ module.exports = require("zlib");
 /******/ 				case "default": {
 /******/ 					register("axios", "0.21.1", () => () => __webpack_require__(/*! ./node_modules/axios/index.js */ "./node_modules/axios/index.js"));
 /******/ 					register("kafkajs", "1.14.0", () => () => __webpack_require__(/*! ./node_modules/kafkajs/index.js */ "./node_modules/kafkajs/index.js"));
+/******/ 					register("nanoid", "3.1.12", () => () => __webpack_require__(/*! ./node_modules/nanoid/index.js */ "./node_modules/nanoid/index.js"));
 /******/ 					register("smartystreets-javascript-sdk", "1.6.0", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
 /******/ 				}
 /******/ 				break;
@@ -32161,14 +32293,19 @@ module.exports = require("zlib");
 /******/ 		var installedModules = {};
 /******/ 		var moduleToHandlerMapping = {
 /******/ 			"webpack/sharing/consume/default/kafkajs/kafkajs": () => loadStrictVersionCheckFallback("default", "kafkajs", [1,1,14,0], () => () => __webpack_require__(/*! kafkajs */ "./node_modules/kafkajs/index.js")),
+/******/ 			"webpack/sharing/consume/default/nanoid/nanoid": () => loadStrictVersionCheckFallback("default", "nanoid", [1,3,1,12], () => () => __webpack_require__(/*! nanoid */ "./node_modules/nanoid/index.js")),
 /******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js"))
 /******/ 		};
 /******/ 		// no consumes in initial chunks
 /******/ 		var chunkMapping = {
-/******/ 			"src_adapters_index_js": [
+/******/ 			"583": [
+/******/ 				"webpack/sharing/consume/default/nanoid/nanoid"
+/******/ 			],
+/******/ 			"610": [
 /******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
 /******/ 			],
-/******/ 			"src_services_index_js": [
+/******/ 			"662": [
+/******/ 				"webpack/sharing/consume/default/nanoid/nanoid",
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			]
 /******/ 		};
@@ -32282,7 +32419,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			"distributed-cache": 0
+/******/ 			578: 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -32345,7 +32482,7 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__("webpack/container/entry/distributed-cache");
+/******/ 	return __webpack_require__("webpack/container/entry/microservices");
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map

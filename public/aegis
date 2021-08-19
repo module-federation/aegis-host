@@ -1,0 +1,251 @@
+zackwashere /Users/tyson/microlib/auth/key-set.json
+>>>>>>>>>chunkId 777
+github url URL {
+  href: 'https://api.github.com/777.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/777.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
+}
+>>>>>>>>>chunkId 610
+github url URL {
+  href: 'https://api.github.com/610.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/610.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
+}
+>>>>>>>>>chunkId 662
+github url URL {
+  href: 'https://api.github.com/662.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/662.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
+}
+9bd9c3462eecae0306a02be17153b290540703f4
+d7880c64634529e0528ec13799bd0d83a70f4de8
+96ed090e4cd20c682694827a61cccf2ba47f347b
+[
+  Object [Module] {
+    Address: [Getter],
+    Event: [Getter],
+    Payment: [Getter],
+    Shipping: [Getter],
+    EventBus: [Getter],
+    publishEvent: [Getter]
+  }
+]
+service import took 1138 ms
+>>>>>>>>>chunkId 610
+[
+  Object [Module] {
+    validateAddress: [Getter],
+    authorizePayment: [Getter],
+    completePayment: [Getter],
+    refundPayment: [Getter],
+    shipOrder: [Getter],
+    trackShipment: [Getter],
+    verifyDelivery: [Getter],
+    listen: [Getter],
+    notify: [Getter],
+    pickOrder: [Getter]
+  }
+]
+adapter import took 1 ms
+{
+  services: Object [Module] {
+    Address: [Getter],
+    Event: [Getter],
+    Payment: [Getter],
+    Shipping: [Getter],
+    EventBus: [Getter],
+    publishEvent: [Getter]
+  },
+  adapters: Object [Module] {
+    validateAddress: [Getter],
+    authorizePayment: [Getter],
+    completePayment: [Getter],
+    refundPayment: [Getter],
+    shipOrder: [Getter],
+    trackShipment: [Getter],
+    verifyDelivery: [Getter],
+    listen: [Getter],
+    notify: [Getter],
+    pickOrder: [Getter]
+  },
+  overrides: {
+    save: [Function: save],
+    find: [Function: find],
+    Persistence: {
+      save: [AsyncFunction: save],
+      find: [AsyncFunction: find],
+      close: [Function: close]
+    }
+  }
+}
+github url https://api.github.com
+>>>>>>>>>chunkId 610
+>>>>>>>>>chunkId 583
+github url URL {
+  href: 'https://api.github.com/583.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/583.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
+}
+server address { address: '127.0.0.1', family: 4 }
+707bf805515832b8967fe3c815a5cae3e641dc16
+729230644d184c1abff551fb9bd56074b44cce24
+wasm modules took 434ms
+[
+  {
+    modelName: 'wasm',
+    endpoint: 'wasm',
+    factory: [Function: factory],
+    dispose: [Function: dispose]
+  },
+  {
+    modelName: 'order',
+    endpoint: 'orders',
+    factory: [Function: makeOrderFactory],
+    dependencies: {
+      uuid: [Function: uuid],
+      listen: [Function (anonymous)],
+      notify: [Function (anonymous)],
+      validateAddress: [Function (anonymous)],
+      authorizePayment: [Function (anonymous)],
+      pickOrder: [Function (anonymous)],
+      shipOrder: [Function (anonymous)],
+      trackShipment: [Function (anonymous)],
+      verifyDelivery: [Function (anonymous)],
+      completePayment: [Function (anonymous)],
+      refundPayment: [Function (anonymous)]
+    },
+    mixins: [
+      [Function (anonymous)],
+      [Function (anonymous)],
+      [Function (anonymous)],
+      [Function (anonymous)],
+      [Function (anonymous)]
+    ],
+    validate: [Function: validateModel],
+    onDelete: [Function: readyToDelete],
+    eventHandlers: [ [Function: handleOrderEvent] ],
+    ports: {
+      listen: [Object],
+      notify: [Object],
+      save: [Object],
+      find: [Object],
+      validateAddress: [Object],
+      authorizePayment: [Object],
+      pickOrder: [Object],
+      shipOrder: [Object],
+      trackShipment: [Object],
+      verifyDelivery: [Object],
+      completePayment: [Object],
+      cancelShipment: [Object],
+      refundPayment: [Object],
+      oauthCallback: [Object],
+      refreshToken: [Object]
+    },
+    endpoints: { oauthCallback: [Object] },
+    relations: { customer: [Object], product: [Object] },
+    commands: { decrypt: [Object], approve: [Object], cancel: [Object] },
+    accessControlList: {
+      admin: [Object],
+      owner: [Object],
+      delegate: [Object],
+      approver: [Object],
+      orders: [Object]
+    },
+    serializers: [ [Object], [Object], [Object] ]
+  },
+  {
+    modelName: 'user',
+    endpoint: 'users',
+    dependencies: { uuid: [Function: uuid] },
+    factory: [Function: userFactory],
+    mixins: [
+      [Function (anonymous)],
+      [Function (anonymous)],
+      [Function (anonymous)],
+      [Function (anonymous)],
+      [Function (anonymous)]
+    ],
+    validate: [Function: validateModel],
+    relations: { customer: [Object] }
+  }
+]
+model import took 985 ms
+running in webserver mode
+{ endpoint: 'wasm', fn: [AsyncFunction: getModels] }
+{ endpoint: 'orders', fn: [AsyncFunction: getModels] }
+{ endpoint: 'users', fn: [AsyncFunction: getModels] }
+{ endpoint: 'wasm', fn: [AsyncFunction: postModel] }
+{ endpoint: 'orders', fn: [AsyncFunction: postModel] }
+{ endpoint: 'users', fn: [AsyncFunction: postModel] }
+{ endpoint: 'wasm', fn: [AsyncFunction: getModelById] }
+{ endpoint: 'orders', fn: [AsyncFunction: getModelById] }
+{ endpoint: 'users', fn: [AsyncFunction: getModelById] }
+{ endpoint: 'wasm', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'orders', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'users', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'wasm', fn: [AsyncFunction: deleteModel] }
+{ endpoint: 'orders', fn: [AsyncFunction: deleteModel] }
+{ endpoint: 'users', fn: [AsyncFunction: deleteModel] }
+{ endpoint: 'wasm', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'orders', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'users', fn: [AsyncFunction: patchModel] }
+
+total time to import & register remote modules: 2.147s
+RouteMap(0) [Map] {}
+
+time to load cache: 8.409ms
+
+ 🌎 ÆGIS listening on http://localhost:8070 
+
