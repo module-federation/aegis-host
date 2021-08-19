@@ -37,8 +37,9 @@ DISTRIBUTED_CACHE_ENABLED=false
 
 # Common websocket server which aegis instances use for eventing
 WEBSWITCH_ENABLED=false
-WEBSWITCH_SERVER=switch.appmesh.dev
-WEBSWITCH_UPLINK=uplink.appmesh.dev
+WEBSWITCH_SERVER=switch.app-mesh.net
+WEBSWITCH_PORT=8070
+#WEBSWITCH_UPLINK=uplink.app-mesh.net
 
 # Don't re/start workflow - always false in prod
 RESUME_WORKFLOW_DISABLED=true
