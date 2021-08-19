@@ -41,3 +41,4 @@ public/product.json
 /.idea/
 PID
 public/aegis.log
+public/wasm.json
