@@ -6,10 +6,12 @@ const importFresh = require("import-fresh");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
+const websocket = require("ws");
 const express = require("express");
 const cluster = require("@module-federation/aegis/lib/cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("@module-federation/aegis/lib/services/auth");
+const serviceMesh = require("@module-federation/aegis/lib/services/mesh-switch");
 const messageParser =
   require("@module-federation/aegis/lib/adapters/serverless/message-parsers").parsers;
 const {
@@ -124,6 +126,16 @@ function checkPublicIpAddress() {
   );
 }
 
+function attachWebSocket(server) {
+  const wss = new websocket.Server({ clientTracking: true, server: server });
+  wss.on("upgrade", (request, socket, head) => {
+    wss.handleUpgrade(request, socket, head, function (ws) {
+      wss.emit("connection", ws, request);
+    });
+  });
+  serviceMesh.attachServer(wss);
+}
+
 /**
  * Start web server, optionally require secure socket.
  */
@@ -133,10 +145,12 @@ async function startWebServer() {
     const cert = fs.readFileSync("cert/domain.crt", "utf8");
     const httpsServer = https.createServer({ key, cert }, app);
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
+    attachWebSocket(httpsServer);
     httpsServer.listen(sslPort, checkPublicIpAddress);
   } else {
     const httpServer = http.createServer(app);
     app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
+    attachWebSocket(httpServer)
     httpServer.listen(port, checkPublicIpAddress);
   }
 }
@@ -161,8 +175,6 @@ async function startService() {
     console.error(e);
   }
 }
-
-
 
 if (!isServerless()) {
   if (clusterEnabled) {

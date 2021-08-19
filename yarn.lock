@@ -1208,10 +1208,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@module-federation/aegis@^0.0.0-beta.2":
-  version "0.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-beta.2.tgz#e261aadcbe9455985e2b74e5960519b46b46dad6"
-  integrity sha512-Cc2HxPMrOuS0yqBzOXGQId9REnYVo5kkYeeB75TK0zjNL5vAN+yto6Fu97is9MyhTugeaaheBnfd6k4+VSRW/w==
+"@module-federation/aegis@^0.0.0-beta.8":
+  version "0.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-beta.8.tgz#95f385051e19be896a64199615ceddfa1103d5ee"
+  integrity sha512-3oWuOAuSNMRSZ+r64ZK+l/cmaSM2AFLAou8nHY2uOPNxRtvASq1DWWE2uGNDip3x2kqEmdioEu33POWqt+gqXA==
   dependencies:
     "@octokit/core" "^3.4.0"
     "@octokit/rest" "^18.5.2"
@@ -10170,6 +10170,11 @@ ws@^7.4.5:
   version "7.5.3"
   resolved "https://registry.npmjs.org/ws/-/ws-7.5.3.tgz"
   integrity sha512-kQ/dHIzuLrS6Je9+uv81ueZomEwH0qVYstcAQ4/Z93K8zeko9gtAbttJWzoC5ukqXY1PpoouV3+VSOqEAFt5wg==
+
+ws@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.2.0.tgz#0b738cd484bfc9303421914b11bb4011e07615bb"
+  integrity sha512-uYhVJ/m9oXwEI04iIVmgLmugh2qrZihkywG9y5FfZV2ATeLIzHf93qs+tUNqlttbQK957/VX3mtwAS+UfIwA4g==
 
 xdg-basedir@^4.0.0:
   version "4.0.0"

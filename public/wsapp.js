@@ -43,9 +43,9 @@
       ws.close();
     }
 
-    ws = new WebSocket(`${location.protocol}//${location.host}}:8062`);
-    ws.onerror = function () {
-      showMessage("WebSocket error");
+    ws = new WebSocket(`ws://${location.hostname}:${location.port}`);
+    ws.onerror = function (e) {
+      showMessage("WebSocket error", e);
     };
     ws.onopen = function () {
       showMessage("WebSocket connection established");

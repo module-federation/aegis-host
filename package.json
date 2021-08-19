@@ -21,8 +21,8 @@
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "build-all": "cp webpack/remote-entries-all.js webpack/remote-entries.js && npm run build",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && npm run build",
-    "build-order": "cp webpack/remote-entries-order.js webpack/remote-entries.js && npm run build",
-    "build-customer": "cp webpack/remote-entries-customer.js webpack/remote-entries.js && npm run build",
+    "build-order": "cp webpack/remote-entries-cache-order.js webpack/remote-entries.js && npm run build",
+    "build-customer": "cp webpack/remote-entries-cache-customer.js webpack/remote-entries.js && npm run build",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "hot-reload": "curl http://localhost:8070/microlib/reload",
     "hot-reload-customer": "curl http://localhost:8072/microlib/reload",
@@ -78,7 +78,8 @@
     "mongodb-client-encryption": "^1.2.3",
     "nanoid": "^3.1.20",
     "regenerator-runtime": "^0.13.7",
-    "serverless-aws-static-file-handler": "^2.0.8"
+    "serverless-aws-static-file-handler": "^2.0.8",
+    "ws": "^8.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
