@@ -1,4 +1,4 @@
-const order = require("./remote-entries-order");
+const order = require("./remote-entries-customer");
 
 module.exports = [
   {

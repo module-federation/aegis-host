@@ -13,7 +13,7 @@ module.exports = [
     type: "model",
     wasm: true,
     importRemote() {
-      return importWebAssembly(this);
+      return importWebAssembly(this, "model");
     }
   },
 ].concat(order);

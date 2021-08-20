@@ -26,7 +26,7 @@ PORT=8070
 DATASOURCE_ADAPTER=DataSourceFile
 
 # If using file system storage, choose directory.
-DATASOURCE_FILE_DIRECTORY=/var/www/html
+#DATASOURCE_FILE_DIRECTORY=/var/www/html
 
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000
