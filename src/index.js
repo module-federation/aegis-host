@@ -127,7 +127,7 @@ function checkPublicIpAddress() {
 }
 
 function attachWebSocket(server) {
-  const wss = new websocket.Server({ clientTracking: true, server: server });
+  const wss = new websocket.Server({ clientTracking: true, server: server, maxPayload: 1024 });
   wss.on("upgrade", (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, function (ws) {
       wss.emit("connection", ws, request);
