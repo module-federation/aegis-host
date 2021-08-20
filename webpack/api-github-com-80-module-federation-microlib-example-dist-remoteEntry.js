@@ -31792,7 +31792,7 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 "use strict";
 var moduleMap = {
-	"./domain": () => {
+	"./models": () => {
 		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(583)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	},
 	"./adapters": () => {
@@ -32382,11 +32382,13 @@ module.exports = require("zlib");
 /******/ 		      });
 /******/ 		  });
 /******/ 		}
+/******/ 		
 /******/ 		function httpRequest(url) {
 /******/ 		  if (/github/i.test(url.hostname)) 
 /******/ 		    return githubFetch(url)
 /******/ 		  return httpGet(url)
 /******/ 		}
+/******/ 		
 /******/ 		function httpGet(params) {
 /******/ 		  return new Promise(function(resolve, reject) {
 /******/ 		    var req = require(params.protocol.slice(0, params.protocol.length - 1)).request(params, function(res) {

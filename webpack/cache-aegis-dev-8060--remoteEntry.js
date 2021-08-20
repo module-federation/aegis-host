@@ -32248,11 +32248,13 @@ module.exports = require("zlib");
 /******/ 		      });
 /******/ 		  });
 /******/ 		}
+/******/ 		
 /******/ 		function httpRequest(url) {
 /******/ 		  if (/github/i.test(url.hostname)) 
 /******/ 		    return githubFetch(url)
 /******/ 		  return httpGet(url)
 /******/ 		}
+/******/ 		
 /******/ 		function httpGet(params) {
 /******/ 		  return new Promise(function(resolve, reject) {
 /******/ 		    var req = require(params.protocol.slice(0, params.protocol.length - 1)).request(params, function(res) {

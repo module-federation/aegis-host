@@ -1,3 +1,4 @@
+const order = require("./remote-entries-order");
 
 module.exports = [
   {
@@ -9,7 +10,8 @@ module.exports = [
     branch: "cache-test",
     path: __dirname,
     type: "model",
-    importRemote: async () => Object.values((await import("microservices/domain")).models),
+    importRemote: async () =>
+      Object.values((await import("distributed-cache/domain")).models),
   },
   {
     name: "adapter-cache",
@@ -33,4 +35,4 @@ module.exports = [
     type: "service",
     importRemote: async () => import("distributed-cache/services"),
   },
-];
+].concat(order);

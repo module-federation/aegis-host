@@ -6,7 +6,7 @@ module.exports = [
     url: "http://cache.aegis.dev:8060/remoteEntry.js",
     path: __dirname,
     type: "model-cache",
-    importRemote: async () => Object.values((await import("microservices/domain")).models),
+    importRemote: async () => Object.values((await import("distributed-cache/domain")).models),
   },
   {
     name: "adapter-cache",
