@@ -16,13 +16,19 @@
   "repository": {
     "url": "https://github.com/module-federation/microlib"
   },
+  "_moduleAliases": {
+    "@domain": "@module-federation/aegis/lib/domain",
+    "@adapters": "@module-federation/aegis/lib/adapters",
+    "@services": "@module-federation/aegis/lib/services",
+    "@use-cases": "@module-federation/aegis/lib/use-cases"
+  },
   "scripts": {
     "certs": "node src/services/ca-certs.js",
     "build": "npm run clean && npm run transpile && webpack --config webpack.config.js",
     "build-all": "cp webpack/remote-entries-all.js webpack/remote-entries.js && npm run build",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && npm run build",
-    "build-order": "cp webpack/remote-entries-cache-order.js webpack/remote-entries.js && npm run build",
-    "build-customer": "cp webpack/remote-entries-cache-customer.js webpack/remote-entries.js && npm run build",
+    "build-order": "cp webpack/remote-entries-cache-order-github.js webpack/remote-entries.js && npm run build",
+    "build-customer": "cp webpack/remote-entries-cache-customer-github.js webpack/remote-entries.js && npm run build",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "hot-reload": "curl http://localhost:8070/microlib/reload",
     "hot-reload-customer": "curl http://localhost:8072/microlib/reload",
@@ -64,7 +70,7 @@
   "license": "MIT",
   "dependencies": {
     "@assemblyscript/loader": "^0.19.11",
-    "@module-federation/aegis": "^0.0.0-beta.12",
+    "@module-federation/aegis": "^0.0.0-beta.13",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "assemblyscript": "^0.19.11",
@@ -74,6 +80,7 @@
     "express-jwt": "^6.0.0",
     "import-fresh": "^3.3.0",
     "jwks-rsa": "^2.0.1",
+    "module-alias": "^2.2.2",
     "mongodb": "^3.6.6",
     "mongodb-client-encryption": "^1.2.3",
     "nanoid": "^3.1.20",

@@ -1,25 +1,38 @@
-const order = require("./remote-entries-order");
+const customer = require("./remote-entries-customer");
 
 module.exports = [
   {
     name: "distributed-cache",
-    url: "http://cache.aegis.dev:8060/remoteEntry.js",
+    url: "https://api.github.com",
+    repo: "microlib-example",
+    owner: "module-federation",
+    filedir: "dist",
+    branch: "cache",
     path: __dirname,
-    type: "model-cache",
-    importRemote: async () => Object.values((await import("distributed-cache/domain")).models),
+    type: "model",
+    importRemote: async () =>
+      Object.values((await import("distributed-cache/models")).models),
   },
   {
     name: "adapter-cache",
-    url: "http://cache.aegis.dev:8060/remoteEntry.js",
+    url: "https://api.github.com",
+    repo: "microlib-example",
+    owner: "module-federation",
+    filedir: "dist",
+    branch: "cache",
     path: __dirname,
-    type: "adapter-cache",
-    importRemote: async () => import("distributed-cache/adapter-cache"),
+    type: "adapter",
+    importRemote: async () => import("distributed-cache/adapters"),
   },
   {
     name: "service-cache",
-    url: "http://cache.aegis.dev:8060/remoteEntry.js",
+    url: "https://api.github.com",
+    repo: "microlib-example",
+    owner: "module-federation",
+    filedir: "dist",
+    branch: "cache",
     path: __dirname,
-    type: "service-cache",
-    importRemote: async () => import("distributed-cache/service-cache"),
+    type: "service",
+    importRemote: async () => import("distributed-cache/services"),
   },
-].concat(order);
+].concat(customer);

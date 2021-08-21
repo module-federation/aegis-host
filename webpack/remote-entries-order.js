@@ -9,7 +9,7 @@ module.exports = [
     branch: "master",
     path: __dirname,
     type: "model",
-    importRemote: async () => Object.values((await import("microservices/domain")).models),
+    importRemote: async () => Object.values((await import("microservices/models")).models),
   },
   {
     name: "adapters",

@@ -1,5 +1,5 @@
+const customer = require("./remote-entries-customer");
 
-const order = require("./remote-entries-order")
 module.exports = [
   {
     name: "distributed-cache",
@@ -7,10 +7,11 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "cache-test",
+    branch: "cache",
     path: __dirname,
     type: "model",
-    importRemote: async () => Object.values((await import("distributed-cache/domain")).models),
+    importRemote: async () =>
+      Object.values((await import("distributed-cache/models")).models),
   },
   {
     name: "adapter-cache",
@@ -18,7 +19,7 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "cache-test",
+    branch: "cache",
     path: __dirname,
     type: "adapter",
     importRemote: async () => import("distributed-cache/adapters"),
@@ -29,9 +30,9 @@ module.exports = [
     repo: "microlib-example",
     owner: "module-federation",
     filedir: "dist",
-    branch: "cache-test",
+    branch: "cache",
     path: __dirname,
     type: "service",
     importRemote: async () => import("distributed-cache/services"),
   },
-].concat(order);
+].concat(customer);

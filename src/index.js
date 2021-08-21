@@ -11,12 +11,50 @@ const express = require("express");
 const cluster = require("@module-federation/aegis/lib/cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("@module-federation/aegis/lib/services/auth");
-const serviceMesh = require("@module-federation/aegis/lib/services/mesh-switch");
+const meshNetwork = require("@module-federation/aegis/lib/services/mesh-switch");
 const messageParser =
   require("@module-federation/aegis/lib/adapters/serverless/message-parsers").parsers;
 const {
   ServerlessAdapter,
 } = require("@module-federation/aegis/lib/adapters/serverless/serverless-adapter");
+
+module.exports = [
+  {
+    name: "microservices",
+    url: "https://api.github.com",
+    repo: "microlib-example",
+    owner: "module-federation",
+    filedir: "dist",
+    branch: "customer2",
+    path: __dirname,
+    type: "model",
+    importRemote: async () =>
+      Object.values((await import("microservices/models")).models),
+  },
+  {
+    name: "adapters",
+    url: "https://api.github.com",
+    repo: "microlib-example",
+    owner: "module-federation",
+    filedir: "dist",
+    branch: "customer2",
+    path: __dirname,
+    type: "adapter",
+    importRemote: async () => import("microservices/adapters"),
+  },
+  {
+    name: "services",
+    url: "https://api.github.com",
+    repo: "microlib-example",
+    owner: "module-federation",
+    filedir: "dist",
+    branch: "customer2",
+    path: __dirname,
+    type: "service",
+    importRemote: async () => import("microservices/services"),
+  },
+];
+
 const StaticFileHandler = require("serverless-aws-static-file-handler");
 fs.writeFileSync("PID", `${process.pid}\n`, "utf-8");
 
@@ -126,14 +164,22 @@ function checkPublicIpAddress() {
   );
 }
 
+/**
+ * Listen for upgrade events from http server and switch client to ws protocol
+ * @param {*} server
+ */
 function attachWebSocket(server) {
-  const wss = new websocket.Server({ clientTracking: true, server: server, maxPayload: 104857600 });
+  const wss = new websocket.Server({
+    clientTracking: true,
+    server: server,
+    maxPayload: 104857600,
+  });
   wss.on("upgrade", (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, function (ws) {
       wss.emit("connection", ws, request);
     });
   });
-  serviceMesh.attachServer(wss);
+  meshNetwork.attachServer(wss);
 }
 
 /**
@@ -150,7 +196,7 @@ async function startWebServer() {
   } else {
     const httpServer = http.createServer(app);
     app.use(graceful(httpServer, { logger: console, forceTimeout: 30000 }));
-    attachWebSocket(httpServer)
+    attachWebSocket(httpServer);
     httpServer.listen(port, checkPublicIpAddress);
   }
 }

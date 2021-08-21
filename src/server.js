@@ -125,13 +125,10 @@ const Server = (() => {
   async function control(path, method, req, res) {
     if (routes.has(path)) {
       try {
-        console.debug("path match: ", path);
         const fn = routes.get(path)[method];
         if (fn) {
-          console.debug("method match:", method);
           return await fn(req, res);
         }
-        console.warn("method not supported", path, method);
       } catch (error) {
         console.error("problem running controller", error);
       }

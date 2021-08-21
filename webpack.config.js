@@ -32,6 +32,12 @@ module.exports = env => {
         },
         resolve: {
           extensions: [".js"],
+          alias: {
+            "@domain": path.resolve(__dirname, "node_modules/@module-federation/aegis/lib/domain"),
+            "@adapters": path.resolve(__dirname, "node_modules/@module-federation/aegis/lib/adapters"),
+            "@services": path.resolve(__dirname, "node_modules/@module-federation/aegis/lib/services"),
+            "@use-cases": path.resolve(__dirname, "node_modules/@module-federation/aegis/lib/use-cases")
+          }
         },
         module: {
           rules: [
