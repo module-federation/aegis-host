@@ -10,8 +10,12 @@ import {
   getConfig,
 } from "@module-federation/aegis/lib/adapters/controllers";
 
+import {
+  save,
+  find,
+  close,
+} from "@module-federation/aegis/lib/adapters/persistence-adapter";
 import { Persistence } from "@module-federation/aegis/lib/services/persistence-service";
-import { save, find, close } from "@module-federation/aegis/lib/adapters/persistence-adapter";
 import http from "@module-federation/aegis/lib/adapters/http-adapter";
 import ModelFactory from "@module-federation/aegis/lib/domain";
 
@@ -24,6 +28,10 @@ const idRoute = route =>
 const cmdRoute = route =>
   route.split("/").splice(0, 6).concat([":id", ":command"]).join("/");
 
+/**
+ * Store routes and their controllers
+ * @extends {Map}
+ */
 class RouteMap extends Map {
   has(route) {
     if (!route) {

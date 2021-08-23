@@ -1,4 +1,3 @@
-const customer = require("./remote-entries-customer");
 
 module.exports = [
   {
@@ -9,9 +8,9 @@ module.exports = [
     filedir: "dist",
     branch: "cache",
     path: __dirname,
-    type: "model",
+    type: "model-cache",
     importRemote: async () =>
-      Object.values((await import("distributed-cache/models")).models),
+      Object.values((await import("distributed-cache/model-cache")).models),
   },
   {
     name: "adapter-cache",
@@ -21,8 +20,8 @@ module.exports = [
     filedir: "dist",
     branch: "cache",
     path: __dirname,
-    type: "adapter",
-    importRemote: async () => import("distributed-cache/adapters"),
+    type: "adapter-cache",
+    importRemote: async () => import("distributed-cache/adapter-cache"),
   },
   {
     name: "service-cache",
@@ -32,7 +31,8 @@ module.exports = [
     filedir: "dist",
     branch: "cache",
     path: __dirname,
-    type: "service",
-    importRemote: async () => import("distributed-cache/services"),
+    type: "service-cache",
+    importRemote: async () => import("distributed-cache/service-cache"),
   },
-].concat(customer);
+]
+

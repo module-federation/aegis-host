@@ -26,6 +26,7 @@ function generateFilename(entry) {
 }
 
 function getPath(entry) {
+  console.debug(getPath.name, entry);
   const filename = generateFilename(entry);
   let basedir = entry.path;
   if (entry.path.charAt(entry.path.length - 1) !== "/") {
@@ -92,7 +93,7 @@ function httpGet(entry, path, done) {
  * @returns
  */
 function getUniqueEntry(entry) {
-  return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}`;
+  return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}${entry.brach}`;
 }
 
 /**

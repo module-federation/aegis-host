@@ -1,5 +1,4 @@
 const { importWebAssembly } = require("@module-federation/aegis/lib/adapters/webassembly/import-wasm");
-const order = require("./remote-entries-order");
 
 module.exports = [
   {
@@ -16,4 +15,4 @@ module.exports = [
       return importWebAssembly(this, "model");
     }
   },
-].concat(order);
+]
