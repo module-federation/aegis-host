@@ -11,7 +11,7 @@ const express = require("express");
 const cluster = require("@module-federation/aegis/lib/services/cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("@module-federation/aegis/lib/services/auth");
-const meshNetwork = require("@module-federation/aegis/lib/services/mesh-switch");
+const meshNetwork = require("@module-federation/aegis/lib/services/app-mesh/app-node");
 const messageParser =
   require("@module-federation/aegis/lib/adapters/serverless/message-parsers").parsers;
 const {

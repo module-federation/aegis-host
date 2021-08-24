@@ -93,7 +93,7 @@ function httpGet(entry, path, done) {
  * @returns
  */
 function getUniqueEntry(entry) {
-  return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}${entry.brach}`;
+  return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}${entry.branch}`;
 }
 
 /**
