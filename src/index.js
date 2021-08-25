@@ -32,7 +32,6 @@ const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED);
 
 // enable authorization
 const app = authorization(express(), "/microlib");
-let secureContext; // use context for cert renewal without restarting server
 
 function isServerless() {
   return (
@@ -154,17 +153,22 @@ function createSecureContext() {
   });
 }
 
+let secureCtx = createSecureContext();
+
 /**
  * Start web server, optionally require secure socket.
  */
 async function startWebServer() {
   if (sslEnabled) {
-    secureContext = createSecureContext();
-    const httpsServer = https.createServer({
-      SNICallback: (_serverName, cb) => cb(null, secureContext)
-    }, app);
+    // create with `secureCtx` so we can renew certs without restarting the server
+    const httpsServer = https.createServer({ SNICallback: (_, cb) => cb(null, secureCtx) }, app);
+    // update secureCtx to reassign the new cert files
+    app.use("/reload-certs", () => secureCtx = createSecureContext());
+    // graceful shutdown prevents new clients from connecting & waits for to diconnect
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
+    // websocket uses same socket
     attachWebSocket(httpsServer);
+    // callback gets public facing ip
     httpsServer.listen(sslPort, checkPublicIpAddress);
   } else {
     const httpServer = http.createServer(app);
