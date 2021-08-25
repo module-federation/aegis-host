@@ -4,6 +4,7 @@ require("dotenv").config();
 require("regenerator-runtime");
 const importFresh = require("import-fresh");
 const fs = require("fs");
+const tls = require("tls");
 const http = require("http");
 const https = require("https");
 const websocket = require("ws");
@@ -11,49 +12,12 @@ const express = require("express");
 const cluster = require("@module-federation/aegis/lib/services/cluster");
 const graceful = require("express-graceful-shutdown");
 const authorization = require("@module-federation/aegis/lib/services/auth");
-const meshNetwork = require("@module-federation/aegis/lib/services/mesh-switch");
+const meshnet = require("@module-federation/aegis/lib/services/app-mesh/web-node");
 const messageParser =
   require("@module-federation/aegis/lib/adapters/serverless/message-parsers").parsers;
 const {
   ServerlessAdapter,
 } = require("@module-federation/aegis/lib/adapters/serverless/serverless-adapter");
-
-module.exports = [
-  {
-    name: "microservices",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "customer2",
-    path: __dirname,
-    type: "model",
-    importRemote: async () =>
-      Object.values((await import("microservices/models")).models),
-  },
-  {
-    name: "adapters",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "customer2",
-    path: __dirname,
-    type: "adapter",
-    importRemote: async () => import("microservices/adapters"),
-  },
-  {
-    name: "services",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "customer2",
-    path: __dirname,
-    type: "service",
-    importRemote: async () => import("microservices/services"),
-  },
-];
 
 const StaticFileHandler = require("serverless-aws-static-file-handler");
 fs.writeFileSync("PID", `${process.pid}\n`, "utf-8");
@@ -142,11 +106,11 @@ function reloadCallback() {
 function checkPublicIpAddress() {
   const bytes = [];
   const proto = sslEnabled ? "https" : "http";
-  const p = sslEnabled ? sslPort : port;
+  const prt = sslEnabled ? sslPort : port;
 
   if (/local/i.test(process.env.NODE_ENV)) {
     const ipAddr = "localhost";
-    console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${p} \n`);
+    console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`);
     return;
   }
   http.get(
@@ -179,19 +143,32 @@ function attachWebSocket(server) {
       wss.emit("connection", ws, request);
     });
   });
-  meshNetwork.attachServer(wss);
+  meshnet.attachServer(wss);
 }
+
+function createSecureContext() {
+  return tls.createSecureContext({
+    key: fs.readFileSync("cert/privkey1.pem", "utf8"),
+    cert: fs.readFileSync("cert/fullchain.pem", "utf8")
+  });
+}
+
+let secureCtx = createSecureContext();
 
 /**
  * Start web server, optionally require secure socket.
  */
 async function startWebServer() {
   if (sslEnabled) {
-    const key = fs.readFileSync("cert/server.key", "utf8");
-    const cert = fs.readFileSync("cert/domain.crt", "utf8");
-    const httpsServer = https.createServer({ key, cert }, app);
+    // create with `secureCtx` so we can renew certs without restarting the server
+    const httpsServer = https.createServer({ SNICallback: (_, cb) => cb(null, secureCtx) }, app);
+    // update secureCtx to reassign the new cert files
+    app.use("/reload-certs", () => secureCtx = createSecureContext());
+    // graceful shutdown prevents new clients from connecting & waits for to diconnect
     app.use(graceful(httpsServer, { logger: console, forceTimeout: 30000 }));
+    // websocket uses same socket
     attachWebSocket(httpsServer);
+    // callback gets public facing ip
     httpsServer.listen(sslPort, checkPublicIpAddress);
   } else {
     const httpServer = http.createServer(app);
