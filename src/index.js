@@ -12,7 +12,7 @@ const express = require('express')
 const cluster = require('@module-federation/aegis/lib/services/cluster')
 const graceful = require('express-graceful-shutdown')
 const authorization = require('@module-federation/aegis/lib/services/auth')
-const meshnet = require('@module-federation/aegis/lib/services/app-mesh/web-node')
+const mesh = require('@module-federation/aegis/lib/services/app-mesh/web-switch')
 const cacert = require('@module-federation/aegis/lib/adapters/ca-cert')
 const messageParser = require('@module-federation/aegis/lib/adapters/serverless/message-parsers')
   .parsers
@@ -148,19 +148,19 @@ function attachWebSocket(server) {
   })
   wss.on('upgrade', (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, function (ws) {
-      wss.emit('connection', ws, request)
+      wss.emit('conn`ection', ws, request)
     })
   })
-  meshnet.attachServer(wss)
+  mesh.attachServer(wss)
 }
 
-function createSecureContext() {
-  fs.existsSync('cert/fullchain.pem') ||
-    cacert.provisonCert(null)({
+async function createSecureContext() {
+  fs.existsSync('cert/privkey.pem') ||
+    await cacert.provisonCert()({
       model: {
         domain: DOMAIN
       },
-      args: []
+      args: [() => console.log("provisioned new cert for", DOMAIN)]
     })
 
   return tls.createSecureContext({
@@ -195,7 +195,7 @@ async function startWebServer() {
       })
     )
 
-    // websocket uses same handle
+    // websocket uses same sd
     attachWebSocket(httpsServer)
     // callback gets public facing ip
     httpsServer.listen(sslPort, checkPublicIpAddress)

@@ -99,7 +99,7 @@ const Server = (() => {
     },
 
     /**
-     * serverless mode - save routes, etc for fast lookup
+     * serverless mode - execute controllers directly
      * @param {*} path
      * @param {*} method
      * @param {*} controllers

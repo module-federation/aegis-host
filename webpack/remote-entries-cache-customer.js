@@ -1,8 +1,6 @@
-const order = require("./remote-entries-order");
-const cache = require("./remote-entries-cache");
+const customer = require("./remote-entries-customer");
+const cache = require("./remote-entries-cache-aws");
 
-module.exports = [order, cache].flat();
+module.exports = [customer, cache].flat();
 
 console.log(module.exports)
-
-
