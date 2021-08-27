@@ -13,14 +13,14 @@ module.exports = [
     url: "http:/aegis.module-federation.org:8060/remoteEntry.js",
     path: __dirname,
     type: "adapter-cache",
-    importRemote: async () => import("distributed-cache/adapter-cache"),
+    importRemote: async () => Object.values(await import("distributed-cache/adapter-cache")),
   },
   {
     name: "service-cache",
     url: "http://aegis.module-federation.org:8060/remoteEntry.js",
     path: __dirname,
     type: "service-cache",
-    importRemote: async () => import("distributed-cache/service-cache"),
+    importRemote: async () => Object.values(await import("distributed-cache/service-cache")),
   },
 ]
 

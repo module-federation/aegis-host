@@ -81,6 +81,7 @@
     "greenlock": "^4.0.4",
     "import-fresh": "^3.3.0",
     "jwks-rsa": "^2.0.1",
+    "log-timestamp": "^0.3.0",
     "module-alias": "^2.2.2",
     "mongodb": "^3.6.6",
     "mongodb-client-encryption": "^1.2.3",

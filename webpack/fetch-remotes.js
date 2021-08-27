@@ -1,7 +1,9 @@
 "use strict";
 
+const pipe = require("@module-federation/aegis/lib/domain/util/pipe");
 const { Octokit } = require("@octokit/rest");
 const fs = require("fs");
+const remoteEntriesWasm = require("./remote-entries-wasm");
 
 /**
  * Allow multiple entry points from different owners, repos, etc on github.
@@ -16,6 +18,7 @@ function githubPath(entry, url) {
 }
 
 function generateFilename(entry) {
+  if (!(entry && entry.url)) return;
   const url = new URL(entry.url);
   const hostpart = url.hostname.split(".").join("-");
   const portpart = url.port ? url.port : 80;
@@ -102,6 +105,7 @@ function getUniqueEntry(entry) {
  * @returns {{[x:string]:{name:string,path:string,url:string}}}
  */
 function deduplicate(entries) {
+  if (!entries || entries.length < 1) return;
   return entries
     .map(function (e) {
       return {
@@ -112,6 +116,22 @@ function deduplicate(entries) {
       };
     })
     .reduce((p, c) => ({ ...p, ...c }));
+}
+
+function removeEmptyObjects(remoteEntries) {
+  return remoteEntries.filter(e => Object.getOwnPropertyNames(e).length > 0);
+}
+
+function removeWasmObjects(remoteEntries) {
+  return remoteEntries.filter(e => !e.wasm);
+}
+
+function validateEntries(remoteEntries) {
+  if (!remoteEntries || !remoteEntries.length > 0) {
+    console.log("entries missing or invalid");
+    throw new Error("entries missing or invalid");
+  }
+  return pipe(removeEmptyObjects, removeWasmObjects)(remoteEntries);
 }
 
 /**
@@ -127,10 +147,10 @@ function deduplicate(entries) {
 module.exports = async remoteEntry => {
   console.info(remoteEntry);
   const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
-  const entriesNonWasm = entries.filter(e => !e.wasm);
+  const cleanEntries = validateEntries(entries);
 
   const remotes = await Promise.all(
-    Object.values(deduplicate(entriesNonWasm)).map(function (entry) {
+    Object.values(deduplicate(cleanEntries)).map(function (entry) {
       const path = getPath(entry);
       console.log("downloading file to", path);
 
@@ -148,7 +168,7 @@ module.exports = async remoteEntry => {
     })
   );
 
-  return entriesNonWasm.map(e => ({
+  return cleanEntries.map(e => ({
     [e.name]: remotes.find(r => r[getUniqueEntry(e)])[getUniqueEntry(e)],
   }));
 };

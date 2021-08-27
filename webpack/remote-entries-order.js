@@ -1,5 +1,9 @@
+/**
+ * @typedef {import("./remote-entries-type")} entry
+ */
 
-module.exports = [
+/** @type {entry} */
+const entries = [
   {
     name: "microservices",
     url: "https://api.github.com",
@@ -9,7 +13,7 @@ module.exports = [
     branch: "master",
     path: __dirname,
     type: "model",
-    importRemote: async () => Object.values((await import("microservices/models")).models),
+    importRemote: async () => import("microservices/models"),
   },
   {
     name: "adapters",
@@ -34,3 +38,5 @@ module.exports = [
     importRemote: async () => import("microservices/services"),
   },
 ];
+
+module.exports = entries;

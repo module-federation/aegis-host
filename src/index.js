@@ -169,6 +169,7 @@ async function createSecureContext() {
   })
 }
 
+/** the current cert/key pair */
 let secureCtx
 
 /**
