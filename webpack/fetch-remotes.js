@@ -115,23 +115,21 @@ function deduplicate(entries) {
         },
       };
     })
-    .reduce((p, c) => ({ ...p, ...c }));
-}
-
-function removeEmptyObjects(remoteEntries) {
-  return remoteEntries.filter(e => Object.getOwnPropertyNames(e).length > 0);
+    .reduce((p, c) => ({ ...p, ...c }), entries);
 }
 
 function removeWasmObjects(remoteEntries) {
-  return remoteEntries.filter(e => !e.wasm);
+  if (remoteEntries)
+    return remoteEntries.filter(e => e && !e.wasm);
 }
 
 function validateEntries(remoteEntries) {
-  if (!remoteEntries || !remoteEntries.length > 0) {
+  if (!remoteEntries || remoteEntries.length < 1 || remoteEntries === []) {
     console.log("entries missing or invalid");
     throw new Error("entries missing or invalid");
   }
-  return pipe(removeEmptyObjects, removeWasmObjects)(remoteEntries);
+  return removeWasmObjects(remoteEntries);
+  //  return pipe(removeWasmObjects, removeEmptyObjects)(remoteEntries);
 }
 
 /**
@@ -146,11 +144,11 @@ function validateEntries(remoteEntries) {
  */
 module.exports = async remoteEntry => {
   console.info(remoteEntry);
-  const entries = Array.isArray(remoteEntry) ? remoteEntry : [remoteEntry];
-  const cleanEntries = validateEntries(entries);
+  const validEntries = validateEntries(remoteEntry);
+  if (validEntries.length < 1) return;
 
   const remotes = await Promise.all(
-    Object.values(deduplicate(cleanEntries)).map(function (entry) {
+    Object.values(deduplicate(validEntries)).map(function (entry) {
       const path = getPath(entry);
       console.log("downloading file to", path);
 
@@ -168,7 +166,7 @@ module.exports = async remoteEntry => {
     })
   );
 
-  return cleanEntries.map(e => ({
+  return validEntries.map(e => ({
     [e.name]: remotes.find(r => r[getUniqueEntry(e)])[getUniqueEntry(e)],
   }));
 };

@@ -3,7 +3,8 @@
  */
 
 /** @type {entry} */
-const entries = [
+
+module.exports = [
   {
     name: "microservices",
     url: "https://api.github.com",
@@ -39,4 +40,4 @@ const entries = [
   },
 ];
 
-module.exports = entries;
+//q module.exports = entries;

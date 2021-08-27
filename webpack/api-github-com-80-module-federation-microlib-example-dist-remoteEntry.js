@@ -31799,7 +31799,7 @@ var moduleMap = {
 		return __webpack_require__.e(610).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./services": () => {
-		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(610), __webpack_require__.e(662)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(662)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./event-bus": () => {
 		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(778)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
@@ -31853,19 +31853,6 @@ module.exports = require("assert");
 
 "use strict";
 module.exports = require("crypto");
-
-/***/ }),
-
-/***/ "dns/promises":
-/*!*******************************!*\
-  !*** external "dns/promises" ***!
-  \*******************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("dns/promises");
 
 /***/ }),
 
