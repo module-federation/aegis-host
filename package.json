@@ -80,6 +80,7 @@
     "express-jwt": "^6.0.0",
     "greenlock": "^4.0.4",
     "import-fresh": "^3.3.0",
+    "ipfs-core": "^0.10.4",
     "jwks-rsa": "^2.0.1",
     "log-timestamp": "^0.3.0",
     "module-alias": "^2.2.2",
