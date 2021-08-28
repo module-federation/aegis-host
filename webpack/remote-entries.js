@@ -1,4 +1,5 @@
-const customer = require("./remote-entries-customer");
-const cache = require("./remote-entries-cache-aws");
+const order = require("./remote-entries-order")
+const customer = require("./remote-entries-customer")
+const wasm = require("./remote-entries-wasm");
 
-module.exports = [customer, cache].flat();
+module.exports = [order, customer, wasm].flat();
