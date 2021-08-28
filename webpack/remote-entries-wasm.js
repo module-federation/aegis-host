@@ -15,4 +15,15 @@ module.exports = [
       return importWebAssembly(this, "model");
     }
   },
+  // {
+  //   name: "wasm",
+  //   url: "https://aegis.module-federation.org:8060/",
+  //   path: __dirname,
+  //   type: "model",
+  //   wasm: true,
+  //   importRemote() {
+  //     return importWebAssembly(this, "model");
+  //   }
+  // },
+
 ]
