@@ -295,6 +295,12 @@ MicroLib prevents vendor lock-in by providing a layer of abstraction on top of v
 
 [Stop Paying the Microservice Premium: Eliminating the Microservices Deployment/Distribution Trade-Off](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
 
+[Federated Applications: E Plurbis Unum](https://trmidboe.medium.com/federated-applications-e-plurbus-unum-2cc7850250a0?sk=08d98f5ae22695c2296fad382fb6006f)
+
+[Self-Deploying Applications: Deployment Automation That Works Anywhere](https://trmidboe.medium.com/what-is-a-self-deploying-or-installation-free-application-658f4d79082d?sk=3e27745b6660fa2d6837545c8e075ad3)
+
+[Cell-based Architecture and Federation](https://trmidboe.medium.com/cell-based-architecture-and-federated-microservices-4fc0cf3df5a6?sk=d50a09dcec880da26378f5e7522eb0b6)
+
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
 [Webpack 5 Module Federation: A game-changer in JavaScript architecture](https://medium.com/swlh/webpack-5-module-federation-a-game-changer-to-javascript-architecture-bcdd30e02669)
