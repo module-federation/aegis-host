@@ -1,20 +1,22 @@
-const { importWebAssembly } = require("@module-federation/aegis/lib/adapters/webassembly/import-wasm");
+const {
+  importWebAssembly
+} = require('@module-federation/aegis/lib/adapters/webassembly/wasm-import')
 
 module.exports = [
   {
-    name: "wasm",
-    url: "https://api.github.com",
-    repo: "assembly",
-    owner: "tysonrm",
-    filedir: "build",
-    branch: "master",
+    name: 'wasm',
+    url: 'https://api.github.com',
+    repo: 'assembly',
+    owner: 'tysonrm',
+    filedir: 'build',
+    branch: 'master',
     path: __dirname,
-    type: "model",
+    type: 'model',
     wasm: true,
-    importRemote() {
-      return importWebAssembly(this, "model");
+    importRemote () {
+      return importWebAssembly(this, 'model')
     }
-  },
+  }
   // {
   //   name: "wasm",
   //   url: "https://aegis.module-federation.org:8060/",
@@ -25,5 +27,4 @@ module.exports = [
   //     return importWebAssembly(this, "model");
   //   }
   // },
-
 ]
