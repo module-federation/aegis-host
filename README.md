@@ -50,7 +50,7 @@ Is there such an alternative? [Fowler](https://martinfowler.com/articles/microse
 
 > "One main reason for using services as components (rather than libraries) is that services are independently deployable. If you have an application that consists of multiple libraries in a single process, a change to any single component results in having to redeploy the entire application.”
 
-While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this is no longer the case.
+While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this view is no longer warranted.
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
@@ -68,14 +68,14 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Dynamic, independent persistence of federated modules
-- Dynamic port generation for federated modules
-- Dynamic port-adapter binding
-- Dynamic adapter-service binding
+- Runtime port generation
+- Runtime port-adapter binding
+- Runtime adapter-service binding
 - [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
 - Built-in error handling (circuit breaker, undo)
-- Common broker for locally shared events
+- Common broker for locally shared (in-memory) events
 - Persistence API for cached datasources
 - Datasource relations for federated schemas and objects
 - Object broker for retrieving external model instances
@@ -85,13 +85,15 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Dynamic A/B testing
 - Vendor-agnostic serverless deployment (no vendor lock-in)
 - Faster serverless deployment
+- Obsolesence of deployment automation 
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 - Automatated CA certifcate setup and renewal
 - Intial AppMesh implementation (can be used in place of event bus)
-- Inital support for WebAssembly (outside the browser) - write components in any language
+- WebAssembly runtime supporting the next gen compute platform
+- Polyglossia - components written in any lang with a WASM compile target
 
 ---
 
@@ -294,6 +296,12 @@ MicroLib prevents vendor lock-in by providing a layer of abstraction on top of v
 [Federated Microservices: Manageable Autonomy](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
 [Stop Paying the Microservice Premium: Eliminating the Microservices Deployment/Distribution Trade-Off](https://trmidboe.medium.com/discounting-the-microservice-premium-a95311c61367)
+
+[Federated Applications: E Plurbis Unum](https://trmidboe.medium.com/federated-applications-e-plurbus-unum-2cc7850250a0?sk=08d98f5ae22695c2296fad382fb6006f)
+
+[Self-Deploying Applications: Deployment Automation That Works Anywhere](https://trmidboe.medium.com/what-is-a-self-deploying-or-installation-free-application-658f4d79082d?sk=3e27745b6660fa2d6837545c8e075ad3)
+
+[Cell-based Architecture and Federation](https://trmidboe.medium.com/cell-based-architecture-and-federated-microservices-4fc0cf3df5a6?sk=d50a09dcec880da26378f5e7522eb0b6)
 
 [Clean Micoservices: Building Composable Microservices with Module Federation](https://trmidboe.medium.com/clean-microservices-building-composable-microservices-with-module-federation-f1d2b03d2b27)
 
