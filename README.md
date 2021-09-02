@@ -68,14 +68,14 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Dynamic, independent persistence of federated modules
-- Dynamic port generation for federated modules
-- Dynamic port-adapter binding
-- Dynamic adapter-service binding
+- Runtime port generation
+- Runtime port-adapter binding
+- Runtime adapter-service binding
 - [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
 - Built-in error handling (circuit breaker, undo)
-- Common broker for locally shared events
+- Common broker for locally shared (in-memory) events
 - Persistence API for cached datasources
 - Datasource relations for federated schemas and objects
 - Object broker for retrieving external model instances
@@ -85,13 +85,15 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Dynamic A/B testing
 - Vendor-agnostic serverless deployment (no vendor lock-in)
 - Faster serverless deployment
+- Obsolesence of deployment automation 
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 - Automatated CA certifcate setup and renewal
 - Intial AppMesh implementation (can be used in place of event bus)
-- Inital support for WebAssembly (outside the browser) - write components in any language
+- WebAssembly runtime supporting the next gen compute platform
+- Polyglossia - components written in any lang with a WASM compile target
 
 ---
 
