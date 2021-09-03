@@ -42,7 +42,6 @@
       ws.onerror = ws.onopen = ws.onclose = null
       ws.close()
     }
-
     ws = new WebSocket(`ws://${location.hostname}:${location.port}`)
     ws.onerror = function (e) {
       showMessage('WebSocket error', e)
@@ -59,12 +58,10 @@
       try {
         if (event.data instanceof Blob) {
           reader = new FileReader()
-
           reader.onload = () => {
             console.log('Result: ' + reader.result)
             showMessage(JSON.stringify(JSON.parse(reader.result), undefined, 2))
           }
-
           reader.readAsText(event.data)
         } else {
           showMessage(JSON.stringify(JSON.parse(event.data), undefined, 2))
