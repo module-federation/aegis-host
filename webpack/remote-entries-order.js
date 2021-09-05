@@ -1,3 +1,7 @@
+'use strict'
+
+const wasm = require('./remote-entries-wasm')
+
 /**
  * @typedef {import("./remote-entries-type")} entry
  */
@@ -6,38 +10,38 @@
 
 module.exports = [
   {
-    name: "microservices",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "master",
+    name: 'microservices',
+    url: 'https://api.github.com',
+    repo: 'microlib-example',
+    owner: 'module-federation',
+    filedir: 'dist',
+    branch: 'master',
     path: __dirname,
-    type: "model",
-    importRemote: async () => import("microservices/models"),
+    type: 'model',
+    importRemote: async () => import('microservices/models')
   },
   {
-    name: "adapters",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "master",
+    name: 'adapters',
+    url: 'https://api.github.com',
+    repo: 'microlib-example',
+    owner: 'module-federation',
+    filedir: 'dist',
+    branch: 'master',
     path: __dirname,
-    type: "adapter",
-    importRemote: async () => import("microservices/adapters"),
+    type: 'adapter',
+    importRemote: async () => import('microservices/adapters')
   },
   {
-    name: "services",
-    url: "https://api.github.com",
-    repo: "microlib-example",
-    owner: "module-federation",
-    filedir: "dist",
-    branch: "master",
+    name: 'services',
+    url: 'https://api.github.com',
+    repo: 'microlib-example',
+    owner: 'module-federation',
+    filedir: 'dist',
+    branch: 'master',
     path: __dirname,
-    type: "service",
-    importRemote: async () => import("microservices/services"),
-  },
-];
+    type: 'service',
+    importRemote: async () => import('microservices/services')
+  }
+].concat(wasm)
 
 //q module.exports = entries;

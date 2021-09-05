@@ -23,7 +23,7 @@ module.exports = [
     repo: 'aegis',
     owner: 'module-federation',
     filedir: 'wasm/build',
-    branch: 'master',
+    branch: 'main',
     path: __dirname,
     type: 'model',
     wasm: true,
