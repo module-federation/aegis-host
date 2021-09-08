@@ -30,7 +30,7 @@
     "build-order": "cp webpack/remote-entries-cache-order.js webpack/remote-entries.js && yarn build",
     "build-customer": "cp webpack/remote-entries-cache-customer.js webpack/remote-entries.js && yarn build",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
-    "hot-reload": "curl http://localhost:8070/microlib/reload",
+    "hot-reload": "curl http://localhost/microlib/reload",
     "hot-reload-customer": "curl http://localhost:8072/microlib/reload",
     "restart": "yarn build && yarn start",
     "stats": "git ls-files | xargs wc -l",

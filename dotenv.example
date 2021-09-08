@@ -17,29 +17,26 @@ AUTH_ENABLED=false
 # Use Secure Sockets Layer / TLS / HTTPS
 # See cert/domain.crt, cert/server.key
 SSL_ENABLED=false
-SSL_PORT=8071
-PORT=8070
+SSL_PORT=443
+PORT=80
 
 # Default datasource for models that do not specify one
 #DATASOURCE_ADAPTER=DataSourceMemory
 #DATASOURCE_ADAPTER=DataSourceMongoDb
+#DATASOURCE_IPFS
 DATASOURCE_ADAPTER=DataSourceFile
-
-# If using file system storage, choose directory.
-#DATASOURCE_FILE_DIRECTORY=/var/www/html
 
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000
-CACHE_ALGO=LRU
 
 # Enable cache events for transparent integration
 DISTRIBUTED_CACHE_ENABLED=false
 
-# Common websocket server which aegis instances use for eventing
+# All aegis instances can be connected via ws
+#WEBSWITCH_UPLINK=uplink1.app-mesh.net
+WEBSWITCH_SERVER=switch1.app-mesh.net
+WEBSWITCH_PORT=80
 WEBSWITCH_ENABLED=false
-WEBSWITCH_SERVER=switch.app-mesh.net
-WEBSWITCH_PORT=8070
-#WEBSWITCH_UPLINK=uplink.app-mesh.net
 
 # Don't re/start workflow - always false in prod
 RESUME_WORKFLOW_DISABLED=true
@@ -59,9 +56,18 @@ PROVIDER_NAME=aws
 # Get external IP
 CHECK_IP=https://checkip.amazonaws.com
 
-# Required by 3rd party client APIs
+--------------------------------
+# the rest is for 3rd party APIs
+--------------------------------
+
+# mongo driver
 MONGODB_URL=mongodb://localhost:27017
+
+# kafka client 
 KAFKA_GROUP_ID=microlib-host
+
+# secrets - store elsewhere in prod
+-----------------------------------
 # AWS_ACCESS_KEY_ID=xxxxxx
 # AWS_SECRET_ACCESS_KEY=xxxxxx
 # GITHUB_TOKEN=xxxxxx

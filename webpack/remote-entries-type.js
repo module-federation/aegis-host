@@ -12,6 +12,8 @@
  * @property {string} path local path where compiled files are written
  * @property {"model"|"adapter"|"service"} type the type of components in the module
  * @property {function():Promise<object>} importRemote the function to call to import
+ * @property {boolean} wasm is this a WebAssembly module?
+ * @property {remoteEntry} model location of the model for webAssembly modules
  * - `await import("microservices/models")` imports models based on the below webpack.config.js
  * ```js
  * new ModuleFederationPlugin({
@@ -32,11 +34,6 @@
  */
 
 /** @type {remoteEntry[]} */
-const entries = [
-  {
-  },
-  {
-  }
-];
+const entries = [{}, {}]
 
-module.exports = entries;
+module.exports = entries

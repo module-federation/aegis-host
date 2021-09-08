@@ -31,13 +31,13 @@
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container-lg">
     <div class="row">
-      <div class="col">
+      <div class="col-lg-5">
 
         <div class="mb-3">
-        <!-- <button id="login" class="btn btn-outline-light" title="post">Log in</button>-->
-          <button id="wsButton" class="btn btn-outline-light" title="patch">Open WebSocket</button> 
+          <!-- <button id="login" class="btn btn-outline-light" title="post">Log in</button>-->
+          <button id="wsButton" class="btn btn-outline-light" title="patch">Open WebSocket</button>
           <button id="status" class="btn btn-outline-light" title="post">Get Status</button>
           <button id="clear" class="btn btn-outline-light" title="delete">Clear</button>
         </div>
@@ -48,6 +48,10 @@
         <pre id="messages" class="text-light mb-3 overflow-scroll"
           style="height: 420px; "><code id="jsonCode" class="line-nowrap"></code></pre>
       </div>
+      <!--div class="col">
+        <iframe id="inlineFrameExample" title="Inline Frame Example" width="300" height="200"
+          src="http://localhost:8080"></iframe>
+      </div-->
     </div>
   </div>
   </div>
@@ -57,3 +61,9 @@
 </body>
 
 </html>
+
+
+<!--video width="320" height="240" autoplay>
+  <source src="localhost:8080" type="video/webm">
+  Your browser does not support the video tag.
+</video-->
