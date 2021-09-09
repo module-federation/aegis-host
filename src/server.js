@@ -2,6 +2,10 @@
 
 import { adapters, domain, services } from '@module-federation/aegis'
 
+const { StorageAdapter, controllers } = adapters
+const { ModelFactory } = domain
+const { StorageService } = services
+
 const {
   postModels,
   patchModels,
@@ -11,11 +15,7 @@ const {
   initCache,
   getConfig,
   http
-} = adapters.controllers
-
-const { StorageAdapter } = adapters
-const { ModelFactory } = domain
-const { StorageService } = services
+} = controllers
 
 const apiRoot = process.env.API_ROOT || '/microlib/api'
 const modelPath = `${apiRoot}/models`
@@ -69,7 +69,7 @@ class RouteMap extends Map {
   }
 }
 
-const Server = (() => {
+const App = (() => {
   const routes = new RouteMap()
 
   const endpoint = e => `${modelPath}/${e}`
@@ -230,4 +230,4 @@ const Server = (() => {
   }
 })()
 
-export default Server
+export default App
