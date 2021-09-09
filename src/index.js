@@ -3,25 +3,23 @@
 require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
+const adapters = require('@module-federation/aegis').adapters
+const services = require('@module-federation/aegis').services
+const {
+  AuthorizationService,
+  CertificateService,
+  ClusterService,
+  MeshService
+} = services
+const { ServerlessAdapter } = adapters
 const fs = require('fs')
 const tls = require('tls')
 const http = require('http')
 const https = require('https')
 const websocket = require('ws')
 const express = require('express')
-const cluster = require('@module-federation/aegis/lib/services/cluster')
 const graceful = require('express-graceful-shutdown')
-const authorization = require('@module-federation/aegis/lib/services/auth')
-const mesh = require('@module-federation/aegis/lib/services/app-mesh/web-switch')
-const cacert = require('@module-federation/aegis/lib/adapters/ca-cert')
-const messageParser = require('@module-federation/aegis/lib/adapters/serverless/message-parsers')
-  .parsers
-const {
-  ServerlessAdapter
-} = require('@module-federation/aegis/lib/adapters/serverless/serverless-adapter')
-
 const StaticFileHandler = require('serverless-aws-static-file-handler')
-fs.writeFileSync('PID', `${process.pid}\n`, 'utf-8')
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 8070
 const sslPort = process.env.SSL_PORT || 8071
@@ -30,14 +28,17 @@ const reloadPath = process.env.RELOAD_PATH || '/microlib/reload'
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED)
 const cloudProvider = process.env.CLOUD_PROVIDER
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
-const DOMAIN = process.env.DOMAIN || 'module-federation.org'
+const domain = process.env.DOMAIN || 'module-federation.org'
 
-// enable authorization
-const app = authorization(express(), '/microlib')
+// enable authorization if selected
+const app = AuthorizationService.protectRoutes(express(), '/microlib')
 
-function isServerless() {
+// write out our process id for stop scripts
+fs.writeFileSync('PID', `${process.pid}\n`, 'utf-8')
+
+function isServerless () {
   return (
-    /serverless/i.test(process.title) || /true/i.test(process.env.SERVERLESS)
+    /true/i.test(process.env.SERVERLESS) || /serverless/i.test(process.title)
   )
 }
 
@@ -45,7 +46,7 @@ function isServerless() {
  * Callbacks attached to existing routes are stale.
  * Clear the routes we need to update.
  */
-function clearRoutes() {
+function clearRoutes () {
   app._router.stack = app._router.stack.filter(
     k => !(k && k.route && k.route.path && k.route.path.startsWith(apiRoot))
   )
@@ -58,7 +59,7 @@ function clearRoutes() {
  *
  * @param {boolean} hot `true` to hot reload
  */
-async function startMicroLib({ hot = false, serverless = false } = {}) {
+async function startMicroLib ({ hot = false, serverless = false } = {}) {
   const remoteEntry = importFresh('./remoteEntry')
   const factory = await remoteEntry.microlib.get('./server')
   const serverModule = factory()
@@ -69,36 +70,34 @@ async function startMicroLib({ hot = false, serverless = false } = {}) {
     serverModule.default.clear()
   }
   await serverModule.default.start(app, serverless)
-  return serverModule.default.control
+  return serverModule.default.invoke
 }
 
 /**
- * Control hot reload differently depending on cluster mode.
+ * Handle hot reload request.
+ * If running in cluster mode,
+ * do a rolling restart instead
+ * of memory purge.
  */
-function reloadCallback() {
+function reloadCallback () {
   // Manual reset if left in wrong stated
   app.use(`${reloadPath}-reset`, function (req, res) {
-    process.send({
-      cmd: 'reload-reset'
-    })
+    process.send({ cmd: 'reload-reset' })
     res.send('reload status reset...try again')
   })
 
   if (clusterEnabled) {
     app.use(reloadPath, async function (req, res) {
       res.send('<h1>starting cluster reload</h1>')
-      process.send({
-        cmd: 'reload'
-      })
+      process.send({ cmd: 'reload' })
     })
     return
   }
 
   app.use(reloadPath, async function (req, res) {
     try {
-      await startMicroLib({
-        hot: true
-      })
+      // restart microlib
+      await startMicroLib({ hot: true })
       res.send('<h1>hot reload complete</h1>')
     } catch (error) {
       console.error(error)
@@ -111,7 +110,7 @@ function reloadCallback() {
  * @param {*} provider
  * @param {*} messages
  */
-function checkPublicIpAddress() {
+function checkPublicIpAddress () {
   const bytes = []
   const proto = sslEnabled ? 'https' : 'http'
   const prt = sslEnabled ? sslPort : port
@@ -140,7 +139,7 @@ function checkPublicIpAddress() {
  * Listen for upgrade events from http server and switch client to ws protocol
  * @param {*} server
  */
-function attachWebSocket(server) {
+function attachWebSocket (server) {
   const wss = new websocket.Server({
     clientTracking: true,
     server: server,
@@ -148,20 +147,15 @@ function attachWebSocket(server) {
   })
   wss.on('upgrade', (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, function (ws) {
-      wss.emit('conn`ection', ws, request)
+      wss.emit('connection', ws, request)
     })
   })
-  mesh.attachServer(wss)
+  MeshService.attachServer(wss)
 }
 
-async function createSecureContext() {
+async function createSecureContext () {
   fs.existsSync('cert/privkey.pem') ||
-    await cacert.provisonCert()({
-      model: {
-        domain: DOMAIN
-      },
-      args: [() => console.log("provisioned new cert for", DOMAIN)]
-    })
+    (await CertificateService.provisonCert(domain))
 
   return tls.createSecureContext({
     key: fs.readFileSync('cert/privkey.pem', 'utf8'),
@@ -175,9 +169,14 @@ let secureCtx
 /**
  * Start web server, optionally require secure socket.
  */
-async function startWebServer() {
+async function startWebServer () {
+  const shutdownOptions = {
+    logger: console,
+    forceTimeout: 30000
+  }
+
   if (sslEnabled) {
-    secureCtx = createSecureContext()
+    secureCtx = await createSecureContext()
     // create with `secureCtx` so we can renew certs without restarting the server
     const httpsServer = https.createServer(
       {
@@ -185,32 +184,31 @@ async function startWebServer() {
       },
       app
     )
-
     // update secureCtx to reassign the new cert files
-    app.use('/reload-certs', () => (secureCtx = createSecureContext()))
-    // graceful shutdown prevents new clients from connecting & waits for to diconnect
     app.use(
-      graceful(httpsServer, {
-        logger: console,
-        forceTimeout: 30000
-      })
+      '/reload-certs',
+      async () => (secureCtx = await createSecureContext())
     )
-
-    // websocket uses same sd
+    // graceful shutdown prevents new clients from connecting & waits for to diconnect
+    app.use(graceful(httpsServer, shutdownOptions))
+    // websocket uses same fd
     attachWebSocket(httpsServer)
     // callback gets public facing ip
     httpsServer.listen(sslPort, checkPublicIpAddress)
-  } else {
-    const httpServer = http.createServer(app)
-    app.use(
-      graceful(httpServer, {
-        logger: console,
-        forceTimeout: 30000
-      })
-    )
-    attachWebSocket(httpServer)
-    httpServer.listen(port, checkPublicIpAddress)
   }
+
+  const httpServer = http.createServer(app)
+  app.use(graceful(httpServer, shutdownOptions))
+
+  if (sslEnabled) {
+    // set up a route to redirect http to https
+    httpServer.get('*', function (req, res) {
+      res.redirect('https://' + req.headers.host + req.url)
+    })
+  } else {
+    attachWebSocket(httpServer)
+  }
+  httpServer.listen(port, checkPublicIpAddress)
 }
 
 /**
@@ -222,7 +220,7 @@ async function startWebServer() {
  * clustered or single process,
  * hot reload via rolling restart or deleting cache
  */
-async function startService() {
+async function startService () {
   try {
     app.use(express.json())
     app.use(express.static('public'))
@@ -236,7 +234,7 @@ async function startService() {
 
 if (!isServerless()) {
   if (clusterEnabled) {
-    cluster.startCluster(startService)
+    ClusterService.start(startService)
   } else {
     startService()
   }
@@ -253,12 +251,8 @@ exports.handleServerlessRequest = async function (...args) {
 
   if (!serverlessAdapter) {
     serverlessAdapter = await ServerlessAdapter(
-      () =>
-        startMicroLib({
-          serverless: true
-        }),
-      cloudProvider,
-      messageParser
+      () => startMicroLib({ serverless: true }),
+      cloudProvider
     )
   }
 
@@ -266,6 +260,7 @@ exports.handleServerlessRequest = async function (...args) {
 }
 
 const fileHandler = new StaticFileHandler('public')
+
 /**
  * Serve static files, i.e. the demo app.
  * @param {*} event

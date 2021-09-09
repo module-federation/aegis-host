@@ -1,6 +1,8 @@
 'use strict'
 
-import {
+import { adapters, domain, services } from '@module-federation/aegis'
+
+const {
   postModels,
   patchModels,
   getModels,
@@ -9,16 +11,11 @@ import {
   initCache,
   getConfig,
   http
-} from '@module-federation/aegis/lib/adapters/controllers'
+} = adapters.controllers
 
-import {
-  save,
-  find,
-  close
-} from '@module-federation/aegis/lib/adapters/persistence-adapter'
-
-import { Persistence } from '@module-federation/aegis/lib/services/persistence-service'
-import ModelFactory from '@module-federation/aegis/lib/domain'
+const { StorageAdapter } = adapters
+const { ModelFactory } = domain
+const { StorageService } = services
 
 const apiRoot = process.env.API_ROOT || '/microlib/api'
 const modelPath = `${apiRoot}/models`
@@ -94,7 +91,7 @@ const Server = (() => {
 
   const make = {
     /**
-     * webServer mode - create routes and register controllers
+     * webserver mode - create routes and register controllers
      * @param {*} path
      * @param {*} app
      * @param {*} method
@@ -125,27 +122,31 @@ const Server = (() => {
         }
         routes.set(route, { [method]: http(ctlr.fn) })
       })
-    }
-  }
+    },
 
-  function makeAdmin (app, adapter, serverMode) {
-    if (serverMode === make.webserver.name) {
-      app.get(`${apiRoot}/config`, adapter(getConfig()))
-    } else if (serverMode === make.serverless.name) {
-      routes.set(`${apiRoot}/config`, { get: adapter(getConfig()) })
+    admin (adapter, serverMode, app) {
+      if (serverMode === make.webserver.name) {
+        app.get(`${apiRoot}/config`, adapter(getConfig()))
+      } else if (serverMode === make.serverless.name) {
+        routes.set(`${apiRoot}/config`, { get: adapter(getConfig()) })
+        console.info(routes)
+      }
     }
   }
 
   /**
    * Call controllers directly in serverless mode.
    */
-  async function control (path, method, req, res) {
+  async function invoke (path, method, req, res) {
     if (routes.has(path)) {
       try {
-        const fn = routes.get(path)[method]
-        if (fn) {
-          return await fn(req, res)
+        const controller = routes.get(path)[method]
+
+        if (typeof controller === 'function') {
+          return await controller(req, res)
         }
+
+        console.error('controller is not a function', controller)
       } catch (error) {
         console.error('problem running controller', error)
       }
@@ -159,18 +160,19 @@ const Server = (() => {
   }
 
   /**
-   * Clear all non-webpack module cache, i.e.
-   * everything bundled by remoteEntry.js (models
-   * & remoteEntry config), which includes all the
+   * Clear everything bundled by remoteEntry.js
+   * (models & remoteEntry config), i.e. all the
    * user code downloaded from the remote. This is
    * the code that needs to be disposed of & reimported.
    */
   function clear () {
     try {
-      close()
-      routes.clear()
+      // free resources
+      StorageAdapter.close()
+      // free wasm memory if any
       ModelFactory.clearModels()
 
+      // purge everything we imported
       Object.keys(__non_webpack_require__.cache).forEach(k => {
         console.log('deleting cached module', k)
         delete __non_webpack_require__.cache[k]
@@ -183,8 +185,8 @@ const Server = (() => {
   /**
    * Import federated modules, see {@link getRemoteModules}. Then, generate
    * routes for each controller method and model. If running as a serverless
-   * function, tore the routes and controllers for direct invocation via the
-   * {@link control} method.
+   * function, store the route-controller bindings for direct invocation via
+   * the {@link invoke} method.
    *
    * @param {import("express").Router} router - express app/router
    * @param {boolean} serverless - set to true if running as a servless function
@@ -192,7 +194,7 @@ const Server = (() => {
    */
   async function start (router, serverless = false) {
     const serverMode = serverless ? make.serverless.name : make.webserver.name
-    const overrides = { save, find, Persistence }
+    const overrides = { ...StorageAdapter, StorageService }
 
     const label = '\ntotal time to import & register remote modules'
     console.time(label)
@@ -210,14 +212,12 @@ const Server = (() => {
           make[serverMode](endpointId, 'patch', patchModels, router)
           make[serverMode](endpointId, 'delete', deleteModels, router)
           make[serverMode](endpointCmd, 'patch', patchModels, router)
+          make.admin(http, serverMode, router)
 
-          makeAdmin(router, http, serverMode)
           console.timeEnd(label)
-          console.info(routes)
-
           process.on('sigterm', () => shutdown(() => close()))
           await cache.load()
-          return control
+          return invoke
         })
       })
     })
@@ -226,7 +226,7 @@ const Server = (() => {
   return {
     clear,
     start,
-    control
+    invoke
   }
 })()
 
