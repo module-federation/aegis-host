@@ -3,15 +3,18 @@
 require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
-const adapters = require('@module-federation/aegis').adapters
-const services = require('@module-federation/aegis').services
+
+const { adapters, services } = require('@module-federation/aegis')
+
 const {
   AuthorizationService,
   CertificateService,
   ClusterService,
   MeshService
 } = services
+
 const { ServerlessAdapter } = adapters
+
 const fs = require('fs')
 const tls = require('tls')
 const http = require('http')
@@ -28,6 +31,7 @@ const reloadPath = process.env.RELOAD_PATH || '/microlib/reload'
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED)
 const cloudProvider = process.env.CLOUD_PROVIDER
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
+const publicIpCheckHost = process.env.IPCHECKHOST || 'checkip.amazonaws.com'
 const domain = process.env.DOMAIN || 'module-federation.org'
 
 // enable authorization if selected
@@ -122,7 +126,7 @@ function checkPublicIpAddress () {
   }
   http.get(
     {
-      hostname: 'checkip.amazonaws.com',
+      hostname: publicIpCheckHost,
       method: 'get'
     },
     function (response) {
@@ -240,23 +244,21 @@ if (!isServerless()) {
   }
 }
 
-let serverlessAdapter = null
-
+let serverlessAdapter
 /**
  * Serverless entry point - called by the serverless function.
  * @param  {...any} args arguments passsed to serverless function
  */
 exports.handleServerlessRequest = async function (...args) {
-  console.info('running in serverless mode', args)
-
-  if (!serverlessAdapter) {
+  console.info('serverless function called', args)
+  if (serverlessAdapter) {
+    serverlessAdapter.invokeController(...args)
+  } else {
     serverlessAdapter = await ServerlessAdapter(
       () => startMicroLib({ serverless: true }),
       cloudProvider
     )
   }
-
-  return serverlessAdapter.invokeController(...args)
 }
 
 const fileHandler = new StaticFileHandler('public')
@@ -268,10 +270,7 @@ const fileHandler = new StaticFileHandler('public')
  * @returns
  */
 exports.serveHtml = async (event, context) => {
-  console.debug({
-    event,
-    context
-  })
+  console.debug({ event, context })
   console.log(event.path)
   event.path = 'index.html'
   return fileHandler.get(event, context)

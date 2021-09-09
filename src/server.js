@@ -2,7 +2,7 @@
 
 import { adapters, domain, services } from '@module-federation/aegis'
 
-const { StorageAdapter, controllers } = adapters
+const { StorageAdapter } = adapters
 const { ModelFactory } = domain
 const { StorageService } = services
 
@@ -15,7 +15,7 @@ const {
   initCache,
   getConfig,
   http
-} = controllers
+} = adapters.controllers
 
 const apiRoot = process.env.API_ROOT || '/microlib/api'
 const modelPath = `${apiRoot}/models`
@@ -155,7 +155,7 @@ const App = (() => {
   }
 
   function shutdown (shutdownTasks) {
-    console.warn('Received SIGTERM - system shutdown in progress')
+    console.warn('Received SIGTERM - app shutdown in progress')
     shutdownTasks()
   }
 
@@ -168,7 +168,7 @@ const App = (() => {
   function clear () {
     try {
       // free resources
-      StorageAdapter.close()
+      StorageService.close()
       // free wasm memory if any
       ModelFactory.clearModels()
 
@@ -215,7 +215,7 @@ const App = (() => {
           make.admin(http, serverMode, router)
 
           console.timeEnd(label)
-          process.on('sigterm', () => shutdown(() => close()))
+          process.on('SIGTERM', () => shutdown(() => StorageService.close()))
           await cache.load()
           return invoke
         })
