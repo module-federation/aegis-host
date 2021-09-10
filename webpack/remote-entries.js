@@ -1,5 +1,4 @@
-const order = require('./remote-entries-order')
-const cache = require('./remote-entries-cache-aws')
-const wasm2 = require('./remote-entries-wasm2.js')
+const order = require("./remote-entries-order");
+const cache = require("./remote-entries-cache-aws");
 
-module.exports = [order, cache, wasm2].flat()
+module.exports = [order, cache].flat();

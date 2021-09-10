@@ -145,7 +145,6 @@ const App = (() => {
         if (typeof controller === 'function') {
           return await controller(req, res)
         }
-
         console.error('controller is not a function', controller)
       } catch (error) {
         console.error('problem running controller', error)
