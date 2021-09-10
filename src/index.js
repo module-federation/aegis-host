@@ -1,3 +1,14 @@
+/**
+ * Handle options and start the service.
+ * Options:
+ *
+ * - run as serverless function or as web server
+ * - http or https
+ * - authorized routes enabled or disabled (json web token)
+ * - clustering enabled or disabled
+ * - hot reload as rolling restart or module cache refresh
+ */
+
 'use strict'
 
 require('dotenv').config()
@@ -24,8 +35,8 @@ const express = require('express')
 const graceful = require('express-graceful-shutdown')
 const StaticFileHandler = require('serverless-aws-static-file-handler')
 
-const port = process.argv[2] ? process.argv[2] : process.env.PORT || 8070
-const sslPort = process.env.SSL_PORT || 8071
+const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
+const sslPort = process.env.SSL_PORT || 443
 const apiRoot = process.env.API_ROOT || '/microlib/api'
 const reloadPath = process.env.RELOAD_PATH || '/microlib/reload'
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED)
@@ -48,7 +59,7 @@ function isServerless () {
 
 /**
  * Callbacks attached to existing routes are stale.
- * Clear the routes we need to update.
+ * Clear the routes whose controllers we need to update.
  */
 function clearRoutes () {
   app._router.stack = app._router.stack.filter(
@@ -78,10 +89,8 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
 }
 
 /**
- * Handle hot reload request.
- * If running in cluster mode,
- * do a rolling restart instead
- * of memory purge.
+ * Handle hot reload request. If running in cluster mode,
+ * do a rolling restart instead of memory purge.
  */
 function reloadCallback () {
   // Manual reset if left in wrong stated
@@ -157,6 +166,10 @@ function attachWebSocket (server) {
   MeshService.attachServer(wss)
 }
 
+/**
+ * using to request/renew automated CA cert
+ * without restarting the server
+ */
 async function createSecureContext () {
   fs.existsSync('cert/privkey.pem') ||
     (await CertificateService.provisonCert(domain))
@@ -216,13 +229,9 @@ async function startWebServer () {
 }
 
 /**
- * Handle options and start the server.
- * Options:
- * https or http,
- * authorization (via jwt and a\
- * uth0) enabled or disabled
- * clustered or single process,
- * hot reload via rolling restart or deleting cache
+ * start microlib and the webserver
+ *
+ * this function isn't called if running in serverless mode
  */
 async function startService () {
   try {
@@ -246,8 +255,8 @@ if (!isServerless()) {
 
 let serverlessAdapter
 /**
- * Serverless entry point - called by the serverless function.
- * @param  {...any} args arguments passsed to serverless function
+ * Serverless function - entry point called by serverless platform.
+ * @param  {...any} args - payload passed to serverless function
  */
 exports.handleServerlessRequest = async function (...args) {
   console.info('serverless function called', args)
