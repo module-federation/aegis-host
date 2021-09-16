@@ -38,12 +38,14 @@ const StaticFileHandler = require('serverless-aws-static-file-handler')
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
 const sslPort = process.env.SSL_PORT || 443
 const apiRoot = process.env.API_ROOT || '/microlib/api'
-const reloadPath = process.env.RELOAD_PATH || '/microlib/reload'
-const sslEnabled = /true/i.test(process.env.SSL_ENABLED)
-const cloudProvider = process.env.CLOUD_PROVIDER
+const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
+const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
+const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const publicIpCheckHost = process.env.IPCHECKHOST || 'checkip.amazonaws.com'
 const domain = process.env.DOMAIN || 'module-federation.org'
+const sslEnabled = // required in production
+  /PROD/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
 // enable authorization if selected
 const app = AuthorizationService.protectRoutes(express(), '/microlib')
@@ -93,21 +95,21 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
  * do a rolling restart instead of memory purge.
  */
 function reloadCallback () {
-  // Manual reset if left in wrong stated
-  app.use(`${reloadPath}-reset`, function (req, res) {
+  // Manual reset if left in wrong state
+  app.use(`${hotReloadPath}-reset`, function (_req, res) {
     process.send({ cmd: 'reload-reset' })
     res.send('reload status reset...try again')
   })
 
   if (clusterEnabled) {
-    app.use(reloadPath, async function (req, res) {
+    app.use(hotReloadPath, async function (_req, res) {
       res.send('<h1>starting cluster reload</h1>')
       process.send({ cmd: 'reload' })
     })
     return
   }
 
-  app.use(reloadPath, async function (req, res) {
+  app.use(hotReloadPath, async function (_req, res) {
     try {
       // restart microlib
       await startMicroLib({ hot: true })
@@ -150,7 +152,7 @@ function checkPublicIpAddress () {
 
 /**
  * Listen for upgrade events from http server and switch client to ws protocol
- * @param {*} server
+ * @param {https.Server|http.Server} server
  */
 function attachWebSocket (server) {
   const wss = new websocket.Server({
@@ -167,8 +169,11 @@ function attachWebSocket (server) {
 }
 
 /**
- * using to request/renew automated CA cert
- * without restarting the server
+ * Using this to provision/renew an automated CA-signed cert &
+ * private key without ever having to restart the server.
+ *
+ * {@link CertificateService} kicks off and handles a series of
+ * automated id challenge tests conducted by the issuing CA.
  */
 async function createSecureContext () {
   fs.existsSync('cert/privkey.pem') ||
@@ -201,22 +206,19 @@ async function startWebServer () {
       },
       app
     )
-    // update secureCtx to reassign the new cert files
-    app.use(
-      '/reload-certs',
-      async () => (secureCtx = await createSecureContext())
-    )
-    // graceful shutdown prevents new clients from connecting & waits for to diconnect
+    // update secureCtx to re/load cert files
+    app.use(certLoadPath, async () => (secureCtx = await createSecureContext()))
+    // graceful shutdown prevents new clients from connecting & waits
+    // up to `shutdownOptions.forceTimeout` for them to disconnect
     app.use(graceful(httpsServer, shutdownOptions))
-    // websocket uses same fd
+    // websocket uses same file descriptor
     attachWebSocket(httpsServer)
-    // callback gets public facing ip
+    // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
   }
-
+  // run unsecured port regardless
   const httpServer = http.createServer(app)
   app.use(graceful(httpServer, shutdownOptions))
-
   if (sslEnabled) {
     // set up a route to redirect http to https
     httpServer.get('*', function (req, res) {
@@ -247,6 +249,8 @@ async function startService () {
 
 if (!isServerless()) {
   if (clusterEnabled) {
+    // Fork child processes (one per core)
+    // children share socket descriptor (round-robin)
     ClusterService.start(startService)
   } else {
     startService()
@@ -254,20 +258,20 @@ if (!isServerless()) {
 }
 
 let serverlessAdapter
+
 /**
  * Serverless function - entry point called by serverless platform.
  * @param  {...any} args - payload passed to serverless function
  */
 exports.handleServerlessRequest = async function (...args) {
   console.info('serverless function called', args)
-  if (serverlessAdapter) {
-    serverlessAdapter.invokeController(...args)
-  } else {
+  if (!serverlessAdapter) {
     serverlessAdapter = await ServerlessAdapter(
       () => startMicroLib({ serverless: true }),
       cloudProvider
     )
   }
+  serverlessAdapter.invokeController(...args)
 }
 
 const fileHandler = new StaticFileHandler('public')

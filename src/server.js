@@ -1,10 +1,10 @@
 'use strict'
 
-import { adapters, domain, services } from '@module-federation/aegis'
+import { domain, adapters, services } from '@module-federation/aegis'
 
+const { StorageService } = services
 const { StorageAdapter } = adapters
 const { ModelFactory } = domain
-const { StorageService } = services
 
 const {
   postModels,
@@ -135,7 +135,12 @@ const App = (() => {
   }
 
   /**
-   * Call controllers directly in serverless mode.
+   * Call controllers directly when in serverless mode.
+   * @param {string} path
+   * @param {function()} method
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   * @returns
    */
   async function invoke (path, method, req, res) {
     if (routes.has(path)) {
