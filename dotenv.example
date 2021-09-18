@@ -38,11 +38,15 @@ CACHE_ALGO=RNN
 
 # Enable cache events for transparent integration
 DISTRIBUTED_CACHE_ENABLED=true
+
 # -----------------------------------
 # service mesh control and data plane
 # -----------------------------------
+# - bespoke integration
+# - transparent integration
 # - adaptive deployment 
 # - distributed cache
+# - distributed workflow
 # - streaming 
 # - telemetry
 # - operations analytics
@@ -50,7 +54,7 @@ DISTRIBUTED_CACHE_ENABLED=true
 WEBSWITCH_ENABLED=true
 WEBSWITCH_PORT=80
 WEBSWITCH_SERVER=localhost
-# WEBSWITCH_UPLINK=uplink1.mesh.net
+#WEBSWITCH_UPLINK=uplink1.appmesh.net
 # if available use nats 
 NETWORK_MIDDLEWARE=nats
 # accept kubernetes control
@@ -60,7 +64,8 @@ OPERATIONS_ANALYTICS=tensorflow
 # custom AIOps, AISecOps
 OPERATIONS_AUTOMATION=AIOps
 # run wasm in kernel space, shared wasm memory, secondstate vm
-SYSTEMS_OPTIMIZATION=run_in_kernel,faasm,ssvm
+PERFORMANCE_OPTIMIZATION=run_in_kernel,faasm,ssvm
+# ---------------------------------
 
 # Don't re/start workflow - always false in prod
 RESUME_WORKFLOW_DISABLED=false
