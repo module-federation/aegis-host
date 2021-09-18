@@ -39,18 +39,24 @@ CACHE_ALGO=RNN
 # Enable cache events for transparent integration
 DISTRIBUTED_CACHE_ENABLED=true
 
-# -----------------------------------
-# service mesh control and data plane
-# -----------------------------------
+# ------------------------------------
+# service mesh control and data planes
+# ------------------------------------
 # - bespoke integration
 # - transparent integration
-# - adaptive deployment 
 # - distributed cache
 # - distributed workflow
+# - adaptive deployment 
 # - streaming 
 # - telemetry
 # - operations analytics
 # - operations automation
+# - sync, async, pub/sub, req/res
+# - https, websocket
+# - full or switched mesh
+# - clustering, failover
+# - auto-scaling, self-healing
+# - observable, controllable
 WEBSWITCH_ENABLED=true
 WEBSWITCH_PORT=80
 WEBSWITCH_SERVER=localhost
@@ -59,11 +65,11 @@ WEBSWITCH_SERVER=localhost
 NETWORK_MIDDLEWARE=nats
 # accept kubernetes control
 SYSTEMS_MIDDLEWARE=kubernetes
-# machine learning software
+# machine learning provider
 OPERATIONS_ANALYTICS=tensorflow
 # custom AIOps, AISecOps
 OPERATIONS_AUTOMATION=AIOps
-# run wasm in kernel space, shared wasm memory, secondstate vm
+# run wasm in kernel space, shared memory/state, secondstate vm
 PERFORMANCE_OPTIMIZATION=run_in_kernel,faasm,ssvm
 # ---------------------------------
 

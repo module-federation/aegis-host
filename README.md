@@ -83,17 +83,20 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
+- Runs as web server or serverless function 
 - Vendor-agnostic serverless deployment (no vendor lock-in)
-- Faster serverless deployment
-- Obsolesence of deployment automation 
+- Fast deployment - no-install deployment is the shortest path
+- Self-deployment - built-in deployment automation
 - Configurable serialization for network and storage I/O
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 - Automatated CA certifcate setup and renewal
-- Intial AppMesh implementation (can be used in place of event bus)
-- WebAssembly runtime supporting the next gen compute platform
+- Service mesh implementation (can be used in place of event bus)
+- WebAssembly runtime for services implemented as WASM modules
 - Polyglossia - components written in any lang with a WASM compile target
+- MLOps - supports ci/cd pipeline for machine learning deployment
+- AIOps - uses deep learning for adaptive, lights-outs operations
 
 ---
 
