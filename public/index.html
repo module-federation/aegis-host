@@ -136,9 +136,6 @@
               <option value="approve">Checkout</option>
               <option value="cancel"></option>
               <option value="websocketNotify">WASM Pub</option>
-              <option value="webasocketListen">WASM Sub</option>
-              <option value="fibonacci">fibonacciklnlklk</option>
-              <option value="commandEx"></option>
             </datalist>
             <button
               class="btn btn-outline-light"
@@ -160,11 +157,14 @@
             <label for="query" class="form-label text-white">Query</label>
             <datalist id="queryList">
               <option value="command=decrypt"></option>
+              <option value="command=runFibonacci"></option>
+              <option value="command=commandEx"></option>
               <option value="relation=customer"></option>
               <option value="relation=orders"></option>
               <option value="count=all"></option>
+              <option value="count=today"></option>
+              <option value="count=1"></option>
               <option value="count=orderStatus:COMPLETE"></option>
-              <option value="count=yesterday"></option>
               <option value="orderStatus=COMPLETE"></option>
             </datalist>
             <button
@@ -193,7 +193,10 @@
               "orderItems": [ 
                 { "itemId": "item1", "price": 329.95 },
                 { "itemId": "item2", "price": 59.00, "qty": 4 }
-              ]
+              ],
+              "key1":"val1",
+              "key2":"val2",
+              "fibonacci":"20"
             }</textarea
             >
             <label for="payload" class="text-white">Payload</label>

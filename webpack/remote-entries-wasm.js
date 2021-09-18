@@ -11,12 +11,12 @@ const {
 /** @type {entries} */
 const entries = [
   {
-    name: 'wasm2',
+    name: 'wasm',
     url: 'https://api.github.com',
-    repo: 'assembly',
-    owner: 'tysonrm',
-    filedir: 'build',
-    branch: 'master',
+    repo: 'aegis',
+    owner: 'module-federation',
+    filedir: 'wasm/build',
+    branch: 'main',
     path: __dirname,
     type: 'model',
     wasm: true,

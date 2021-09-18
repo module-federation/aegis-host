@@ -17,29 +17,53 @@ AUTH_ENABLED=false
 # Use Secure Sockets Layer / TLS / HTTPS
 # See cert/domain.crt, cert/server.key
 SSL_ENABLED=false
-SSL_PORT=443
+SSL_PORT=433
 PORT=80
 
 # Default datasource for models that do not specify one
-#DATASOURCE_ADAPTER=DataSourceMemory
-#DATASOURCE_ADAPTER=DataSourceMongoDb
-#DATASOURCE_IPFS
-DATASOURCE_ADAPTER=DataSourceFile
+#DATASOURCE_ADAPTER=DataSourceMemory 
+DATASOURCE_ADAPTER=DataSourceMongoDb 
+#DATASOURCE_ADAPTER=DataSourceFile 
+#DATASOURCE_ADAPTER=DataSourceIpfs
+
+# Set directory for file-based storage. Defaults to public web folder.
+#DATASOURCE_DIRECTORY=/var/www/html
 
 # Maximum number of instances to cache per model
-CACHE_SIZE=2000
+CACHE_SIZE=2000 
+# Recursive neural network (RNN) long short term memory (LSTM) model  
+CACHE_ALGO=RNN
+# LRU - least recently used
+# CACHE_ALGO=LRU
 
 # Enable cache events for transparent integration
-DISTRIBUTED_CACHE_ENABLED=false
-
-# All aegis instances can be connected via ws
-#WEBSWITCH_UPLINK=uplink1.app-mesh.net
-WEBSWITCH_SERVER=switch1.app-mesh.net
+DISTRIBUTED_CACHE_ENABLED=true
+# -----------------------------------
+# service mesh control and data plane
+# -----------------------------------
+# - adaptive deployment 
+# - distributed cache
+# - streaming 
+# - telemetry
+# - operations analytics
+# - operations automation
+WEBSWITCH_ENABLED=true
 WEBSWITCH_PORT=80
-WEBSWITCH_ENABLED=false
+WEBSWITCH_SERVER=localhost
+# WEBSWITCH_UPLINK=uplink1.mesh.net
+# if available use nats 
+NETWORK_MIDDLEWARE=nats
+# accept kubernetes control
+SYSTEMS_MIDDLEWARE=kubernetes
+# machine learning software
+OPERATIONS_ANALYTICS=tensorflow
+# custom AIOps, AISecOps
+OPERATIONS_AUTOMATION=AIOps
+# run wasm in kernel space, shared wasm memory, secondstate vm
+SYSTEMS_OPTIMIZATION=run_in_kernel,faasm,ssvm
 
 # Don't re/start workflow - always false in prod
-RESUME_WORKFLOW_DISABLED=true
+RESUME_WORKFLOW_DISABLED=false
 
 # URL root level path
 API_ROOT=/microlib/api
@@ -54,20 +78,11 @@ ENCRYPTION_PWD=secret
 PROVIDER_NAME=aws
 
 # Get external IP
-CHECK_IP=https://checkip.amazonaws.com
+IPCHECKHOST=https://checkip.amazonaws.com
 
---------------------------------
-# the rest is for 3rd party APIs
---------------------------------
-
-# mongo driver
+# Required by 3rd party client APIs
 MONGODB_URL=mongodb://localhost:27017
-
-# kafka client 
 KAFKA_GROUP_ID=microlib-host
-
-# secrets - store elsewhere in prod
------------------------------------
 # AWS_ACCESS_KEY_ID=xxxxxx
 # AWS_SECRET_ACCESS_KEY=xxxxxx
 # GITHUB_TOKEN=xxxxxx

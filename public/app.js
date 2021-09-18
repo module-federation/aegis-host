@@ -203,13 +203,11 @@
   clearIdButton.addEventListener('click', function () {
     document.getElementById('modelId').value = ''
     document.getElementById('parameter').value = ''
-    document.getElementById('query').value = ''
     getUrl()
   })
 
   clearParamButton.addEventListener('click', function () {
     document.getElementById('parameter').value = ''
-    document.getElementById('query').value = ''
     getUrl()
   })
 
