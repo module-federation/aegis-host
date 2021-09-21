@@ -92,7 +92,8 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 - Automatated CA certifcate setup and renewal
-- Service mesh implementation (can be used in place of event bus)
+- Basic websockets-based switched mesh, gracefully upgrade to NATS if avail
+- Systems (K8s) and network (NATS) mniddleware plugins
 - WebAssembly runtime for services implemented as WASM modules
 - Polyglossia - components written in any lang with a WASM compile target
 - MLOps - supports ci/cd pipeline for machine learning deployment
