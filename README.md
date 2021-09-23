@@ -71,6 +71,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Runtime port generation
 - Runtime port-adapter binding
 - Runtime adapter-service binding
+- Runtime dynamic linking of WebAssembly ports, adapters and service modules
 - [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
