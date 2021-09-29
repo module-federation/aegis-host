@@ -1,4 +1,29 @@
-const order = require("./remote-entries-order");
-const cache = require("./remote-entries-cache-aws");
+'use strict'
 
-module.exports = [order, cache].flat();
+/**
+ * @typedef {import("./remote-entries-type")} entries
+ */
+
+const {
+  importWebAssembly
+} = require('@module-federation/aegis').adapters.webassembly
+
+/** @type {entries} */
+const entries = [
+  {
+    name: 'wasm',
+    url: 'https://api.github.com',
+    repo: 'aegis',
+    owner: 'module-federation',
+    filedir: 'wasm/build',
+    branch: 'main',
+    path: __dirname,
+    type: 'model',
+    wasm: true,
+    importRemote () {
+      return importWebAssembly(this, 'model')
+    }
+  }
+]
+
+module.exports = entries

@@ -69,6 +69,13 @@ class RouteMap extends Map {
   }
 }
 
+/**
+ * Application entry point
+ *
+ * - {@link App.start} import remotes, generate APIs
+ * - {@link App.invoke} call controllers directly
+ * - {@link App.clear} dispose of module cache
+ */
 const App = (() => {
   const routes = new RouteMap()
 

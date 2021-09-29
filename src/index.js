@@ -28,6 +28,7 @@ const { ServerlessAdapter } = adapters
 
 const fs = require('fs')
 const tls = require('tls')
+const path = require('path')
 const http = require('http')
 const https = require('https')
 const websocket = require('ws')
@@ -169,15 +170,19 @@ function attachWebSocket (server) {
 }
 
 /**
- * Using this to provision/renew an automated CA-signed cert &
- * private key without ever having to restart the server.
+ * Using this to programmatically provision CA-signed cert
+ * using rfc https://datatracker.ietf.org/doc/html/rfc8555
+ * and update server without ever having to restart.
  *
  * {@link CertificateService} kicks off and handles a series of
  * automated id challenge tests conducted by the issuing CA.
  */
 async function createSecureContext () {
-  fs.existsSync('cert/privkey.pem') ||
-    (await CertificateService.provisonCert(domain))
+  fs.existsSync('cert/fullchain.pem') ||
+    (await CertificateService.provisionCert(
+      domain,
+      path.resolve(process.cwd(), 'public')
+    ))
 
   return tls.createSecureContext({
     key: fs.readFileSync('cert/privkey.pem', 'utf8'),
