@@ -45,6 +45,7 @@ const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const publicIpCheckHost = process.env.IPCHECKHOST || 'checkip.amazonaws.com'
 const domain = process.env.DOMAIN || 'federated-microservices.org'
+const domainEmail = process.env.DOMAIN_EMAIL
 const sslEnabled = // required in production
   /PROD/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
@@ -184,6 +185,7 @@ async function createSecureContext () {
   fs.existsSync('cert/fullchain.pem') ||
     (await CertificateService.provisionCert(
       domain,
+      domainEmail,
       path.resolve(process.cwd(), 'public')
     ))
 
