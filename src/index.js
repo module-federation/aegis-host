@@ -44,7 +44,7 @@ const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
 const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const publicIpCheckHost = process.env.IPCHECKHOST || 'checkip.amazonaws.com'
-const domain = process.env.DOMAIN || 'module-federation.org'
+const domain = process.env.DOMAIN || 'federated-microservices.org'
 const sslEnabled = // required in production
   /PROD/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
@@ -78,7 +78,7 @@ function clearRoutes () {
  * @param {boolean} hot `true` to hot reload
  */
 async function startMicroLib ({ hot = false, serverless = false } = {}) {
-  const remoteEntry = importFresh('./remoteEntry')
+  let remoteEntry = importFresh('./remoteEntry')
   const factory = await remoteEntry.microlib.get('./server')
   const serverModule = factory()
   if (hot) {
@@ -152,10 +152,13 @@ function checkPublicIpAddress () {
 }
 
 /**
- * Listen for upgrade events from http server and switch client to ws protocol
+ * Attach {@link MeshService} to the listener socket.
+ * Listen for upgrade events from http server and switch client to ws protocol.
+ * Clients connecting this way are using the service mesh.
+ *
  * @param {https.Server|http.Server} server
  */
-function attachWebSocket (server) {
+function attachServiceMesh (server) {
   const wss = new websocket.Server({
     clientTracking: true,
     server: server,
@@ -216,8 +219,8 @@ async function startWebServer () {
     // graceful shutdown prevents new clients from connecting & waits
     // up to `shutdownOptions.forceTimeout` for them to disconnect
     app.use(graceful(httpsServer, shutdownOptions))
-    // websocket uses same file descriptor
-    attachWebSocket(httpsServer)
+    // service mesh using uses same file descriptor
+    attachServiceMesh(httpsServer)
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
   }
@@ -230,7 +233,7 @@ async function startWebServer () {
       res.redirect('https://' + req.headers.host + req.url)
     })
   } else {
-    attachWebSocket(httpServer)
+    attachServiceMesh(httpServer)
   }
   httpServer.listen(port, checkPublicIpAddress)
 }
