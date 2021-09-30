@@ -96,6 +96,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Basic websockets-based switched mesh, gracefully upgrade to NATS if avail
 - Systems (K8s) and network (NATS) mniddleware plugins
 - WebAssembly runtime for services implemented as WASM modules
+- WebAssembly workflow - pipe modules togther in control flows
 - Polyglossia - components written in any lang with a WASM compile target
 - MLOps - supports ci/cd pipeline for machine learning deployment
 - AIOps - uses deep learning for adaptive, lights-outs operations
