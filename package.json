@@ -27,7 +27,7 @@
     "build": "yarn clean && npm run transpile && webpack --config webpack.config.js",
     "build-all": "cp webpack/remote-entries-all.js webpack/remote-entries.js && yarn build",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && yarn build",
-    "build-order": "cp webpack/remote-entries-cache-order.js webpack/remote-entries.js && yarn build",
+    "build-order": "cp webpack/remote-entries-order.js webpack/remote-entries.js && yarn build",
     "build-customer": "cp webpack/remote-entries-cache-customer.js webpack/remote-entries.js && yarn build",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "hot-reload": "curl http://localhost/microlib/reload",

@@ -1,7 +1,5 @@
 'use strict'
 
-const wasm = require('./remote-entries-wasm')
-
 /**
  * @typedef {import("./remote-entries-type")} entry
  */
@@ -42,6 +40,4 @@ module.exports = [
     type: 'service',
     importRemote: async () => import('microservices/services')
   }
-].concat(wasm)
-
-//q module.exports = entries;
+]
