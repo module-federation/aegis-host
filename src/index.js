@@ -28,7 +28,6 @@ const { ServerlessAdapter } = adapters
 
 const fs = require('fs')
 const tls = require('tls')
-const path = require('path')
 const http = require('http')
 const https = require('https')
 const websocket = require('ws')
@@ -153,9 +152,10 @@ function checkPublicIpAddress () {
 }
 
 /**
- * Attach {@link MeshService} to the listener socket.
- * Listen for upgrade events from http server and switch client to ws protocol.
- * Clients connecting this way are using the service mesh.
+ * Attach {@link MeshService} to the API listener socket.
+ * Listen for upgrade events from http server and switch
+ * to WebSockets protocol. Clients connecting this way are
+ * using the service mesh, not the API.
  *
  * @param {https.Server|http.Server} server
  */
@@ -174,25 +174,45 @@ function attachServiceMesh (server) {
 }
 
 /**
- * Using this to programmatically provision CA-signed cert
- * using rfc https://datatracker.ietf.org/doc/html/rfc8555
- * and update server without ever having to restart.
+ * Programmatically provision CA cert using rfc
+ * https://datatracker.ietf.org/doc/html/rfc8555
  *
  * {@link CertificateService} kicks off and handles a series of
  * automated id challenge tests conducted by the issuing CA.
+ *
+ * @param {*} domain
+ * @param {*} domainEmail
+ * @returns
  */
-async function createSecureContext () {
-  fs.existsSync('cert/fullchain.pem') ||
-    (await CertificateService.provisionCert(
-      domain,
-      domainEmail,
-      path.resolve(process.cwd(), 'public')
-    ))
+async function getWebPkixCert (domain, domainEmail, renewal = false) {
+  if (
+    !renewal &&
+    fs.existsSync('cert/certificate.pem') &&
+    fs.existsSync('cert/privatekey.pem')
+  ) {
+    return {
+      key: fs.readFileSync('cert/privatekey.pem', 'utf8'),
+      cert: fs.readFileSync('cert/certificate.pem', 'utf8')
+    }
+  }
+  const { key, cert } = await CertificateService.provisionCert(
+    domain,
+    domainEmail
+  )
+  fs.writeFileSync('cert/certificate.pem', cert)
+  fs.writeFileSync('cert/privatekey.pem', key)
+}
 
-  return tls.createSecureContext({
-    key: fs.readFileSync('cert/privkey.pem', 'utf8'),
-    cert: fs.readFileSync('cert/fullchain.pem', 'utf8')
-  })
+/**
+ * Using {@link tls.createSecureContext} to create/renew
+ * certs without restarting the server
+ *
+ * @param {boolean} renewal
+ * @returns
+ */
+async function createSecureContext (renewal = false) {
+  const cert = await getWebPkixCert(domain, domainEmail, renewal)
+  return tls.createSecureContext(cert)
 }
 
 /** the current cert/key pair */
@@ -216,12 +236,15 @@ async function startWebServer () {
       },
       app
     )
-    // update secureCtx to re/load cert files
-    app.use(certLoadPath, async () => (secureCtx = await createSecureContext()))
+    // update secureCtx to refresh certificate
+    app.use(
+      certLoadPath,
+      async () => (secureCtx = await createSecureContext(true))
+    )
     // graceful shutdown prevents new clients from connecting & waits
     // up to `shutdownOptions.forceTimeout` for them to disconnect
     app.use(graceful(httpsServer, shutdownOptions))
-    // service mesh using uses same file descriptor
+    // service mesh uses same port
     attachServiceMesh(httpsServer)
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)

@@ -31782,7 +31782,7 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 /***/ }),
 
-/***/ "webpack/container/entry/distributed-cache":
+/***/ "webpack/container/entry/microservices":
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -31792,13 +31792,13 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 "use strict";
 var moduleMap = {
-	"./model-cache": () => {
+	"./models": () => {
 		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(583)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	},
-	"./adapter-cache": () => {
+	"./adapters": () => {
 		return __webpack_require__.e(610).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
-	"./service-cache": () => {
+	"./services": () => {
 		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(662)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./event-bus": () => {
@@ -32105,7 +32105,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=cache";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
@@ -32405,7 +32405,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			325: 0
+/******/ 			578: 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -32468,7 +32468,7 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__("webpack/container/entry/distributed-cache");
+/******/ 	return __webpack_require__("webpack/container/entry/microservices");
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map

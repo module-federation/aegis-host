@@ -44,7 +44,7 @@
     "mesh-status": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-status.mjs",
     "transpile": "babel src/index.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
-    "clean": "rimraf dist",
+    "clean": "rimraf dist",                                       
     "test-mocha": "mocha --recursive -r esm",
     "test": "jest",
     "demo": "open http://localhost",
@@ -70,7 +70,7 @@
   "license": "MIT",
   "dependencies": {
     "@assemblyscript/loader": "^0.19.12",
-    "@module-federation/aegis": "^0.0.0-beta.21",
+    "@module-federation/aegis": "^0.0.0-beta.25",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "assemblyscript": "^0.19.12",
