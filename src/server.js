@@ -1,10 +1,9 @@
 'use strict'
 
-import { domain, adapters, services } from '@module-federation/aegis'
+import { adapters, services } from '@module-federation/aegis'
 
 const { StorageService } = services
 const { StorageAdapter } = adapters
-const { ModelFactory } = domain
 
 const {
   postModels,
@@ -144,7 +143,7 @@ const App = (() => {
   /**
    * Call controllers directly when in serverless mode.
    * @param {string} path
-   * @param {function()} method
+   * @param {string} method method name
    * @param {import('express').Request} req
    * @param {import('express').Response} res
    * @returns
@@ -178,14 +177,8 @@ const App = (() => {
    */
   function clear () {
     try {
-      // free resources
-      StorageService.close()
-      // free wasm memory if any
-      ModelFactory.clearModels()
-
-      // purge everything we imported
       Object.keys(__non_webpack_require__.cache).forEach(k => {
-        console.log('deleting cached module', k)
+        console.debug('deleting cached module', k)
         delete __non_webpack_require__.cache[k]
       })
     } catch (error) {
@@ -227,7 +220,7 @@ const App = (() => {
 
           console.timeEnd(label)
           process.on('SIGTERM', () => shutdown(() => StorageService.close()))
-          await cache.load()
+          cache.load()
           return invoke
         })
       })

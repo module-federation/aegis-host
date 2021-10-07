@@ -48,7 +48,7 @@
     }
     ws.onopen = function () {
       showMessage('WebSocket connection established')
-      ws.send(JSON.stringify('webswitch'))
+      ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' }))
     }
     ws.onclose = function () {
       showMessage('WebSocket connection closed')
@@ -70,6 +70,7 @@
         console.error('onmessage', event, err.message)
       }
     }
+    ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' }))
   }
 
   statusButton.onclick = function () {

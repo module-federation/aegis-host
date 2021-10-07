@@ -42,11 +42,12 @@ const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
 const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
 const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
-const publicIpCheckHost = process.env.IPCHECKHOST || 'checkip.amazonaws.com'
+const checkPublicIpUrl =
+  process.env.IPCHECKHOST || 'https://checkip.amazonaws.com'
 const domain = process.env.DOMAIN || 'federated-microservices.org'
 const domainEmail = process.env.DOMAIN_EMAIL
 const sslEnabled = // required in production
-  /PROD/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
+  /prod/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
 // enable authorization if selected
 const app = AuthorizationService.protectRoutes(express(), '/microlib')
@@ -78,7 +79,7 @@ function clearRoutes () {
  * @param {boolean} hot `true` to hot reload
  */
 async function startMicroLib ({ hot = false, serverless = false } = {}) {
-  let remoteEntry = importFresh('./remoteEntry')
+  const remoteEntry = importFresh('./remoteEntry')
   const factory = await remoteEntry.microlib.get('./server')
   const serverModule = factory()
   if (hot) {
@@ -138,7 +139,7 @@ function checkPublicIpAddress () {
   }
   http.get(
     {
-      hostname: publicIpCheckHost,
+      hostname: checkPublicIpUrl,
       method: 'get'
     },
     function (response) {
@@ -177,30 +178,37 @@ function attachServiceMesh (server) {
  * Programmatically provision CA cert using rfc
  * https://datatracker.ietf.org/doc/html/rfc8555
  *
- * {@link CertificateService} kicks off and handles a series of
- * automated id challenge tests conducted by the issuing CA.
+ * {@link CertificateService} kicks off automated
+ * id challenge test conducted by the issuing CA.
+ * If tests pass, hands back the cert and key.
  *
  * @param {*} domain
  * @param {*} domainEmail
  * @returns
  */
-async function getWebPkixCert (domain, domainEmail, renewal = false) {
-  if (
-    !renewal &&
-    fs.existsSync('cert/certificate.pem') &&
-    fs.existsSync('cert/privatekey.pem')
-  ) {
+async function getAuthorizedCert (domain, domainEmail, renewal = false) {
+  const certFile = 'cert/certificate.pem'
+  const keyFile = 'cert/privatekey.pem'
+
+  if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
     return {
-      key: fs.readFileSync('cert/privatekey.pem', 'utf8'),
-      cert: fs.readFileSync('cert/certificate.pem', 'utf8')
+      key: fs.readFileSync(certFile, 'utf8'),
+      cert: fs.readFileSync(keyFile, 'utf8')
     }
   }
+
   const { key, cert } = await CertificateService.provisionCert(
     domain,
     domainEmail
   )
-  fs.writeFileSync('cert/certificate.pem', cert)
-  fs.writeFileSync('cert/privatekey.pem', key)
+  
+  fs.writeFileSync(certFile, cert)
+  fs.writeFileSync(keyFile, key)
+
+  return {
+    key,
+    cert
+  }
 }
 
 /**
@@ -211,7 +219,7 @@ async function getWebPkixCert (domain, domainEmail, renewal = false) {
  * @returns
  */
 async function createSecureContext (renewal = false) {
-  const cert = await getWebPkixCert(domain, domainEmail, renewal)
+  const cert = await getAuthorizedCert(domain, domainEmail, renewal)
   return tls.createSecureContext(cert)
 }
 

@@ -1,7 +1,6 @@
 [![aegis](https://user-images.githubusercontent.com/38910830/128654405-93098731-3c31-4f52-bda0-efe95d77c5fe.png)](https://blog.federated-microservices.com)
 
-
-# NOTA BENE: Core code has been extracted to [aegis](https://github.com/module-federation/aegis). MicroLib server now loads from NPM.
+# NOTA BENE: Core code has been extracted to [aegis](https://github.com/module-federation/aegis). MicroLib server now loads from NPM
 
 # MicroLib <sub><sup>codename _ÆGIS_</sup></sub>
 
@@ -17,7 +16,6 @@
 
 ![mono-micro-fed 001](https://user-images.githubusercontent.com/38910830/126571702-0cd570fd-2a94-4560-86b0-18d514d7cb65.jpeg)
 
-
 ## TL;DR
 
 ```shell
@@ -29,8 +27,9 @@ yarn build
 yarn start
 yarn demo
 ```
+
 Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
-modules directly from GitHub. 
+modules directly from GitHub.
 
 [Importing your own app](#importing-your-own-repo)
 
@@ -84,7 +83,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Runs as web server or serverless function 
+- Runs as web server or serverless function
 - Vendor-agnostic serverless deployment (no vendor lock-in)
 - Fast deployment - no-install deployment is the shortest path
 - Self-deployment - built-in deployment automation
@@ -100,6 +99,38 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Polyglossia - components written in any lang with a WASM compile target
 - MLOps - supports ci/cd pipeline for machine learning deployment
 - AIOps - uses deep learning for adaptive, lights-outs operations
+
+### Service Mesh <sub><sup>codename _SUBSTRATE_</sup></sub>
+
+Under construction
+
+Desc: ultra high-speed service mesh for interactive media and AI inference
+
+Supports:
+
+- bespoke integration
+- transparent integration
+- distributed cache
+- distributed workflow
+- adaptive deployment
+- streaming media, MLOps
+- telemetry
+- operations analytics
+- operations automation
+- sync, async, pub/sub, req/res
+- https, websocket
+- full or switched mesh
+- clustering, failover
+- auto-scaling, self-healing
+- observable, controllable
+- MLOps for CI/CD pipeline
+- AIOps deep learning for lights out opteration
+
+Based on:
+
+- HTTP/3, QUIC transport protocol
+- WasmEdge native sockets
+- WasmEdge wasm_proxy
 
 ---
 
@@ -279,9 +310,10 @@ cert
 ```shell
 SSL_ENABLED=true
 ```
+
 ### Importing your own repo
 
-To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). Also from microlib-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack). 
+To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). Also from microlib-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack).
 
 ### Installation
 
