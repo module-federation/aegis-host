@@ -32105,7 +32105,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=master";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */

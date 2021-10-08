@@ -14,7 +14,9 @@ const remoteEntriesWasm = require('./remote-entries-wasm')
  */
 function githubPath (entry, url) {
   if (entry.owner)
-    return `${entry.owner}-${entry.repo}-${entry.filedir.split('/').join('-')}`
+    return `${entry.owner}-${entry.repo}-${entry.filedir
+      .split('/')
+      .join('-')}-${entry.branch}`
   return url.pathname.split('/').join('-')
 }
 
