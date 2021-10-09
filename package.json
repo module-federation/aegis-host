@@ -25,6 +25,7 @@
   "scripts": {
     "certs": "node src/services/ca-certs.js",
     "build": "yarn clean && npm run transpile && webpack --config webpack.config.js",
+    "start-intgrn-test": "yarn build-order-test && yarn start-daemon && yarn build-customer-test && yarn start-8072",
     "build-order-test": "cp webpack/remote-entries-order-test.js webpack/remote-entries.js && yarn build",
     "build-customer-test": "cp webpack/remote-entries-customer-test.js webpack/remote-entries.js && yarn build",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && yarn build",

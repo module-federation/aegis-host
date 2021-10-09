@@ -1,6 +1,6 @@
-const order = require('./remote-entries-order')
+//const order = require('./remote-entries-order')
 const wasm = require('./remote-entries-wasm')
 const cache = require('./remote-entries-cache')
-//const customer = require('./remote-entries-customer')
+const customer = require('./remote-entries-customer')
 
-module.exports = [order, wasm, cache].flat()
+module.exports = [customer, wasm, cache].flat()
