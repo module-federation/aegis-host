@@ -39,5 +39,3 @@ module.exports = [
     importRemote: async () => import('microservices/services')
   }
 ]
-
-//q module.exports = entries;
