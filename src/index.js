@@ -32,7 +32,6 @@ const http = require('http')
 const https = require('https')
 const websocket = require('ws')
 const express = require('express')
-const graceful = require('express-graceful-shutdown')
 const StaticFileHandler = require('serverless-aws-static-file-handler')
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
@@ -201,7 +200,7 @@ async function getAuthorizedCert (domain, domainEmail, renewal = false) {
     domain,
     domainEmail
   )
-  
+
   fs.writeFileSync(certFile, cert)
   fs.writeFileSync(keyFile, key)
 
@@ -223,6 +222,49 @@ async function createSecureContext (renewal = false) {
   return tls.createSecureContext(cert)
 }
 
+/**
+ * Shutdown gracefully. Return 503 during shutdown to prevent new connections
+ * @param {*} server
+ * @param {*} [options ]
+ * @returns
+ */
+function shutdown (server) {
+  let shuttingDown = false
+  const forceTimeout = 30000
+
+  // Graceful shutdown taken from: http://blog.argteam.com/
+  process.on('SIGTERM', gracefulExit)
+
+  function gracefulExit () {
+    // Don't bother with graceful shutdown on development to speed up round trip
+    if (!/^prod/i.test(process.env.NODE_ENV)) return process.exit(1)
+
+    if (shuttingDown) return
+    shuttingDown = true
+    console.info('Received kill signal (SIGTERM), shutting down')
+
+    setTimeout(function () {
+      console.error(
+        'Could not close connections in time, forcefully shutting down'
+      )
+      process.exit(1)
+    }, forceTimeout).unref()
+
+    server.close(function () {
+      console.info('Closed out remaining connections.')
+      process.exit()
+    })
+  }
+
+  function middleware (req, res, next) {
+    if (!shuttingDown) return next()
+    res.set('Connection', 'close')
+    res.status(503).send('Server is in the process of restarting.')
+  }
+
+  return middleware
+}
+
 /** the current cert/key pair */
 let secureCtx
 
@@ -230,36 +272,40 @@ let secureCtx
  * Start web server, optionally require secure socket.
  */
 async function startWebServer () {
-  const shutdownOptions = {
-    logger: console,
-    forceTimeout: 30000
-  }
-
   if (sslEnabled) {
+    // Get CA cert
     secureCtx = await createSecureContext()
-    // create with `secureCtx` so we can renew certs without restarting the server
+
+    // renew certs without restarting the server
     const httpsServer = https.createServer(
       {
         SNICallback: (_, cb) => cb(null, secureCtx)
       },
       app
     )
+
     // update secureCtx to refresh certificate
     app.use(
       certLoadPath,
       async () => (secureCtx = await createSecureContext(true))
     )
+
     // graceful shutdown prevents new clients from connecting & waits
     // up to `shutdownOptions.forceTimeout` for them to disconnect
-    app.use(graceful(httpsServer, shutdownOptions))
+    app.use(shutdown(httpsServer))
+
     // service mesh uses same port
     attachServiceMesh(httpsServer)
+
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
   }
   // run unsecured port regardless
   const httpServer = http.createServer(app)
-  app.use(graceful(httpServer, shutdownOptions))
+
+  // Use graceful shutdown middleware
+  app.use(shutdown(httpServer))
+
   if (sslEnabled) {
     // set up a route to redirect http to https
     httpServer.get('*', function (req, res) {
@@ -268,6 +314,7 @@ async function startWebServer () {
   } else {
     attachServiceMesh(httpServer)
   }
+
   httpServer.listen(port, checkPublicIpAddress)
 }
 
