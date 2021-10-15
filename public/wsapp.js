@@ -36,24 +36,30 @@
   }
 
   let ws
+  let intervalId
+  let timerId
 
   wsButton.onclick = function () {
     if (ws) {
       ws.onerror = ws.onopen = ws.onclose = null
       ws.close()
     }
+
     ws = new WebSocket(`ws://${location.hostname}:${location.port}`)
     ws.onerror = function (e) {
       showMessage('WebSocket error', e)
     }
+
     ws.onopen = function () {
       showMessage('WebSocket connection established')
       ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' }))
     }
+
     ws.onclose = function () {
       showMessage('WebSocket connection closed')
       ws = null
     }
+
     ws.onmessage = function (event) {
       try {
         if (event.data instanceof Blob) {
@@ -70,6 +76,7 @@
         console.error('onmessage', event, err.message)
       }
     }
+
     ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' }))
   }
 

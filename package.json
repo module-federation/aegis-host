@@ -25,6 +25,7 @@
     "build-customer": "cp webpack/remote-entries-cache-customer.js webpack/remote-entries.js && yarn build",
     "start": "node --title aegis dist/index.js",
     "start-8070": "yarn start 8070",
+    "start-8072": "yarn start 8072",
     "start-intgrn-test": "yarn build-order-test && yarn start-daemon-orders && yarn build-customer-test && yarn start-daemon-customers",
     "start-daemon": "sh scripts/daemon.sh",
     "start-daemon-orders": "sh scripts/daemon-orders.sh",
@@ -67,7 +68,7 @@
   "license": "MIT",
   "dependencies": {
     "@assemblyscript/loader": "^0.19.12",
-    "@module-federation/aegis": "^0.0.0-beta.26",
+    "@module-federation/aegis": "^0.0.0-beta.28",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "assemblyscript": "^0.19.12",
