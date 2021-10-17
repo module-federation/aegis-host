@@ -36,8 +36,6 @@
   }
 
   let ws
-  let intervalId
-  let timerId
 
   wsButton.onclick = function () {
     if (ws) {
@@ -52,7 +50,7 @@
 
     ws.onopen = function () {
       showMessage('WebSocket connection established')
-      ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' }))
+      ws.send(JSON.stringify({ proto: 'webswitch', pid: 1, role: 'browser' }))
     }
 
     ws.onclose = function () {

@@ -51,9 +51,6 @@ const sslEnabled = // required in production
 // enable authorization if selected
 const app = AuthorizationService.protectRoutes(express(), '/microlib')
 
-// write out our process id for stop scripts
-fs.writeFileSync('PID', `${process.pid}\n`, 'utf-8')
-
 function isServerless () {
   return (
     /true/i.test(process.env.SERVERLESS) || /serverless/i.test(process.title)
@@ -316,6 +313,8 @@ async function startWebServer () {
   }
 
   httpServer.listen(port, checkPublicIpAddress)
+  // write out our process id for stop scripts
+  fs.writeFileSync('PID', `${process.pid}\n`, 'utf-8')
 }
 
 /**

@@ -1,0 +1,258 @@
+zackwashere /Users/tyson/microlib/auth/key-set.json
+>>>>>>>>>chunkId 610
+github url URL {
+  href: 'https://api.github.com/610.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/610.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'customer4' },
+  hash: ''
+}
+>>>>>>>>>chunkId 662
+github url URL {
+  href: 'https://api.github.com/662.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/662.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'customer4' },
+  hash: ''
+}
+0d05e2a92a9a1eb656ba73e65b888325f68ab1b5
+d7880c64634529e0528ec13799bd0d83a70f4de8
+modules [
+  Object [Module] {
+    Address: [Getter],
+    Event: [Getter],
+    Payment: [Getter],
+    Shipping: [Getter],
+    EventBus: [Getter]
+  }
+]
+service import took 1612 ms
+>>>>>>>>>chunkId 610
+modules [
+  Object [Module] {
+    validateAddress: [Getter],
+    authorizePayment: [Getter],
+    completePayment: [Getter],
+    refundPayment: [Getter],
+    shipOrder: [Getter],
+    trackShipment: [Getter],
+    verifyDelivery: [Getter],
+    listen: [Getter],
+    notify: [Getter],
+    pickOrder: [Getter]
+  }
+]
+adapter import took 0 ms
+{
+  services: {
+    Address: { validateAddress: [Function: validateAddress] },
+    Event: {
+      listening: false,
+      topics: /(?:)/,
+      listen: [Function: listen],
+      notify: [Function: notify]
+    },
+    Payment: {
+      authorizePayment: [Function: authorizePayment],
+      completePayment: [Function: completePayment],
+      refundPayment: [Function: refundPayment]
+    },
+    Shipping: {
+      serviceName: 'shippingService',
+      topic: 'shippingChannel',
+      shipOrder: [Function: shipOrder],
+      trackShipment: [Function: trackShipment],
+      verifyDelivery: [Function: verifyDelivery],
+      returnShipment: [Function: returnShipment],
+      getPayload: [Function: getPayload],
+      getProperty: [Function: getProperty]
+    },
+    EventBus: { notify: [Function: notify], listen: [Function: listen] }
+  },
+  adapters: {
+    validateAddress: [Function: validateAddress],
+    authorizePayment: [Function: authorizePayment],
+    completePayment: [Function: completePayment],
+    refundPayment: [Function: refundPayment],
+    shipOrder: [Function: shipOrder],
+    trackShipment: [Function: trackShipment],
+    verifyDelivery: [Function: verifyDelivery],
+    listen: [Function: listen],
+    notify: [Function: notify],
+    pickOrder: [Function: pickOrder]
+  },
+  overrides: {
+    save: [Function: save],
+    remove: [Function: remove],
+    find: [Function: find],
+    update: [Function: update],
+    close: [Function: close],
+    StorageService: { Persistence: [Object] }
+  }
+}
+>>>>>>>>>chunkId 610
+>>>>>>>>>chunkId 583
+github url URL {
+  href: 'https://api.github.com/583.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/583.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'customer4' },
+  hash: ''
+}
+github url https://api.github.com
+dbe8111e01f3c394130164688f0da06e7bb77a69
+wasm modules took 868ms
+constructObject 26672
+constructObject 27344
+{
+  modelName: 'wasm',
+  endpoint: 'wasm',
+  factory: [Function: factory],
+  onUpdate: [Function: onUpdate],
+  onDelete: [Function: onDelete],
+  commands: {
+    serviceMeshListen: { command: [Function: command], acl: [Array] },
+    serviceMeshNotify: { command: [Function: command], acl: [Array] },
+    serviceMeshCallback: { command: [Function: command], acl: [Array] },
+    runFibonacci: { command: [Function: command], acl: [Array] },
+    fibonacci: { command: [Function: command], acl: [Array] },
+    commandEx: { command: [Function: command], acl: [Array] }
+  },
+  ports: {
+    notify: {
+      service: 'Event',
+      type: '0',
+      callback: [Function: callback],
+      undo: [Function: undo]
+    },
+    listen: {
+      service: 'Event',
+      type: '0',
+      callback: [Function: callback],
+      undo: [Function: undo]
+    }
+  },
+  dispose: [Function: dispose]
+}
+modules [
+  Object [Module] { models: [Getter] },
+  {
+    modelName: 'wasm',
+    endpoint: 'wasm',
+    factory: [Function: factory],
+    onUpdate: [Function: onUpdate],
+    onDelete: [Function: onDelete],
+    commands: {
+      serviceMeshListen: [Object],
+      serviceMeshNotify: [Object],
+      serviceMeshCallback: [Object],
+      runFibonacci: [Object],
+      fibonacci: [Object],
+      commandEx: [Object]
+    },
+    ports: { notify: [Object], listen: [Object] },
+    dispose: [Function: dispose]
+  }
+]
+model import took 1677 ms
+running in webserver mode
+{ endpoint: 'customers', fn: [AsyncFunction: getModels] }
+{ endpoint: 'products', fn: [AsyncFunction: getModels] }
+{ endpoint: 'wasm', fn: [AsyncFunction: getModels] }
+{ endpoint: 'customers', fn: [AsyncFunction: postModel] }
+{ endpoint: 'products', fn: [AsyncFunction: postModel] }
+{ endpoint: 'wasm', fn: [AsyncFunction: postModel] }
+{ endpoint: 'customers', fn: [AsyncFunction: getModelById] }
+{ endpoint: 'products', fn: [AsyncFunction: getModelById] }
+{ endpoint: 'wasm', fn: [AsyncFunction: getModelById] }
+{ endpoint: 'customers', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'products', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'wasm', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'customers', fn: [AsyncFunction: deleteModel] }
+{ endpoint: 'products', fn: [AsyncFunction: deleteModel] }
+{ endpoint: 'wasm', fn: [AsyncFunction: deleteModel] }
+{ endpoint: 'customers', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'products', fn: [AsyncFunction: patchModel] }
+{ endpoint: 'wasm', fn: [AsyncFunction: patchModel] }
+
+total time to import & register remote modules: 3.294s
+
+time to load cache: 10.216ms
+local models [ 'customer', 'product', 'wasm' ] remote models [ 'order' ]
+listen for unhandled consumer events
+ [] 
+forward unhandled producer events
+ []
+
+ 🌎 ÆGIS listening on http://localhost:8070 
+
+can't connect to db - using memory
+can't connect to db - using memory
+can't connect to db - using memory
+dnsResolve warning Error: queryCname ENODATA localhost
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:171:17) {
+  errno: undefined,
+  code: 'ENODATA',
+  syscall: 'queryCname',
+  hostname: 'localhost'
+}
+dnsResolve warning Error: queryCname ENODATA localhost
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:171:17) {
+  errno: undefined,
+  code: 'ENODATA',
+  syscall: 'queryCname',
+  hostname: 'localhost'
+}
+resolved host address 127.0.0.1
+resolved host address 127.0.0.1
+[Function: addListener] Error: connect ECONNREFUSED 127.0.0.1:80
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1142:16) {
+  errno: -61,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Received SIGTERM - app shutdown in progress
+/Users/tyson/microlib/dist/src_server_js.js:354
+                                return StorageService.close();
+                                                      ^
+
+TypeError: StorageService.close is not a function
+    at /Users/tyson/microlib/dist/src_server_js.js:354:55
+    at shutdown (/Users/tyson/microlib/dist/src_server_js.js:280:5)
+    at process.<anonymous> (/Users/tyson/microlib/dist/src_server_js.js:353:38)
+    at process.emit (node:events:406:35)

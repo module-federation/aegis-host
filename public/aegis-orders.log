@@ -1,0 +1,21 @@
+zackwashere /Users/tyson/microlib/auth/key-set.json
+Error: Cannot find module './remoteEntry'
+Require stack:
+- /Users/tyson/microlib/dist/noop.js
+    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:933:15)
+    at resolveFileName (/Users/tyson/microlib/node_modules/import-fresh/node_modules/resolve-from/index.js:29:39)
+    at resolveFrom (/Users/tyson/microlib/node_modules/import-fresh/node_modules/resolve-from/index.js:43:9)
+    at module.exports (/Users/tyson/microlib/node_modules/import-fresh/node_modules/resolve-from/index.js:46:41)
+    at module.exports (/Users/tyson/microlib/node_modules/import-fresh/index.js:14:19)
+    at startMicroLib (/Users/tyson/microlib/dist/index.js:90:23)
+    at startService (/Users/tyson/microlib/dist/index.js:334:11)
+    at Object.<anonymous> (/Users/tyson/microlib/dist/index.js:348:5)
+    at Module._compile (node:internal/modules/cjs/loader:1101:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)
+    at Module.load (node:internal/modules/cjs/loader:981:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:79:12)
+    at node:internal/main/run_main_module:17:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/Users/tyson/microlib/dist/noop.js' ]
+}

@@ -10,7 +10,7 @@ const sslEnabled = /true/i.test(process.env.SSL_ENABLED)
 const publicPort = sslEnabled ? sslPort : port
 const chalk = require('chalk')
 
-module.exports = env => {
+const server = env => {
   console.log(env)
   if (env.serverless) {
     remoteEntries.forEach(e => (e.path = 'webpack'))
@@ -68,3 +68,5 @@ module.exports = env => {
     })
   })
 }
+
+module.exports = [server]
