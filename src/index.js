@@ -37,8 +37,11 @@ const StaticFileHandler = require('serverless-aws-static-file-handler')
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
 const sslPort = process.env.SSL_PORT || 443
 const apiRoot = process.env.API_ROOT || '/microlib/api'
+const keyFile = 'cert/privatekey.pem'
+const certFile = 'cert/certificate.pem'
 const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
 const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
+const forceTimeout = 3000 // time to wait for conn to drop before closing server
 const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const checkPublicIpUrl =
@@ -81,10 +84,14 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
   if (hot) {
     // clear stale routes
     clearRoutes()
-    // clear cache on hot reload
+    // clear cache on hot reload:
+    // even though we just loaded a
+    // fresh copy, the other imports
+    // aren't fresh & need to be purged
     serverModule.default.clear()
   }
   await serverModule.default.start(app, serverless)
+  // return a method for invoking controllers
   return serverModule.default.invoke
 }
 
@@ -152,7 +159,8 @@ function checkPublicIpAddress () {
  * Attach {@link MeshService} to the API listener socket.
  * Listen for upgrade events from http server and switch
  * to WebSockets protocol. Clients connecting this way are
- * using the service mesh, not the API.
+ * using the service mesh, not the REST API. This wil need
+ * to be reimplemented when mesh switches to QUIC protocol
  *
  * @param {https.Server|http.Server} server
  */
@@ -171,21 +179,19 @@ function attachServiceMesh (server) {
 }
 
 /**
- * Programmatically provision CA cert using rfc
+ * Programmatically provision CA cert using RFC
  * https://datatracker.ietf.org/doc/html/rfc8555
  *
  * {@link CertificateService} kicks off automated
- * id challenge test conducted by the issuing CA.
- * If tests pass, hands back the cert and key.
+ * id challenge test, conducted by the issuing CA.
+ * If test passes or if cert already exists, hand
+ * back the cert and private key.
  *
  * @param {*} domain
  * @param {*} domainEmail
  * @returns
  */
 async function getAuthorizedCert (domain, domainEmail, renewal = false) {
-  const certFile = 'cert/certificate.pem'
-  const keyFile = 'cert/privatekey.pem'
-
   if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
     return {
       key: fs.readFileSync(certFile, 'utf8'),
@@ -227,14 +233,14 @@ async function createSecureContext (renewal = false) {
  */
 function shutdown (server) {
   let shuttingDown = false
-  const forceTimeout = 30000
+  const devTimeout = 3000
 
   // Graceful shutdown taken from: http://blog.argteam.com/
-  process.on('SIGTERM', gracefulExit)
-
-  function gracefulExit () {
-    // Don't bother with graceful shutdown on development to speed up round trip
-    if (!/^prod/i.test(process.env.NODE_ENV)) return process.exit(1)
+  process.on('SIGTERM', () => {
+    // shorter timeout in dev
+    const timeout = !/^prod.*/i.test(process.env.NODE_ENV)
+      ? devTimeout
+      : forceTimeout
 
     if (shuttingDown) return
     shuttingDown = true
@@ -242,16 +248,16 @@ function shutdown (server) {
 
     setTimeout(function () {
       console.error(
-        'Could not close connections in time, forcefully shutting down'
+        'Taking too long to close connections, forcefully shutting down'
       )
       process.exit(1)
-    }, forceTimeout).unref()
+    }, timeout).unref()
 
     server.close(function () {
       console.info('Closed out remaining connections.')
       process.exit()
     })
-  }
+  })
 
   function middleware (req, res, next) {
     if (!shuttingDown) return next()
@@ -338,7 +344,7 @@ if (!isServerless()) {
   if (clusterEnabled) {
     // Fork child processes (one per core)
     // children share socket descriptor (round-robin)
-    ClusterService.start(startService)
+    ClusterService.startCluster(startService)
   } else {
     startService()
   }
