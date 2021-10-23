@@ -1547,10 +1547,10 @@
     semver "^7.3.4"
     tar "^6.1.0"
 
-"@module-federation/aegis@^0.0.0-beta.26":
-  version "0.0.0-beta.26"
-  resolved "https://registry.npmjs.org/@module-federation/aegis/-/aegis-0.0.0-beta.26.tgz"
-  integrity sha512-l4bxlPUcm2TdKhAjiYweo2EQDZTjTZ0NPyj40JnuTkq5RUU3fQ1WQ4Y1qmLNurdZTe/Jq30kaNFzQaD1VHr7pg==
+"@module-federation/aegis@^0.0.0-beta.29":
+  version "0.0.0-beta.29"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-beta.29.tgz#3d972a1bcd16b323dea2ae1246c2aec8e16c40bf"
+  integrity sha512-pMjQJnx0zSWV7h/etK4WuODOkq6sH8LMRmr4XDt/i0213iZGDMJXzUdS+Y8wDjpw8rQNw1WgpLJh3o5I4UGn3A==
   dependencies:
     "@assemblyscript/loader" "^0.19.12"
     "@octokit/core" "^3.4.0"
@@ -1566,7 +1566,6 @@
     ipfs "^0.58.2"
     jwks-rsa "^2.0.1"
     mongodb "^4.0.0"
-    mongodb-client-encryption "^1.2.3"
     nanoid "^3.1.20"
     nats "^2.2.0"
     regenerator-runtime "^0.13.7"
