@@ -1,0 +1,45 @@
+{
+  "env": {
+    "desc": "Example .env file",
+    "datasources": {
+      "DataSourceMemory": {
+        "desc": "Non-persistent, in-memory storage",
+        "enabled": false
+      },
+      "DataSourceFile": {
+        "desc": "Persistent storage on local file system",
+        "enabled": false
+      },
+      "DataSourceMongoDb": {
+        "desc": "Persistent NoSQL, JSON document storage",
+        "enabled": false
+      },
+      "DataSourceMesh": {
+        "desc": "Data distributed across service mesh network",
+        "enabled": true
+      }
+    },
+    "serviceMesh": {
+      "WebSwitch": {
+        "desc": "Default implementation. Switched mesh over web sockets.",
+        "enabled": false,
+        "host": "localhost",
+        "port": 80,
+        "heartbeat": 30000,
+        "debug": false
+      },
+      "MeshLink": {
+        "desc": "Fast, UDP-based, peer-to-peer mesh, with shared Redis cache.",
+        "enabled": true
+      },
+      "QuicMesh": {
+        "desc": "Mesh over QUIC transport protocol. Replaces TCP in HTTP/3. Optimized for streaming.",
+        "enabled": false
+      },
+      "NatsMesh": {
+        "desc": "Mesh uses NATs at Layer 7.",
+        "enabled": false
+      }
+    }
+  }
+}

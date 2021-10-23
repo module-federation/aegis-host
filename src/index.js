@@ -39,9 +39,9 @@ const sslPort = process.env.SSL_PORT || 443
 const apiRoot = process.env.API_ROOT || '/microlib/api'
 const keyFile = 'cert/privatekey.pem'
 const certFile = 'cert/certificate.pem'
-const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
-const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
 const forceTimeout = 3000 // time to wait for conn to drop before closing server
+const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
+const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
 const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const checkPublicIpUrl =
@@ -84,14 +84,12 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
   if (hot) {
     // clear stale routes
     clearRoutes()
-    // clear cache on hot reload:
-    // even though we just loaded a
-    // fresh copy, the other imports
-    // aren't fresh & need to be purged
+    // clear cache on hot reload: even though we just loaded a fresh
+    // copy, the other imports are not fresh and need to be purged
     serverModule.default.clear()
   }
   await serverModule.default.start(app, serverless)
-  // return a method for invoking controllers
+  // `invoke` calls the server's controllers directly
   return serverModule.default.invoke
 }
 
@@ -214,18 +212,6 @@ async function getAuthorizedCert (domain, domainEmail, renewal = false) {
 }
 
 /**
- * Using {@link tls.createSecureContext} to create/renew
- * certs without restarting the server
- *
- * @param {boolean} renewal
- * @returns
- */
-async function createSecureContext (renewal = false) {
-  const cert = await getAuthorizedCert(domain, domainEmail, renewal)
-  return tls.createSecureContext(cert)
-}
-
-/**
  * Shutdown gracefully. Return 503 during shutdown to prevent new connections
  * @param {*} server
  * @param {*} [options ]
@@ -266,6 +252,18 @@ function shutdown (server) {
   }
 
   return middleware
+}
+
+/**
+ * Using {@link tls.createSecureContext} to create/renew
+ * certs without restarting the server
+ *
+ * @param {boolean} renewal
+ * @returns
+ */
+async function createSecureContext (renewal = false) {
+  const cert = await getAuthorizedCert(domain, domainEmail, renewal)
+  return tls.createSecureContext(cert)
 }
 
 /** the current cert/key pair */
@@ -311,7 +309,7 @@ async function startWebServer () {
 
   if (sslEnabled) {
     // set up a route to redirect http to https
-    httpServer.get('*', function (req, res) {
+    httpServer.all('*', function (req, res) {
       res.redirect('https://' + req.headers.host + req.url)
     })
   } else {
