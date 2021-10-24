@@ -104,7 +104,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 
 Under construction
 
-Desc: ultra high-speed service mesh for interactive media and AI inference
+Desc: high-speed service mesh for interactive media and AI inference
 
 Supports:
 
@@ -113,24 +113,26 @@ Supports:
 - distributed cache
 - distributed workflow
 - adaptive deployment
-- streaming media, MLOps
+- streaming media
 - telemetry
 - operations analytics
 - operations automation
 - sync, async, pub/sub, req/res
-- https, websocket
+- https, websocket, http/3, quic
 - full or switched mesh
 - clustering, failover
-- auto-scaling, self-healing
-- observable, controllable
-- MLOps for CI/CD pipeline
-- AIOps deep learning for lights out opteration
+- auto-scaling,
+- observable / controllable
+- MLOps CI/CD pipeline
+- AIOps deep learning for lights out operations
+- Pluggable - plug in NATS, Envoy, etc as needed
 
 Based on:
 
-- HTTP/3, QUIC transport protocol
-- WasmEdge native sockets
-- WasmEdge wasm_proxy
+- QUIC transport protocol (HTTP/3)
+- WasmEdge + TensorFlow
+- WebRTC
+
 
 ---
 

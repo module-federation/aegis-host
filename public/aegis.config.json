@@ -1,6 +1,17 @@
 {
   "env": {
-    "desc": "Example .env file",
+    "distributedCache": {
+      "enabled": true
+    },
+    "serviceMesh": {
+      "enabled": true
+    },
+    "restartWorflow": true,
+    "checkIpHost": "https://checkip.amazonaws.com"
+  },
+  "adapters": {
+    "desc": "services config",  
+    "datasourceAdapter": "DataSourceFile",
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",
@@ -12,13 +23,17 @@
       },
       "DataSourceMongoDb": {
         "desc": "Persistent NoSQL, JSON document storage",
-        "enabled": false
+        "enabled": false,
+        "url": "mongodb://localhost:27017",
+        "cacheSize": 3000
       },
       "DataSourceMesh": {
         "desc": "Data distributed across service mesh network",
         "enabled": true
       }
-    },
+    }
+  },
+  "services": {
     "serviceMesh": {
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
@@ -26,19 +41,12 @@
         "host": "localhost",
         "port": 80,
         "heartbeat": 30000,
-        "debug": false
+        "debug": false,
+        "uplink": null
       },
       "MeshLink": {
         "desc": "Fast, UDP-based, peer-to-peer mesh, with shared Redis cache.",
         "enabled": true
-      },
-      "QuicMesh": {
-        "desc": "Mesh over QUIC transport protocol. Replaces TCP in HTTP/3. Optimized for streaming.",
-        "enabled": false
-      },
-      "NatsMesh": {
-        "desc": "Mesh uses NATs at Layer 7.",
-        "enabled": false
       }
     }
   }

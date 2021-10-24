@@ -15,6 +15,8 @@ require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
 
+global.aegisConfig = require('../public/aegis.config.json')
+
 const { adapters, services } = require('@module-federation/aegis')
 
 const {
