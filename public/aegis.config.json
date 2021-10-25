@@ -1,17 +1,21 @@
 {
+  "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
   "env": {
+    "desc": "live-updateable environmental vars",
     "distributedCache": {
+      "desc": "enables transparent integration between aegis instances",
       "enabled": true
     },
     "serviceMesh": {
+      "desc": "service mesh enabled or not: disable to use external, federated event bus",
       "enabled": true
     },
     "restartWorflow": true,
     "checkIpHost": "https://checkip.amazonaws.com"
   },
   "adapters": {
-    "desc": "services config",  
-    "datasourceAdapter": "DataSourceFile",
+    "desc": "adapter config",
+    "defaultDatasource": "DataSourceFile",
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",
@@ -19,21 +23,22 @@
       },
       "DataSourceFile": {
         "desc": "Persistent storage on local file system",
-        "enabled": false
+        "enabled": true
       },
       "DataSourceMongoDb": {
         "desc": "Persistent NoSQL, JSON document storage",
-        "enabled": false,
         "url": "mongodb://localhost:27017",
         "cacheSize": 3000
       },
       "DataSourceMesh": {
         "desc": "Data distributed across service mesh network",
-        "enabled": true
+        "enabled": false
       }
     }
   },
   "services": {
+    "desc": "services config",
+    "activeServiceMesh": "MeshLink",
     "serviceMesh": {
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
@@ -45,8 +50,28 @@
         "uplink": null
       },
       "MeshLink": {
-        "desc": "Fast, UDP-based, peer-to-peer mesh, with shared Redis cache.",
-        "enabled": true
+        "desc": "Fast UDP-based, peer-to-peer mesh, with shared Redis cache.",
+        "enabled": true,
+        "config": {
+          "redis": {
+            "host": "127.0.0.1",
+            "port": 6379
+          },
+          "ttl": 1000000000,
+          "prefix": "aegis",
+          "strict": false,
+          "relayLimit": 1,
+          "relayDelay": 0,
+          "updateInterval": 1000
+        }
+      },
+      "NatsMesh": {
+        "desc": "Use NATS at layer 7",
+        "enabled": false
+      },
+      "QuicMesh": {
+        "desc": "Uses QUIC transport protocol (replacing TCP in HTTP/3). Optimized for streaming.",
+        "enabled": false
       }
     }
   }
