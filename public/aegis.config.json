@@ -33,6 +33,18 @@
       "DataSourceMesh": {
         "desc": "Data distributed across service mesh network",
         "enabled": false
+      },
+      "DataSourceIpfs": {
+        "desc": "Data distributed over web (interplanetary file system)",
+        "enabled": false
+      },
+      "DataSourceEtherium": {
+        "desc": "Data distributed over web on Etherium blockchain",
+        "enabled": false
+      },
+      "DataSourceSolidPod": {
+        "desc": "Data on Sir Tim Berners Lee's solid pod",
+        "enabled": false
       }
     }
   },
