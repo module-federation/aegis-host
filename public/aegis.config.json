@@ -19,7 +19,7 @@
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",
-        "enabled": false
+        "enabled": true
       },
       "DataSourceFile": {
         "desc": "Persistent storage on local file system",
@@ -27,6 +27,7 @@
       },
       "DataSourceMongoDb": {
         "desc": "Persistent NoSQL, JSON document storage",
+        "enabled": true,
         "url": "mongodb://localhost:27017",
         "cacheSize": 3000
       },
@@ -43,7 +44,7 @@
         "enabled": false
       },
       "DataSourceSolidPod": {
-        "desc": "Data on Sir Tim Berners Lee's solid pod",
+        "desc": "Data on Sir Tim Berners Lee's Solid Pod",
         "enabled": false
       }
     }
@@ -53,7 +54,7 @@
     "activeServiceMesh": "WebSwitch",
     "serviceMesh": {
       "WebSwitch": {
-        "desc": "Default implementation. Switched mesh over web sockets.",
+        "desc": "Default implementation: switched mesh over web sockets.",
         "enabled": true,
         "host": "localhost",
         "port": 80,
@@ -79,7 +80,8 @@
       },
       "NatsMesh": {
         "desc": "Use NATS at layer 7",
-        "enabled": false
+        "enabled": true,
+        "servers": "localhost:4222"
       },
       "QuicMesh": {
         "desc": "Uses QUIC transport protocol (replacing TCP in HTTP/3). Optimized for streaming.",
