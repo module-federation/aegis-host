@@ -1,10 +1,8 @@
 'use strict'
 
-const pipe = require('@module-federation/aegis/lib/domain/util/pipe')
 const { Octokit } = require('@octokit/rest')
 const fs = require('fs')
 const path = require('path')
-const remoteEntriesWasm = require('./remote-entries-wasm')
 
 /**
  * Allow multiple entry points from different owners, repos, etc on github.
@@ -21,7 +19,6 @@ function githubPath (entry, url) {
 }
 
 function generateFilename (entry) {
-  if (!(entry && entry.url)) return
   const url = new URL(entry.url)
   const hostpart = url.hostname.split('.').join('-')
   const portpart = url.port ? url.port : 80
@@ -55,7 +52,7 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
  * @param {*} path where to write file contents
  * @returns
  */
-async function githubFetch (entry, path) {
+async function octoGet (entry, path) {
   return octokit
     .request(
       'GET https://api.github.com/repos/{owner}/{repo}/contents/{filedir}?ref={branch}',
@@ -125,7 +122,7 @@ function deduplicate (entries) {
     .reduce((p, c) => ({ ...p, ...c }), entries)
 }
 
-function removeWasmObjects (remoteEntries) {
+function removeWasmEntries (remoteEntries) {
   if (remoteEntries) return remoteEntries.filter(e => e && !e.wasm)
 }
 
@@ -134,8 +131,7 @@ function validateEntries (remoteEntries) {
     console.log('entries missing or invalid')
     throw new Error('entries missing or invalid')
   }
-  return removeWasmObjects(remoteEntries)
-  //  return pipe(removeWasmObjects, removeEmptyObjects)(remoteEntries);
+  return remoteEntries
 }
 
 /**
@@ -150,7 +146,7 @@ function validateEntries (remoteEntries) {
  */
 module.exports = async remoteEntry => {
   console.info(remoteEntry)
-  const validEntries = validateEntries(remoteEntry)
+  const validEntries = removeWasmEntries(validateEntries(remoteEntry))
   if (validEntries.length < 1) return
 
   const remotes = await Promise.all(
@@ -163,7 +159,7 @@ module.exports = async remoteEntry => {
 
         if (/^https:\/\/api.github.com.*/i.test(entry.url)) {
           // Download from github.
-          await githubFetch(entry, path)
+          await octoGet(entry, path)
           resolvePath()
         } else {
           httpGet(entry, path, resolvePath)
