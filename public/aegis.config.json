@@ -38,7 +38,7 @@
   },
   "services": {
     "desc": "services config",
-    "activeServiceMesh": "MeshLink",
+    "activeServiceMesh": "WebSwitch",
     "serviceMesh": {
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
