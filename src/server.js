@@ -164,12 +164,12 @@ const App = (() => {
     console.warn('potential config issue', path, method)
   }
 
-  function shutdown (shutdownTasks) {
+  function shutdown (shutdownTasks = () => {}) {
     console.warn('Received SIGTERM - app shutdown in progress')
     shutdownTasks()
   }
 
-  /**
+  /**q
    * Clear everything bundled by remoteEntry.js
    * (models & remoteEntry config), i.e. all the
    * user code downloaded from the remote. This is
@@ -198,7 +198,7 @@ const App = (() => {
    */
   async function start (router, serverless = false) {
     const serverMode = serverless ? make.serverless.name : make.webserver.name
-    const overrides = { ...StorageAdapter, StorageService }
+    const overrides = { ...StorageAdapter, Persistence: StorageService }
 
     const label = '\ntotal time to import & register remote modules'
     console.time(label)
@@ -219,7 +219,7 @@ const App = (() => {
           make.admin(http, serverMode, router)
 
           console.timeEnd(label)
-          process.on('SIGTERM', () => shutdown(() => StorageService.close()))
+          process.on('SIGTERM', shutdown)
           cache.load()
           return invoke
         })

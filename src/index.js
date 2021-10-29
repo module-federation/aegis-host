@@ -320,7 +320,7 @@ async function startWebServer () {
 
   httpServer.listen(port, checkPublicIpAddress)
   // write out our process id for stop scripts
-  fs.writeFileSync('PID', `${process.pid}\n`, 'utf-8')
+  fs.writeFileSync(`${process.title}.pid`, `${process.pid}\n`, 'utf-8')
 }
 
 /**
