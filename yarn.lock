@@ -1559,10 +1559,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@module-federation/aegis@^0.0.0-beta.39":
-  version "0.0.0-beta.39"
-  resolved "https://registry.npmjs.org/@module-federation/aegis/-/aegis-0.0.0-beta.39.tgz"
-  integrity sha512-wN2iDz59uSYNEjXMjXx7/suxnf7ehfDgoxzHEwSJJhbaaQz6k/3FaXKURYKP2spKwANQXOzl7BCHIIuUSaO+2Q==
+"@module-federation/aegis@^0.0.0-beta.41":
+  version "0.0.0-beta.41"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-0.0.0-beta.41.tgz#8fe3460e30a57cada0f34b6e04c0456647671b43"
+  integrity sha512-vgLM8pmgDusGMmtkvf7uGzvCEPR6m0zSkmQY1ZoM/bb3U3WmGgsdRiJ2Il9uUFNsE520JllihVZs+MpAuOZnEg==
   dependencies:
     "@assemblyscript/loader" "0.19.17"
     "@octokit/core" "3.5.1"
