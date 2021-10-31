@@ -15,9 +15,7 @@ require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
 
-global.aegisConfig = require('../public/aegis.config.json')
-
-const { adapters, services } = require('@module-federation/aegis')
+const { adapters, services } = require('../../aegis/lib')
 
 const {
   AuthorizationService,
@@ -34,7 +32,7 @@ const http = require('http')
 const https = require('https')
 const websocket = require('ws')
 const express = require('express')
-const StaticFileHandler = require('serverless-aws-static-file-handler')
+//const StaticFileHandler = require('serverless-aws-static-file-handler')
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
 const sslPort = process.env.SSL_PORT || 443
@@ -367,7 +365,7 @@ exports.handleServerlessRequest = async function (...args) {
   serverlessAdapter.invokeController(...args)
 }
 
-const fileHandler = new StaticFileHandler('public')
+// const fileHandler = new StaticFileHandler('public')
 
 /**
  * Serve static files, i.e. the demo app.
@@ -375,9 +373,9 @@ const fileHandler = new StaticFileHandler('public')
  * @param {*} context
  * @returns
  */
-exports.serveHtml = async (event, context) => {
-  console.debug({ event, context })
-  console.log(event.path)
-  event.path = 'index.html'
-  return fileHandler.get(event, context)
-}
+// exports.serveHtml = async (event, context) => {
+//   console.debug({ event, context })
+//   console.log(event.path)
+//   event.path = 'index.html'
+//   return fileHandler.get(event, context)
+// }

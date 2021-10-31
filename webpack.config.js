@@ -20,7 +20,7 @@ const server = env => {
     fetchRemotes(remoteEntries).then(remotes => {
       console.info(remotes)
       resolve({
-        externals: [nodeExternals()],
+        externals: [nodeExternals(), 'mongodb-client-encryption'],
         target: 'async-node',
         mode: 'development',
         devtool: 'source-map',
@@ -59,7 +59,8 @@ const server = env => {
             remotes,
             exposes: {
               './server': './src/server',
-              './domain': '@module-federation/aegis/lib/domain',
+              //'./domain': '@module-federation/aegis/lib/domain',
+              './domain': '../aegis/lib/domain',
               './remoteEntries': './webpack/remote-entries'
             }
           })

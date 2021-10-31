@@ -13,7 +13,7 @@ github url URL {
   search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
   searchParams: URLSearchParams {
     'owner' => 'module-federation',
-    'repo' => 'microlib-example',
+    'repo' => 'microlib-examples',
     'filedir' => 'dist',
     'branch' => 'customer4' },
   hash: ''
@@ -32,7 +32,7 @@ github url URL {
   search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
   searchParams: URLSearchParams {
     'owner' => 'module-federation',
-    'repo' => 'microlib-example',
+    'repo' => 'microlib-examples',
     'filedir' => 'dist',
     'branch' => 'customer4' },
   hash: ''
@@ -127,7 +127,7 @@ github url URL {
   search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=customer4',
   searchParams: URLSearchParams {
     'owner' => 'module-federation',
-    'repo' => 'microlib-example',
+    'repo' => 'microlib-examples',
     'filedir' => 'dist',
     'branch' => 'customer4' },
   hash: ''

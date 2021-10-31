@@ -4,9 +4,7 @@
  * @typedef {import("./remote-entries-type")} entries
  */
 
-const {
-  importWebAssembly
-} = require('@module-federation/aegis').adapters.webassembly
+const { importWebAssembly } = require('../../aegis/lib').adapters.webassembly
 
 /** @type {entries} */
 const entries = [

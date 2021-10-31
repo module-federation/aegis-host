@@ -10,7 +10,7 @@ module.exports = [
   {
     name: 'microservices',
     url: 'https://api.github.com',
-    repo: 'microlib-example',
+    repo: 'microlib-examples',
     owner: 'module-federation',
     filedir: 'dist',
     branch: 'master',
@@ -21,7 +21,7 @@ module.exports = [
   {
     name: 'adapters',
     url: 'https://api.github.com',
-    repo: 'microlib-example',
+    repo: 'microlib-examples',
     owner: 'module-federation',
     filedir: 'dist',
     branch: 'master',
@@ -32,7 +32,7 @@ module.exports = [
   {
     name: 'services',
     url: 'https://api.github.com',
-    repo: 'microlib-example',
+    repo: 'microlib-examples',
     owner: 'module-federation',
     filedir: 'dist',
     branch: 'master',
