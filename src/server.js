@@ -174,16 +174,21 @@ const App = (() => {
    * (models & remoteEntry config), i.e. all the
    * user code downloaded from the remote. This is
    * the code that needs to be disposed of & reimported.
+   * Call `setImmediate` so we execute during the check
+   * phase, where there is nothing besides us on the 
+   * callstack and all callbacks have executed.
    */
   function clear () {
-    try {
-      Object.keys(__non_webpack_require__.cache).forEach(k => {
-        console.debug('deleting cached module', k)
-        delete __non_webpack_require__.cache[k]
-      })
-    } catch (error) {
-      console.error(error)
-    }
+    setImmediate(() => {
+      try {
+        Object.keys(__non_webpack_require__.cache).forEach(k => {
+          console.debug('deleting cached module', k)
+          delete __non_webpack_require__.cache[k]
+        })
+      } catch (error) {
+        console.error(error)
+      }
+    })
   }
 
   /**

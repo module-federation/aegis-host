@@ -51,7 +51,7 @@
   },
   "services": {
     "desc": "services config",
-    "activeServiceMesh": "MeshLink",
+    "activeServiceMesh": "WebSwitch",
     "serviceMesh": {
       "WebSwitch": {
         "desc": "Default implementation: switched mesh over web sockets.",
@@ -65,6 +65,7 @@
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh, with shared Redis cache.",
         "enabled": true,
+        "debug": true,
         "config": {
           "redis": {
             "host": "127.0.0.1",
