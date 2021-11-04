@@ -76,14 +76,14 @@ function clearRoutes () {
  * set API routes and load persisted data from storage.
  *
  * Note:
- * 
- * About hot reload cache purge: even though we will have just loaded a fresh 
+ *
+ * About hot reload cache purge: even though we will have just loaded a fresh
  * copy of remoteEntry.js, because the runtime only loads each module once and
- * subsequent imports don't bypass the cache, they  won't be fresh and will need 
- * to be purged. We do not cache remoteEntry.js itself, so the old copy won't be 
- * purged, but it will eventually be garbage collected since nothing will point 
+ * subsequent imports don't bypass the cache, they  won't be fresh and will need
+ * to be purged. We do not cache remoteEntry.js itself, so the old copy won't be
+ * purged, but it will eventually be garbage collected since nothing will point
  * to it anymore after reload.
- * 
+ *
  * @param {{hot:boolean, serverless:boolean}} options If `hot` is true, reload;
  * if this is a serverless function call, set `serverless` to true.
  */
@@ -95,8 +95,8 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
     // clear stale routes
     clearRoutes()
     // clear cache on hot reload: even though we just loaded a fresh
-    // copy, because the runtime only loads a library once, and its 
-    // dependencies dont bypass the cache, they are not fresh and 
+    // copy, because the runtime only loads a library once, and its
+    // dependencies dont bypass the cache, they are not fresh and
     // need to be purged
     serverModule.default.clear()
   }
@@ -159,7 +159,7 @@ function checkPublicIpAddress () {
       response.on('data', chunk => bytes.push(chunk))
       response.on('end', function () {
         const ipAddr = bytes.join('').trim()
-        console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${p} \n`)
+        console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`)
       })
     }
   )

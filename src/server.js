@@ -164,9 +164,8 @@ const App = (() => {
     console.warn('potential config issue', path, method)
   }
 
-  function shutdown (shutdownTasks = () => {}) {
+  function shutdown () {
     console.warn('Received SIGTERM - app shutdown in progress')
-    shutdownTasks()
   }
 
   /**q

@@ -43,3 +43,4 @@ PID
 public/aegis.log
 public/wasm.json
 yarn-error.log
+aegis.pid
