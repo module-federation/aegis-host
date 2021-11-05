@@ -155,7 +155,7 @@ function checkPublicIpAddress () {
       hostname: checkPublicIpUrl,
       method: 'get'
     },
-    function (response) {
+    response => {
       response.on('data', chunk => bytes.push(chunk))
       response.on('end', function () {
         const ipAddr = bytes.join('').trim()
@@ -214,8 +214,8 @@ async function getAuthorizedCert (domain, domainEmail, renewal = false) {
     domainEmail
   )
 
-  fs.writeFileSync(certFile, cert)
-  fs.writeFileSync(keyFile, key)
+  fs.writeFileSync(certFile, cert, 'utf-8')
+  fs.writeFileSync(keyFile, key, 'utf-8')
 
   return {
     key,
