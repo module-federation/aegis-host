@@ -30,22 +30,25 @@ const fs = require('fs')
 const tls = require('tls')
 const http = require('http')
 const https = require('https')
-const websocket = require('ws')
+const proxy = require('express-http-proxy')
 const express = require('express')
+const websocket = require('ws')
+
 //const StaticFileHandler = require('serverless-aws-static-file-handler')
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
-const sslPort = process.env.SSL_PORT || 443
+const sslPort = process.argv[2] ? process.argv[2] : process.env.SSL_PORT || 443
 const apiRoot = process.env.API_ROOT || '/microlib/api'
 const keyFile = 'cert/privatekey.pem'
 const certFile = 'cert/certificate.pem'
+const proxyMode = /true/i.test(process.env.PROXYMODE) || false
 const forceTimeout = 3000 // time to wait for conn to drop before closing server
 const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
 const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
 const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const checkPublicIpUrl =
-  process.env.IPCHECKHOST || 'https://checkip.amazonaws.com'
+  process.env.IPCHECK_URL || 'https://checkip.amazonaws.com'
 const domain = process.env.DOMAIN || 'federated-microservices.org'
 const domainEmail = process.env.DOMAIN_EMAIL
 const sslEnabled = // required in production
@@ -137,8 +140,6 @@ function reloadCallback () {
 
 /**
  *
- * @param {*} provider
- * @param {*} messages
  */
 function checkPublicIpAddress () {
   const bytes = []
@@ -169,8 +170,7 @@ function checkPublicIpAddress () {
  * Attach {@link MeshService} to the API listener socket.
  * Listen for upgrade events from http server and switch
  * to WebSockets protocol. Clients connecting this way are
- * using the service mesh, not the REST API. This wil need
- * to be reimplemented when mesh switches to QUIC protocol
+ * using the service mesh, not the REST API.
  *
  * @param {https.Server|http.Server} server
  */
@@ -201,11 +201,11 @@ function attachServiceMesh (server) {
  * @param {*} domainEmail
  * @returns
  */
-async function getAuthorizedCert (domain, domainEmail, renewal = false) {
+async function getTrustedCert (domain, domainEmail, renewal = false) {
   if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
     return {
-      key: fs.readFileSync(certFile, 'utf8'),
-      cert: fs.readFileSync(keyFile, 'utf8')
+      key: fs.readFileSync(keyFile, 'utf8'),
+      cert: fs.readFileSync(certFile, 'utf-8')
     }
   }
 
@@ -274,7 +274,7 @@ function shutdown (server) {
  * @returns
  */
 async function createSecureContext (renewal = false) {
-  const cert = await getAuthorizedCert(domain, domainEmail, renewal)
+  const cert = await getTrustedCert(domain, domainEmail, renewal)
   return tls.createSecureContext(cert)
 }
 
@@ -321,7 +321,7 @@ async function startWebServer () {
 
   if (sslEnabled) {
     // set up a route to redirect http to https
-    httpServer.all('*', function (req, res) {
+    httpServer.use('*', function (req, res) {
       res.redirect('https://' + req.headers.host + req.url)
     })
   } else {
@@ -351,7 +351,10 @@ async function startService () {
 }
 
 if (!isServerless()) {
-  if (clusterEnabled) {
+  if (proxyMode) {
+    app.use('/', proxy(process.argv[2]))
+    app.listen(process.argv[3])
+  } else if (clusterEnabled) {
     // Fork child processes (one per core)
     // children share socket descriptor (round-robin)
     ClusterService.startCluster(startService)
