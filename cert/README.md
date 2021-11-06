@@ -1,0 +1,1 @@
+This is here for the folder structure. The private key and cert for TLS go here. The system handles this programmatically. No manual effort to get certs or renew them.
