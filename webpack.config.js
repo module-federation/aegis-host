@@ -24,7 +24,7 @@ const server = env => {
         target: 'async-node',
         mode: 'development',
         devtool: 'source-map',
-        entry: ['@babel/polyfill', path.resolve(__dirname, 'src/server.js')],
+        entry: path.resolve(__dirname, 'src/server.js'),
         output: {
           publicPath: `http://localhost:${publicPort}`,
           path: path.resolve(__dirname, 'dist'),

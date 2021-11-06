@@ -14,8 +14,7 @@ const {
   getModelsById,
   deleteModels,
   getConfig,
-  initCache,
-  getUserRoutes
+  initCache
 } = adapters.controllers
 
 const apiRoot = process.env.API_ROOT || '/microlib/api'
@@ -139,12 +138,6 @@ const App = (() => {
         routes.set(`${apiRoot}/config`, { get: adapter(getConfig()) })
         console.info(routes)
       }
-    },
-
-    userRoutes (serverMode, app) {
-      getUserRoutes(serverMode).forEach(function (r) {
-        app[r.method](apiRoot.concat(r.route), http(r.controller))
-      })
     }
   }
 
@@ -228,7 +221,6 @@ const App = (() => {
           make[serverMode](endpointId, 'patch', patchModels, router)
           make[serverMode](endpointId, 'delete', deleteModels, router)
           make[serverMode](endpointCmd, 'patch', patchModels, router)
-          make.userRoutes(serverMode, router)
           make.admin(http, serverMode, router)
 
           console.timeEnd(label)
