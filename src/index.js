@@ -188,40 +188,7 @@ function attachServiceMesh (server) {
   MeshService.attachServer(wss)
 }
 
-/**
- * Programmatically provision CA cert using RFC
- * https://datatracker.ietf.org/doc/html/rfc8555
- *
- * {@link CertificateService} kicks off automated
- * id challenge test, conducted by the issuing CA.
- * If test passes or if cert already exists, hand
- * back the cert and private key.
- *
- * @param {*} domain
- * @param {*} domainEmail
- * @returns
- */
-async function getTrustedCert (domain, domainEmail, renewal = false) {
-  if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
-    return {
-      key: fs.readFileSync(keyFile, 'utf8'),
-      cert: fs.readFileSync(certFile, 'utf-8')
-    }
-  }
-
-  const { key, cert } = await CertificateService.provisionCert(
-    domain,
-    domainEmail
-  )
-
-  fs.writeFileSync(certFile, cert, 'utf-8')
-  fs.writeFileSync(keyFile, key, 'utf-8')
-
-  return {
-    key,
-    cert
-  }
-}
+let certAuthChallenge = false
 
 /**
  * Shutdown gracefully. Return 503 during shutdown to prevent new connections
@@ -267,6 +234,46 @@ function shutdown (server) {
 }
 
 /**
+ * Programmatically provision CA cert using RFC
+ * https://datatracker.ietf.org/doc/html/rfc8555
+ *
+ * {@link CertificateService} kicks off automated
+ * id challenge test, conducted by the issuing CA.
+ * If test passes or if cert already exists, hand
+ * back the cert and private key.
+ *
+ * @param {*} domain
+ * @param {*} domainEmail
+ * @returns
+ */
+async function getTrustedCert (domain, domainEmail, renewal = false) {
+  if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
+    return {
+      key: fs.readFileSync(keyFile, 'utf8'),
+      cert: fs.readFileSync(certFile, 'utf-8')
+    }
+  }
+  // tell http server not to redirect
+  certAuthChallenge = true
+
+  const { key, cert } = await CertificateService.provisionCert(
+    domain,
+    domainEmail
+  )
+
+  fs.writeFileSync(certFile, cert, 'utf-8')
+  fs.writeFileSync(keyFile, key, 'utf-8')
+
+  // http server can redirect now
+  certAuthChallenge = false
+
+  return {
+    key,
+    cert
+  }
+}
+
+/**
  * Using {@link tls.createSecureContext} to create/renew
  * certs without restarting the server
  *
@@ -278,17 +285,42 @@ async function createSecureContext (renewal = false) {
   return tls.createSecureContext(cert)
 }
 
+/**
+ * Listen on unsecured port (80). Redirect
+ * to secure port (443) if SSL is enabled.
+ */
+function startHttpServer () {
+  // always run unsecured port
+  const httpServer = http.createServer(app)
+  // Use graceful shutdown middleware
+  app.use(shutdown(httpServer))
+  if (sslEnabled) {
+    // set route that redirects http to https
+    httpServer.use('*', function (req, res) {
+      // Facilitate cert challenge - no redirect yet
+      if (!certAuthChallenge) {
+        res.redirect('https://' + req.headers.host + req.url)
+      }
+    })
+  } else {
+    attachServiceMesh(httpServer)
+  }
+  httpServer.listen(port, checkPublicIpAddress)
+}
+
 /** the current cert/key pair */
 let secureCtx
 
 /**
- * Start web server, optionally require secure socket.
+ * Start the web server. Programmatically
+ * provision CA cert if SSL (TLS) is enabled
+ * and no cert is found in /cert directory.
  */
 async function startWebServer () {
-  if (sslEnabled) {
-    // Get CA cert
-    secureCtx = await createSecureContext()
+  startHttpServer()
 
+  if (sslEnabled) {
+    secureCtx = await createSecureContext()
     // renew certs without restarting the server
     const httpsServer = https.createServer(
       {
@@ -296,40 +328,20 @@ async function startWebServer () {
       },
       app
     )
-
     // update secureCtx to refresh certificate
     app.use(
       certLoadPath,
       async () => (secureCtx = await createSecureContext(true))
     )
-
     // graceful shutdown prevents new clients from connecting & waits
     // up to `shutdownOptions.forceTimeout` for them to disconnect
     app.use(shutdown(httpsServer))
-
     // service mesh uses same port
     attachServiceMesh(httpsServer)
-
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
   }
-  // run unsecured port regardless
-  const httpServer = http.createServer(app)
 
-  // Use graceful shutdown middleware
-  app.use(shutdown(httpServer))
-
-  if (sslEnabled) {
-    // set up a route to redirect http to https
-    httpServer.use('*', function (req, res) {
-      res.redirect('https://' + req.headers.host + req.url)
-    })
-  } else {
-    attachServiceMesh(httpServer)
-  }
-
-  httpServer.listen(port, checkPublicIpAddress)
-  // write out our process id for stop scripts
   fs.writeFileSync(`${process.title}.pid`, `${process.pid}\n`, 'utf-8')
 }
 

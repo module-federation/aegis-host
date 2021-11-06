@@ -4,16 +4,18 @@ import { adapters, services } from '../../aegis/lib'
 
 const { StorageService } = services
 const { StorageAdapter } = adapters
+const { find, save } = StorageAdapter
 
 const {
+  http,
   postModels,
   patchModels,
   getModels,
   getModelsById,
   deleteModels,
-  initCache,
   getConfig,
-  http
+  initCache,
+  getUserRoutes
 } = adapters.controllers
 
 const apiRoot = process.env.API_ROOT || '/microlib/api'
@@ -137,6 +139,12 @@ const App = (() => {
         routes.set(`${apiRoot}/config`, { get: adapter(getConfig()) })
         console.info(routes)
       }
+    },
+
+    userRoutes (serverMode, app) {
+      getUserRoutes(serverMode).forEach(function (r) {
+        app[r.method](apiRoot.concat(r.route), http(r.controller))
+      })
     }
   }
 
@@ -174,7 +182,7 @@ const App = (() => {
    * user code downloaded from the remote. This is
    * the code that needs to be disposed of & reimported.
    * Call `setImmediate` so we execute during the check
-   * phase, where there is nothing besides us on the 
+   * phase, where there is nothing besides us on the
    * callstack and all callbacks have executed.
    */
   function clear () {
@@ -202,7 +210,7 @@ const App = (() => {
    */
   async function start (router, serverless = false) {
     const serverMode = serverless ? make.serverless.name : make.webserver.name
-    const overrides = { ...StorageAdapter, Persistence: StorageService }
+    const overrides = { save, find, Persistence: StorageService }
 
     const label = '\ntotal time to import & register remote modules'
     console.time(label)
@@ -220,6 +228,7 @@ const App = (() => {
           make[serverMode](endpointId, 'patch', patchModels, router)
           make[serverMode](endpointId, 'delete', deleteModels, router)
           make[serverMode](endpointCmd, 'patch', patchModels, router)
+          make.userRoutes(serverMode, router)
           make.admin(http, serverMode, router)
 
           console.timeEnd(label)
