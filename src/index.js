@@ -296,7 +296,7 @@ function startHttpServer () {
   app.use(shutdown(httpServer))
   if (sslEnabled) {
     // set route that redirects http to https
-    httpServer.use('*', function (req, res) {
+    app.use('*', function (req, res) {
       // Facilitate cert challenge - no redirect yet
       if (!certAuthChallenge) {
         res.redirect('https://' + req.headers.host + req.url)
