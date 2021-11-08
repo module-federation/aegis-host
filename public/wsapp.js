@@ -43,7 +43,8 @@
       ws.close()
     }
 
-    ws = new WebSocket(`ws://${location.hostname}:${location.port}`)
+    const proto = /https/i.test(location.protocol) ? 'wss' : 'ws'
+    ws = new WebSocket(`${proto}://${location.hostname}:${location.port}`)
     ws.onerror = function (e) {
       showMessage('WebSocket error', e)
     }
