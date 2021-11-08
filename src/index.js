@@ -296,7 +296,7 @@ async function createSecureContext (renewal = false) {
  * to secure port (443) if SSL is enabled.
  */
 function startHttpServer () {
-  if (process.argv[2] === sslPort) return // another instance
+  if (process.argv[2] === sslPort || parseInt(process.argv[2] !== NaN)) return // another instance
   // always run unsecured ports
   const httpServer = http.createServer(app)
   // Use graceful shutdown middleware
