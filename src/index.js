@@ -179,8 +179,9 @@ function checkPublicIpAddress () {
  *
  * @param {https.Server|http.Server} server
  */
-function attachServiceMesh (server) {
+function attachServiceMesh (server, secureCtx) {
   const wss = new websocket.Server({
+    ...secureCtx,
     clientTracking: true,
     server: server,
     maxPayload: 104857600
@@ -190,7 +191,7 @@ function attachServiceMesh (server) {
       wss.emit('connection', ws, request)
     })
   })
-  MeshService.attachServer(wss)
+  MeshService.attachServer(wss, secureCtx)
 }
 
 /**
@@ -342,7 +343,7 @@ async function startWebServer () {
     // up to `shutdownOptions.forceTimeout` for them to disconnect
     app.use(shutdown(httpsServer))
     // service mesh uses same port
-    attachServiceMesh(httpsServer)
+    attachServiceMesh(httpsServer, secureCtx)
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
   }
