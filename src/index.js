@@ -296,7 +296,7 @@ async function createSecureContext (renewal = false) {
  * to secure port (443) if SSL is enabled.
  */
 function startHttpServer () {
-  // always run unsecured port
+  // always run unsecured ports
   const httpServer = http.createServer(app)
   // Use graceful shutdown middleware
   app.use(shutdown(httpServer))
@@ -311,7 +311,12 @@ function startHttpServer () {
   } else {
     attachServiceMesh(httpServer)
   }
-  httpServer.listen(port, checkPublicIpAddress)
+
+  try {
+    httpServer.listen(port, checkPublicIpAddress)
+  } catch (e) {
+    console.error('startHttpServer', 'if already running ignore', e.message)
+  }
 }
 
 /** the current cert/key pair */

@@ -1,14 +1,11 @@
 {
-  "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
+  "desc": "hot-reloadable config (mostly), see https://github.com/module-federatio/aegis",
   "env": {
-    "desc": "live-updateable environmental vars",
+    "desc": "live-updateable env vars",
     "distributedCache": {
       "desc": "enables transparent integration between aegis instances",
-      "enabled": true
-    },
-    "serviceMesh": {
-      "desc": "service mesh enabled or not: disable to use external, federated event bus",
-      "enabled": true
+      "enabled": true,
+      "cacheSize": 2000
     },
     "restartWorflow": true,
     "checkIpHost": "https://checkip.amazonaws.com"
@@ -56,7 +53,7 @@
       "WebSwitch": {
         "desc": "Default implementation: switched mesh over web sockets.",
         "enabled": true,
-        "host": "localhost",
+        "server": "localhost",
         "port": 80,
         "heartbeat": 30000,
         "debug": false,
