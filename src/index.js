@@ -47,8 +47,7 @@ const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
 const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
 const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
-const checkPublicIpUrl =
-  process.env.IPCHECK_URL || 'https://checkip.amazonaws.com'
+const checkIpHostname = process.env.CHECKIPHOST || 'checkip.amazonaws.com'
 const domain = process.env.DOMAIN || 'federated-microservices.org'
 const domainEmail = process.env.DOMAIN_EMAIL
 const sslEnabled = // required in production
@@ -145,25 +144,31 @@ function checkPublicIpAddress () {
   const bytes = []
   const proto = sslEnabled ? 'https' : 'http'
   const prt = sslEnabled ? sslPort : port
-
-  if (/local/i.test(process.env.NODE_ENV)) {
-    const ipAddr = 'localhost'
-    console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`)
-    return
-  }
-  http.get(
-    {
-      hostname: checkPublicIpUrl,
-      method: 'get'
-    },
-    response => {
-      response.on('data', chunk => bytes.push(chunk))
-      response.on('end', function () {
-        const ipAddr = bytes.join('').trim()
-        console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`)
-      })
+  if (!/local/i.test(process.env.NODE_ENV)) {
+    try {
+      http.get(
+        {
+          hostname: checkIpHostname,
+          method: 'get'
+        },
+        response => {
+          response.on('data', chunk => bytes.push(chunk))
+          response.on('end', function () {
+            const ipAddr = bytes.join('').trim()
+            console.log(
+              `\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`
+            )
+          })
+        }
+      )
+      return
+    } catch (e) {
+      console.error('checkip', e.message)
     }
-  )
+  }
+  const ipAddr = 'localhost'
+  console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`)
+  return
 }
 
 /**
@@ -187,8 +192,6 @@ function attachServiceMesh (server) {
   })
   MeshService.attachServer(wss)
 }
-
-let certAuthChallenge = false
 
 /**
  * Shutdown gracefully. Return 503 during shutdown to prevent new connections
@@ -232,6 +235,8 @@ function shutdown (server) {
 
   return middleware
 }
+
+let certAuthChallenge = false
 
 /**
  * Programmatically provision CA cert using RFC

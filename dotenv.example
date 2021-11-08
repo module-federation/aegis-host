@@ -4,6 +4,9 @@
 # Target environment: e.g. local, dev, test, prod
 NODE_ENV=local
 
+# DOMAIN
+DOMAIN=aegis.module-federation.org
+
 # Run in serverless mode (no webserver)
 SERVERLESS=false
 
@@ -43,7 +46,7 @@ DISTRIBUTED_CACHE_ENABLED=true
 WEBSWITCH_ENABLED=true
 WEBSWITCH_PORT=80
 WEBSWITCH_SERVER=localhost
-#WEBSWITCH_UPLINK=uplink1.appmesh.net
+#WEBSWITCH_UPLINK=uplink.app-mesh.net
 
 # if available use nats 
 NETWORK_MIDDLEWARE=nats
@@ -72,7 +75,7 @@ ENCRYPTION_PWD=secret
 PROVIDER_NAME=aws
 
 # Get external IP
-IPCHECKHOST=https://checkip.amazonaws.com
+CHECKIPHOST=checkip.amazonaws.com
 
 # Required by 3rd party client APIs
 MONGODB_URL=mongodb://localhost:27017
