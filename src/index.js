@@ -191,7 +191,7 @@ function attachServiceMesh (server, secureCtx) {
       wss.emit('connection', ws, request)
     })
   })
-  MeshService.attachServer(wss, secureCtx)
+  MeshService.attachServer(wss)
 }
 
 /**
