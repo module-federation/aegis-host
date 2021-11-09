@@ -33,8 +33,7 @@ const https = require('https')
 const proxy = require('express-http-proxy')
 const express = require('express')
 const websocket = require('ws')
-
-//const StaticFileHandler = require('serverless-aws-static-file-handler')
+const EventEmitter = require('events').EventEmitter
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
 const sslPort = process.argv[2] ? process.argv[2] : process.env.SSL_PORT || 443
@@ -48,7 +47,7 @@ const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
 const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const checkIpHostname = process.env.CHECKIPHOST || 'checkip.amazonaws.com'
-const domain = process.env.DOMAIN || 'federated-microservices.org'
+const domain = process.env.DOMAIN || 'aegis.module-federation.org'
 const domainEmail = process.env.DOMAIN_EMAIL
 const sslEnabled = // required in production
   /prod/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
@@ -108,7 +107,7 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
 }
 
 /**
- * Handle hot reload request. If running in cluster mode,
+ * Handle hot reload requests. If running in cluster mode,
  * do a rolling restart instead of memory purge.
  */
 function reloadCallback () {
@@ -138,7 +137,7 @@ function reloadCallback () {
 }
 
 /**
- *
+ * Ping a public server for our public address.
  */
 function checkPublicIpAddress () {
   const bytes = []
@@ -165,17 +164,19 @@ function checkPublicIpAddress () {
     } catch (e) {
       console.error('checkip', e.message)
     }
+  } else {
+    const ipAddr = 'localhost'
+    console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`)
   }
-  const ipAddr = 'localhost'
-  console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`)
   return
 }
 
 /**
  * Attach {@link MeshService} to the API listener socket.
  * Listen for upgrade events from http server and switch
- * to WebSockets protocol. Clients connecting this way are
- * using the service mesh, not the REST API.
+ * client to WebSockets protocol. Clients connecting this
+ * way are using the service mesh, not the REST API. Use
+ * key + cert in {@link secureCtx} for secure connection.
  *
  * @param {https.Server|http.Server} server
  */
@@ -237,8 +238,6 @@ function shutdown (server) {
   return middleware
 }
 
-let certAuthChallenge = false
-
 /**
  * Programmatically provision CA cert using RFC
  * https://datatracker.ietf.org/doc/html/rfc8555
@@ -259,9 +258,8 @@ async function getTrustedCert (domain, domainEmail, renewal = false) {
       cert: fs.readFileSync(certFile, 'utf-8')
     }
   }
-  // tell http server not to redirect
-  certAuthChallenge = true
 
+  // call service to acquire or renew x509 certificate from PKI
   const { key, cert } = await CertificateService.provisionCert(
     domain,
     domainEmail
@@ -270,13 +268,7 @@ async function getTrustedCert (domain, domainEmail, renewal = false) {
   fs.writeFileSync(certFile, cert, 'utf-8')
   fs.writeFileSync(keyFile, key, 'utf-8')
 
-  // http server can redirect now
-  certAuthChallenge = false
-
-  return {
-    key,
-    cert
-  }
+  return { key, cert }
 }
 
 /**
@@ -294,34 +286,41 @@ async function createSecureContext (renewal = false) {
 /**
  * Listen on unsecured port (80). Redirect
  * to secure port (443) if SSL is enabled.
+ * If cert challenge is in progress, wait
+ * for it to finish. Challenge requires
+ * http server on port 80.
  */
-function startHttpServer () {
-  if (process.argv[2] === sslPort || parseInt(process.argv[2] !== NaN)) return // another instance
-  // always run unsecured ports
+function startHttpServer (certAuth) {
+  // if the 3rd arg is a number, this is a 2nd inst,
+  // dont run another http server (port collision)
+  if (parseInt(process.argv[2])) return
+
   const httpServer = http.createServer(app)
-  // Use graceful shutdown middleware
-  app.use(shutdown(httpServer))
+  app.use(shutdown(httpServer)) // kill after timeout
+  httpServer.listen(port, checkPublicIpAddress)
+
   if (sslEnabled) {
-    // set route that redirects http to https
-    //app.use('*', function (req, res) {
-      // Facilitate cert challenge - no redirect yet
-     // if (!certAuthChallenge) {
-      //  res.redirect('https://' + req.headers.host + req.url)
-     // }
-   // })
+    // we needed to run http for the auth challenge
+    certAuth.on('done', () => {
+      // kill it (because it references the app)
+      httpServer.close(() => {
+        // and redirect everything to secure port
+        const srv = http.createServer(function (req, res) {
+          res.redirect(domain + req.url)
+        })
+        srv.listen(port)
+      })
+    })
   } else {
     attachServiceMesh(httpServer)
-  }
-
-  try {
-    httpServer.listen(port, checkPublicIpAddress)
-  } catch (e) {
-    console.error('startHttpServer', 'if already running ignore', e.message)
   }
 }
 
 /** the current cert/key pair */
 let secureCtx
+
+/** cert auth challenge event */
+class CertAuth extends EventEmitter {}
 
 /**
  * Start the web server. Programmatically
@@ -329,7 +328,8 @@ let secureCtx
  * and no cert is found in /cert directory.
  */
 async function startWebServer () {
-  startHttpServer()
+  const certAuth = new CertAuth()
+  startHttpServer(certAuth)
 
   if (sslEnabled) {
     secureCtx = await createSecureContext()
@@ -352,6 +352,8 @@ async function startWebServer () {
     attachServiceMesh(httpsServer, secureCtx)
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
+    // start http redirects
+    certAuth.emit('done')
   }
 
   fs.writeFileSync(`${process.title}.pid`, `${process.pid}\n`, 'utf-8')
@@ -374,6 +376,9 @@ async function startService () {
   }
 }
 
+/**
+ * Start as a single or clustered server (or proxy)
+ */
 if (!isServerless()) {
   if (proxyMode) {
     app.use('/', proxy(process.argv[2]))
@@ -390,7 +395,7 @@ if (!isServerless()) {
 let serverlessAdapter
 
 /**
- * Serverless function - entry point called by serverless platform.
+ * Start as a serverless function - express does not run.
  * @param  {...any} args - payload passed to serverless function
  */
 exports.handleServerlessRequest = async function (...args) {
