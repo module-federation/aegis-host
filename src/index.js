@@ -290,9 +290,8 @@ async function getTrustedCert (domain, domainEmail, renewal = false) {
  * @param {boolean} renewal
  * @returns
  */
-async function createSecureContext (certAuth, renewal = false) {
+async function createSecureContext (renewal = false) {
   const cert = await getTrustedCert(domain, domainEmail, renewal)
-  certAuth.emit('done')
   return tls.createSecureContext(cert)
 }
 
