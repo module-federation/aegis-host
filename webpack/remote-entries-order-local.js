@@ -1,4 +1,3 @@
-const wasm = require('./remote-entries-wasm')
 
 module.exports = [
   {
@@ -22,6 +21,6 @@ module.exports = [
     type: "service",
     importRemote: async () => import("microservices/services"),
   },
-].concat(wasm)
+]
 
 

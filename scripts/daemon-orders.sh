@@ -1,3 +1,2 @@
 # start as daemon
-
-nohup node --title "aegis-orders" dist/index.js >public/aegis-orders.log &
+node --title "aegis-orders" ../dist/index.js 8072 >../public/aegis-orders.log

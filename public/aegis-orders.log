@@ -1,21 +1,242 @@
-zackwashere /Users/tyson/microlib/auth/key-set.json
-Error: Cannot find module './remoteEntry'
-Require stack:
-- /Users/tyson/microlib/dist/noop.js
-    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:933:15)
-    at resolveFileName (/Users/tyson/microlib/node_modules/import-fresh/node_modules/resolve-from/index.js:29:39)
-    at resolveFrom (/Users/tyson/microlib/node_modules/import-fresh/node_modules/resolve-from/index.js:43:9)
-    at module.exports (/Users/tyson/microlib/node_modules/import-fresh/node_modules/resolve-from/index.js:46:41)
-    at module.exports (/Users/tyson/microlib/node_modules/import-fresh/index.js:14:19)
-    at startMicroLib (/Users/tyson/microlib/dist/index.js:90:23)
-    at startService (/Users/tyson/microlib/dist/index.js:334:11)
-    at Object.<anonymous> (/Users/tyson/microlib/dist/index.js:348:5)
-    at Module._compile (node:internal/modules/cjs/loader:1101:14)
-    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)
-    at Module.load (node:internal/modules/cjs/loader:981:32)
-    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
-    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:79:12)
-    at node:internal/main/run_main_module:17:47 {
-  code: 'MODULE_NOT_FOUND',
-  requireStack: [ '/Users/tyson/microlib/dist/noop.js' ]
+zackwashere /home/ec2-user/microlib/scripts/auth/key-set.json
+>>>>>>>>>chunkId 610
+github url URL {
+  href: 'https://api.github.com/610.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/610.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
 }
+>>>>>>>>>chunkId 778
+github url URL {
+  href: 'https://api.github.com/778.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/778.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
+}
+d7880c64634529e0528ec13799bd0d83a70f4de8
+826a2cbe8ebbb91e94797bbf786014a180f33bcd
+zackwashere /home/ec2-user/microlib/scripts/auth/key-set.json
+>>>>>>>>>chunkId 610
+>>>>>>>>>chunkId 662
+github url URL {
+  href: 'https://api.github.com/662.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/662.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
+}
+0d05e2a92a9a1eb656ba73e65b888325f68ab1b5
+modules [
+  Object [Module] {
+    Address: [Getter],
+    Event: [Getter],
+    Payment: [Getter],
+    Shipping: [Getter],
+    EventBus: [Getter]
+  }
+]
+service import took 384 ms
+>>>>>>>>>chunkId 610
+modules [
+  Object [Module] {
+    validateAddress: [Getter],
+    authorizePayment: [Getter],
+    completePayment: [Getter],
+    refundPayment: [Getter],
+    shipOrder: [Getter],
+    trackShipment: [Getter],
+    verifyDelivery: [Getter],
+    listen: [Getter],
+    notify: [Getter],
+    pickOrder: [Getter]
+  }
+]
+adapter import took 0 ms
+{
+  services: {
+    Address: { validateAddress: [Function: validateAddress] },
+    Event: {
+      listening: false,
+      topics: /(?:)/,
+      listen: [Function: listen],
+      notify: [Function: notify]
+    },
+    Payment: {
+      authorizePayment: [Function: authorizePayment],
+      completePayment: [Function: completePayment],
+      refundPayment: [Function: refundPayment]
+    },
+    Shipping: {
+      serviceName: 'shippingService',
+      topic: 'shippingChannel',
+      shipOrder: [Function: shipOrder],
+      trackShipment: [Function: trackShipment],
+      verifyDelivery: [Function: verifyDelivery],
+      returnShipment: [Function: returnShipment],
+      getPayload: [Function: getPayload],
+      getProperty: [Function: getProperty]
+    },
+    EventBus: { notify: [Function: notify], listen: [Function: listen] }
+  },
+  adapters: {
+    validateAddress: [Function: validateAddress],
+    authorizePayment: [Function: authorizePayment],
+    completePayment: [Function: completePayment],
+    refundPayment: [Function: refundPayment],
+    shipOrder: [Function: shipOrder],
+    trackShipment: [Function: trackShipment],
+    verifyDelivery: [Function: verifyDelivery],
+    listen: [Function: listen],
+    notify: [Function: notify],
+    pickOrder: [Function: pickOrder]
+  },
+  overrides: {
+    save: [Function: save],
+    find: [Function: find],
+    Persistence: { Persistence: [Object] }
+  }
+}
+>>>>>>>>>chunkId 610
+>>>>>>>>>chunkId 583
+github url URL {
+  href: 'https://api.github.com/583.js?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  origin: 'https://api.github.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'api.github.com',
+  hostname: 'api.github.com',
+  port: '',
+  pathname: '/583.js',
+  search: '?owner=module-federation&repo=microlib-example&filedir=dist&branch=master',
+  searchParams: URLSearchParams {
+    'owner' => 'module-federation',
+    'repo' => 'microlib-example',
+    'filedir' => 'dist',
+    'branch' => 'master' },
+  hash: ''
+}
+github url https://api.github.com
+51eaa0a730109e2b72fe5ff6c005a80556eadb45
+wasm modules took 152ms
+_constructObject 27360
+_constructObject 28032
+{
+  modelName: 'wasm',
+  endpoint: 'wasm',
+  factory: [Function: factory],
+  onUpdate: [Function: onUpdate],
+  onDelete: [Function: onDelete],
+  commands: {
+    serviceMeshListen: { command: [Function: command], acl: [Array] },
+    serviceMeshNotify: { command: [Function: command], acl: [Array] },
+    serviceMeshCallback: { command: [Function: command], acl: [Array] },
+    runFibonacci: { command: [Function: command], acl: [Array] },
+    fibonacci: { command: [Function: command], acl: [Array] },
+    commandEx: { command: [Function: command], acl: [Array] }
+  },
+  ports: {
+    port1: {
+      service: 'dFlow',
+      type: 'outbound',
+      consumesEvent: 'dFlow_start',
+      producesEvent: 'port1_done',
+      callback: [Function: callback],
+      undo: [Function: undo]
+    },
+    port2: {
+      service: 'dFlow',
+      type: 'outbound',
+      consumesEvent: 'port1_done',
+      producesEvent: 'port2_done',
+      callback: [Function: callback],
+      undo: [Function: undo]
+    }
+  },
+  dispose: [Function: dispose]
+}
+modules [
+  Object [Module] { models: [Getter] },
+  {
+    modelName: 'wasm',
+    endpoint: 'wasm',
+    factory: [Function: factory],
+    onUpdate: [Function: onUpdate],
+    onDelete: [Function: onDelete],
+    commands: {
+      serviceMeshListen: [Object],
+      serviceMeshNotify: [Object],
+      serviceMeshCallback: [Object],
+      runFibonacci: [Object],
+      fibonacci: [Object],
+      commandEx: [Object]
+    },
+    ports: { port1: [Object], port2: [Object] },
+    dispose: [Function: dispose]
+  }
+]
+model import took 291 ms
+running in webserver mode
+{ endpoint: 'orders', fn: [Function: getModels] }
+{ endpoint: 'users', fn: [Function: getModels] }
+{ endpoint: 'wasm', fn: [Function: getModels] }
+{ endpoint: 'orders', fn: [Function: postModel] }
+{ endpoint: 'users', fn: [Function: postModel] }
+{ endpoint: 'wasm', fn: [Function: postModel] }
+{ endpoint: 'orders', fn: [Function: getModelById] }
+{ endpoint: 'users', fn: [Function: getModelById] }
+{ endpoint: 'wasm', fn: [Function: getModelById] }
+{ endpoint: 'orders', fn: [Function: patchModel] }
+{ endpoint: 'users', fn: [Function: patchModel] }
+{ endpoint: 'wasm', fn: [Function: patchModel] }
+{ endpoint: 'orders', fn: [Function: deleteModel] }
+{ endpoint: 'users', fn: [Function: deleteModel] }
+{ endpoint: 'wasm', fn: [Function: deleteModel] }
+{ endpoint: 'orders', fn: [Function: patchModel] }
+{ endpoint: 'users', fn: [Function: patchModel] }
+{ endpoint: 'wasm', fn: [Function: patchModel] }
+
+total time to import & register remote modules: 691.583ms
+
+time to load cache: 0.973ms
+listen for unhandled consumer events
+ [] 
+forward unhandled producer events
+ []
+Received SIGTERM - app shutdown in progress
+Received SIGTERM - app shutdown in progress

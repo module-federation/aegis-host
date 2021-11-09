@@ -303,12 +303,12 @@ function startHttpServer () {
   app.use(shutdown(httpServer))
   if (sslEnabled) {
     // set route that redirects http to https
-    app.use('*', function (req, res) {
+    //app.use('*', function (req, res) {
       // Facilitate cert challenge - no redirect yet
-      if (!certAuthChallenge) {
-        res.redirect('https://' + req.headers.host + req.url)
-      }
-    })
+     // if (!certAuthChallenge) {
+      //  res.redirect('https://' + req.headers.host + req.url)
+     // }
+   // })
   } else {
     attachServiceMesh(httpServer)
   }
