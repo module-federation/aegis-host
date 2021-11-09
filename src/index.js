@@ -33,6 +33,10 @@ const https = require('https')
 const proxy = require('express-http-proxy')
 const express = require('express')
 const websocket = require('ws')
+const {
+  default: httpAdapter
+} = require('../../aegis/lib/adapters/controllers/http-adapter')
+const { EventEmitter } = require('stream')
 
 //const StaticFileHandler = require('serverless-aws-static-file-handler')
 
@@ -286,42 +290,62 @@ async function getTrustedCert (domain, domainEmail, renewal = false) {
  * @param {boolean} renewal
  * @returns
  */
-async function createSecureContext (renewal = false) {
+async function createSecureContext (certAuth, renewal = false) {
   const cert = await getTrustedCert(domain, domainEmail, renewal)
+  certAuth.emit('done')
   return tls.createSecureContext(cert)
+}
+
+/**
+ * `y` is within `n` of `m`.
+ * m - n > y && m + n < y
+ * @param {number} y
+ * @param {number} n
+ * @param {number} m
+ * @returns
+ */
+function within (y, n, m) {
+  return (
+    Array.from({ length: n }, (x, i) => i)
+      .map(i => i + y)
+      .includes(m) ||
+    Array.from({ length: n }, (x, i) => i)
+      .map(i => y - i)
+      .includes(m)
+  )
 }
 
 /**
  * Listen on unsecured port (80). Redirect
  * to secure port (443) if SSL is enabled.
+ * If cert challenge is in progress, wait
+ * for it to finish.
  */
-function startHttpServer () {
-  if (process.argv[2] === sslPort || parseInt(process.argv[2] !== NaN)) return // another instance
-  // always run unsecured ports
+function startHttpServer (certAuth) {
+  if (within(parseInt(process.argv[2]), 20, parseInt(sslPort))) return
+
   const httpServer = http.createServer(app)
-  // Use graceful shutdown middleware
   app.use(shutdown(httpServer))
+  httpServer.listen(port, checkPublicIpAddress)
+
   if (sslEnabled) {
-    // set route that redirects http to https
-    app.use('*', function (req, res) {
-      // Facilitate cert challenge - no redirect yet
-      if (!certAuthChallenge) {
-        res.redirect('https://' + req.headers.host + req.url)
-      }
+    certAuth.on('done', () => {
+      httpServer.close(() => {
+        const srv = http.createServer(function (req, res) {
+          res.redirect(domain + req.url)
+        })
+        srv.listen(port)
+      })
     })
   } else {
     attachServiceMesh(httpServer)
-  }
-
-  try {
-    httpServer.listen(port, checkPublicIpAddress)
-  } catch (e) {
-    console.error('startHttpServer', 'if already running ignore', e.message)
   }
 }
 
 /** the current cert/key pair */
 let secureCtx
+
+class CertAuth extends EventEmitter {}
 
 /**
  * Start the web server. Programmatically
@@ -329,7 +353,8 @@ let secureCtx
  * and no cert is found in /cert directory.
  */
 async function startWebServer () {
-  startHttpServer()
+  const certAuth = new CertAuth()
+  startHttpServer(certAuth)
 
   if (sslEnabled) {
     secureCtx = await createSecureContext()
@@ -352,6 +377,8 @@ async function startWebServer () {
     attachServiceMesh(httpsServer, secureCtx)
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
+    // start http redirects
+    certAuth.emit('done')
   }
 
   fs.writeFileSync(`${process.title}.pid`, `${process.pid}\n`, 'utf-8')
