@@ -306,7 +306,11 @@ function startHttpServer (certAuth) {
       httpServer.close(() => {
         // and redirect everything to secure port
         const srv = http.createServer(function (req, res) {
-          res.redirect(domain + req.url)
+          // do a 302 redirect
+          res.writeHead(302, {
+            location: `https://${domain}:${port}`
+          })
+          res.end()
         })
         srv.listen(port)
       })
