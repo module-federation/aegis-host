@@ -308,7 +308,7 @@ function startHttpServer (certAuth) {
         const srv = http.createServer(function (req, res) {
           // do a 302 redirect
           res.writeHead(302, {
-            location: `https://${domain}:${port}`
+            location: `https://${domain}:${sslPort}`
           })
           res.end()
         })
