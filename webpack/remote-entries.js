@@ -1,27 +1,6 @@
+const order = require('./remote-entries-order')
 const wasm = require('./remote-entries-wasm')
+const cache = require('./remote-entries-cache')
+//const customer = require('./remote-entries-customer')
 
-module.exports = [
-  {
-    name: "microservices",
-    url: "http://aegis.module-federation.org:8060/remoteEntry.js",
-    path: __dirname,
-    type: "model",
-    importRemote: async () => import("microservices/models"),
-  },
-  {
-    name: "adapters",
-    url: "http:/aegis.module-federation.org:8060/remoteEntry.js",
-    path: __dirname,
-    type: "adapter",
-    importRemote: async () => import("microservices/adapters"),
-  },
-  {
-    name: "services",
-    url: "http://aegis.module-federation.org:8060/remoteEntry.js",
-    path: __dirname,
-    type: "service",
-    importRemote: async () => import("microservices/services"),
-  },
-].concat(wasm)
-
-
+module.exports = [order, wasm, cache].flat()
