@@ -1,6 +1,6 @@
 'use strict'
 
-import { adapters, services } from '../../aegis/lib'
+import { adapters, services } from '@module-federation/aegis'
 
 const { StorageService } = services
 const { StorageAdapter } = adapters
