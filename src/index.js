@@ -15,7 +15,7 @@ require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
 
-const { adapters, services } = require('../../aegis/lib')
+const { adapters, services } = require('@module-federation/aegis')
 
 const {
   AuthorizationService,
