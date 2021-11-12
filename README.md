@@ -317,7 +317,7 @@ Two options are available here: Easy Button or DIY.
 
 #### EASY BUTTON
 
-Click [here](https://module-federation/aegis-application/generate), to generate the scaffolding for building a federated application with Aegis.
+Click [here](https://github.com/module-federation/aegis-application/generate), to generate the scaffolding for building a federated application with Aegis.
 
 #### DIY
 
