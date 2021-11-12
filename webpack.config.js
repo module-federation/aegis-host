@@ -60,7 +60,6 @@ const server = env => {
             exposes: {
               './server': './src/server',
               './domain': '@module-federation/aegis/lib/domain',
-              //'./domain': '../aegis/lib/domain',
               './remoteEntries': './webpack/remote-entries'
             }
           })

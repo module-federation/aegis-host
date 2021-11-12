@@ -1304,9 +1304,9 @@
     "tar" "^6.1.11"
 
 "@module-federation/aegis@^1.0.0-beta.53":
-  "integrity" "sha512-DKsZi+vsgoHpWu8gBZz3wkwwMjyttJsacD4GOq2BOIUG3AAyzFqBkuWCqU7UAc6UKqQm0gvsUsC9BpELq0S1Ow=="
-  "resolved" "https://registry.npmjs.org/@module-federation/aegis/-/aegis-1.0.0-beta.53.tgz"
-  "version" "1.0.0-beta.53"
+  "integrity" "sha512-7lDHHbjxnT5FPsQvX48fYJ8hVN+uIT+NL/BePQdyBfqOLcNISY1WxQU6lwWbYoEv2WaG9x9+Ic3SIBdrYotuwQ=="
+  "resolved" "https://registry.npmjs.org/@module-federation/aegis/-/aegis-1.0.0-beta.55.tgz"
+  "version" "1.0.0-beta.55"
   dependencies:
     "@assemblyscript/loader" "0.19.17"
     "@octokit/core" "3.5.1"
