@@ -2,8 +2,6 @@
 
 # ÆGIS <sub><sup>formerly _MicroLib_</sup></sub>
 
-### Open Aegis in Visual Studio Code
-
 
 | Repo         | Edit with VS Code |
 | -------------| -------------     |
