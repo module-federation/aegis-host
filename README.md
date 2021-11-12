@@ -313,6 +313,14 @@ SSL_ENABLED=true
 
 ### Importing your own repo
 
+Two options are available here: Easy Button or DIY.
+
+#### EASY BUTTON
+
+Click [here](https://module-federation/aegis-application/generate), to generate the scaffolding for building a federated application with Aegis.
+
+#### DIY
+
 To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). Also from microlib-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack).
 
 ### Installation
