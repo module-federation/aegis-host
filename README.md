@@ -2,9 +2,14 @@
 
 # ÆGIS <sub><sup>formerly _MicroLib_</sup></sub>
 
-[![Open Aegis Host in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis-host)
+### Open Aegis in Visual Studio Code
 
-[![Open Aegis Libraru in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis)
+
+| Repo         | Edit with VS Code |
+| -------------| -------------     |
+| Host    | [![Open Aegis Host in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis-host)|
+| Library | [![Open Aegis Libraru in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis)|
+
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
