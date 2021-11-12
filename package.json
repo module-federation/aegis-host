@@ -69,7 +69,7 @@
   "license": "MIT",
   "dependencies": {
     "@assemblyscript/loader": "^0.19.12",
-    "@module-federation/aegis": "^1.0.0-beta.53",
+    "@module-federation/aegis": "^1.0.0-beta.55",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "assemblyscript": "^0.19.12",
