@@ -181,8 +181,9 @@ function checkPublicIpAddress () {
  * @param {https.Server|http.Server} server
  */
 function attachServiceMesh (server, secureCtx) {
+  const context = sslEnabled ? secureCtx : {}
   const wss = new websocket.Server({
-    ...secureCtx,
+    ...context,
     clientTracking: true,
     server: server,
     maxPayload: 104857600
