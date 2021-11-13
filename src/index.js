@@ -290,35 +290,40 @@ async function createSecureContext (renewal = false) {
  * for it to finish. Challenge requires
  * http server on port 80.
  */
-function startHttpServer (certAuth) {
-  // if the 3rd arg is a number, its a port for a 2nd server instance, 
-  // which we don't want if ssl is enabled. One http server is sufficient 
-  // for redirect to https (typically done by a load balancer anyway)
-  if (sslEnabled && parseInt(process.argv[2]) !== NaN) return
+async function startHttpServer (certAuth) {
+  return new Promise(function (resolve) {
+    try {
+      const httpServer = http.createServer(app)
+      app.use(shutdown(httpServer)) // kill after timeout
 
-  const httpServer = http.createServer(app)
-  app.use(shutdown(httpServer)) // kill after timeout
-  httpServer.listen(port, checkPublicIpAddress)
+      httpServer.listen(port, function () {
+        checkPublicIpAddress()
 
-  if (sslEnabled) {
-    // we needed to run http for the auth challenge
-    certAuth.on('done', () => {
-      // kill it (because it references the app)
-      httpServer.close(() => {
-        // and redirect everything to secure port
-        const srv = http.createServer(function (req, res) {
-          // do a 302 redirect
-          res.writeHead(302, {
-            location: `https://${domain}:${sslPort}`
+        if (sslEnabled) {
+          // we needed to run http for the auth challenge
+          certAuth.on('done', function () {
+            // kill it (because it references the app)
+            httpServer.close(function () {
+              // and redirect everything to secure port
+              const srv = http.createServer(function (_req, res) {
+                // do a 302 redirect
+                res.writeHead(302, {
+                  location: `https://${domain}:${sslPort}`
+                })
+                res.end()
+              })
+              srv.listen(port)
+            })
           })
-          res.end()
-        })
-        srv.listen(port)
+        } else {
+          attachServiceMesh(httpServer)
+        }
       })
-    })
-  } else {
-    attachServiceMesh(httpServer)
-  }
+      resolve()
+    } catch (e) {
+      console.error(startHttpServer.name, e.message)
+    }
+  })
 }
 
 /** the current cert/key pair */
@@ -334,7 +339,7 @@ class CertAuth extends EventEmitter {}
  */
 async function startWebServer () {
   const certAuth = new CertAuth()
-  startHttpServer(certAuth)
+  await startHttpServer(certAuth)
 
   if (sslEnabled) {
     secureCtx = await createSecureContext()

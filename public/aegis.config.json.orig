@@ -1,31 +1,22 @@
 {
-  "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
-  "general": {
-    "desc": "live-updateable environmental vars",
+  "desc": "hot-reloadable config (mostly), see https://github.com/module-federatio/aegis",
+  "env": {
+    "desc": "live-updateable env vars",
     "distributedCache": {
       "desc": "enables transparent integration between aegis instances",
-      "enabled": true
-    },
-    "serviceMesh": {
-      "desc": "service mesh enabled or not: disable to use external, federated event bus",
-      "enabled": true
+      "enabled": true,
+      "cacheSize": 2000
     },
     "restartWorflow": true,
-    "checkIpHost": "https://checkip.amazonaws.com",
-    "defaultCircuitBreaker": {
-      "errorRate": 25,
-      "callVolume": 100,
-      "intervalMs": 6000
-    }
+    "checkIpHost": "https://checkip.amazonaws.com"
   },
   "adapters": {
     "desc": "adapter config",
-    "cacheSize": 3000,
     "defaultDatasource": "DataSourceFile",
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",
-        "enabled": false
+        "enabled": true
       },
       "DataSourceFile": {
         "desc": "Persistent storage on local file system",
@@ -33,21 +24,34 @@
       },
       "DataSourceMongoDb": {
         "desc": "Persistent NoSQL, JSON document storage",
+        "enabled": true,
         "url": "mongodb://localhost:27017",
         "cacheSize": 3000
       },
       "DataSourceMesh": {
         "desc": "Data distributed across service mesh network",
         "enabled": false
+      },
+      "DataSourceIpfs": {
+        "desc": "Data distributed over web (interplanetary file system)",
+        "enabled": false
+      },
+      "DataSourceEtherium": {
+        "desc": "Data distributed over web on Etherium blockchain",
+        "enabled": false
+      },
+      "DataSourceSolidPod": {
+        "desc": "Data on Sir Tim Berners Lee's Solid Pod",
+        "enabled": false
       }
     }
   },
   "services": {
     "desc": "services config",
-    "activeServiceMesh": "MeshLink",
+    "activeServiceMesh": "WebSwitch",
     "serviceMesh": {
       "WebSwitch": {
-        "desc": "Default implementation. Switched mesh over web sockets.",
+        "desc": "Default implementation: switched mesh over web sockets.",
         "enabled": true,
         "host": "localhost",
         "port": 80,
@@ -56,8 +60,9 @@
         "uplink": null
       },
       "MeshLink": {
-        "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
+        "desc": "Fast UDP-based, peer-to-peer mesh, with shared Redis cache.",
         "enabled": true,
+        "debug": true,
         "config": {
           "redis": {
             "host": "127.0.0.1",
@@ -73,7 +78,8 @@
       },
       "NatsMesh": {
         "desc": "Use NATS at layer 7",
-        "enabled": false
+        "enabled": true,
+        "servers": "localhost:4222"
       },
       "QuicMesh": {
         "desc": "Uses QUIC transport protocol (replacing TCP in HTTP/3). Optimized for streaming.",
@@ -88,14 +94,8 @@
         "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
         "audience": "https://microlib.io/",
         "issuer": "https://dev-2fe2iar6.us.auth0.com/",
-        "algoridthms": ["RS256"]
+        "algorithms": ["RS256"]
       }
-    },
-    "cert": {
-      "certDir": "cert",
-      "webRoot": "public",
-      "domain": "aegis.module-federation.org",
-      "domainEmail": "admin@gmail.com"
     }
   }
 }
