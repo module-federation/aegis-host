@@ -291,9 +291,10 @@ async function createSecureContext (renewal = false) {
  * http server on port 80.
  */
 function startHttpServer (certAuth) {
-  // if the 3rd arg is a number, this is a 2nd inst,
-  // dont run another http server (port collision)
-  if (parseInt(process.argv[2])) return
+  // if the 3rd arg is a number, its a port for a 2nd server instance, 
+  // which we don't want if ssl is enabled. One http server is sufficient 
+  // for redirect to https (typically done by a load balancer anyway)
+  if (sslEnabled && parseInt(process.argv[2]) !== NaN) return
 
   const httpServer = http.createServer(app)
   app.use(shutdown(httpServer)) // kill after timeout
