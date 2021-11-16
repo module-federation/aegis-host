@@ -11,7 +11,7 @@ module.exports = [
     repo: 'microlib-examples',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'customer4',
+    branch: 'customer5',
     path: __dirname,
     type: 'model',
     importRemote: async () => import('microservices/models')
@@ -22,7 +22,7 @@ module.exports = [
     repo: 'microlib-examples',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'customer4',
+    branch: 'customer5',
     path: __dirname,
     type: 'adapter',
     importRemote: async () => import('microservices/adapters')
@@ -33,7 +33,7 @@ module.exports = [
     repo: 'microlib-examples',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'customer4',
+    branch: 'customer5',
     path: __dirname,
     type: 'service',
     importRemote: async () => import('microservices/services')

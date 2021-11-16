@@ -46,7 +46,6 @@ const cloudProvider = process.env.CLOUDPROVIDER || 'aws'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const checkIpHostname = process.env.CHECKIPHOST || 'checkip.amazonaws.com'
 const domain = process.env.DOMAIN || 'aegis.module-federation.org'
-const domainEmail = process.env.DOMAIN_EMAIL
 const sslEnabled = // required in production
   /prod/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
@@ -212,7 +211,6 @@ function shutdown (server) {
   return middleware
 }
 
-
 /**
  * Attach {@link MeshService} to the API listener socket.
  * Listen for upgrade events from http server and switch
@@ -223,7 +221,7 @@ function shutdown (server) {
  * @param {https.Server|http.Server} server
  * @param {tls.SecureContext} [secureCtx] if ssl enabled
  */
- function attachServiceMesh (server, secureCtx) {
+function attachServiceMesh (server, secureCtx = null) {
   const keyAndCert = secureCtx || {}
   const wss = new websocket.Server({
     ...keyAndCert,
@@ -249,7 +247,6 @@ function shutdown (server) {
  * back the cert and private key.
  *
  * @param {*} domain
- * @param {*} domainEmail
  * @returns
  */
 async function getTrustedCert (domain, renewal = false) {
@@ -277,7 +274,7 @@ async function getTrustedCert (domain, renewal = false) {
  * @returns
  */
 async function createSecureContext (renewal = false) {
-  const cert = await getTrustedCert(domain, domainEmail, renewal)
+  const cert = await getTrustedCert(domain, renewal)
   return tls.createSecureContext(cert)
 }
 
@@ -411,7 +408,7 @@ exports.handleServerlessRequest = async function (...args) {
       cloudProvider
     )
   }
-  serverlessAdapter.invokeController(...args)
+  return serverlessAdapter.invokeController(...args)
 }
 
 // const fileHandler = new StaticFileHandler('public')
