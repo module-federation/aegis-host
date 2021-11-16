@@ -49,6 +49,7 @@ const sslEnabled = // required in production
   /prod/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
 // enable authorization if selected
+/**@type {express.Application} */
 const app = AuthorizationService.protectRoutes(express(), '/microlib')
 
 function isServerless () {
@@ -221,9 +222,9 @@ function shutdown (server) {
  * @param {tls.SecureContext} [secureCtx] if ssl enabled
  */
 function attachServiceMesh (server, secureCtx = null) {
-  const keyAndCert = secureCtx || {}
+  const secure = secureCtx || {}
   const wss = new websocket.Server({
-    ...keyAndCert,
+    ...secure,
     clientTracking: true,
     server: server,
     maxPayload: 104857600
@@ -266,6 +267,11 @@ async function getTrustedCert (domain, renewal = false) {
 }
 
 /**
+ * redirect (from 80) to secure port (443)?
+ */
+let redirect = true
+
+/**
  * Using {@link tls.createSecureContext} to create/renew
  * certs without restarting the server
  *
@@ -273,73 +279,45 @@ async function getTrustedCert (domain, renewal = false) {
  * @returns
  */
 async function createSecureContext (renewal = false) {
+  // turn off redirect
+  redirect = false
+  // get cert
   const cert = await getTrustedCert(domain, renewal)
+  // turn redirect back on
+  redirect = true
+  // return cert and key
   return tls.createSecureContext(cert)
 }
 
 /**
  * Listen on unsecured port (80). Redirect
  * to secure port (443) if SSL is enabled.
- * If cert challenge is in progress, wait
- * for it to finish. Challenge requires
- * http server on port 80.
+ * Don't redirect while cert challenge is
+ * in progress. Challenge requires port 80
  */
-async function startHttpServer (event) {
-  return new Promise(function (resolve) {
-    try {
-      const httpServer = http.createServer(app)
-      app.use(shutdown(httpServer)) // kill after timeout
+async function startHttpServer () {
+  const httpServer = http.createServer(app)
 
-      httpServer.listen(port, function () {
-        checkPublicIpAddress()
+  if (sslEnabled) {
+    /**
+     * if {@link redirect} is true, redirect
+     * all requests for http to https port
+     */
+    app.use(function (req, res) {
+      if (redirect && /^http$/i.test(req.protocol)) {
+        res.redirect(`https://${domain}:${sslPort}`)
+      }
+    })
+  } else {
+    // https disabled, so attach to http
+    attachServiceMesh(httpServer)
+  }
 
-        if (sslEnabled) {
-          // we needed to run http for the auth challenge
-          event.callback(function () {
-            try {
-              // kill it (because it references the app)
-              httpServer.close(function () {
-                // and redirect everything to secure port
-                const srv = http.createServer(function (_req, res) {
-                  // do a 302 redirect
-                  res.writeHead(302, {
-                    location: `https://${domain}:${sslPort}`
-                  })
-                  res.end()
-                })
-                srv.listen(port, domain)
-              })
-            } catch (e) {
-              console.error(startHttpServer.name, 'listener error', error)
-            }
-          })
-        } else {
-          attachServiceMesh(httpServer)
-        }
-        resolve()
-      })
-    } catch (e) {
-      console.error(startHttpServer.name, e.message)
-      resolve()
-    }
-  })
+  httpServer.listen(port, checkPublicIpAddress)
 }
 
 /** the current cert/key pair */
 let secureCtx
-
-/** cert auth challenge event */
-function certEvent () {
-  let cb = () => console.log('non SSL')
-  return {
-    callback (fn) {
-      cb = fn
-    },
-    fire () {
-      cb()
-    }
-  }
-}
 
 /**
  * Start the web server. Programmatically
@@ -347,14 +325,16 @@ function certEvent () {
  * and no cert is found in /cert directory.
  */
 async function startWebServer () {
-  const event = certEvent()
-  await startHttpServer(event)
+  startHttpServer()
 
   if (sslEnabled) {
+    // provision or renew cert and key
     secureCtx = await createSecureContext()
-    // start forwarding http to https
-    event.fire()
-    // renew certs without restarting the server
+
+    /**
+     * provide cert via {@link secureCtx} - provision +
+     * renew certs without having to restart the server
+     */
     const httpsServer = https.createServer(
       {
         SNICallback: (_, cb) => cb(null, secureCtx)
@@ -369,8 +349,10 @@ async function startWebServer () {
     // graceful shutdown prevents new clients from connecting & waits
     // up to `shutdownOptions.forceTimeout` for them to disconnect
     app.use(shutdown(httpsServer))
+
     // service mesh uses same port
     attachServiceMesh(httpsServer, secureCtx)
+
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
   }
