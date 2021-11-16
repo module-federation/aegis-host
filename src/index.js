@@ -32,7 +32,6 @@ const http = require('http')
 const https = require('https')
 const express = require('express')
 const websocket = require('ws')
-const EventEmitter = require('events').EventEmitter
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
 const sslPort = process.argv[2] ? process.argv[2] : process.env.SSL_PORT || 443
@@ -285,7 +284,7 @@ async function createSecureContext (renewal = false) {
  * for it to finish. Challenge requires
  * http server on port 80.
  */
-async function startHttpServer (certAuth) {
+async function startHttpServer (event) {
   return new Promise(function (resolve) {
     try {
       const httpServer = http.createServer(app)
@@ -294,25 +293,28 @@ async function startHttpServer (certAuth) {
       httpServer.listen(port, function () {
         if (sslEnabled) {
           // we needed to run http for the auth challenge
-          certAuth.on('done', function () {
-            // kill it (because it references the app)
-            httpServer.close(function () {
-              // and redirect everything to secure port
-              const srv = http.createServer(function (_req, res) {
-                // do a 302 redirect
-                res.writeHead(302, {
-                  location: `https://${domain}:${sslPort}`
+          event.callback(function () {
+            try {
+              // kill it (because it references the app)
+              httpServer.close(function () {
+                // and redirect everything to secure port
+                const srv = http.createServer(function (_req, res) {
+                  // do a 302 redirect
+                  res.writeHead(302, {
+                    location: `https://${domain}:${sslPort}`
+                  })
+                  res.end()
                 })
-                res.end()
+                srv.listen(port, domain)
               })
-              srv.listen(port)
-            })
+            } catch (e) {
+              console.error(startHttpServer.name, 'listener error', error)
+            }
           })
-          resolve()
         } else {
           attachServiceMesh(httpServer)
-          resolve()
         }
+        resolve()
       })
     } catch (e) {
       console.error(startHttpServer.name, e.message)
@@ -325,7 +327,17 @@ async function startHttpServer (certAuth) {
 let secureCtx
 
 /** cert auth challenge event */
-class CertAuth extends EventEmitter {}
+function certEvent () {
+  let cb
+  return {
+    callback (fn) {
+      cb = fn
+    },
+    fire () {
+      cb()
+    }
+  }
+}
 
 /**
  * Start the web server. Programmatically
@@ -333,11 +345,13 @@ class CertAuth extends EventEmitter {}
  * and no cert is found in /cert directory.
  */
 async function startWebServer () {
-  const certAuth = new CertAuth()
-  await startHttpServer(certAuth)
+  const event = certEvent()
+  await startHttpServer(event)
 
   if (sslEnabled) {
     secureCtx = await createSecureContext()
+    // start forwarding http to https
+    event.fire()
     // renew certs without restarting the server
     const httpsServer = https.createServer(
       {
@@ -357,8 +371,6 @@ async function startWebServer () {
     attachServiceMesh(httpsServer, secureCtx)
     // callback figures out public-facing addr
     httpsServer.listen(sslPort, checkPublicIpAddress)
-    // start http redirects
-    certAuth.emit('done')
   }
 }
 
