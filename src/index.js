@@ -292,8 +292,6 @@ async function startHttpServer (certAuth) {
       app.use(shutdown(httpServer)) // kill after timeout
 
       httpServer.listen(port, function () {
-        checkPublicIpAddress()
-
         if (sslEnabled) {
           // we needed to run http for the auth challenge
           certAuth.on('done', function () {
@@ -307,7 +305,7 @@ async function startHttpServer (certAuth) {
                 })
                 res.end()
               })
-              srv.listen(port, checkIpHostname)
+              srv.listen(port)
             })
           })
           resolve()
