@@ -316,6 +316,7 @@ async function startHttpServer () {
   httpServer.listen(port, checkPublicIpAddress)
 }
 
+
 /** the current cert/key pair */
 let secureCtx
 
