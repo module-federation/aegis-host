@@ -1,3 +1,3 @@
 # start as daemon
 
-node --title "aegis-customers" ../dist/index.js 8070 > ../public/aegis-customers.log 
+nohup node --title "aegis-customers" dist/index.js 8070 >public/aegis-customers.log &

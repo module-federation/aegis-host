@@ -1,6 +1,6 @@
 {
   "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
-  "general": {
+  "env": {
     "desc": "live-updateable environmental vars",
     "distributedCache": {
       "desc": "enables transparent integration between aegis instances",
@@ -44,7 +44,7 @@
   },
   "services": {
     "desc": "services config",
-    "activeServiceMesh": "MeshLink",
+    "activeServiceMesh": "WebSwitch",
     "serviceMesh": {
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",

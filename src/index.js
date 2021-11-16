@@ -30,7 +30,6 @@ const fs = require('fs')
 const tls = require('tls')
 const http = require('http')
 const https = require('https')
-const proxy = require('express-http-proxy')
 const express = require('express')
 const websocket = require('ws')
 const EventEmitter = require('events').EventEmitter
@@ -40,7 +39,6 @@ const sslPort = process.argv[2] ? process.argv[2] : process.env.SSL_PORT || 443
 const apiRoot = process.env.API_ROOT || '/microlib/api'
 const keyFile = 'cert/privatekey.pem'
 const certFile = 'cert/certificate.pem'
-const proxyMode = /true/i.test(process.env.PROXYMODE) || false
 const forceTimeout = 3000 // time to wait for conn to drop before closing server
 const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
 const hotReloadPath = process.env.HOTRELOAD_PATH || '/microlib/reload'
@@ -172,34 +170,9 @@ function checkPublicIpAddress () {
 }
 
 /**
- * Attach {@link MeshService} to the API listener socket.
- * Listen for upgrade events from http server and switch
- * client to WebSockets protocol. Clients connecting this
- * way are using the service mesh, not the REST API. Use
- * key + cert in {@link secureCtx} for secure connection.
- *
- * @param {https.Server|http.Server} server
- */
-function attachServiceMesh (server, secureCtx) {
-  const context = sslEnabled ? secureCtx : {}
-  const wss = new websocket.Server({
-    ...context,
-    clientTracking: true,
-    server: server,
-    maxPayload: 104857600
-  })
-  wss.on('upgrade', (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, function (ws) {
-      wss.emit('connection', ws, request)
-    })
-  })
-  MeshService.attachServer(wss)
-}
-
-/**
  * Shutdown gracefully. Return 503 during shutdown to prevent new connections
  * @param {*} server
- * @param {*} [options ]
+ * @param {*} [options]
  * @returns
  */
 function shutdown (server) {
@@ -239,6 +212,33 @@ function shutdown (server) {
   return middleware
 }
 
+
+/**
+ * Attach {@link MeshService} to the API listener socket.
+ * Listen for upgrade events from http server and switch
+ * client to WebSockets protocol. Clients connecting this
+ * way are using the service mesh, not the REST API. Use
+ * key + cert in {@link secureCtx} for secure connection.
+ *
+ * @param {https.Server|http.Server} server
+ * @param {tls.SecureContext} [secureCtx] if ssl enabled
+ */
+ function attachServiceMesh (server, secureCtx) {
+  const keyAndCert = secureCtx || {}
+  const wss = new websocket.Server({
+    ...keyAndCert,
+    clientTracking: true,
+    server: server,
+    maxPayload: 104857600
+  })
+  wss.on('upgrade', (request, socket, head) => {
+    wss.handleUpgrade(request, socket, head, function (ws) {
+      wss.emit('connection', ws, request)
+    })
+  })
+  MeshService.attachServer(wss)
+}
+
 /**
  * Programmatically provision CA cert using RFC
  * https://datatracker.ietf.org/doc/html/rfc8555
@@ -252,7 +252,7 @@ function shutdown (server) {
  * @param {*} domainEmail
  * @returns
  */
-async function getTrustedCert (domain, domainEmail, renewal = false) {
+async function getTrustedCert (domain, renewal = false) {
   if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
     return {
       key: fs.readFileSync(keyFile, 'utf8'),
@@ -261,10 +261,7 @@ async function getTrustedCert (domain, domainEmail, renewal = false) {
   }
 
   // call service to acquire or renew x509 certificate from PKI
-  const { key, cert } = await CertificateService.provisionCert(
-    domain,
-    domainEmail
-  )
+  const { key, cert } = await CertificateService.provisionCert(domain)
 
   fs.writeFileSync(certFile, cert, 'utf-8')
   fs.writeFileSync(keyFile, key, 'utf-8')
@@ -313,16 +310,18 @@ async function startHttpServer (certAuth) {
                 })
                 res.end()
               })
-              srv.listen(port)
+              srv.listen(port, checkIpHostname)
             })
           })
+          resolve()
         } else {
           attachServiceMesh(httpServer)
+          resolve()
         }
       })
-      resolve()
     } catch (e) {
       console.error(startHttpServer.name, e.message)
+      resolve()
     }
   })
 }
@@ -366,8 +365,6 @@ async function startWebServer () {
     // start http redirects
     certAuth.emit('done')
   }
-
-  fs.writeFileSync(`${process.title}.pid`, `${process.pid}\n`, 'utf-8')
 }
 
 /**
@@ -391,10 +388,7 @@ async function startService () {
  * Start as a single or clustered server (or proxy)
  */
 if (!isServerless()) {
-  if (proxyMode) {
-    app.use('/', proxy(process.argv[2]))
-    app.listen(process.argv[3])
-  } else if (clusterEnabled) {
+  if (clusterEnabled) {
     // Fork child processes (one per core)
     // children share socket descriptor (round-robin)
     ClusterService.startCluster(startService)
