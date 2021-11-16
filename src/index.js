@@ -291,6 +291,8 @@ async function startHttpServer (event) {
       app.use(shutdown(httpServer)) // kill after timeout
 
       httpServer.listen(port, function () {
+        checkPublicIpAddress()
+
         if (sslEnabled) {
           // we needed to run http for the auth challenge
           event.callback(function () {
@@ -328,7 +330,7 @@ let secureCtx
 
 /** cert auth challenge event */
 function certEvent () {
-  let cb
+  let cb = () => console.log('non SSL')
   return {
     callback (fn) {
       cb = fn
