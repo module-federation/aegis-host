@@ -138,8 +138,9 @@ function reloadCallback () {
  */
 function checkPublicIpAddress () {
   const bytes = []
-  const proto = sslEnabled ? 'https' : 'http'
-  const prt = sslEnabled ? sslPort : port
+  const greeting = ipAddr =>
+    `\n 🌎 ÆGIS listening on http://${ipAddr}:${port} \n`
+
   if (!/local/i.test(process.env.NODE_ENV)) {
     try {
       http.get(
@@ -151,9 +152,7 @@ function checkPublicIpAddress () {
           response.on('data', chunk => bytes.push(chunk))
           response.on('end', function () {
             const ipAddr = bytes.join('').trim()
-            console.log(
-              `\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`
-            )
+            console.log(greeting(ipAddr))
           })
         }
       )
@@ -162,8 +161,7 @@ function checkPublicIpAddress () {
       console.error('checkip', e.message)
     }
   } else {
-    const ipAddr = 'localhost'
-    console.log(`\n 🌎 ÆGIS listening on ${proto}://${ipAddr}:${prt} \n`)
+    console.log(greeting('localhost'))
   }
   return
 }
