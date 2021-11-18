@@ -301,8 +301,9 @@ async function startHttpServer () {
      * all requests for http to https port
      */
     app.use(function (req, res) {
-      console.log('protocol', req.protocol)
+      console.log('redirect url', req.url)
       if (/^http$/i.test(req.protocol) && redirect) {
+        console.log('protocol', req.protocol)
         const redirectUrl = `${domain}:${sslPort}${req.url}`
         console.debug('redirect URL', redirectUrl)
         res.redirect(301, redirectUrl)

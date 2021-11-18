@@ -10,7 +10,7 @@
       "desc": "service mesh enabled or not: disable to use external, federated event bus",
       "enabled": true
     },
-    "restartWorflow": true,
+    "restartWorkflow": true,
     "checkIpHost": "https://checkip.amazonaws.com",
     "defaultCircuitBreaker": {
       "errorRate": 25,
@@ -49,8 +49,8 @@
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
         "enabled": true,
-        "host": "localhost",
-        "port": 80,
+        "host": "aegis.module-federation.org",
+        "port": 443,
         "heartbeat": 30000,
         "debug": false,
         "uplink": null
@@ -88,7 +88,7 @@
         "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
         "audience": "https://microlib.io/",
         "issuer": "https://dev-2fe2iar6.us.auth0.com/",
-        "algoridthms": ["RS256"]
+        "algorithms": ["RS256"]
       }
     },
     "cert": {
