@@ -2,6 +2,8 @@
 
 # ÆGIS <sub><sup>formerly _MicroLib_</sup></sub>
 
+N.B. This is the host - see the library [here](https://github.com/module-federation/aegis).
+
 
 | Repo         | Edit with VS Code |
 | -------------| -------------     |
