@@ -1,24 +1,24 @@
 
-# Example .env file
+# Example .env file - cp to .env and update as needed
 
-# Target environment: e.g. local, dev, test, prod
+# Target environment: local, dev, test, prod
 NODE_ENV=local
 
-# DOMAIN
+# system provisions cert for this domain
 DOMAIN=aegis.module-federation.org
 
-# Run in serverless mode (no webserver)
+# Run in serverless mode (no web server)
 SERVERLESS=false
 
-# Create child processes, one per core
+# Create child processes, one per core, which share server
+# socket and take turns (round-robin) handling requests
 CLUSTER_ENABLED=false
 
 # Token-based authorization (JSON Web Tokens)
-# Secure protected routes. See auth/key-set.json.
+# Secure protected routes. See key-set in aegis.config.
 AUTH_ENABLED=false
 
 # Use Secure Sockets Layer / TLS / HTTPS
-# System provisions cert automatically
 SSL_ENABLED=false
 SSL_PORT=443
 PORT=80
@@ -28,6 +28,7 @@ PORT=80
 DATASOURCE_ADAPTER=DataSourceFile 
 #DATASOURCE_ADAPTER=DataSourceMongoDb 
 #DATASOURCE_ADAPTER=DataSourceIpfs
+#DATASOURCE_ADAPTER=DataSourceEtherium
 
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000 
@@ -39,10 +40,9 @@ DISTRIBUTED_CACHE_ENABLED=true
 API_ROOT=/microlib/api
 
 # Shared secret for crypto
-ENCRYPTION_PWD=secret
+ENCRYPTION_PWD=b!gSecr3t
 
 # Cloud serverless provider name
-# See src/message.js
 # PROVIDER_NAME=azure
 # PROVIDER_NAME=google
 PROVIDER_NAME=aws

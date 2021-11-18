@@ -1,67 +1,77 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="microlib.png" />
 
-<head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="microlib.png">
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+      crossorigin="anonymous"
+    />
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <title>ÆGIS Service Mesh Listener</title>
+  </head>
 
-  <title>MicroLib WebSwitch Listener</title>
-</head>
+  <body style="background-color:black">
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+      crossorigin="anonymous"
+    ></script>
 
-<body style="background-color:black">
+    <nav class="navbar navbar-dark">
+      <div class="container-lg">
+        <a class="navbar-brand" href="#">
+          <img src="microlib.png" alt="MicroLib" width="30" height="24" />
+          <span class="navbar-brand mb-0 h1 text-warning">ÆGIS</span>
+          <span class="navbar-brand text-muted mb-0"
+            >Service Mesh Listener</span
+          >
+        </a>
+      </div>
+    </nav>
 
-  <!-- Option 1: Bootstrap Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
-    </script>
-
-  <nav class="navbar navbar-dark">
-    <div class="container">
-      <a class="navbar-brand" href="#">
-        <img src="microlib.png" alt="MicroLib" width="30" height="24">
-        <span class="navbar-brand mb-0 h1 text-warning">MicroLib</span>
-        <span class="navbar-brand text-muted mb-0">WebSwitch Event Listener</span>
-      </a>
-    </div>
-  </nav>
-
-  <div class="container-lg">
-    <div class="row">
-      <div class="col-lg-5">
-
-        <div class="mb-3">
-          <!-- <button id="login" class="btn btn-outline-light" title="post">Log in</button>-->
-          <button id="wsButton" class="btn btn-outline-light" title="patch">Open WebSocket</button>
-          <button id="status" class="btn btn-outline-light" title="post">Get Status</button>
-          <button id="clear" class="btn btn-outline-light" title="delete">Clear</button>
+    <div class="container-lg">
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="mb-3">
+            <!-- <button id="login" class="btn btn-outline-light" title="post">Log in</button>-->
+            <button id="wsButton" class="btn btn-outline-light" title="patch">
+              Open WebSocket
+            </button>
+            <button id="status" class="btn btn-outline-light" title="post">
+              Get Status
+            </button>
+            <button id="clear" class="btn btn-outline-light" title="delete">
+              Clear
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <pre id="messages" class="text-light mb-3 overflow-scroll"
-          style="height: 420px; "><code id="jsonCode" class="line-nowrap"></code></pre>
-      </div>
-      <!--div class="col">
+      <div class="row">
+        <div class="col">
+          <pre
+            id="messages"
+            class="text-light mb-3 overflow-scroll"
+            style="height: 420px; "
+          ><code id="jsonCode" class="line-nowrap"></code></pre>
+        </div>
+        <!--div class="col">
         <iframe id="inlineFrameExample" title="Inline Frame Example" width="300" height="200"
           src="http://localhost:8080"></iframe>
-      </div-->
+        </div-->
+      </div>
     </div>
-  </div>
-  </div>
 
-  <script src="wsapp.js"></script>
-
-</body>
-
+    <script src="wsapp.js"></script>
+  </body>
 </html>
-
 
 <!--video width="320" height="240" autoplay>
   <source src="localhost:8080" type="video/webm">
