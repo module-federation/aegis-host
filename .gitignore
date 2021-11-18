@@ -1,7 +1,6 @@
 node_modules
 dist
 .vscode
-.prettierrc.json
 *.cpuprofile
 src/.DS_Store
 .env*
@@ -38,10 +37,10 @@ public/user.json
 public/order.json
 public/customer.json
 public/product.json
-/.idea/
-PID
-public/aegis.log
 public/wasm.json
+public/aegis.log
 yarn-error.log
 aegis.pid
-aegis.pid
+cert/certificate.pem
+cert/privatekey.pem
+cert/.prev
