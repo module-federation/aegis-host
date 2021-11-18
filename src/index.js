@@ -163,7 +163,6 @@ function checkPublicIpAddress () {
   } else {
     console.log(greeting('localhost'))
   }
-  return
 }
 
 /**
