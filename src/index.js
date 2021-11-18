@@ -297,6 +297,7 @@ async function createSecureContext (renewal = false) {
  */
 async function startHttpServer () {
   const httpServer = http.createServer(app)
+  app.use(shutdown(httpServer))
 
   if (sslEnabled) {
     /**
@@ -304,8 +305,8 @@ async function startHttpServer () {
      * all requests for http to https port
      */
     app.use(function (req, res) {
-      if (redirect && /^http$/i.test(req.protocol)) {
-        res.redirect(`https://${domain}:${sslPort}`)
+      if (/^http$/i.test(req.protocol) && redirect) {
+        res.redirect(`https://${domain}:${sslPort}${req.url}`)
       }
     })
   } else {
@@ -315,7 +316,6 @@ async function startHttpServer () {
 
   httpServer.listen(port, checkPublicIpAddress)
 }
-
 
 /** the current cert/key pair */
 let secureCtx
@@ -342,11 +342,13 @@ async function startWebServer () {
       },
       app
     )
+
     // update secureCtx to refresh certificate
     app.use(
       certLoadPath,
       async () => (secureCtx = await createSecureContext(true))
     )
+
     // graceful shutdown prevents new clients from connecting & waits
     // up to `shutdownOptions.forceTimeout` for them to disconnect
     app.use(shutdown(httpsServer))
@@ -355,7 +357,9 @@ async function startWebServer () {
     attachServiceMesh(httpsServer, secureCtx)
 
     // callback figures out public-facing addr
-    httpsServer.listen(sslPort, checkPublicIpAddress)
+    httpsServer.listen(sslPort, () =>
+      console.info(`\n 🌎 ÆGIS listening on https://${domain}:${sslPort} \n`)
+    )
   }
 }
 
@@ -377,12 +381,12 @@ async function startService () {
 }
 
 /**
- * Start as a single or clustered server (or proxy)
+ * Start a single instance or a cluster
  */
 if (!isServerless()) {
   if (clusterEnabled) {
-    // Fork child processes (one per core)
-    // children share socket descriptor (round-robin)
+    // Fork child processes (one per core),
+    // which share socket descriptor (round-robin)
     ClusterService.startCluster(startService)
   } else {
     startService()
