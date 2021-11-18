@@ -218,10 +218,9 @@ function shutdown (server) {
  * @param {https.Server|http.Server} server
  * @param {tls.SecureContext} [secureCtx] if ssl enabled
  */
-function attachServiceMesh (server, secureCtx = null) {
-  const secure = secureCtx || {}
+function attachServiceMesh (server, secureCtx = {}) {
   const wss = new websocket.Server({
-    ...secure,
+    ...secureCtx,
     clientTracking: true,
     server: server,
     maxPayload: 104857600
@@ -302,8 +301,11 @@ async function startHttpServer () {
      * all requests for http to https port
      */
     app.use(function (req, res) {
+      console.log('protocol', req.protocol)
       if (/^http$/i.test(req.protocol) && redirect) {
-        res.redirect(`https://${domain}:${sslPort}${req.url}`)
+        const redirectUrl = `${domain}:${sslPort}${req.url}`
+        console.debug('redirect URL', redirectUrl)
+        res.redirect(301, redirectUrl)
       }
     })
   } else {
