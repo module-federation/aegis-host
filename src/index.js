@@ -300,15 +300,15 @@ async function startHttpServer () {
      * if {@link redirect} is true, redirect
      * all requests for http to https port
      */
-    app.use(function (req, res) {
-      console.log('redirect url', req.url)
-      if (/^http$/i.test(req.protocol) && redirect) {
-        console.log('protocol', req.protocol)
-        const redirectUrl = `${domain}:${sslPort}${req.url}`
-        console.debug('redirect URL', redirectUrl)
-        res.redirect(301, redirectUrl)
-      }
-    })
+    // app.use(function (req, res) {
+    //   console.log('redirect url', req.url)
+    //   if (/^http$/i.test(req.protocol) && redirect) {
+    //     console.log('protocol', req.protocol)
+    //     const redirectUrl = `${domain}:${sslPort}${req.url}`
+    //     console.debug('redirect URL', redirectUrl)
+    //     res.redirect(301, redirectUrl)
+    //   }
+    // })
   } else {
     // https disabled, so attach to http
     attachServiceMesh(httpServer)

@@ -32350,10 +32350,23 @@ module.exports = require("zlib");
 /******/ 		        }
 /******/ 		      )
 /******/ 		      .then(function (rest) {
+/******/ 		        if (!rest?.data) {
+/******/ 		          console.error('cannot find file')
+/******/ 		          return
+/******/ 		        }
 /******/ 		        const file = rest.data.find(d => "/" + d.name === url.pathname);
+/******/ 		
+/******/ 		        if (!file?.sha) {
+/******/ 		          console.error('cannot read file or sha')
+/******/ 		          return
+/******/ 		        }
 /******/ 		        return file.sha;
 /******/ 		      })
 /******/ 		      .then(function (sha) {
+/******/ 		        if (!sha) {
+/******/ 		          console.error('cannot find sha')
+/******/ 		          return
+/******/ 		        }
 /******/ 		        console.log(sha);
 /******/ 		        return octokit.request(
 /******/ 		          "GET /repos/{owner}/{repo}/git/blobs/{sha}",
