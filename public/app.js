@@ -41,7 +41,7 @@
    * Need CORS for this.
    */
   async function refreshAccessToken () {
-    const file = await fetch('config.json')
+    const file = await fetch('app.json')
     const text = await file.text()
     const config = JSON.parse(text)
     let token = { access_token: '' }
