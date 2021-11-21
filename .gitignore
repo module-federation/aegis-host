@@ -39,8 +39,11 @@ public/customer.json
 public/product.json
 public/wasm.json
 public/aegis.log
+public/inventory.json
+public/catalog.log
 yarn-error.log
 aegis.pid
 cert/certificate.pem
 cert/privatekey.pem
 cert/.prev
+aegis.pid
