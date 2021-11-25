@@ -17,7 +17,7 @@ const importFresh = require('import-fresh')
 
 const { adapters, services } = require('@module-federation/aegis')
 const { AuthorizationService, CertificateService, ClusterService } = services
-const { ServerlessAdapter, ServiceMesh } = adapters
+const { ServerlessAdapter, ServiceMeshAdapter } = adapters
 
 const fs = require('fs')
 const tls = require('tls')
@@ -223,7 +223,7 @@ function attachServiceMesh (server, secureCtx = {}) {
       wss.emit('connection', ws, request)
     })
   })
-  ServiceMesh.attachServer(wss)
+  ServiceMeshAdapter.attachServer(wss)
 }
 
 /**
