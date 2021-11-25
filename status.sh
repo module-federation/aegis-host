@@ -13,14 +13,14 @@ external_ip_aws=$(curl checkip.amazonaws.com)
 external_ip_dns1=$(nslookup -recurse $domain1 | grep Address | grep -v "#" | awk '{print $2}')
 external_ip_dns2=$(nslookup -recurse $domain2 | grep Address | grep -v "#" | awk '{print $2}')
 
-echo "AWS external address $external_ip_aws"
+echo "external address $external_ip_aws"
 
 if [ "$external_ip_aws" == "$external_ip_dns1" ]; then
-  echo -e "${GREEN}this is $domain1 $NC"
+  echo -e "domain${GREEN} $domain1 $NC"
 fi
 
 if [ "$external_ip_aws" == "$external_ip_dns2" ]; then
-  echo -e "${GREEN}this is $domain2 $NC"
+  echo -e "domain${GREEN} $domain2 $NC"
 fi
 
 # print current entries that match
