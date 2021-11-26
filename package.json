@@ -1,5 +1,5 @@
 {
-  "name": "micro-lib",
+  "name": "aegis-host",
   "version": "1.0.0",
   "description": "",
   "installConfig": {
@@ -14,7 +14,7 @@
     "domain": ""
   },
   "repository": {
-    "url": "https://github.com/module-federation/microlib"
+    "url": "https://github.com/module-federation/aegis-host"
   },
   "scripts": {
     "build": "yarn clean && npm run transpile && webpack --config webpack.config.js",
@@ -33,9 +33,6 @@
     "build-order": "cp webpack/remote-entries-cache-order.js webpack/remote-entries.js && yarn build",
     "build-customer": "cp webpack/remote-entries-cache-customer.js webpack/remote-entries.js && yarn build",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && yarn build",
-    "start-daemon": "sh scripts/daemon.sh",
-    "start-daemon-orders": "sh scripts/daemon-orders.sh",
-    "start-daemon-customers": "sh scripts/daemon-customers.sh",
     "deploy-lambda": "npm run clean && npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "mesh-start": "node --title appmesh ./node_modules/@module-federation/aegis/lib/services/mesh-switch.js",
     "mesh-status": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-status.mjs",
@@ -67,7 +64,7 @@
   "license": "MIT",
   "dependencies": {
     "@assemblyscript/loader": "^0.19.12",
-    "@module-federation/aegis": "^1.0.0-beta.63",
+    "@module-federation/aegis": "^1.0.0-beta.68",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "assemblyscript": "^0.19.12",

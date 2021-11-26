@@ -6,21 +6,21 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-domain1=aegis.module-federation.org
-domain2=aegis2.module-federation.org
+DOMAIN1=aegis.module-federation.org
+DOMAIN2=aegis2.module-federation.org
 
-external_ip_aws=$(curl checkip.amazonaws.com)
-external_ip_dns1=$(nslookup -recurse $domain1 | grep Address | grep -v "#" | awk '{print $2}')
-external_ip_dns2=$(nslookup -recurse $domain2 | grep Address | grep -v "#" | awk '{print $2}')
+IP_AWS=$(curl checkip.amazonaws.com)
+IP_DNS1=$(nslookup -recurse $DOMAIN1 | grep Address | grep -v "#" | awk '{print $2}')
+IP_DNS2=$(nslookup -recurse $DOMAIN2 | grep Address | grep -v "#" | awk '{print $2}')
 
-echo "external address $external_ip_aws"
+echo "external address ${IP_AWS}"
 
-if [ "$external_ip_aws" == "$external_ip_dns1" ]; then
-  echo -e "domain${GREEN} $domain1 $NC"
+if [ "${IP_AWS}" == "${IP_DNS1}" ]; then
+  echo -e "domain${GREEN} $DOMAIN1 $NC"
 fi
 
-if [ "$external_ip_aws" == "$external_ip_dns2" ]; then
-  echo -e "domain${GREEN} $domain2 $NC"
+if [ "$IP_AWS" == "$IP_DNS2" ]; then
+  echo -e "domain${GREEN} $DOMAIN2 $NC"
 fi
 
 # print current entries that match
