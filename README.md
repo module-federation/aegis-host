@@ -237,7 +237,7 @@ MONGODB_URL=mongodb://localhost:27017
 
 ### Clustering
 
-MicroLib supports clustering with automatic cache synchronization and rolling restart for increased stability, scalality and efficiency with zero downtime. When you rebuild the example service, it will automatically update the cluster. To enable:
+MicroLib supports clustering with automatic cache synchronization and rolling restart for increased stability, scalality and efficiency with zero downtime. To enable:
 
 .env
 
