@@ -237,13 +237,17 @@ MONGODB_URL=mongodb://localhost:27017
 
 ### Clustering
 
-MicroLib supports clustering with automatic cache synchronization and rolling restart for increased stability, scalality and efficiency with zero downtime. To enable:
+Aegis supports clustering with automatic cache synchronization and rolling restart for increased stability, scalality and efficiency with zero downtime. To enable:
 
 .env
 
 ```
 CLUSTER_ENABLED=true
 ```
+
+### Serverless 
+
+Aegis can also run as a serverless function. It's rated for AWS. Support can be extended to other platforms and vendors by writing a message parser that simply amaps the input and output to request and response objects, indicating the HTTP method. See /adapters/serverless/parsers
 
 ### Authorization
 
