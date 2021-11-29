@@ -232,7 +232,7 @@ See above TL;DS section for a simplied install. Get up and running in about 60 s
 
 ### Datasources
 
-In the default configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change the default to Mongo. You can also update an individual model's datasource in the ModelSpec.
+In the default configuaton, aegis uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change the default to Mongo. You can also update an individual model's datasource in the ModelSpec.
 
 ```shell
 brew install mongodb-community
