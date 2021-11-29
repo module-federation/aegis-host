@@ -219,40 +219,9 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 See above TL;DS section for a simplied install. Get up and running in about 60 seconds.
 
-To demonstrate that polyrepo code sharing is a reality, you will clone two repos. The first is MicroLib-Example, which shows you how you might implement an Order service using MicroLib. It also mocks several services and how they might communicate over an event backbone (Kafka). In module-federation terms, this is the remote. The second is the MicroLib host, which streams federated modules exposed by the remote over the network and generates CRUD REST API endpoints for each one.
-
-```shell
-git clone https://github.com/module-federation/MicroLib-Example.git
-cd *Example
-npm ci
-echo "KAFKA_GROUP_ID=remote" > .env
-echo "ENCRYPTION_PWD=secret" >> .env
-npm run build
-
-```
-
-```shell
-git clone https://github.com/module-federation/MicroLib.git
-cd MicroLib
-npm ci
-echo "KAFKA_GROUP_ID=host" > .env
-echo "ENCRYPTION_PWD=secret" >> .env
-echo "DATASOURCE_ADAPTER=DataSourceFile" >> .env
-npm run build
-```
-
-Start the services:
-
-```shell
-# in MicroLib-Example dir
-npm run start-all
-# in MicroLib dir
-npm start
-```
-
 ### Datasources
 
-In the above configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change the default to Mongo. You can also update an individual model's datasource in the ModelSpec.
+In the default configuaton, Microlib uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change the default to Mongo. You can also update an individual model's datasource in the ModelSpec.
 
 ```shell
 brew install mongodb-community
@@ -278,9 +247,9 @@ CLUSTER_ENABLED=true
 
 ### Authorization
 
-MicroLib supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the `auth` directory.
+ÆGIS supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the `public/aegis.config.json` file.
 
-auth/key-set.json
+public/aegis.config.json
 
 ```json
 {
@@ -300,21 +269,15 @@ auth/key-set.json
 AUTH_ENABLED=true
 ```
 
-HTTPS
+### Transport Level Security (HTTPS)
 
-To enable Transport Layer Security, you'll need to import and trust the certificate in the `cert` directory or provide your own cert and private key. Then update .env.
-
-cert
-
-```shell
--rw-r--r--  1 tysonrm  staff  1090 Mar 19 06:55 csr.pem
--rw-r--r--  1 tysonrm  staff  1314 Mar 19 06:30 domain.crt
--rw-r--r--  1 tysonrm  staff  1679 Mar 19 06:54 server.key
-```
+When ÆGIS starts, it will check for the presence of `certificate.pem` and `privatekey.pem` files in the cert folder. If not there, it will automatically provision an x509 certificate for your domain using the [ACME standard](https://datatracker.ietf.org/doc/html/rfc8555) and write the files to the `cert` directory. The following environment must be set. Note: if `NODE_ENV` is set to anything other than `prod` the systems will provision a test certificate.
 
 .env
 
 ```shell
+NODE_ENV=prod
+DOMAIN=aegis.module-federation.org
 SSL_ENABLED=true
 ```
 
