@@ -247,7 +247,7 @@ CLUSTER_ENABLED=true
 
 ### Serverless 
 
-Aegis can also run as a serverless function. It's rated for AWS. Support can be extended to other platforms and vendors by writing a message parser that simply amaps the input and output to request and response objects, indicating the HTTP method. See /adapters/serverless/parsers
+Alternatively, Aegis can run as a serverless function. It's rated for AWS. Support can be extended to other platforms and vendors by writing a message parser that simply amaps the input and output to request and response objects, indicating the HTTP method. See /adapters/serverless/parsers
 
 ### Authorization
 
