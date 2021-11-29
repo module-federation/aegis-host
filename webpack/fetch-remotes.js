@@ -4,44 +4,7 @@ const { Octokit } = require('@octokit/rest')
 const fs = require('fs')
 const path = require('path')
 
-/**
- * Allow multiple entry points from different owners, repos, etc on github.
- * @param {*} entry
- * @param {*} url
- * @returns
- */
-function githubPath (entry, url) {
-  if (entry.owner)
-    return `${entry.owner}-${entry.repo}-${entry.filedir
-      .split('/')
-      .join('-')}-${entry.branch}`
-  return url.pathname.split('/').join('-')
-}
-
-function generateFilename (entry) {
-  const url = new URL(entry.url)
-  const hostpart = url.hostname.split('.').join('-')
-  const portpart = url.port ? url.port : 80
-  const pathpart = githubPath(entry, url)
-  if (/remoteEntry/i.test(pathpart))
-    return `${hostpart}-${portpart}-${pathpart}`
-  return `${hostpart}-${portpart}-${pathpart}-remoteEntry.js`
-}
-
-function getPath (entry) {
-  var entry
-  if (!entry || !entry.path) {
-    entry.path = path.join(process.cwd(), 'webpack')
-  }
-  console.debug(getPath.name, entry)
-  const filename = generateFilename(entry)
-  let basedir = entry.path
-  if (entry.path && entry.path.charAt(entry.path.length - 1) !== '/') {
-    basedir = entry.path.concat('/')
-  }
-  return basedir.concat(filename)
-}
-
+// Use developer token for github api
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
 
 /**
@@ -95,43 +58,86 @@ function httpGet (entry, path, done) {
 }
 
 /**
+ * Allow multiple entry points from different owners, repos, etc on github.
+ * @param {*} entry
+ * @param {*} url
+ * @returns
+ */
+function generatePath (entry, url) {
+  if (entry.owner)
+    return `${entry.owner}-${entry.repo}-${entry.filedir
+      .split('/')
+      .join('-')}-${entry.branch}`
+  return url.pathname.split('/').join('-')
+}
+
+function generateFilename (entry) {
+  const url = new URL(entry.url)
+  const hostpart = url.hostname.split('.').join('-')
+  const portpart = url.port ? url.port : 80
+  const pathpart = generatePath(entry, url)
+  if (/remoteEntry/i.test(pathpart))
+    return `${hostpart}-${portpart}-${pathpart}`
+  return `${hostpart}-${portpart}-${pathpart}-remoteEntry.js`
+}
+
+function getPath (entry) {
+  var entry
+  if (!entry || !entry.path) {
+    entry.path = path.join(process.cwd(), 'webpack')
+  }
+  console.debug(getPath.name, entry)
+  const filename = generateFilename(entry)
+  let basedir = entry.path
+  if (entry.path && entry.path.charAt(entry.path.length - 1) !== '/') {
+    basedir = entry.path.concat('/')
+  }
+  return basedir.concat(filename)
+}
+
+/**
  * If streaming from github, owner, repo etc contribute to uniqueness.
  * @param {*} entry
  * @returns
  */
-function getUniqueEntry (entry) {
+function uniqueUrl (entry) {
   return `${entry.url}${entry.owner}${entry.repo}${entry.filedir}${entry.branch}`
 }
 
-/**
- * Return each unique url just once
- * @param {{name:string,path:sting,filedir:string,branch:string,url:string}[]} entries
- * @returns {{[x:string]:{name:string,path:string,url:string}}}
- */
-function deduplicate (entries) {
-  if (!entries || entries.length < 1) return
-  return entries
+function deduplicate (remoteEntries) {
+  if (!remoteEntries || remoteEntries.length < 1) return {}
+  return remoteEntries
     .map(function (e) {
       return {
-        [getUniqueEntry(e)]: {
+        [uniqueUrl(e)]: {
           ...e,
-          name: getUniqueEntry(e)
+          name: uniqueUrl(e)
         }
       }
     })
-    .reduce((p, c) => ({ ...p, ...c }), entries)
+    .reduce((p, c) => ({ ...p, ...c }), remoteEntries)
 }
 
-function removeWasmEntries (remoteEntries) {
-  if (remoteEntries) return remoteEntries.filter(e => e && !e.wasm)
-}
+/**
+ *
+ * @param {{name:string,path:sting,filedir:string,branch:string,url:string}[]} remoteEntries
+ */
+function RemoteEntriesUtil (remoteEntries) {
+  console.info(remoteEntries)
 
-function validateEntries (remoteEntries) {
-  if (!remoteEntries || remoteEntries.length < 1 || remoteEntries === []) {
-    console.log('entries missing or invalid')
-    throw new Error('entries missing or invalid')
+  return {
+    validateEntries () {
+      if (!remoteEntries || remoteEntries.length < 1)
+        throw new Error('entries missing or invalid')
+      return this
+    },
+
+    removeWasmEntries () {
+      if (Array.isArray(remoteEntries))
+        remoteEntries.forEach((e, i, a) => !e.wasm || a.splice(i, 1))
+      return this
+    }
   }
-  return remoteEntries
 }
 
 /**
@@ -140,17 +146,17 @@ function validateEntries (remoteEntries) {
  *  name: string,
  *  url: string,
  *  path: string
- * }[]} remoteEntry `name` of file, `url` of file, download file to `path`
+ * }[]} remoteEntries `name` of file, `url` of file, download file to `path`
  *
  * @returns {Promise<{[index: string]: string}>} local paths to downloaded entries
  */
-module.exports = async remoteEntry => {
-  console.info(remoteEntry)
-  const validEntries = removeWasmEntries(validateEntries(remoteEntry))
-  if (validEntries.length < 1) return
+module.exports = async remoteEntries => {
+  RemoteEntriesUtil(remoteEntries)
+    .validateEntries()
+    .removeWasmEntries()
 
   const remotes = await Promise.all(
-    Object.values(deduplicate(validEntries)).map(function (entry) {
+    Object.values(deduplicate(remoteEntries)).map(function (entry) {
       const path = getPath(entry)
       console.log('downloading file to', path)
 
@@ -168,7 +174,7 @@ module.exports = async remoteEntry => {
     })
   )
 
-  return validEntries.map(e => ({
-    [e.name]: remotes.find(r => r[getUniqueEntry(e)])[getUniqueEntry(e)]
+  return remoteEntries.map(e => ({
+    [e.name]: remotes.find(r => r[uniqueUrl(e)])[uniqueUrl(e)]
   }))
 }
