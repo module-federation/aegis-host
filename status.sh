@@ -10,7 +10,7 @@ DOMAIN1=aegis.module-federation.org
 DOMAIN2=aegis2.module-federation.org
 
 # Get public IP of this host
-IPADDR_PUBLIC=$(curl checkip.amazonaws.com)
+IPADDR_PUBLIC=$(curl -s checkip.amazonaws.com)
 # Get IP of domain1
 IPADDR_DOMAIN1=$(nslookup -recurse $DOMAIN1 | grep Address | grep -v "#" | awk '{print $2}')
 # Get IP of domain2
