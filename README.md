@@ -247,9 +247,9 @@ CLUSTER_ENABLED=true
 
 ### Authorization
 
-ÆGIS supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the `auth` directory.
+ÆGIS supports JSON Web Tokens for authorization of protected routes. To enable, you must provide JSON Web Key URI to retrieve the public key of the signer of the JSON Web Token. You can set up an account with Auth0 for testing purposes. You update the key set configuration in the `public/aegis.config.json` file.
 
-auth/key-set.json
+public/aegis.config.json
 
 ```json
 {
@@ -269,7 +269,7 @@ auth/key-set.json
 AUTH_ENABLED=true
 ```
 
-HTTPS
+### Transport Level Security (HTTPS)
 
 When ÆGIS starts, it will check for the presence of `certificate.pem` and `privatekey.pem` files in the cert folder. If not there, it will automatically provision an x509 certificate for your domain using the [ACME standard](https://datatracker.ietf.org/doc/html/rfc8555) and write the files to the `cert` directory. The following environment must be set. Note: if `NODE_ENV` is set to anything other than `prod` the systems will provision a test certificate.
 
