@@ -15,6 +15,7 @@ require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
 
+// aegis library
 const { adapters, services } = require('@module-federation/aegis')
 const { AuthorizationService, CertificateService, ClusterService } = services
 const { ServerlessAdapter, ServiceMeshAdapter } = adapters
@@ -62,18 +63,19 @@ function clearRoutes () {
 }
 
 /**
- * Load federated server module. Call `clear` to delete non-webpack cache if
- * hot reloading. Call `start` to import remote models, adapters, services,
- * set API routes and load persisted data from storage.
+ * Load federated server module bundle, the bundle we self-expose. (We
+ * never load main.js). Call `clear` to delete non-webpack cache if hot
+ * reloading. Call `start` and return the `invoke` method, which calls
+ * the server's controllers directly, for running as a serverless function.
  *
  * Note:
  *
  * About hot reload cache purge: even though we will have just loaded a fresh
  * copy of remoteEntry.js, because the runtime only loads each module once and
- * subsequent imports don't bypass the cache, they  won't be fresh and will need
- * to be purged. We do not cache remoteEntry.js itself, so the old copy won't be
- * purged, but it will eventually be garbage collected since nothing will point
- * to it anymore after reload.
+ * subsequent imports don't bypass the cache, those imports won't be fresh and
+ * will need to be purged. We do not cache remoteEntry.js itself, so of course
+ * the old copy won't be purged, but it _will_ eventually be garbage collected
+ * since nothing will point to it after this.
  *
  * @param {{hot:boolean, serverless:boolean}} options If `hot` is true, reload;
  * if this is a serverless function call, set `serverless` to true.
@@ -85,12 +87,10 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
   if (hot) {
     // clear stale routes
     clearRoutes()
-    // clear cache on hot reload: even though we just loaded a fresh
-    // copy, because the runtime only loads a library once, and its
-    // dependencies dont bypass the cache, they are not fresh and
-    // need to be purged
+    // clear cache on hot reload, see above.
     serverModule.default.clear()
   }
+  // import and run remote service components
   await serverModule.default.start(app, serverless)
   // `invoke` calls the server's controllers directly
   return serverModule.default.invoke
@@ -126,14 +126,14 @@ function reloadCallback () {
   })
 }
 
+const greeting = (proto, host, port) =>
+  `\n 🌎 ÆGIS listening on ${proto}://${host}:${port} \n`
+
 /**
  * Ping a public server for our public address.
  */
 function checkPublicIpAddress () {
   const bytes = []
-  const greeting = ipAddr =>
-    `\n 🌎 ÆGIS listening on http://${ipAddr}:${port} \n`
-
   if (!/local/i.test(process.env.NODE_ENV)) {
     try {
       http.get(
@@ -145,7 +145,7 @@ function checkPublicIpAddress () {
           response.on('data', chunk => bytes.push(chunk))
           response.on('end', function () {
             const ipAddr = bytes.join('').trim()
-            console.log(greeting(ipAddr))
+            console.log(greeting('http', ipAddr, port))
           })
         }
       )
@@ -154,7 +154,7 @@ function checkPublicIpAddress () {
       console.error('checkip', e.message)
     }
   } else {
-    console.log(greeting('localhost'))
+    console.log(greeting('http', 'localhost', port))
   }
 }
 
@@ -202,7 +202,7 @@ function shutdown (server) {
 }
 
 /**
- * Attach {@link MeshService} to the API listener socket.
+ * Attach {@link ServiceMeshAdapter} to the API listener socket.
  * Listen for upgrade events from http server and switch
  * client to WebSockets protocol. Clients connecting this
  * way are using the service mesh, not the REST API. Use
@@ -326,7 +326,7 @@ async function startWebServer () {
     secureCtx = await createSecureContext()
 
     /**
-     * provide cert via {@link secureCtx} - provision +
+     * provide cert via {@link secureCtx} - provision &
      * renew certs without having to restart the server
      */
     const httpsServer = https.createServer(
@@ -342,17 +342,14 @@ async function startWebServer () {
       async () => (secureCtx = await createSecureContext(true))
     )
 
-    // graceful shutdown prevents new clients from connecting & waits
-    // up to `shutdownOptions.forceTimeout` for them to disconnect
+    // graceful shutdown prevents new clients from connecting
     app.use(shutdown(httpsServer))
 
     // service mesh uses same port
     attachServiceMesh(httpsServer, secureCtx)
 
-    // callback figures out public-facing addr
-    httpsServer.listen(sslPort, () =>
-      console.info(`\n 🌎 ÆGIS listening on https://${domain}:${sslPort} \n`)
-    )
+    // listen on ssl port
+    httpsServer.listen(sslPort, () => greeting('https', domain, sslPort))
   }
 }
 
