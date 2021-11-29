@@ -273,7 +273,7 @@ public/aegis.config.json
 AUTH_ENABLED=true
 ```
 
-### Transport Level Security (HTTPS)
+### Transport Layer Security (HTTPS)
 
 When ÆGIS starts, it will check for the presence of `certificate.pem` and `privatekey.pem` files in the cert folder. If not there, it will automatically provision an x509 certificate for your domain using the [ACME standard](https://datatracker.ietf.org/doc/html/rfc8555) and write the files to the `cert` directory. The following environment must be set. Note: if `NODE_ENV` is set to anything other than `prod` the systems will provision a test certificate.
 
