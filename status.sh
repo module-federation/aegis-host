@@ -9,24 +9,29 @@ NC='\033[0m'
 DOMAIN1=aegis.module-federation.org
 DOMAIN2=aegis2.module-federation.org
 
-IP_AWS=$(curl checkip.amazonaws.com)
-IP_DNS1=$(nslookup -recurse $DOMAIN1 | grep Address | grep -v "#" | awk '{print $2}')
-IP_DNS2=$(nslookup -recurse $DOMAIN2 | grep Address | grep -v "#" | awk '{print $2}')
+# Get public IP of this host
+IPADDR_PUBLIC=$(curl checkip.amazonaws.com)
+# Get IP of domain1
+IPADDR_DOMAIN1=$(nslookup -recurse $DOMAIN1 | grep Address | grep -v "#" | awk '{print $2}')
+# Get IP of domain2
+IPADDR_DOMAIN2=$(nslookup -recurse $DOMAIN2 | grep Address | grep -v "#" | awk '{print $2}')
 
-echo "external address ${IP_AWS}"
+# print the public IP and fully qualified domain name of this host
 
-if [ "${IP_AWS}" == "${IP_DNS1}" ]; then
+echo "public address $IPADDR_PUBLIC"
+
+if [ "$IPADDR_PUBLIC" == "$IPADDR_DOMAIN1" ]; then
   echo -e "domain${GREEN} $DOMAIN1 $NC"
 fi
 
-if [ "$IP_AWS" == "$IP_DNS2" ]; then
+if [ "$IPADDR_PUBLIC" == "$IPADDR_DOMAIN2" ]; then
   echo -e "domain${GREEN} $DOMAIN2 $NC"
 fi
 
-# print current entries that match
+# print current running process
 sudo lsof -P -i tcp | grep LISTEN | grep aegis
 
-# get process id of aegis
+# get process ID of aegis
 PID=$(sudo lsof -P -i tcp | grep LISTEN | grep aegis | awk '{print $2}')
 
 # get number of characters in PID
@@ -34,7 +39,6 @@ NUM=$(echo $PID | wc -c)
 
 # the num of chars if PID is
 # not found = 1, otherwise > 1
-
 if [ ${NUM} -gt 1 ]; then
   echo -e "${GREEN}server is up $NC"
 else
