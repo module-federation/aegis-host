@@ -4,5 +4,5 @@ export GITHUB_TOKEN=$GITHUB_TOKEN
 sudo nohup ${NVM_BIN}/node --title aegis dist/index.js >public/aegis.log 2>&1 &
 # display result of command
 echo "checking status..."
-sleep 2
+sleep 4
 ./status.sh
