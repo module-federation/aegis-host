@@ -349,7 +349,9 @@ async function startWebServer () {
     attachServiceMesh(httpsServer, secureCtx)
 
     // listen on ssl port
-    httpsServer.listen(sslPort, () => greeting('https', domain, sslPort))
+    httpsServer.listen(sslPort, () =>
+      console.info(greeting('https', domain, sslPort))
+    )
   }
 }
 
