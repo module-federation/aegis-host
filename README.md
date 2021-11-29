@@ -215,6 +215,11 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ---
 
+## Service Mesh
+
+Aegis provides a built-in service mesh that ties Aegis instances together in an application fabric, where data, code and workload can be distributed and deployed dynamically in response to functional or non-functional requirements and conditions. The service mesh enables transparent integration of aegis components, such that component developers can write business logic that is valid regardless of where components are deployed. The service mesh is pluggable. It is straightforward to plug in another implementation. Default implementation is "webswitch" a switched mesh based on websockets. Nats and a QUIC-based implementation are planned.
+
+
 ## Running the Application
 
 See above TL;DS section for a simplied install. Get up and running in about 60 seconds.
