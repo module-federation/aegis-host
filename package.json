@@ -72,7 +72,6 @@
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
     "import-fresh": "^3.3.0",
-    "ipfs-core": "^0.4.2",
     "jwks-rsa": "^2.0.1",
     "log-timestamp": "^0.3.0",
     "mongodb": "^3.6.6",
