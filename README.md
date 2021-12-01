@@ -206,7 +206,7 @@ Local events can also be forwarded to remote event targets. Like any external in
 
 ---
 
-<img width="72" alt="workflow" src="https://user-images.githubusercontent.com/38910830/144235360-5e9f009b-cb21-4350-bca4-9f0db5aadc26.png">
+<img width="124" alt="workflow" src="https://user-images.githubusercontent.com/38910830/144235360-5e9f009b-cb21-4350-bca4-9f0db5aadc26.png">
 
 ## Orchestration
 
