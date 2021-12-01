@@ -141,7 +141,7 @@ Based on:
 
 ---
 
-![Components](doc/port-adapter.png)
+<img width="124" alt="ports-adapters" src="https://user-images.githubusercontent.com/38910830/144235923-7a9159c8-9de0-480a-8b3f-dbcdd19a0012.png">
 
 ## Components
 
@@ -155,7 +155,8 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 ---
 
-![Persistence](doc/persistence.png)
+<img width="124" alt="persistence" src="https://user-images.githubusercontent.com/38910830/144235261-2265f3be-0c84-4b0d-b395-b5c16ed3b7f3.png">
+
 
 ## Persistence
 
@@ -172,8 +173,8 @@ const creditCard = customer.decrypt().creditCardNumber;
 Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
 
 ---
+<img width="124" alt="eventing" src="https://user-images.githubusercontent.com/38910830/144235314-608d49c3-858e-4582-81f7-0355e965ae5e.png">
 
-![Eventing](doc/eventing.png)
 
 ## Integration
 
@@ -205,7 +206,7 @@ Local events can also be forwarded to remote event targets. Like any external in
 
 ---
 
-![Workflow](doc/workflow.png)
+<img width="124" alt="workflow" src="https://user-images.githubusercontent.com/38910830/144235360-5e9f009b-cb21-4350-bca4-9f0db5aadc26.png">
 
 ## Orchestration
 
