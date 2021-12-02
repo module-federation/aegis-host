@@ -141,7 +141,7 @@ Based on:
 
 ---
 
-<img width="124" alt="ports-adapters" src="https://user-images.githubusercontent.com/38910830/144235923-7a9159c8-9de0-480a-8b3f-dbcdd19a0012.png">
+<img width="148" alt="ports-adapters" src="https://user-images.githubusercontent.com/38910830/144235923-7a9159c8-9de0-480a-8b3f-dbcdd19a0012.png">
 
 ## Components
 
@@ -206,7 +206,7 @@ Local events can also be forwarded to remote event targets. Like any external in
 
 ---
 
-<img width="124" alt="workflow" src="https://user-images.githubusercontent.com/38910830/144235360-5e9f009b-cb21-4350-bca4-9f0db5aadc26.png">
+<img width="148" alt="workflow" src="https://user-images.githubusercontent.com/38910830/144235360-5e9f009b-cb21-4350-bca4-9f0db5aadc26.png">
 
 ## Orchestration
 
