@@ -368,7 +368,7 @@ async function startService () {
     reloadCallback()
     startWebServer()
   } catch (e) {
-    console.error(e)
+    console.error(startService.name, e)
   }
 }
 
