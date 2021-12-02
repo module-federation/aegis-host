@@ -25,7 +25,7 @@
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",
-        "enabled": false
+        "enabled": true
       },
       "DataSourceFile": {
         "desc": "Persistent storage on local file system",
@@ -33,6 +33,7 @@
       },
       "DataSourceMongoDb": {
         "desc": "Persistent NoSQL, JSON document storage",
+        "enabled": true,
         "url": "mongodb://localhost:27017",
         "cacheSize": 3000
       },
