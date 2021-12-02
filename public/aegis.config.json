@@ -10,7 +10,7 @@
       "desc": "Is service mesh enabled or not: disable to use external integration",
       "enabled": true
     },
-    "restartWorkflow": true,
+    "resumeWorkflow": true,
     "checkIpHost": "https://checkip.amazonaws.com",
     "defaultCircuitBreaker": {
       "errorRate": 25,
