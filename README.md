@@ -24,8 +24,8 @@ Host    | [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https
 ## TL;DR
 
 ```shell
-git clone https://github.com/module-federation/microlib
-cd microlib
+git clone https://github.com/module-federation/aegis-host
+cd aegis-host
 cp dotenv.example .env
 yarn
 yarn build
