@@ -101,43 +101,10 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Support for WebAssembly modules as models, adapters, services
 - WebAssembly workflow - pipe modules togther to form control flows
 - Polyglossia - write components in any lang with a WASM compile target
-- Stretch: MLOps - ci/cd pipeline for machine learning deployment
-- Stretch: AIOps - deep learning for adaptive, lights-outs operations
+- Eventually MLOps - ci/cd pipeline for machine learning deployment
+- Sooner than later AIOps - deep learning for adaptive, lights-outs operations
 
-### Service Mesh <sub><sup>codename _SUBSTRATE_</sup></sub>
 
-Under construction
-
-Desc: Built-in service mesh available to all host instances.
-Pluggable architecture allows specialized implementations
-to coexist, e.g. in the datacenter, at the edge, mobile, IoT.
-
-Supports:
-
-- bespoke integration
-- transparent integration
-- distributed cache
-- distributed workflow
-- adaptive deployment
-- streaming media
-- telemetry
-- operations analytics
-- operations automation
-- sync, async, pub/sub, req/res
-- https, websocket, http/3, quic
-- full or switched mesh
-- clustering, failover
-- auto-scaling,
-- observable / controllable
-- MLOps CI/CD pipeline
-- AIOps deep learning for lights out operations
-- Pluggable - plug in NATS, Envoy, etc as needed
-
-Based on:
-
-- QUIC transport protocol (HTTP/3)
-- WasmEdge + TensorFlow
-- WebRTC, 
 
 
 ---
