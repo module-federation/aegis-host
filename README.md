@@ -88,7 +88,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Runs as web server or serverless function
+- Host runs as a Server, Cluster or Severless Function
 - Vendor-agnostic serverless deployment (no vendor lock-in)
 - Fast deployment - no-install deployment is the shortest path
 - Self-deployment - built-in deployment automation
@@ -97,19 +97,20 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 - Automatated CA certifcate setup and renewal
-- Basic websockets-based switched mesh, gracefully upgrade to NATS if avail
-- Systems (K8s) and network (NATS) mniddleware plugins
-- WebAssembly runtime for services implemented as WASM modules
-- WebAssembly workflow - pipe modules togther in control flows
-- Polyglossia - components written in any lang with a WASM compile target
-- MLOps - supports ci/cd pipeline for machine learning deployment
-- AIOps - uses deep learning for adaptive, lights-outs operations
+- Built-in, pluggable service mesh
+- Support for WebAssembly modules as models, adapters, services
+- WebAssembly workflow - pipe modules togther to form control flows
+- Polyglossia - write components in any lang with a WASM compile target
+- Stretch: MLOps - ci/cd pipeline for machine learning deployment
+- Stretch: AIOps - deep learning for adaptive, lights-outs operations
 
 ### Service Mesh <sub><sup>codename _SUBSTRATE_</sup></sub>
 
 Under construction
 
-Desc: high-speed service mesh for interactive media and AI inference
+Desc: Built-in service mesh available to all host instances.
+Pluggable architecture allows specialized implementations
+to coexist, e.g. in the datacenter, at the edge, mobile, IoT.
 
 Supports:
 
@@ -136,7 +137,7 @@ Based on:
 
 - QUIC transport protocol (HTTP/3)
 - WasmEdge + TensorFlow
-- WebRTC
+- WebRTC, 
 
 
 ---
