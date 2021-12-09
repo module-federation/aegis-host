@@ -4,12 +4,10 @@
 
 N.B. This is the host - see the library [here](https://github.com/module-federation/aegis).
 
-
 | Repo         | Edit with GitPod   | Edit with VSCode  |
 | -------------| -------------------|-------------------|
 Host    | [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis-host) | [![Open Aegis Host in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis-host)|
 | Library | [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) | [![Open Aegis Libraru in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis)|
-
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
@@ -138,7 +136,6 @@ Based on:
 - WasmEdge + TensorFlow
 - WebRTC
 
-
 ---
 
 <img width="148" alt="ports-adapters" src="https://user-images.githubusercontent.com/38910830/144235923-7a9159c8-9de0-480a-8b3f-dbcdd19a0012.png">
@@ -157,7 +154,6 @@ A [service](https://github.com/module-federation/MicroLib-Example/blob/master/sr
 
 <img width="124" alt="persistence" src="https://user-images.githubusercontent.com/38910830/144235261-2265f3be-0c84-4b0d-b395-b5c16ed3b7f3.png">
 
-
 ## Persistence
 
 The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
@@ -174,7 +170,6 @@ Access to data and objects requires explicit permission, otherwise services cann
 
 ---
 <img width="124" alt="eventing" src="https://user-images.githubusercontent.com/38910830/144235314-608d49c3-858e-4582-81f7-0355e965ae5e.png">
-
 
 ## Integration
 
@@ -220,12 +215,11 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 Aegis provides an in-process service mesh that ties Aegis instances together in an application fabric, where data, code and workload can be distributed and deployed dynamically in response to functional or non-functional requirements and conditions. The service mesh is built into federation host and in some implementations runs on the same port (e.g. Websockets version). It is not a sidecar, but external clients can connect to the mesh (e.g. to request status, observe traffic, etc). The mesh enables transparent integration of aegis components, such that component developers can write business logic that is valid regardless of where components are deployed. The service mesh is pluggable. It is straightforward to plug in another implementation. Default implementation is "webswitch" a switched mesh based on websockets. Nats and a QUIC-based implementation are planned.
 
-See http://localhost/aegis.config.json
+See <http://localhost/aegis.config.json>
 
 ```shell
 public/aegis.config.json
 ```
-
 
 ## Running the Application
 
@@ -257,7 +251,7 @@ Aegis supports clustering with automatic cache synchronization and rolling resta
 CLUSTER_ENABLED=true
 ```
 
-### Serverless 
+### Serverless
 
 Alternatively, Aegis can run as a serverless function. It's rated for AWS. Support can be extended to other platforms and vendors by writing a message parser that simply amaps the input and output to request and response objects, indicating the HTTP method. See /adapters/serverless/parsers
 
