@@ -60,7 +60,7 @@
         "enabled": true,
         "isSwitch": true,
         "host": "localhost",
-        "port": 80,
+        "port": 8080,
         "heartbeat": 30000,
         "debug": false,
         "uplink": null
