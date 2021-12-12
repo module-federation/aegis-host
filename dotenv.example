@@ -20,7 +20,7 @@ AUTH_ENABLED=false
 
 # Use Secure Sockets Layer / TLS / HTTPS
 SSL_ENABLED=false
-SSL_PORT=443
+SSL_PORT=44300
 PORT=8080
 
 # Default datasource for models that do not specify one

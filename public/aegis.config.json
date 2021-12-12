@@ -60,7 +60,7 @@
         "enabled": true,
         "isSwitch": true,
         "host": "localhost",
-        "port": 8080,
+        "port": 8880,
         "heartbeat": 30000,
         "debug": false,
         "uplink": null
@@ -73,7 +73,7 @@
             "host": "127.0.0.1",
             "port": 6379
           },
-          "ttl": 1000000000,
+          "ttl": 10000,
           "prefix": "aegis",
           "strict": false,
           "relayLimit": 1,

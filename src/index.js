@@ -235,10 +235,11 @@ function attachServiceMesh (server, secureCtx = {}) {
  * If test passes or if cert already exists, hand
  * back the cert and private key.
  *
- * @param {*} domain
+ * @param {string} domain domain for which cert will be  created
+ * @param {boolean} [renewal] false by default, set true to renew
  * @returns
  */
-async function getTrustedCert (domain, renewal = false) {
+async function requestTrustedCert (domain, renewal = false) {
   if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
     return {
       key: fs.readFileSync(keyFile, 'utf8'),
@@ -271,7 +272,7 @@ async function createSecureContext (renewal = false) {
   // turn off redirect
   redirect = false
   // get cert
-  const cert = await getTrustedCert(domain, renewal)
+  const cert = await requestTrustedCert(domain, renewal)
   // turn redirect back on
   redirect = true
   // return cert and key
@@ -293,15 +294,12 @@ async function startHttpServer () {
      * if {@link redirect} is true, redirect
      * all requests for http to https port
      */
-    // app.use(function (req, res) {
-    //   console.log('redirect url', req.url)
-    //   if (/^http$/i.test(req.protocol) && redirect) {
-    //     console.log('protocol', req.protocol)
-    //     const redirectUrl = `${domain}:${sslPort}${req.url}`
-    //     console.debug('redirect URL', redirectUrl)
-    //     res.redirect(301, redirectUrl)
-    //   }
-    // })
+    app.use(function (req, res) {
+      if (redirect && req.protocol === 'http:') {
+        const redirectUrl = `https://${domain}:${sslPort}${req.url}`
+        res.redirect(301, redirectUrl)
+      }
+    })
   } else {
     // https disabled, so attach to http
     attachServiceMesh(httpServer)
