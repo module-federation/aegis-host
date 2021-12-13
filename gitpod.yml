@@ -8,11 +8,11 @@ github:
     addComment: false
     addBadge: true
 tasks:
-  - name: "build order"
-    init: yarn && yarn build-order
+  - name: "build customer"
+    init: yarn && yarn build-customer
     command: yarn start
     env:
-      IS_SWITCH: true # designate as primary mesh server
+      IS_SWITCH: false # designate as primary mesh server
       SERVERLESS: false
       CLUSTER_ENABLED: false
       AUTH_ENABLED: false
