@@ -9,7 +9,7 @@ github:
     addBadge: true
 tasks:
   - name: "build order"
-    init: yarn && yarn build-order-test
+    init: yarn && yarn build-order
     command: yarn start
     env:
       IS_SWITCH: true # designate as primary mesh server
