@@ -1,13 +1,25 @@
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: false
+    addComment: false
+    addBadge: true
 tasks:
   - name: "build order"
     init: yarn && yarn build-order-test
-    command: yarn start-order
-  - name: "build customer"
-    init: yarn build-customer-test
-    command: yarn start-customer
+    command: yarn start
+    env:
+      IS_SWITCH: true # designate as primary mesh server
+      SERVERLESS: false
+      CLUSTER_ENABLED: false
+      AUTH_ENABLED: false
+      SSL_ENABLED: false
+      PORT: 8080
 ports:
   - port: 8080
-    onOpen: open-preview
-  - port: 8071
-    onOpen: open-preview
-    
+    onOpen: open-browser
+  - port: 5353 # for multicast dns
+    onOpen: notify  
