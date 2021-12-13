@@ -1,7 +1,13 @@
 tasks:
   - name: "build order"
     init: yarn && yarn build-order-test
-    command: yarn start
+    command: yarn start-order
   - name: "build customer"
     init: yarn build-customer-test
-    command: yarn start-8071
+    command: yarn start-customer
+ports:
+  - port: 8080
+    onOpen: open-preview
+  - port: 8071
+    onOpen: open-preview
+    
