@@ -1,3 +1,7 @@
 tasks:
-  - init: yarn install && yarn run build
-    command: yarn run start
+  - name: "build order"
+    init: yarn && yarn build-order-test
+    command: yarn start
+  - name: "build customer"
+    init: yarn build-customer-test
+    command: yarn start-8071

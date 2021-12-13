@@ -3,7 +3,7 @@ const path = require('path')
 const { ModuleFederationPlugin } = require('webpack').container
 const nodeExternals = require('webpack-node-externals')
 const fetchRemotes = require('./webpack/fetch-remotes')
-const remoteEntries = require('./webpack/remote-entries')
+let remoteEntries = require('./webpack/remote-entries')
 const port = process.env.PORT || 80
 const sslPort = process.env.SSL_PORT || 443
 const sslEnabled = /true/i.test(process.env.SSL_ENABLED)
@@ -16,6 +16,8 @@ const server = env => {
     remoteEntries.forEach(e => (e.path = 'webpack'))
     console.log(chalk.yellow('serverless build'))
   }
+  if (env.order) remoteEntries = require('./webpack/remote-entries-order-test')
+  if (env.customer) remoteEntries = require('./webpack/remote-entries-customer-test')
   return new Promise(resolve => {
     fetchRemotes(remoteEntries).then(remotes => {
       console.info(remotes)

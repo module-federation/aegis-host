@@ -17,9 +17,10 @@
     "url": "https://github.com/module-federation/aegis-host"
   },
   "scripts": {
-    "build": "yarn clean && npm run transpile && webpack --config webpack.config.js",
-    "build-order-test": "cp webpack/remote-entries-order-test.js webpack/remote-entries.js && yarn build",
-    "build-customer-test": "cp webpack/remote-entries-customer-test.js webpack/remote-entries.js && yarn build",
+    "prebuild": "yarn clean && npm run transpile",
+    "build": "webpack --config webpack.config.js",
+    "build-order-test": "yarn prebuild && webpack --config webpack.config.js --env order",
+    "build-customer-test": "yarn prebuild && webpack --config webpack.config.js --env customer",
     "start": "node --title aegis dist/index.js",
     "start-8071": "yarn start 8071",
     "start-8073": "yarn start 8073",
