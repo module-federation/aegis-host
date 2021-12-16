@@ -29,17 +29,18 @@ if [ "$IPADDR_PUBLIC" == "$IPADDR_DOMAIN2" ]; then
 fi
 
 # print current running process
-sudo lsof -P -i tcp | grep LISTEN | grep aegis
+sudo lsof -P -i | grep LISTEN | grep aegis
 
 # get process ID of aegis
 PID=$(sudo lsof -P -i tcp | grep LISTEN | grep aegis | awk '{print $2}')
 
-# get number of characters in PID
-NUM=$(echo $PID | wc -c)
+# print current running process
+sudo lsof -P -i | grep LISTEN | grep aegis
 
-# the num of chars if PID is
-# not found = 1, otherwise > 1
-if [ ${NUM} -gt 1 ]; then
+# get process ID of aegis
+PID=$(sudo lsof -P -i | grep LISTEN | grep aegis | awk '{print $2}')
+
+if [[ ${PID} ]]; then
   echo -e "${GREEN}server is up $NC"
 else
   echo -e "${RED}server is down $NC"
