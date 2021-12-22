@@ -8,8 +8,8 @@ module.exports = [
   {
     name: 'microservices',
     url: 'https://api.github.com',
-    repo: 'microlib-examples',
-    owner: 'module-federation',
+    repo: 'aegis-application',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
     path: __dirname,
@@ -19,8 +19,8 @@ module.exports = [
   {
     name: 'adapters',
     url: 'https://api.github.com',
-    repo: 'microlib-examples',
-    owner: 'module-federation',
+    repo: 'aegis-application',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
     path: __dirname,
@@ -30,8 +30,8 @@ module.exports = [
   {
     name: 'services',
     url: 'https://api.github.com',
-    repo: 'microlib-examples',
-    owner: 'module-federation',
+    repo: 'aegis-application',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
     path: __dirname,
