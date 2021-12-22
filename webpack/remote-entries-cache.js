@@ -2,8 +2,8 @@ module.exports = [
   {
     name: 'distributed-cache',
     url: 'https://api.github.com',
-    repo: 'microlib-examples',
-    owner: 'module-federation',
+    repo: 'aegis-application',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'cache',
     path: __dirname,
@@ -13,8 +13,8 @@ module.exports = [
   {
     name: 'adapter-cache',
     url: 'https://api.github.com',
-    repo: 'microlib-examples',
-    owner: 'module-federation',
+    repo: 'aegis-application',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'cache',
     path: __dirname,
@@ -24,8 +24,8 @@ module.exports = [
   {
     name: 'service-cache',
     url: 'https://api.github.com',
-    repo: 'microlib-examples',
-    owner: 'module-federation',
+    repo: 'aegis-application',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'cache',
     path: __dirname,
