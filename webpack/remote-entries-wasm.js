@@ -14,7 +14,7 @@ const entries = [
     name: 'wasm',
     url: 'https://api.github.com',
     repo: 'aegis',
-    owner: 'module-federation',
+    owner: 'briteliteimmersive',
     filedir: 'wasm/build',
     branch: 'main',
     path: __dirname,
