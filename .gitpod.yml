@@ -1,0 +1,26 @@
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: false
+    addComment: false
+    addBadge: true
+tasks:
+  - name: "build order"
+    init: yarn && yarn build-order
+    command: yarn start
+    env:
+      SERVERLESS: false
+      CLUSTER_ENABLED: false
+      AUTH_ENABLED: false
+      SSL_ENABLED: false
+      PORT: 8080
+      GITHUB_TOKEN: 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
+ports:
+  - port: 8080
+    onOpen: open-browser
+  - port: 5353 # for multicast DNS
+    onOpen: notify 

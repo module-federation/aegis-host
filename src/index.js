@@ -11,6 +11,7 @@
 
 'use strict'
 
+
 require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
@@ -46,7 +47,7 @@ const sslEnabled = // required in production
 /**@type {express.Application} */
 const app = AuthorizationService.protectRoutes(express(), '/microlib')
 
-function isServerless () {
+function isServerless() {
   return (
     /true/i.test(process.env.SERVERLESS) || /serverless/i.test(process.title)
   )
@@ -56,7 +57,7 @@ function isServerless () {
  * Callbacks attached to existing routes are stale.
  * Clear the routes whose controllers we need to update.
  */
-function clearRoutes () {
+function clearRoutes() {
   app._router.stack = app._router.stack.filter(
     k => !(k && k.route && k.route.path && k.route.path.startsWith(apiRoot))
   )
@@ -80,7 +81,7 @@ function clearRoutes () {
  * @param {{hot:boolean, serverless:boolean}} options If `hot` is true, reload;
  * if this is a serverless function call, set `serverless` to true.
  */
-async function startMicroLib ({ hot = false, serverless = false } = {}) {
+async function startMicroLib({ hot = false, serverless = false } = {}) {
   const remoteEntry = importFresh('./remoteEntry') // do not cache
   const factory = await remoteEntry.microlib.get('./server')
   const serverModule = factory()
@@ -100,7 +101,7 @@ async function startMicroLib ({ hot = false, serverless = false } = {}) {
  * Handle hot reload requests. If running in cluster mode,
  * do a rolling restart instead of memory purge.
  */
-function reloadCallback () {
+function reloadCallback() {
   // Manual reset if left in wrong state
   app.use(`${hotReloadPath}-reset`, function (_req, res) {
     process.send({ cmd: 'reload-reset' })
@@ -132,7 +133,7 @@ const greeting = (proto, host, port) =>
 /**
  * Ping a public server for our public address.
  */
-function checkPublicIpAddress () {
+function checkPublicIpAddress() {
   const bytes = []
   if (!/local/i.test(process.env.NODE_ENV)) {
     try {
@@ -164,7 +165,7 @@ function checkPublicIpAddress () {
  * @param {*} [options]
  * @returns
  */
-function shutdown (server) {
+function shutdown(server) {
   let shuttingDown = false
   const devTimeout = 3000
 
@@ -192,7 +193,7 @@ function shutdown (server) {
     })
   })
 
-  function middleware (req, res, next) {
+  function middleware(req, res, next) {
     if (!shuttingDown) return next()
     res.set('Connection', 'close')
     res.status(503).send('Server is in the process of restarting.')
@@ -211,7 +212,7 @@ function shutdown (server) {
  * @param {https.Server|http.Server} server
  * @param {tls.SecureContext} [secureCtx] if ssl enabled
  */
-function attachServiceMesh (server, secureCtx = {}) {
+function attachServiceMesh(server, secureCtx = {}) {
   const wss = new websocket.Server({
     ...secureCtx,
     clientTracking: true,
@@ -239,7 +240,7 @@ function attachServiceMesh (server, secureCtx = {}) {
  * @param {boolean} [renewal] false by default, set true to renew
  * @returns
  */
-async function requestTrustedCert (domain, renewal = false) {
+async function requestTrustedCert(domain, renewal = false) {
   if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
     return {
       key: fs.readFileSync(keyFile, 'utf8'),
@@ -268,7 +269,7 @@ let redirect = true
  * @param {boolean} renewal
  * @returns
  */
-async function createSecureContext (renewal = false) {
+async function createSecureContext(renewal = false) {
   // turn off redirect
   redirect = false
   // get cert
@@ -285,7 +286,7 @@ async function createSecureContext (renewal = false) {
  * Don't redirect while cert challenge is
  * in progress. Challenge requires port 80
  */
-async function startHttpServer () {
+async function startHttpServer() {
   const httpServer = http.createServer(app)
   app.use(shutdown(httpServer))
 
@@ -316,7 +317,7 @@ let secureCtx
  * provision CA cert if SSL (TLS) is enabled
  * and no cert is found in /cert directory.
  */
-async function startWebServer () {
+async function startWebServer() {
   startHttpServer()
 
   if (sslEnabled) {
@@ -358,7 +359,7 @@ async function startWebServer () {
  *
  * this function isn't called if running in serverless mode
  */
-async function startService () {
+async function startService() {
   try {
     app.use(express.json())
     app.use(express.static('public'))
