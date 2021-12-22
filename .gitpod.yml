@@ -19,7 +19,7 @@ tasks:
       AUTH_ENABLED: false
       SSL_ENABLED: false
       PORT: 8080
-      GITHUB_TOKEN: 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
+      GITHUB_TOKEN: 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
 ports:
   - port: 8080
     onOpen: open-browser
