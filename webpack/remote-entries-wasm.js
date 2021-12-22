@@ -14,13 +14,13 @@ const entries = [
     name: 'wasm',
     url: 'https://api.github.com',
     repo: 'aegis',
-    owner: 'briteliteimmersive',
+    owner: 'module-federation',
     filedir: 'wasm/build',
     branch: 'main',
     path: __dirname,
     type: 'model',
     wasm: true,
-    importRemote () {
+    importRemote() {
       return importWebAssembly(this, 'model')
     }
   }
