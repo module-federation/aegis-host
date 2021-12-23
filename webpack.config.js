@@ -11,13 +11,7 @@ const publicPort = sslEnabled ? sslPort : port
 const chalk = require('chalk')
 
 const server = env => {
-  console.log(env)
-  if (env.serverless) {
-    remoteEntries.forEach(e => (e.path = 'webpack'))
-    console.log(chalk.yellow('serverless build'))
-  }
-  if (env.order) remoteEntries = require('./webpack/remote-entries-order-test')
-  if (env.customer) remoteEntries = require('./webpack/remote-entries-customer-test')
+  processEnv(env)
   return new Promise(resolve => {
     fetchRemotes(remoteEntries).then(remotes => {
       console.info(remotes)
@@ -69,6 +63,16 @@ const server = env => {
       })
     })
   })
+}
+
+function processEnv(env) {
+  console.log(env)
+  if (env.serverless) {
+    remoteEntries.forEach(e => (e.path = 'webpack'))
+    console.log(chalk.yellow('serverless build'))
+  }
+  if (env.order) remoteEntries = require('./webpack/remote-entries-order-test')
+  if (env.customer) remoteEntries = require('./webpack/remote-entries-customer-test')
 }
 
 module.exports = [server]
