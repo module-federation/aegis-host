@@ -34,9 +34,6 @@ sudo lsof -P -i | grep LISTEN | grep aegis
 # get process ID of aegis
 PID=$(sudo lsof -P -i | grep LISTEN | grep aegis | awk '{print $2}')
 
-# get process ID of aegis
-PID=$(sudo lsof -P -i | grep LISTEN | grep aegis | awk '{print $2}')
-
 if [[ ${PID} ]]; then
   echo -e "${GREEN}server is up $NC"
 else
