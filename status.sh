@@ -32,10 +32,7 @@ fi
 sudo lsof -P -i | grep LISTEN | grep aegis
 
 # get process ID of aegis
-PID=$(sudo lsof -P -i tcp | grep LISTEN | grep aegis | awk '{print $2}')
-
-# print current running process
-sudo lsof -P -i | grep LISTEN | grep aegis
+PID=$(sudo lsof -P -i | grep LISTEN | grep aegis | awk '{print $2}')
 
 # get process ID of aegis
 PID=$(sudo lsof -P -i | grep LISTEN | grep aegis | awk '{print $2}')
