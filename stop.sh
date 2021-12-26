@@ -1,5 +1,5 @@
 # Get PID of Aegis process
-PID=$(sudo lsof -P -i tcp:80,443 | grep aegis | grep LISTEN | awk '{ print $2 }')
+PID=$(sudo lsof -P -i | grep aegis | grep LISTEN | awk '{ print $2 }')
 # display command to execute
 echo "sudo kill $PID"
 # kill process gracefully (sigterm)

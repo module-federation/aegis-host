@@ -17,9 +17,12 @@ tasks:
       CLUSTER_ENABLED: false
       AUTH_ENABLED: false
       SSL_ENABLED: false
+      SSL_PORT: 43300
       PORT: 8080
 ports:
   - port: 8080
+    onOpen: open-browser
+  - port: 43300
     onOpen: open-browser
   - port: 5353 # for multicast DNS
     onOpen: notify 
