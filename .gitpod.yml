@@ -9,20 +9,20 @@ github:
     addComment: false
     addBadge: true
 tasks:
-  - name: "build"
+  - name: start
     init: yarn && yarn build
     command: yarn start
     env:
       SERVERLESS: false
       CLUSTER_ENABLED: false
       AUTH_ENABLED: false
-      SSL_ENABLED: true
-      SSL_PORT: 443
-      PORT: 80
+      SSL_ENABLED: false
+      SSL_PORT: 44300
+      PORT: 8080
 ports:
   - port: 8080
-    onOpen: open-browser
-  - port: 43300
-    onOpen: open-browser
+    onOpen: open-preview
+  - port: 44300
+    onOpen: open-preview
   - port: 5353 # for multicast DNS
-    onOpen: notify 
+    onOpen: ignore 
