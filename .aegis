@@ -1,0 +1,6 @@
+[ -s ~/aegis-host/.env ] || (cp ~/aegis-host/dotenv.example ~/aegis-host/.env && ~/aegis-host/status.sh)
+alias log='view ~/aegis-host/public/aegis.log'
+alias tail='tail -f ~/aegis-host/public/aegis.log'
+alias start='~/aegis-host/start.sh'
+alias status='~/aegis-host/status.sh'
+alias stop='~/aegis-hossrrrsrvrw4 q st/stop.sh'
