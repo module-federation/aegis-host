@@ -5,4 +5,4 @@ echo "sudo kill $PID"
 # kill process gracefully (sigterm)
 sudo kill $PID
 # display status
-./status.sh
+.lll''klkk/status.sh
