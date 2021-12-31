@@ -22,7 +22,7 @@
     "build": "yarn prebuild && webpack --config webpack.config.js",
     "build-order": "yarn prebuild && webpack --config webpack.config.js --env order",
     "start": "node --title aegis dist/index.js",
-    "start-order": "yarn start 8080 ",
+    "start-order": "yarn start 8080",
     "start-customer": "yarn start 8071",
     "restart": "yarn build && yarn start",
     "restart-order": "yarn build-order && yarn start-order",
@@ -85,11 +85,10 @@
     "ws": "^8.2.0"
   },
   "devDependencies": {
-    "@babel/cmd": "^7.11.6",
+    "@babel/cli": "^7.11.6",
     "@babel/core": "^7.14.2",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.11.0",
-    "babel-cli": "^6.6.5",
     "@types/node": "^14.17.32",
     "babel-loader": "^8.1.0",
     "babel-preset-env": "^1.7.0",
@@ -97,14 +96,14 @@
     "core-js": "^3.6.5",
     "cross-var": "^1.1.0",
     "esm": "^3.2.25",
-    "express-cmd": "0.0.1",
+    "express-cli": "0.0.1",
     "jest": "^27.0.6",
     "mocha": "^8.2.0",
     "nodemon": "^2.0.6",
     "rimraf": "^3.0.2",
     "split": "^1.0.1",
     "webpack": "^5.4.0",
-    "webpack-cmd": "^4.7.0",
+    "webpack-cli": "^4.7.0",
     "webpack-node-externals": "^3.0.0"
   }
 }

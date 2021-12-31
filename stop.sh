@@ -5,4 +5,4 @@ echo "sudo kill $PID"
 # kill process gracefully (sigterm)
 sudo kill $PID
 # display status
-.lll''klkk/status.sh
+~/aegis-host/status.sh
