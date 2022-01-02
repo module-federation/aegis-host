@@ -47,3 +47,5 @@ cert/certificate.pem
 cert/privatekey.pem
 cert/.prev
 aegis.pid
+webpack/api-github-com-80*
+public/.well-known/acme-challenge/*

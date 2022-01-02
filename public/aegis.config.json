@@ -1,21 +1,16 @@
 {
   "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
-  "env": {
+  "general": {
     "desc": "live-updateable environmental vars",
-    "distributedCache": {
-      "desc": "enables transparent integration between aegis instances",
-      "enabled": true
-    },
-    "serviceMesh": {
-      "desc": "Is service mesh enabled or not: disable to use external integration",
-      "enabled": true
-    },
+    "fqdn": "aegis.module-federation.org",
+    "remoteServices": "aegis-services",
     "resumeWorkflow": true,
     "checkIpHost": "https://checkip.amazonaws.com",
     "defaultCircuitBreaker": {
       "errorRate": 25,
       "callVolume": 100,
-      "intervalMs": 6000
+      "intervalMs": 6000,
+      "fallbackFn": null
     }
   },
   "adapters": {
@@ -59,11 +54,9 @@
         "desc": "Default implementation. Switched mesh over web sockets.",
         "enabled": true,
         "isSwitch": true,
-        "host": "aegis.module-federation.org",
-        "port": 443,
-        "heartbeat": 30000,
+        "heartbeat": 3000,
         "debug": false,
-        "uplink": null
+        "uplink": "wss://aegis.module-federation.org:443"
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
@@ -98,14 +91,16 @@
         "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
         "audience": "https://microlib.io/",
         "issuer": "https://dev-2fe2iar6.us.auth0.com/",
-        "algorithms": ["RS256"]
+        "algorithms": [
+          "RS256"
+        ]
       }
     },
     "cert": {
-      "certDir": "cert",
       "webRoot": "public",
-      "domain": "aegis.module-federation.org",
-      "domainEmail": "admin@gmail.com"
+      "certDir": "cert",
+      "domain": "module-federation.org",
+      "domainEmail": "admin@fed-micro.com"
     }
   }
 }
