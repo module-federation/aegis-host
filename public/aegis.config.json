@@ -27,7 +27,7 @@
         "enabled": true
       },
       "DataSourceMongoDb": {
-        "desc": "Persistent NoSQL, JSON document storage",
+        "desc": "Persist`ent NoSQL, JSON document storage",
         "enabled": true,
         "url": "mongodb://localhost:27017",
         "cacheSize": 3000
@@ -53,10 +53,12 @@
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
         "enabled": true,
-        "isSwitch": true,
+        "isSwitch": false,
         "heartbeat": 3000,
         "debug": false,
-        "uplink": "wss://aegis.module-federation.org:443"
+        "uplink": null,
+        "port": 443,
+        "protocol": "wss"
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
@@ -99,8 +101,8 @@
     "cert": {
       "webRoot": "public",
       "certDir": "cert",
-      "domain": "module-federation.org",
-      "domainEmail": "admin@fed-micro.com"
+      "domain": "x",
+      "domainEmail": "admin@federated-microservices.com"
     }
   }
 }

@@ -56,6 +56,8 @@ const server = env => {
             exposes: {
               './server': './src/server',
               './domain': '@module-federation/aegis/lib/domain',
+              './adapters': '@module-federation/aegis/lib/adapters',
+              './services': '@module-federation/aegis/lib/services',
               './remoteEntries': './webpack/remote-entries'
             }
           })
