@@ -39,7 +39,7 @@ const cmdRoute = route =>
  * @extends {Map}
  */
 class RouteMap extends Map {
-  has(route) {
+  has (route) {
     if (!route) {
       console.warn('route is ', typeof route)
       return false
@@ -64,7 +64,7 @@ class RouteMap extends Map {
     return false
   }
 
-  get(route) {
+  get (route) {
     return this.route ? this.route : super.get(route)
   }
 }
@@ -93,12 +93,10 @@ const App = (() => {
     .get('./adapters')
     .then(factory => factory())
 
-  const getRemoteModels = remoteEntry.microlib
-    .get('./domain')
-    .then(factory => {
-      const Module = factory()
-      return Module.importRemotes
-    })
+  const getRemoteModels = remoteEntry.microlib.get('./domain').then(factory => {
+    const Module = factory()
+    return Module.importRemotes
+  })
 
   const getRemoteEntries = remoteEntry.microlib
     .get('./remoteEntries')
@@ -112,7 +110,7 @@ const App = (() => {
      * @param {*} method
      * @param {*} controllers
      */
-    webserver(path, method, controllers, app, http) {
+    webserver (path, method, controllers, app, http) {
       controllers().forEach(ctlr => {
         console.info(ctlr)
         app[method](path(ctlr.endpoint), http(ctlr.fn))
@@ -125,7 +123,7 @@ const App = (() => {
      * @param {*} method
      * @param {*} controllers
      */
-    serverless(path, method, controllers, http) {
+    serverless (path, method, controllers, http) {
       controllers().forEach(ctlr => {
         const route = path(ctlr.endpoint)
         if (routes.has(route)) {
@@ -139,7 +137,7 @@ const App = (() => {
       })
     },
 
-    admin(adapter, serverMode, getConfig, app) {
+    admin (adapter, serverMode, getConfig, app) {
       if (serverMode === make.webserver.name) {
         app.get(`${apiRoot}/config`, adapter(getConfig()))
       } else if (serverMode === make.serverless.name) {
@@ -157,7 +155,7 @@ const App = (() => {
    * @param {import('express').Response} res
    * @returns
    */
-  async function invoke(path, method, req, res) {
+  async function invoke (path, method, req, res) {
     if (routes.has(path)) {
       try {
         const controller = routes.get(path)[method]
@@ -173,7 +171,7 @@ const App = (() => {
     console.warn('potential config issue', path, method)
   }
 
-  function shutdown() {
+  function shutdown () {
     console.warn('Received SIGTERM - app shutdown in progress')
   }
 
@@ -186,7 +184,7 @@ const App = (() => {
    * phase, where there is nothing besides us on the
    * callstack and all callbacks have executed.
    */
-  function clear() {
+  function clear () {
     //setImmediate(() => {
     try {
       Object.keys(__non_webpack_require__.cache).forEach(k => {
@@ -209,7 +207,8 @@ const App = (() => {
    * @param {boolean} serverless - set to true if running as a servless function
    * @returns
    */
-  async function start(router, serverless = false) {
+  async function start (app, serverless = false) {
+    const router = require('express').Router()
     return getRemoteAdapters.then(adapters => {
       const {
         http,
@@ -245,6 +244,7 @@ const App = (() => {
             make[serverMode](endpointId, 'delete', deleteModels, router, http)
             make[serverMode](endpointCmd, 'patch', patchModels, router, http)
             make.admin(http, serverMode, getConfig, router, http)
+            app.use(router)
 
             console.timeEnd(label)
             process.on('SIGTERM', shutdown)
@@ -261,8 +261,6 @@ const App = (() => {
   }
 
   return {
-    adapters: async () => getRemoteAdapters,
-    services: async () => getRemoteServices,
     clear,
     start,
     invoke

@@ -2,7 +2,7 @@
   "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
   "general": {
     "desc": "live-updateable environmental vars",
-    "fqdn": "aegis.module-federation.org",
+    "fqdn": "localhost",
     "remoteServices": "aegis-services",
     "resumeWorkflow": true,
     "checkIpHost": "https://checkip.amazonaws.com",
@@ -55,10 +55,8 @@
         "enabled": true,
         "isSwitch": false,
         "heartbeat": 3000,
-        "debug": false,
         "uplink": null,
-        "port": 443,
-        "protocol": "wss"
+        "debug": false
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
@@ -93,15 +91,13 @@
         "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
         "audience": "https://microlib.io/",
         "issuer": "https://dev-2fe2iar6.us.auth0.com/",
-        "algorithms": [
-          "RS256"
-        ]
+        "algorithms": ["RS256"]
       }
     },
     "cert": {
       "webRoot": "public",
       "certDir": "cert",
-      "domain": "x",
+      "domain": "localhost",
       "domainEmail": "admin@federated-microservices.com"
     }
   }

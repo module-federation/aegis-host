@@ -1,7 +1,7 @@
 {
   "name": "aegis-host",
   "version": "1.0.0",
-  "description": "",
+  "description": "Federated Application Host",
   "installConfig": {
     "pnp": false
   },
@@ -17,7 +17,7 @@
     "url": "https://github.com/module-federation/aegis-host"
   },
   "scripts": {
-    "postinstall": "[ -s ~/aegis-host/install.log ] || (echo \". ~/.aegis\" >> ~/.zshrc && echo \". ~/.aegis\" >> ~/.bashrc && echo \"installed on `date`\" > ~/aegis-host/install.log && yarn cmd-log && yarn cmd-tail && yarn cmd-status && yarn cmd-start && yarn cmd-stop && echo \"~/aegis-host/status.sh\" >> ~/.aegis)",
+    "postinstall": "[ -s ~/aegis-host/install.log ] || (echo \". ~/.aegis\" >> ~/.zshrc && echo \". ~/.aegis\" >> ~/.bashrc && echo \"installed on `date`\" > ~/aegis-host/install.log && yarn cmd-log && yarn cmd-tail && yarn cmd-status && yarn cmd-start && yarn cmd-stop && echo \"~/aegis-host/status.sh\" >> ~/.aegis && yarn cmd-env)",
     "prebuild": "yarn clean && yarn transpile",
     "build": "yarn prebuild && webpack --config webpack.config.js",
     "build-order": "yarn prebuild && webpack --config webpack.config.js --env order",
@@ -34,6 +34,7 @@
     "cmd-start": "echo \"alias start='~/aegis-host/start.sh'\" >> ~/.aegis",
     "cmd-status": "echo \"alias status='~/aegis-host/status.sh'\" >> ~/.aegis",
     "cmd-stop": "echo \"alias stop='~/aegis-host/stop.sh'\" >> ~/.aegis",
+    "cmd-env": "cp ~/aegis-host/dotenv.example ~/aegis-host/.env",
     "stats": "git ls-files | xargs wc -l",
     "stop": "PID=$(lsof -P -i | grep LISTEN | awk '{print $2}'); sudo kill $PID",
     "build-wasm": "cp webpack/remote-entries-wasm.js webpack/remote-entries.js && yarn build",
@@ -68,7 +69,7 @@
   "license": "MIT",
   "dependencies": {
     "@assemblyscript/loader": "^0.19.12",
-    "@module-federation/aegis": "^1.0.0-beta.80",
+    "@module-federation/aegis": "^1.0.0-beta.90",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "assemblyscript": "^0.19.12",
@@ -99,7 +100,6 @@
     "express-cli": "0.0.1",
     "jest": "^27.0.6",
     "mocha": "^8.2.0",
-    "nodemon": "^2.0.6",
     "rimraf": "^3.0.2",
     "split": "^1.0.1",
     "webpack": "^5.4.0",

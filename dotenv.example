@@ -5,7 +5,7 @@
 NODE_ENV=local
 
 # system provisions cert for this domain
-DOMAIN=aegis.module-federation.org
+DOMAIN=localhost
 
 # Run in serverless mode (no web server)
 SERVERLESS=false
@@ -20,8 +20,8 @@ AUTH_ENABLED=false
 
 # Use Secure Sockets Layer / TLS / HTTPS
 SSL_ENABLED=false
-SSL_PORT=44300
-PORT=8080
+SSL_PORT=443
+PORT=80
 
 # Default datasource for models that do not specify one
 #DATASOURCE_ADAPTER=DataSourceMemory 
