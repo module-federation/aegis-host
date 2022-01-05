@@ -1,23 +1,6 @@
 'use strict'
 
-//import { adapters, services } from '@module-federation/aegis'
-
-// const { StorageService } = services
-// const { StorageAdapter } = adapters
-// const { find, save } = StorageAdapter
-
-// const {
-//   http,
-//   postModels,
-//   patchModels,
-//   getModels,
-//   getModelsById,
-//   deleteModels,
-//   getConfig,
-//   initCache
-// } = adapters.controllers
-
-const apiRoot = process.env.API_ROOT || '/microlib/api'
+const apiRoot = process.env.API_ROOT || '/aegis/api'
 const modelPath = `${apiRoot}/models`
 
 const idRoute = route =>
@@ -85,20 +68,20 @@ const aegis = (() => {
 
   const remoteEntry = require('./remoteEntry.js')
 
-  const getRemoteServices = remoteEntry.microlib
+  const getRemoteServices = remoteEntry.aegis
     .get('./services')
     .then(factory => factory())
 
-  const getRemoteAdapters = remoteEntry.microlib
+  const getRemoteAdapters = remoteEntry.aegis
     .get('./adapters')
     .then(factory => factory())
 
-  const getRemoteModels = remoteEntry.microlib.get('./domain').then(factory => {
+  const getRemoteModels = remoteEntry.aegis.get('./domain').then(factory => {
     const Module = factory()
     return Module.importRemotes
   })
 
-  const getRemoteEntries = remoteEntry.microlib
+  const getRemoteEntries = remoteEntry.aegis
     .get('./remoteEntries')
     .then(factory => factory())
 
@@ -176,28 +159,6 @@ const aegis = (() => {
   }
 
   /**
-   * Clear everything bundled by remoteEntry.js
-   * (models & remoteEntry config), i.e. all the
-   * user code downloaded from the remote. This is
-   * the code that needs to be disposed of & reimported.
-   * Call `setImmediate` so we execute during the check
-   * phase, where there is nothing besides us on the
-   * callstack and all callbacks have executed.
-   */
-  function clear () {
-    //setImmediate(() => {
-    try {
-      Object.keys(__non_webpack_require__.cache).forEach(k => {
-        console.debug('deleting cached module', k)
-        delete __non_webpack_require__.cache[k]
-      })
-    } catch (error) {
-      console.error(error)
-    }
-    //})
-  }
-
-  /**
    * Import federated modules, see {@link getRemoteModels}. Then, generate
    * routes for each controller method and model. If running as a serverless
    * function, store the route-controller bindings for direct invocation via
@@ -207,8 +168,7 @@ const aegis = (() => {
    * @param {boolean} serverless - set to true if running as a servless function
    * @returns
    */
-  async function start (router, serverless = false) {
-    //const router = require('express').Router()
+  async function start (router, { serverless = false } = {}) {
     return getRemoteServices.then(services => {
       return getRemoteAdapters.then(adapters => {
         const {
@@ -224,11 +184,11 @@ const aegis = (() => {
 
         const { StorageAdapter } = adapters
         const { find, save } = StorageAdapter
+        const overrides = { save, find, StorageAdapter }
 
         const serverMode = serverless
           ? make.serverless.name
           : make.webserver.name
-        const overrides = { save, find, Persistence: {} }
 
         const label = '\ntotal time to import & register remote modules'
         console.time(label)
@@ -266,7 +226,6 @@ const aegis = (() => {
   }
 
   return {
-    clear,
     start,
     invoke
   }

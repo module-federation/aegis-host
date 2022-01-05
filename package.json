@@ -19,10 +19,10 @@
   "scripts": {
     "postinstall": "[ -s ~/aegis-host/install.log ] || (echo \". ~/.aegis\" >> ~/.zshrc && echo \". ~/.aegis\" >> ~/.bashrc && echo \"installed on `date`\" > ~/aegis-host/install.log && yarn cmd-log && yarn cmd-tail && yarn cmd-status && yarn cmd-start && yarn cmd-stop && echo \"~/aegis-host/status.sh\" >> ~/.aegis)",
     "prebuild": "yarn clean && yarn transpile",
-    "transpile": "babel src/server.js src/aegis.js src/container.js -d dist",
+    "transpile": "babel src/server.js src/bootstrap.js src/aegis.js src/container.js -d dist",
     "build": "yarn prebuild && webpack --config webpack.config.js",
     "build-order": "yarn prebuild && webpack --config webpack.config.js --env order",
-    "start": "node --title aegis dist/server.js",
+    "start": "node --title aegis dist/bootstrap.js",
     "start-order": "yarn start 8080",
     "start-customer": "yarn start 8071",
     "restart": "yarn build && yarn start",

@@ -45,10 +45,10 @@ const server = env => {
         },
         plugins: [
           new ModuleFederationPlugin({
-            name: 'microlib',
+            name: 'aegis',
             filename: 'remoteEntry.js',
             library: {
-              name: 'microlib',
+              name: 'aegis',
               type: 'commonjs-module'
             },
             remoteType: 'commonjs-module',
