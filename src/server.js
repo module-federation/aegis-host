@@ -22,14 +22,14 @@ function load (aegis = null) {
   const remote = importFresh('./remoteEntry.js')
   return remote.microlib.get('./server').then(async factory => {
     const aegis = factory()
-    const host = await aegis.init()
+    await aegis.init(server)
     //const handle = app.getRequestHandler()
 
     server.use('/reload', async (_req, res) => {
       await load(aegis)
       res.send('<h1>reload complete</h1>')
     })
-    server.use(host.routes)
+    //server.use(host.routes)
     //server.use(host.middleware)
     //server.all('*', (req, res) => routes(req, res, parse(req.url, true)))
   })

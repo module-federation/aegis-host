@@ -3,7 +3,7 @@
 const aegis = __non_webpack_require__('./aegis.js')
 
 async function init (options) {
-  return require('./aegis.js').default.start(options)
+  return aegis.default.start(options)
 }
 
 function dispose () {

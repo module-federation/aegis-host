@@ -83,7 +83,7 @@ const aegis = (() => {
   const endpointId = e => `${modelPath}/${e}/:id`
   const endpointCmd = e => `${modelPath}/${e}/:id/:command`
 
-  const remoteEntry = require('./')
+  const remoteEntry = require('./remoteEntry.js')
 
   const getRemoteServices = remoteEntry.microlib
     .get('./services')
@@ -207,8 +207,8 @@ const aegis = (() => {
    * @param {boolean} serverless - set to true if running as a servless function
    * @returns
    */
-  async function start (serverless = false) {
-    const router = require('express').Router()
+  async function start (router, serverless = false) {
+    //const router = require('express').Router()
     return getRemoteServices.then(services => {
       return getRemoteAdapters.then(adapters => {
         const {
@@ -254,6 +254,7 @@ const aegis = (() => {
 
               return {
                 invoke,
+                router,
                 adapters,
                 services
               }
