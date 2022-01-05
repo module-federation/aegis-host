@@ -20,7 +20,7 @@ const server = env => {
         target: 'async-node',
         mode: 'development',
         devtool: 'source-map',
-        entry: path.resolve(__dirname, 'src/server.js'),
+        entry: path.resolve(__dirname, 'src/container.js'),
         output: {
           publicPath: `http://localhost:${publicPort}`,
           path: path.resolve(__dirname, 'dist'),
@@ -54,7 +54,7 @@ const server = env => {
             remoteType: 'commonjs-module',
             remotes,
             exposes: {
-              './server': './src/server',
+              './server': './src/container',
               './domain': '@module-federation/aegis/lib/domain',
               './adapters': '@module-federation/aegis/lib/adapters',
               './services': '@module-federation/aegis/lib/services',
@@ -67,14 +67,15 @@ const server = env => {
   })
 }
 
-function processEnv(env) {
+function processEnv (env) {
   console.log(env)
   if (env.serverless) {
     remoteEntries.forEach(e => (e.path = 'webpack'))
     console.log(chalk.yellow('serverless build'))
   }
   if (env.order) remoteEntries = require('./webpack/remote-entries-order-test')
-  if (env.customer) remoteEntries = require('./webpack/remote-entries-customer-test')
+  if (env.customer)
+    remoteEntries = require('./webpack/remote-entries-customer-test')
 }
 
 module.exports = [server]
