@@ -31,4 +31,4 @@ function load (aegis = null) {
   })
 }
 
-load().then(() => server.start(app))
+load().then(async () => server.start(app))

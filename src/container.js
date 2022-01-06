@@ -8,7 +8,7 @@ async function init (router, options) {
 
 function dispose () {
   Object.keys(__non_webpack_require__.cache).forEach(k => {
-    console.assert(!debug, 'deleting cached module', k)
+    console.debug('deleting cached module', k)
     delete __non_webpack_require__.cache[k]
   })
 }
