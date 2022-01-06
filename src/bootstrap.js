@@ -1,4 +1,4 @@
-'use local'
+'use strict'
 
 require('dotenv').config()
 require('regenerator-runtime')
@@ -16,6 +16,7 @@ function load (aegis = null) {
   if (aegis) {
     aegis.dispose()
     clearRoutes()
+    global.gc()
   }
 
   const remote = importFresh('./remoteEntry.js')
@@ -31,4 +32,6 @@ function load (aegis = null) {
   })
 }
 
-load().then(async () => server.start(app))
+load()
+  .then(() => server.start(app))
+  .then(() => console.log('server started'))

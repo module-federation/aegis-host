@@ -210,7 +210,7 @@ const aegis = (() => {
 
               console.timeEnd(label)
               process.on('SIGTERM', shutdown)
-              cache.load()
+              await cache.load()
 
               return {
                 invoke,

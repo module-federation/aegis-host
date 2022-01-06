@@ -22,7 +22,7 @@
     "transpile": "babel src/server.js src/bootstrap.js src/aegis.js src/container.js -d dist",
     "build": "yarn prebuild && webpack --config webpack.config.js",
     "build-order": "yarn prebuild && webpack --config webpack.config.js --env order",
-    "start": "node --title aegis dist/bootstrap.js",
+    "start": "node --expose-gc --title aegis dist/bootstrap.js",
     "start-order": "yarn start 8080",
     "start-customer": "yarn start 8071",
     "restart": "yarn build && yarn start",
