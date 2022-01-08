@@ -3,35 +3,48 @@
 require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
-const app = require('express')()
+const serverless = /true/i.test(process.env.SERVERLESS)
+const express = require('express')
+const webapp = express()
 const server = require('./server')
 
 function clearRoutes () {
-  app._router.stack = app._router.stack.filter(
+  webapp._router.stack = webapp._router.stack.filter(
     k => !(k && k.route && k.route.path)
   )
 }
 
 function load (aegis = null) {
   if (aegis) {
-    aegis.dispose()
     clearRoutes()
-    global.gc()
+    aegis.dispose()
   }
 
   const remote = importFresh('./remoteEntry.js')
 
   return remote.aegis.get('./server').then(async factory => {
     const aegis = factory()
-    await aegis.init(app)
+    const app = await aegis.init()
 
-    app.use('/reload', async (_req, res) => {
+    webapp.use('/reload', async (_req, res) => {
       await load(aegis)
       res.send('<h1>reload complete</h1>')
     })
+    webapp.use(express.static('public'))
+    webapp.all('*', async (req, res) => app.handle(req, res))
+    return app
   })
 }
 
-load()
-  .then(() => server.start(app))
-  .then(() => console.log('server started'))
+if (!serverless) {
+  //load().then(() => server.listen(8080))
+  load().then(() => server.start(webapp))
+}
+
+let app
+exports.handleServerless = async function (...args) {
+  if (!app) {
+    app = await load()
+  }
+  return app.handleServerless(...args)
+}
