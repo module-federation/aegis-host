@@ -69,11 +69,12 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 In addtion to zero-install, hot deployment and local eventing, MicroLib promotes strong boundaries between, and prevents coupling of, collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
 
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
-- Dynamic, independent persistence of federated modules
+- Dynamic, indvidualized storage adapter generation 
+- Automatic persistence of federated modules
 - Runtime port generation
 - Runtime port-adapter binding
 - Runtime adapter-service binding
-- Runtime dynamic linking of WebAssembly ports, adapters and service modules
+- Runtime linking of WebAssembly ports, adapters and service modules
 - [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
@@ -86,7 +87,7 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Host runs as a Server, Cluster or Severless Function
+- Exhaustive deployment options (run as a Server, Cluster or Severless Function)
 - Vendor-agnostic serverless deployment (no vendor lock-in)
 - Fast deployment - no-install deployment is the shortest path
 - Self-deployment - built-in deployment automation
@@ -95,10 +96,10 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 - Automatated CA certifcate setup and renewal
-- Built-in, pluggable service mesh
+- Self-forming, built-in, pluggable service mesh
 - Support for WebAssembly modules as models, adapters, services
 - WebAssembly workflow - pipe modules togther to form control flows
-- Polyglossia - write components in any lang with a WASM compile target
+- Polyglossia - write components in any lang with a Wasm compile target
 - Eventually MLOps - ci/cd pipeline for machine learning deployment
 - Sooner than later AIOps - deep learning for adaptive, lights-outs operations
 
