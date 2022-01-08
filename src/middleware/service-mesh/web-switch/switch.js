@@ -66,7 +66,11 @@ export function attachServer (server) {
   server.reassignBackupSwitch = function (client) {
     if (client.info.id === backupSwitch) {
       for (let c of server.clients) {
-        if (c.info.id !== backupSwitch) {
+        if (
+          c.info.id !== backupSwitch &&
+          c.info.role === 'node' &&
+          c.info.isSwitch === false
+        ) {
           backupSwitch = c.info.id
           c.isBackupSwitch = true
           return
@@ -88,8 +92,10 @@ export function attachServer (server) {
 
     client.on('close', function () {
       console.warn('client disconnecting', client.info)
-      server.reassignBackupSwitch(client)
-      server.broadcast(statusReport(), client)
+      if (client.info.role === 'node') {
+        server.reassignBackupSwitch(client)
+        server.broadcast(statusReport(), client)
+      }
     })
 
     client.on('error', function (error) {
@@ -110,7 +116,7 @@ export function attachServer (server) {
         }
 
         if (msg.proto === SERVICENAME) {
-          if (!backupSwitch && !isSwitch && msg.role === 'node')
+          if (!backupSwitch && isSwitch && msg.role === 'node')
             backupSwitch = client.info.id
           client.info = {
             ...msg,

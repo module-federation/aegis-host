@@ -16,28 +16,29 @@ function clearRoutes () {
 
 function load (aegis = null) {
   if (aegis) {
-    clearRoutes()
     aegis.dispose()
+    clearRoutes()
   }
 
   const remote = importFresh('./remoteEntry.js')
 
   return remote.aegis.get('./server').then(async factory => {
     const aegis = factory()
-    const app = await aegis.init()
+    const app = await aegis.init(remote)
 
     webapp.use('/reload', async (_req, res) => {
       await load(aegis)
       res.send('<h1>reload complete</h1>')
     })
     webapp.use(express.static('public'))
+    //webapp.use(express.json())
     webapp.all('*', async (req, res) => app.handle(req, res))
     return app
   })
 }
 
 if (!serverless) {
-  //load().then(() => server.listen(8080))
+  //load().then(() => webapp.listen(8080))
   load().then(() => server.start(webapp))
 }
 

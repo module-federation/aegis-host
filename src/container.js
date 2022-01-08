@@ -1,10 +1,9 @@
 'use strict'
 
-const aegis = __non_webpack_require__('./aegis.js')
-const remoteEntry = __non_webpack_require__('./remoteEntry')
+const { aegis } = __non_webpack_require__('@module-federation/aegis')
 
-async function init () {
-  return aegis.default.start(remoteEntry)
+async function init (entries) {
+  return aegis.default.start(entries)
 }
 
 function dispose () {

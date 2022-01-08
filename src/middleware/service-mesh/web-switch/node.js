@@ -221,6 +221,7 @@ const handshake = {
   pid: process.pid,
   address: getLocalAddress()[0],
   url: `${PROTOCOL}://${HOST}:${PORT}`,
+  isSwitch,
   serialize () {
     return JSON.stringify({
       ...this,
