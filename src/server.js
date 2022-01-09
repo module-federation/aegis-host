@@ -1,270 +1,298 @@
+/**
+ * Handle options and start the service.
+ * Options:
+ *
+ * - run as serverless function or as web server
+ * - http or https
+ * - authorized routes enabled or disabled (json web token)
+ * - clustering enabled or disabled
+ * - hot reload as rolling restart or module cache refresh
+ */
+
 'use strict'
 
-//import { adapters, services } from '@module-federation/aegis'
+require('dotenv').config()
+require('regenerator-runtime')
 
-// const { StorageService } = services
-// const { StorageAdapter } = adapters
-// const { find, save } = StorageAdapter
+// aegis library
+const { adapters, services } = require('@module-federation/aegis')
+const { AuthorizationService, CertificateService, ClusterService } = services
+const { ServiceMeshAdapter } = adapters
 
-// const {
-//   http,
-//   postModels,
-//   patchModels,
-//   getModels,
-//   getModelsById,
-//   deleteModels,
-//   getConfig,
-//   initCache
-// } = adapters.controllers
+const fs = require('fs')
+const tls = require('tls')
+const http = require('http')
+const https = require('https')
+const express = require('express')
+const websocket = require('ws')
 
-const apiRoot = process.env.API_ROOT || '/microlib/api'
-const modelPath = `${apiRoot}/models`
-
-const idRoute = route =>
-  route
-    .split('/')
-    .splice(0, 5)
-    .concat([':id'])
-    .join('/')
-
-const cmdRoute = route =>
-  route
-    .split('/')
-    .splice(0, 6)
-    .concat([':id', ':command'])
-    .join('/')
+const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
+const sslPort = process.argv[2] ? process.argv[2] : process.env.SSL_PORT || 443
+const keyFile = 'cert/privatekey.pem'
+const certFile = 'cert/certificate.pem'
+const forceTimeout = 3000 // time to wait for conn to drop before closing server
+const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
+const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
+const checkIpHostname = process.env.CHECKIPHOST || 'checkip.amazonaws.com'
+const domain =
+  require('../public/aegis.config.json').general.fqdn || process.env.DOMAIN
+const sslEnabled = // required in production
+  /prod/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
 /**
- * Store routes and their controllers
- * @extends {Map}
- */
-class RouteMap extends Map {
-  has (route) {
-    if (!route) {
-      console.warn('route is ', typeof route)
-      return false
-    }
-
-    if (super.has(route)) {
-      this.route = super.get(route)
-      return true
-    }
-
-    const idInstance = idRoute(route)
-    if (route.match(/\//g).length === 5 && super.has(idInstance)) {
-      this.route = super.get(idInstance)
-      return true
-    }
-
-    const cmdInstance = cmdRoute(route)
-    if (route.match(/\//g).length === 6 && super.has(cmdInstance)) {
-      this.route = super.get(cmdInstance)
-      return true
-    }
-    return false
-  }
-
-  get (route) {
-    return this.route ? this.route : super.get(route)
-  }
-}
-
-/**
- * Application entry point
  *
- * - {@link App.start} import remotes, generate APIs
- * - {@link App.invoke} call controllers directly
- * - {@link App.clear} dispose of module cache
  */
-const App = (() => {
-  const routes = new RouteMap()
+exports.start = async function (app) {
+  // enable authorization if selected
+  /**@type {express.Application} */
+  AuthorizationService.protectRoutes(app, '/microlib')
 
-  const endpoint = e => `${modelPath}/${e}`
-  const endpointId = e => `${modelPath}/${e}/:id`
-  const endpointCmd = e => `${modelPath}/${e}/:id/:command`
-
-  const remoteEntry = __non_webpack_require__('./remoteEntry')
-
-  const getRemoteServices = remoteEntry.microlib
-    .get('./services')
-    .then(factory => factory())
-
-  const getRemoteAdapters = remoteEntry.microlib
-    .get('./adapters')
-    .then(factory => factory())
-
-  const getRemoteModels = remoteEntry.microlib.get('./domain').then(factory => {
-    const Module = factory()
-    return Module.importRemotes
-  })
-
-  const getRemoteEntries = remoteEntry.microlib
-    .get('./remoteEntries')
-    .then(factory => factory())
-
-  const make = {
-    /**
-     * webserver mode - create routes and register controllers
-     * @param {*} path
-     * @param {*} app
-     * @param {*} method
-     * @param {*} controllers
-     */
-    webserver (path, method, controllers, app, http) {
-      controllers().forEach(ctlr => {
-        console.info(ctlr)
-        app[method](path(ctlr.endpoint), http(ctlr.fn))
-      })
-    },
-
-    /**
-     * serverless mode - execute controllers directly
-     * @param {*} path
-     * @param {*} method
-     * @param {*} controllers
-     */
-    serverless (path, method, controllers, http) {
-      controllers().forEach(ctlr => {
-        const route = path(ctlr.endpoint)
-        if (routes.has(route)) {
-          routes.set(route, {
-            ...routes.get(route),
-            [method]: http(ctlr.fn)
-          })
-          return
-        }
-        routes.set(route, { [method]: http(ctlr.fn) })
-      })
-    },
-
-    admin (adapter, serverMode, getConfig, app) {
-      if (serverMode === make.webserver.name) {
-        app.get(`${apiRoot}/config`, adapter(getConfig()))
-      } else if (serverMode === make.serverless.name) {
-        routes.set(`${apiRoot}/config`, { get: adapter(getConfig()) })
-        console.info(routes)
-      }
-    }
-  }
+  const greeting = (proto, host, port) =>
+    `\n 🌎 ÆGIS listening on ${proto}://${host}:${port} \n`
 
   /**
-   * Call controllers directly when in serverless mode.
-   * @param {string} path
-   * @param {string} method method name
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   * @returns
+   * Ping a public server for our public address.
    */
-  async function invoke (path, method, req, res) {
-    if (routes.has(path)) {
+  function checkPublicIpAddress () {
+    const bytes = []
+    if (!/local/i.test(process.env.NODE_ENV)) {
       try {
-        const controller = routes.get(path)[method]
-
-        if (typeof controller === 'function') {
-          return await controller(req, res)
-        }
-        console.error('controller is not a function', controller)
-      } catch (error) {
-        console.error('problem running controller', error)
+        http.get(
+          {
+            hostname: checkIpHostname,
+            method: 'get'
+          },
+          response => {
+            response.on('data', chunk => bytes.push(chunk))
+            response.on('end', function () {
+              const ipAddr = bytes.join('').trim()
+              console.log(greeting('http', ipAddr, port))
+            })
+          }
+        )
+        return
+      } catch (e) {
+        console.error('checkip', e.message)
       }
+    } else {
+      console.log(greeting('http', 'localhost', port))
     }
-    console.warn('potential config issue', path, method)
-  }
-
-  function shutdown () {
-    console.warn('Received SIGTERM - app shutdown in progress')
   }
 
   /**
-   * Clear everything bundled by remoteEntry.js
-   * (models & remoteEntry config), i.e. all the
-   * user code downloaded from the remote. This is
-   * the code that needs to be disposed of & reimported.
-   * Call `setImmediate` so we execute during the check
-   * phase, where there is nothing besides us on the
-   * callstack and all callbacks have executed.
-   */
-  function clear () {
-    //setImmediate(() => {
-    try {
-      Object.keys(__non_webpack_require__.cache).forEach(k => {
-        console.debug('deleting cached module', k)
-        delete __non_webpack_require__.cache[k]
-      })
-    } catch (error) {
-      console.error(error)
-    }
-    //})
-  }
-
-  /**
-   * Import federated modules, see {@link getRemoteModels}. Then, generate
-   * routes for each controller method and model. If running as a serverless
-   * function, store the route-controller bindings for direct invocation via
-   * the {@link invoke} method.
-   *
-   * @param {import("express").Router} router - express app/router
-   * @param {boolean} serverless - set to true if running as a servless function
+   * Shutdown gracefully. Return 503 during shutdown to prevent new connections
+   * @param {*} server
+   * @param {*} [options]
    * @returns
    */
-  async function start (app, serverless = false) {
-    const router = require('express').Router()
-    return getRemoteAdapters.then(adapters => {
-      const {
-        http,
-        postModels,
-        patchModels,
-        getModels,
-        getModelsById,
-        deleteModels,
-        getConfig,
-        initCache
-      } = adapters.controllers
+  function shutdown (server) {
+    let shuttingDown = false
+    const devTimeout = 3000
 
-      const { StorageAdapter } = adapters
-      const { find, save } = StorageAdapter
+    // Graceful shutdown taken from: http://blog.argteam.com/
+    process.on('SIGTERM', () => {
+      // shorter timeout in dev
+      const timeout = !/^prod.*/i.test(process.env.NODE_ENV)
+        ? devTimeout
+        : forceTimeout
 
-      const serverMode = serverless ? make.serverless.name : make.webserver.name
-      const overrides = { save, find, Persistence: {} }
+      if (shuttingDown) return
+      shuttingDown = true
+      console.info('Received kill signal (SIGTERM), shutting down')
 
-      const label = '\ntotal time to import & register remote modules'
-      console.time(label)
+      setTimeout(function () {
+        console.error(
+          'Taking too long to close connections, forcefully shutting down'
+        )
+        process.exit(1)
+      }, timeout).unref()
 
-      return getRemoteEntries.then(remotes => {
-        return getRemoteModels.then(importRemotes => {
-          return importRemotes(remotes, overrides).then(async () => {
-            const cache = initCache()
-
-            console.info(`running in ${serverMode} mode`)
-
-            make[serverMode](endpoint, 'get', getModels, router, http)
-            make[serverMode](endpoint, 'post', postModels, router, http)
-            make[serverMode](endpointId, 'get', getModelsById, router, http)
-            make[serverMode](endpointId, 'patch', patchModels, router, http)
-            make[serverMode](endpointId, 'delete', deleteModels, router, http)
-            make[serverMode](endpointCmd, 'patch', patchModels, router, http)
-            make.admin(http, serverMode, getConfig, router, http)
-            app.use(router)
-
-            console.timeEnd(label)
-            process.on('SIGTERM', shutdown)
-            cache.load()
-
-            return {
-              invoke,
-              adapters
-            }
-          })
-        })
+      server.close(function () {
+        console.info('Closed out remaining connections.')
+        process.exit()
       })
     })
+
+    function middleware (req, res, next) {
+      if (!shuttingDown) return next()
+      res.set('Connection', 'close')
+      res.status(503).send('Server is in the process of restarting.')
+    }
+
+    return middleware
   }
 
-  return {
-    clear,
-    start,
-    invoke
+  /**
+   * Attach {@link ServiceMeshAdapter} to the API listener socket.
+   * Listen for upgrade events from http server and switch
+   * client to WebSockets protocol. Clients connecting this
+   * way are using the service mesh, not the REST API. Use
+   * key + cert in {@link secureCtx} for secure connection.
+   *
+   * @param {https.Server|http.Server} server
+   * @param {tls.SecureContext} [secureCtx] if ssl enabled
+   */
+  function attachServiceMesh (server, secureCtx = {}) {
+    const wss = new websocket.Server({
+      ...secureCtx,
+      clientTracking: true,
+      server: server,
+      maxPayload: 104857600
+    })
+    wss.on('upgrade', (request, socket, head) => {
+      wss.handleUpgrade(request, socket, head, function (ws) {
+        wss.emit('connection', ws, request)
+      })
+    })
+    ServiceMeshAdapter.attachServer(wss)
   }
-})()
 
-export default App
+  /**
+   * Programmatically provision CA cert using RFC
+   * https://datatracker.ietf.org/doc/html/rfc8555
+   *
+   * {@link CertificateService} kicks off automated
+   * id challenge test, conducted by the issuing CA.
+   * If test passes or if cert already exists, hand
+   * back the cert and private key.
+   *
+   * @param {string} domain domain for which cert will be  created
+   * @param {boolean} [renewal] false by default, set true to renew
+   * @returns
+   */
+  async function requestTrustedCert (domain, renewal = false) {
+    if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
+      return {
+        key: fs.readFileSync(keyFile, 'utf8'),
+        cert: fs.readFileSync(certFile, 'utf-8')
+      }
+    }
+
+    // call service to acquire or renew x509 certificate from PKI
+    const { key, cert } = await CertificateService.provisionCert(domain)
+
+    fs.writeFileSync(certFile, cert, 'utf-8')
+    fs.writeFileSync(keyFile, key, 'utf-8')
+
+    return { key, cert }
+  }
+
+  /**
+   * redirect (from 80) to secure port (443)?
+   */
+  let redirect = true
+
+  /**
+   * Using {@link tls.createSecureContext} to create/renew
+   * certs without restarting the server
+   *
+   * @param {boolean} renewal
+   * @returns
+   */
+  async function createSecureContext (renewal = false) {
+    // turn off redirect
+    redirect = false
+    // get cert
+    const cert = await requestTrustedCert(domain, renewal)
+    // turn redirect back on
+    redirect = true
+    // return cert and key
+    return tls.createSecureContext(cert)
+  }
+
+  /**
+   * Listen on unsecured port (80). Redirect
+   * to secure port (443) if SSL is enabled.
+   * Don't redirect while cert challenge is
+   * in progress. Challenge requires port 80
+   */
+  async function startHttpServer () {
+    const httpServer = http.createServer(app)
+    app.use(shutdown(httpServer))
+
+    if (sslEnabled) {
+      /**
+       * if {@link redirect} is true, redirect
+       * all requests for http to https port
+       */
+      app.use(function (req, res) {
+        if (redirect && req.protocol === 'http:') {
+          const redirectUrl = `https://${domain}:${sslPort}${req.url}`
+          res.redirect(301, redirectUrl)
+        }
+      })
+    } else {
+      // https disabled, so attach to http
+      attachServiceMesh(httpServer)
+    }
+    httpServer.listen(port, checkPublicIpAddress)
+  }
+
+  /** the current cert/key pair */
+  let secureCtx
+
+  /**
+   * Start the web server. Programmatically
+   * provision CA cert if SSL (TLS) is enabled
+   * and no cert is found in /cert directory.
+   */
+  async function startWebServer () {
+    startHttpServer()
+
+    if (sslEnabled) {
+      // provision or renew cert and key
+      secureCtx = await createSecureContext()
+      /**
+       * provide cert via {@link secureCtx} - provision &
+       * renew certs without having to restart the server
+       */
+      const httpsServer = https.createServer(
+        {
+          SNICallback: (_, cb) => cb(null, secureCtx)
+        },
+        app
+      )
+      // update secureCtx to refresh certificate
+      app.use(
+        certLoadPath,
+        async () => (secureCtx = await createSecureContext(true))
+      )
+      // graceful shutdown prevents new clients from connecting
+      app.use(shutdown(httpsServer))
+      // service mesh uses same port
+      attachServiceMesh(httpsServer, secureCtx)
+
+      // listen on ssl port
+      httpsServer.listen(sslPort, () =>
+        console.info(greeting('https', domain, sslPort))
+      )
+    }
+  }
+
+  /**
+   * start microlib and the webserver
+   *
+   * this function isn't called if running in serverless mode
+   */
+  async function startService () {
+    try {
+      app.use(express.json())
+      app.use(express.static('public'))
+      // reloadCallback()
+      startWebServer()
+    } catch (e) {
+      console.error(startService.name, e)
+    }
+  }
+
+  /**
+   * Start a single instance or a cluster
+   */
+  if (clusterEnabled) {
+    // Fork child processes (one per core),
+    // which share socket descriptor (round-robin)
+    ClusterService.startCluster(startService)
+  } else {
+    startService()
+  }
+}
