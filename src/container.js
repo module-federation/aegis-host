@@ -2,8 +2,8 @@
 
 const { aegis } = __non_webpack_require__('@module-federation/aegis')
 
-async function init (entries) {
-  return aegis.default.start(entries)
+async function init (remotes) {
+  return aegis.default.start(remotes)
 }
 
 function dispose () {

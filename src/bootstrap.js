@@ -7,11 +7,10 @@ const serverless = /true/i.test(process.env.SERVERLESS)
 const express = require('express')
 const webapp = express()
 const server = require('./server')
+const removeRoute = require('express-remove-route')
 
 function clearRoutes () {
-  webapp._router.stack = webapp._router.stack.filter(
-    k => !(k && k.route && k.route.path)
-  )
+  removeRoute(webapp, '/')
 }
 
 function load (aegis = null) {
