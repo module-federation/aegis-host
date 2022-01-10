@@ -1,14 +1,10 @@
 require('dotenv').config()
 const path = require('path')
+const chalk = require('chalk')
 const { ModuleFederationPlugin } = require('webpack').container
 const nodeExternals = require('webpack-node-externals')
 const fetchRemotes = require('./webpack/fetch-remotes')
 let remoteEntries = require('./webpack/remote-entries')
-const port = process.env.PORT || 80
-const sslPort = process.env.SSL_PORT || 443
-const sslEnabled = /true/i.test(process.env.SSL_ENABLED)
-const publicPort = sslEnabled ? sslPort : port
-const chalk = require('chalk')
 
 const server = env => {
   processEnv(env)
@@ -20,19 +16,20 @@ const server = env => {
         target: 'async-node',
         mode: 'development',
         devtool: 'source-map',
-        entry: path.resolve(__dirname, 'src/server.js'),
+        entry: path.resolve(__dirname, 'src/bootstrap.js'),
         output: {
-          publicPath: `http://localhost:${publicPort}`,
+          publicPath: `http://localhost`,
           path: path.resolve(__dirname, 'dist'),
-          libraryTarget: 'commonjs'
+          libraryTarget: 'commonjs',
+          filename: '[name].js'
         },
         resolve: {
-          extensions: ['.js']
+          extensions: ['.js', '.mjs']
         },
         module: {
           rules: [
             {
-              test: /\.js?$/,
+              test: /\.js?$|\.mjs?$/,
               exclude: /node_modules/,
               use: {
                 loader: 'babel-loader',
@@ -45,10 +42,10 @@ const server = env => {
         },
         plugins: [
           new ModuleFederationPlugin({
-            name: 'microlib',
+            name: 'aegis',
             filename: 'remoteEntry.js',
             library: {
-              name: 'microlib',
+              name: 'aegis',
               type: 'commonjs-module'
             },
             remoteType: 'commonjs-module',
@@ -67,14 +64,15 @@ const server = env => {
   })
 }
 
-function processEnv(env) {
+function processEnv (env) {
   console.log(env)
   if (env.serverless) {
     remoteEntries.forEach(e => (e.path = 'webpack'))
     console.log(chalk.yellow('serverless build'))
   }
   if (env.order) remoteEntries = require('./webpack/remote-entries-order-test')
-  if (env.customer) remoteEntries = require('./webpack/remote-entries-customer-test')
+  if (env.customer)
+    remoteEntries = require('./webpack/remote-entries-customer-test')
 }
 
 module.exports = [server]

@@ -5,23 +5,22 @@ require('regenerator-runtime')
 const serverless = /true/i.test(process.env.SERVERLESS)
 const express = require('express')
 const app = express()
-const server = require('./server-old')
 const aegis = require('@module-federation/aegis').aegis
+const server = require('./server')
+const remotes = require('../webpack/remote-entries')
 
 async function load () {
-  const remotes = require('../webpack/remote-entries')
-  const service = await aegis.init()
-
-  app.use(service.routes())
-  return service
+  const host = await aegis.init(remotes, app)
+  //app.use(host.path, host.routes)
+  return host
 }
 
 if (!serverless) {
   load().then(() => server.start(app))
 }
 
-let service
+let host
 exports.handleServerless = async function (...args) {
-  if (!service) service = await load()
-  return service.handle(...args)
+  if (!host) host = await load()
+  return host.handle(...args)
 }

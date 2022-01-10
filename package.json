@@ -5,7 +5,7 @@
   "installConfig": {
     "pnp": false
   },
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "config": {
     "s3BucketName": "aegisserverless2",
     "region": "us-east-1",
@@ -18,10 +18,11 @@
   },
   "scripts": {
     "postinstall": "[ -s ~/aegis-host/install.log ] || (echo \". ~/.aegis\" >> ~/.zshrc && echo \". ~/.aegis\" >> ~/.bashrc && echo \"installed on `date`\" > ~/aegis-host/install.log && yarn cmd-log && yarn cmd-tail && yarn cmd-status && yarn cmd-start && yarn cmd-stop && echo \"~/aegis-host/status.sh\" >> ~/.aegis && yarn cmd-env)",
+    "transpile": "babel src/worker.js -d dist",  
     "prebuild": "yarn clean && yarn transpile",
     "build": "yarn prebuild && webpack --config webpack.config.js",
     "build-order": "yarn prebuild && webpack --config webpack.config.js --env order",
-    "start": "node --title aegis dist/index.js",
+    "start": "node --title aegis dist/main.js",
     "start-order": "yarn start 8080",
     "start-customer": "yarn start 8071",
     "restart": "yarn build && yarn start",
@@ -41,7 +42,6 @@
     "deploy-lambda": "yarn clean  npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "mesh-start": "node --title appmesh ./node_modules/@module-federation/aegis/lib/services/mesh-switch.js",
     "mesh-status": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-status.mjs",
-    "transpile": "babel src/index.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test-mocha": "mocha --recursive -r esm",
