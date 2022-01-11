@@ -5,7 +5,7 @@ const { workerData, parentPort } = require('worker_threads')
 const { adapters, services, domain } = require('@module-federation/aegis')
 const { importRemotes } = domain
 const { UseCaseService } = domain
-const modelName = workerData
+const modelName = workerData.modelName
 const { StorageService } = services
 const { StorageAdapter } = adapters
 const { find, save } = StorageAdapter
@@ -16,8 +16,8 @@ const getRemoteEntries = remote.aegis
 
 async function init (remotes) {
   const overrides = { find, save, StorageService }
-  const modelService = remotes.filter(r => r.service === modelName)
-  await importRemotes(modelService, overrides)
+  //const modelService = remotes.filter(r => r.service === modelName)
+  await importRemotes(remotes, overrides)
   //loadModels(modelName)
   return UseCaseService(modelName)
 }
