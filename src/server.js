@@ -11,9 +11,6 @@
 
 'use strict'
 
-require('dotenv').config()
-require('regenerator-runtime')
-
 // aegis library
 const { adapters, services } = require('@module-federation/aegis')
 const { AuthorizationService, CertificateService, ClusterService } = services
@@ -43,7 +40,7 @@ const sslEnabled = // required in production
  *
  */
 exports.start = async function (app) {
-  /**@type {express.Application} */
+  /** Authorize routes with JSON Web Tokens*/
   AuthorizationService.protectRoutes(app, '/microlib')
 
   const greeting = (proto, host, port) =>
@@ -139,9 +136,9 @@ exports.start = async function (app) {
       maxPayload: 104857600
     })
     wss.on('upgrade', (request, socket, head) => {
-      wss.handleUpgrade(request, socket, head, function (ws) {
+      wss.handleUpgrade(request, socket, head, ws =>
         wss.emit('connection', ws, request)
-      })
+      )
     })
     ServiceMeshAdapter.attachServer(wss)
   }
@@ -195,7 +192,7 @@ exports.start = async function (app) {
     const cert = await requestTrustedCert(domain, renewal)
     // turn redirect back on
     redirect = true
-    // return cert and key
+    // return cert
     return tls.createSecureContext(cert)
   }
 
@@ -269,6 +266,23 @@ exports.start = async function (app) {
   }
 
   /**
+   * Handle rolling restart request if running in cluster mode
+   */
+  function rollingRestart () {
+    if (clusterEnabled) {
+      // Manual reset if left in wrong state
+      app.use(`${hotReloadPath}-reset`, function (_req, res) {
+        process.send({ cmd: 'reload-reset' })
+        res.send('reload status reset...try again')
+      })
+      app.use(hotReloadPath, async function (_req, res) {
+        res.send('<h1>starting cluster reload</h1>')
+        process.send({ cmd: 'reload' })
+      })
+    }
+  }
+
+  /**
    * start microlib and the webserver
    *
    * this function isn't called if running in serverless mode
@@ -277,7 +291,7 @@ exports.start = async function (app) {
     try {
       app.use(express.json())
       app.use(express.static('public'))
-      // reloadCallback()
+      rollingRestart()
       startWebServer()
     } catch (e) {
       console.error(startService.name, e)
