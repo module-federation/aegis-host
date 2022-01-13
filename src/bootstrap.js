@@ -2,25 +2,26 @@
 
 require('dotenv').config()
 require('regenerator-runtime')
-const serverless = /true/i.test(process.env.SERVERLESS)
-const express = require('express')
-const app = express()
+const isServerless = /true/i.test(process.env.SERVERLESS)
+const app = require('express')()
 const aegis = require('@module-federation/aegis').aegis
 const server = require('./server')
 const remotes = require('../webpack/remote-entries')
+const adapters = require('@module-federation/aegis').adapters
+const { ServerlessAdapter } = adapters
 
-async function load () {
-  const host = await aegis.init(remotes, app)
-  //app.use(host.path, host.routes)
-  return host
+if (!isServerless) {
+  aegis.init(remotes, app).then(() => server.start(app))
 }
 
-if (!serverless) {
-  load().then(() => server.start(app))
-}
+const adapter = isServerless
+  ? aegis
+      .init(remotes)
+      .then(aegis => ServerlessAdapter(aegis))
+      .then(adapter => adapter)
+  : (async (x = { handle: () => console.log('set env var SERVERLESS=true') }) =>
+      x)()
 
-let host
 exports.handleServerless = async function (...args) {
-  if (!host) host = await load()
-  return host.handle(...args)
+  return adapter.then(async adapter => adapter.handle(...args))
 }

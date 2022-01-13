@@ -43,7 +43,6 @@ const sslEnabled = // required in production
  *
  */
 exports.start = async function (app) {
-  // enable authorization if selected
   /**@type {express.Application} */
   AuthorizationService.protectRoutes(app, '/microlib')
 
