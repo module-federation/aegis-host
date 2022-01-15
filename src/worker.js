@@ -30,7 +30,7 @@ getRemoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
 
-      parentPort.once('close', () => {
+      parentPort.once('shutdown', () => {
         console.info('thread exiting')
         process.exit(0)
       })
@@ -39,12 +39,12 @@ getRemoteEntries.then(remotes => {
         if (typeof service[event.name] === 'function') {
           const result = await service[event.name](event.data)
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
-          return
+        } else {
+          console.warn(
+            'event name does not refer to a service function',
+            event.name
+          )
         }
-        console.warn(
-          'event name does not refer to a service function',
-          event.name
-        )
       })
     })
   } catch (error) {
