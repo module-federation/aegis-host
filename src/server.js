@@ -37,7 +37,7 @@ const sslEnabled = // required in production
   /prod/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
 /**
- *
+ * @param {import('express').Application} app
  */
 exports.start = async function (app) {
   /** Authorize routes with JSON Web Tokens*/
@@ -163,7 +163,6 @@ exports.start = async function (app) {
         cert: fs.readFileSync(certFile, 'utf-8')
       }
     }
-
     // call service to acquire or renew x509 certificate from PKI
     const { key, cert } = await CertificateService.provisionCert(domain)
 

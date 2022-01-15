@@ -15,18 +15,39 @@ const getRemoteEntries = remote.aegis
   .then(factory => factory())
 
 async function init (remotes) {
-  const overrides = { find, save, StorageService }
-  await importRemotes(remotes, overrides)
-  //loadModels(modelName)
-  return UseCaseService(modelName)
+  try {
+    const overrides = { find, save, StorageService }
+    await importRemotes(remotes, overrides)
+    //loadModels(modelName)
+    return UseCaseService(modelName)
+  } catch (error) {
+    console.error(init.name, error)
+  }
 }
 
 getRemoteEntries.then(remotes => {
-  init(remotes).then(async service => {
-    console.info('aegis worker thread running')
-    parentPort.on('message', async event => {
-      const result = await service[event.name](event.data)
-      parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+  try {
+    init(remotes).then(async service => {
+      console.info('aegis worker thread running')
+
+      parentPort.once('close', () => {
+        console.info('thread exiting')
+        process.exit(0)
+      })
+
+      parentPort.on('message', async event => {
+        if (typeof service[event.name] === 'function') {
+          const result = await service[event.name](event.data)
+          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+          return
+        }
+        console.warn(
+          'event name does not refer to a service function',
+          event.name
+        )
+      })
     })
-  })
+  } catch (error) {
+    console.error(__filename, error)
+  }
 })
