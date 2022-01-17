@@ -15,7 +15,7 @@ const server = env => {
         externals: [nodeExternals(), 'mongodb-client-encryption'],
         target: 'async-node',
         mode: 'development',
-        devtool: 'source-map',
+        devtool: 'hidden-source-map',
         entry: path.resolve(__dirname, 'src/bootstrap.js'),
         output: {
           publicPath: `http://localhost`,

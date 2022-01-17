@@ -10,7 +10,8 @@ const { importRemotes, UseCaseService } = domain
 const { StorageService } = services
 const { StorageAdapter } = adapters
 const { find, save } = StorageAdapter
-const getRemoteEntries = remote.aegis
+
+const remoteEntries = remote.aegis
   .get('./remoteEntries')
   .then(factory => factory())
 
@@ -25,17 +26,17 @@ async function init (remotes) {
   }
 }
 
-getRemoteEntries.then(remotes => {
+remoteEntries.then(remotes => {
   try {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
 
-      parentPort.once('shutdown', () => {
-        console.info('thread exiting')
-        process.exit(0)
-      })
-
       parentPort.on('message', async event => {
+        if (event.name === 'shutdown') {
+          console.info('thread exiting')
+          process.exit(0)
+        }
+
         if (typeof service[event.name] === 'function') {
           const result = await service[event.name](event.data)
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
