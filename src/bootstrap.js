@@ -2,18 +2,19 @@
 
 require('dotenv').config()
 require('regenerator-runtime')
-const isServerless = /true/i.test(process.env.SERVERLESS)
 const express = require('express')
 const app = express()
 const aegis = require('@module-federation/aegis').aegis
 const server = require('./server')
 const remotes = require('../webpack/remote-entries')
 const adapters = require('@module-federation/aegis').adapters
-const { ServerlessAdapter } = adapters
+const isServerless = /true/i.test(process.env.SERVERLESS)
+const ServerlessAdapter = adapters.ServerlessAdapter
 
 if (!isServerless) {
   app.use(express.json())
   app.use(express.static('public'))
+
   aegis.init(remotes, app).then(() => server.start(app))
 }
 

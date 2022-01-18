@@ -26,15 +26,20 @@ async function init (remotes) {
   }
 }
 
+const messages = {
+  shutdown: x => process.exit(x || 0),
+  disconnect: () => parentPort.close()
+}
+
 remoteEntries.then(remotes => {
   try {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
 
       parentPort.on('message', async event => {
-        if (event.name === 'shutdown') {
-          console.info('from worker: exiting')
-          process.exit(0)
+        if (typeof messages[event.name] === 'function') {
+          console.info('worker calling', event.name)
+          messages[event.name](event.data)
         }
 
         if (typeof service[event.name] === 'function') {
