@@ -33,7 +33,7 @@ remoteEntries.then(remotes => {
 
       parentPort.on('message', async event => {
         if (event.name === 'shutdown') {
-          console.info('thread exiting')
+          console.info('from worker: exiting')
           process.exit(0)
         }
 
@@ -41,10 +41,7 @@ remoteEntries.then(remotes => {
           const result = await service[event.name](event.data)
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
         } else {
-          console.warn(
-            'event name does not refer to a service function',
-            event.name
-          )
+          console.warn('not a service function', event.name)
         }
       })
     })
