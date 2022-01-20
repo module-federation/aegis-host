@@ -1,19 +1,16 @@
-'use strict'
-
 /**
  * @typedef {import("./remote-entries-type")} entry
  */
 
 /** @type {entry} */
-
-module.exports = [
+exports.customer = [
   {
     name: 'microservices',
     url: 'https://api.github.com',
     repo: 'aegis-application',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'master',
+    branch: 'customer',
     path: __dirname,
     type: 'model',
     importRemote: async () => import('microservices/models')
@@ -24,7 +21,7 @@ module.exports = [
     repo: 'aegis-application',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'master',
+    branch: 'customer',
     path: __dirname,
     type: 'adapter',
     importRemote: async () => import('microservices/adapters')
@@ -35,7 +32,7 @@ module.exports = [
     repo: 'aegis-application',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'master',
+    branch: 'customer',
     path: __dirname,
     type: 'service',
     importRemote: async () => import('microservices/services')

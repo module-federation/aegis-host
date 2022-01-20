@@ -70,9 +70,14 @@ function processEnv (env) {
     remoteEntries.forEach(e => (e.path = 'webpack'))
     console.log(chalk.yellow('serverless build'))
   }
-  if (env.order) remoteEntries = require('./webpack/remote-entries-order-test')
+  if (env.order)
+    remoteEntries = remoteEntries.filter(re =>
+      ['master', 'wasm', 'cache'].includes(re.branch)
+    )
   if (env.customer)
-    remoteEntries = require('./webpack/remote-entries-customer-test')
+    remoteEntries = remoteEntries.filter(re =>
+      ['customer', 'wasm', 'cache'].includes(re.branch)
+    )
 }
 
 module.exports = [server]

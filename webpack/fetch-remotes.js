@@ -3,6 +3,7 @@
 const { Octokit } = require('@octokit/rest')
 const fs = require('fs')
 const path = require('path')
+const { RemoteEntriesUtil } = require('./remote-entries-util')
 
 // Use developer token for github api
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
@@ -119,28 +120,6 @@ function deduplicate (remoteEntries) {
 }
 
 /**
- *
- * @param {{name:string,path:sting,filedir:string,branch:string,url:string}[]} remoteEntries
- */
-function RemoteEntriesUtil (remoteEntries) {
-  console.info(remoteEntries)
-
-  return {
-    validateEntries () {
-      if (!remoteEntries || remoteEntries.length < 1)
-        throw new Error('entries missing or invalid')
-      return this
-    },
-
-    removeWasmEntries () {
-      if (Array.isArray(remoteEntries))
-        remoteEntries.forEach((e, i, a) => !e.wasm || a.splice(i, 1))
-      return this
-    }
-  }
-}
-
-/**
  * Download each unique remote entry file.
  * @param {{
  *  name: string,
@@ -151,12 +130,14 @@ function RemoteEntriesUtil (remoteEntries) {
  * @returns {Promise<{[index: string]: string}>} local paths to downloaded entries
  */
 module.exports = async remoteEntries => {
-  RemoteEntriesUtil(remoteEntries)
+  const entries = RemoteEntriesUtil(remoteEntries)
     .validateEntries()
     .removeWasmEntries()
+    .entries()
 
+  console.log(entries)
   const remotes = await Promise.all(
-    Object.values(deduplicate(remoteEntries)).map(function (entry) {
+    Object.values(deduplicate(entries)).map(function (entry) {
       const path = getPath(entry)
       console.log('downloading file to', path)
 
@@ -174,7 +155,7 @@ module.exports = async remoteEntries => {
     })
   )
 
-  return remoteEntries.map(e => ({
+  return entries.map(e => ({
     [e.name]: remotes.find(r => r[uniqueUrl(e)])[uniqueUrl(e)]
   }))
 }
