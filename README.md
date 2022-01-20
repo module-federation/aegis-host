@@ -68,12 +68,28 @@ The goal of Aegis is to provide an alternative to distributed systems and the pe
 
 In addtion to zero-install, hot deployment and local eventing, aegis promotes strong boundaries between, and prevents coupling of, collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
 
+### Highlights
+- Deployment independence without distribution
+- Language independence without distribution
+- Self-deployment (_no deployment automation required!_)
+- Run on: any compute primitive: vm, container, serverless, microprocessor
+- Run as: web server, clustered web server, serverless function
+- Zero downtime, zero installation (code streaming)
+- Transparent integration 
+- Self-forming, in-process service mesh
+- Runtime binding of services and adapters
+- Multithreading for CPU-bound workloads (e.g. AI inference)
+- Distributed data / object cache
+- Hexagonal architecture
+
+### Detail
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Dynamic, independent persistence of federated modules
 - Runtime port generation
-- Runtime port-adapter binding
-- Runtime adapter-service binding
-- Runtime dynamic linking of WebAssembly ports, adapters and service modules
+- Runtime binding (port-adapter binding, adapter-service binding)
+- Zero deployment automation required (install to any compute primitive)
+- Self-forming Service Mesh
+- Runtime linking of WebAssembly modules
 - [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
@@ -101,7 +117,6 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Polyglossia - write components in any lang with a WASM compile target
 - Eventually MLOps - ci/cd pipeline for machine learning deployment
 - Sooner than later AIOps - deep learning for adaptive, lights-outs operations
-
 
 
 ---
@@ -181,7 +196,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Service Mesh
 
-Aegis provides an in-process service mesh that ties Aegis instances together in an application fabric, where data, code and workload can be distributed and deployed dynamically in response to functional or non-functional requirements and conditions. The service mesh is built into federation host and in some implementations runs on the same port (e.g. Websockets version). It is not a sidecar, but external clients can connect to the mesh (e.g. to request status, observe traffic, etc). The mesh enables transparent integration of aegis components, such that component developers can write business logic that is valid regardless of where components are deployed. The service mesh is pluggable. It is straightforward to plug in another implementation. Default implementation is "webswitch" a switched mesh based on websockets. Nats and a QUIC-based implementation are planned.
+Aegis provides an in-process service mesh that ties Aegis instances together in an application and data fabric, where data, code and workload can be distributed and deployed dynamically in response to functional or non-functional requirements and conditions. The service mesh is built into federation host and in some implementations runs on the same port (e.g. Websockets version). It is not a sidecar, but external clients can connect to the mesh (e.g. to request status, observe traffic, etc). The mesh enables transparent integration of aegis components, such that component developers can write business logic that is valid regardless of where components are deployed. The service mesh is pluggable. It is straightforward to plug in another implementation. Default implementation is "webswitch" a switched mesh based on websockets. Nats and a QUIC-based implementation are planned.
 
 See <http://localhost/aegis.config.json>
 
