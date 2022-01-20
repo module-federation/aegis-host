@@ -1,6 +1,6 @@
   [![aegis](https://user-images.githubusercontent.com/38910830/128654405-93098731-3c31-4f52-bda0-efe95d77c5fe.png)](https://blog.federated-microservices.com)
 
-# ÆGIS <sub><sup>formerly _MicroLib_</sup></sub>
+# ÆGIS <sub><sup>formerly _aegis_</sup></sub>
 
 N.B. This is the host - see the library [here](https://github.com/module-federation/aegis).
 
@@ -31,7 +31,7 @@ yarn start
 yarn demo
 ```
 
-Note: you no longer need to run the MicroLib-Example project, as the host has been configured to stream the federated
+Note: you no longer need to run the aegis-Example project, as the host has been configured to stream the federated
 modules directly from GitHub.
 
 [Importing your own app](#importing-your-own-repo)
@@ -54,19 +54,19 @@ Is there such an alternative? [Fowler](https://martinfowler.com/articles/microse
 
 While technologies that support hot deployment have been around for some time (such as [OSGi](https://www.osgi.org/)), it would appear, up until now anyway, perhaps due to complexity, labor intensity, or skills scarcity, they haven't been considered a viable option. Whatever the reason, with the advent of module federation, this view is no longer warranted.
 
-Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. MicroLib exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
+Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. aegis exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
-Using webpack dependency graphs, code splitting and code streaming, MicroLib supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration, promote composability and ensure components remain decoupled, MicroLib implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate, so intra- and interprocess communication is transparent. E.g. whether deployed locally to the same MicroLib host instance or remotely, its all the same to the module developer.
+Using webpack dependency graphs, code splitting and code streaming, Aegis supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration, promote composability and ensure components remain decoupled, aegis implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate, so intra- and interprocess communication is transparent. E.g. whether deployed locally to the same aegis host instance or remotely, its all the same to the module developer.
 
-With MicroLib, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium altogether by building truly modular and independently deployable component libraries that run together in the same process (or cluster of processes), in what you might call a _"polylith"_ - a monolith comprised of multiple (what would otherwise be) microservices.
+With Aegis, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium altogether by building truly modular and independently deployable component libraries that run together in the same process (or cluster of processes), in what you might call a _"polylith"_ - a monolith comprised of multiple (what would otherwise be) microservices.
 
 ---
 
 ## Features
 
-The goal of MicroLib is to provide an alternative to distributed systems and the performance and operational challenges that come with them, while preserving the benefits of deployment independence. To this end, MicroLib organizes components according to hexagonal architecture, such that the boundaries of, and relations between, federated components are clear and useful.
+The goal of Aegis is to provide an alternative to distributed systems and the performance and operational challenges that come with them, while preserving the benefits of deployment independence. To this end, Aegis organizes components according to hexagonal architecture, such that the boundaries of, and relations between, federated components are clear and useful.
 
-In addtion to zero-install, hot deployment and local eventing, MicroLib promotes strong boundaries between, and prevents coupling of, collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
+In addtion to zero-install, hot deployment and local eventing, aegis promotes strong boundaries between, and prevents coupling of, collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
 
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Dynamic, independent persistence of federated modules
@@ -110,13 +110,13 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 
 ## Components
 
-MicroLib uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. MicroLib modules fall into three categories: `model`, `adapter` and `service`.
+Aegis uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. aegis modules fall into three categories: `model`, `adapter` and `service`.
 
-A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the MicroLib [ModelSpecification](https://github.com/module-federation/MicroLib-Example/blob/master/src/config/order.js) interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
+A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the Aegis [ModelSpecification](https://github.com/module-federation/aegis-Example/blob/master/src/config/order.js) interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
-One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An [adapter](https://github.com/module-federation/MicroLib-Example/blob/master/src/adapters/event-adapter.js) implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added, -replaced or -removed, in which case the framework automatically rebinds their adapters as needed. Adapters by themselves can also be hot-replaced and rebound.
+One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An [adapter](https://github.com/module-federation/Aegis-Example/blob/master/src/adapters/event-adapter.js) implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added, -replaced or -removed, in which case the framework automatically rebinds their adapters as needed. Adapters by themselves can also be hot-replaced and rebound.
 
-A [service](https://github.com/module-federation/MicroLib-Example/blob/master/src/services/event-service.js) provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern, binding to the outside-facing end of the adapter. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
+A [service](https://github.com/module-federation/aegis-Example/blob/master/src/services/event-service.js) provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern, binding to the outside-facing end of the adapter. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
 
 ---
 
@@ -235,7 +235,7 @@ public/aegis.config.json
   "rateLimit": true,
   "jwksRequestsPerMinute": 5,
   "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
-  "audience": "https://microlib.io/",
+  "audience": "https://aegis.io/",
   "issuer": "https://dev-2fe2iar6.us.auth0.com/",
   "algorithms": ["RS256"]
 }
@@ -269,7 +269,7 @@ Click [here](https://github.com/module-federation/aegis-application/generate) to
 
 #### DIY
 
-To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/MicroLib-Example/blob/master/webpack.config.js). Also from microlib-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/MicroLib-Example/tree/master/webpack).
+To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/aegis-Example/blob/master/webpack.config.js). Also from aegis-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/aegis-Example/tree/master/webpack).
 
 ### Installation
 
@@ -283,7 +283,7 @@ To import your own models, update the `webpack/remote-entries.js` to point to yo
 
 [![ref arch](https://img.youtube.com/vi/6GJYX9cmk2Q/maxresdefault.jpg)](https://youtu.be/6GJYX9cmk2Q)
 
-MicroLib prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the MicroLib serverless function, which is the only function adapted to the vendor's platform. From that point on, MicroLib handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
+aegis prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the Aegis serverless function, which is the only function adapted to the vendor's platform. From that point on, Aegis handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
 ## Further Reading
 
@@ -305,4 +305,4 @@ MicroLib prevents vendor lock-in by providing a layer of abstraction on top of v
 
 [Microservice Library Videos](https://www.youtube.com/channel/UCT-3YJ2Ilgcjebqvs40Qz2A)
 
-<img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=MicroLIb&dp=/email/MicroLib">
+<img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=aegis&dp=/email/aegis">

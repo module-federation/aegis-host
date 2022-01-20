@@ -3,6 +3,6 @@
   "oauthUri": "https://server.us.auth0.com/oauth/token",
   "client_id": "client1",
   "client_secret": "notell",
-  "audience": "https://microlib.io/",
+  "audience": "https://aegis.io/",
   "grant_type": "client_credentials"
 }

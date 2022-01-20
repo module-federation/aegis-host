@@ -37,7 +37,7 @@ CACHE_SIZE=2000
 DISTRIBUTED_CACHE_ENABLED=true
 
 # URL root level path
-API_ROOT=/microlib/api
+API_ROOT=/aegis/api
 
 # Shared secret for crypto
 ENCRYPTION_PWD=b!gSecr3t
@@ -52,7 +52,7 @@ CHECKIPHOST=checkip.amazonaws.com
 
 # Required by 3rd party client APIs
 MONGODB_URL=mongodb://localhost:27017
-KAFKA_GROUP_ID=microlib-host
+KAFKA_GROUP_ID=aegis-host
 # AWS_ACCESS_KEY_ID=xxxxxx
 # AWS_SECRET_ACCESS_KEY=xxxxxx
 # GITHUB_TOKEN=xxxxxx

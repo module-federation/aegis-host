@@ -1,5 +1,5 @@
 ;(function () {
-  const apiRoot = 'microlib/api'
+  const apiRoot = 'aegis/api'
   const modelApiPath = apiRoot + '/models'
   const messages = document.querySelector('#messages')
   const postButton = document.querySelector('#post')
@@ -220,7 +220,7 @@
     // if enabled, request fresh access token and store in auth header
     await refreshAccessToken()
     // get list of all models and add to datalist for model input control
-    const data = await fetch('microlib/api/config?isCached=false', {
+    const data = await fetch('aegis/api/config?isCached=false', {
       headers: getHeaders()
     })
     const models = await data.json()

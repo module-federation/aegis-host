@@ -28,7 +28,7 @@ const sslPort = process.argv[2] ? process.argv[2] : process.env.SSL_PORT || 443
 const keyFile = 'cert/privatekey.pem'
 const certFile = 'cert/certificate.pem'
 const forceTimeout = 3000 // time to wait for conn to drop before closing server
-const certLoadPath = process.env.CERTLOAD_PATH || '/microlib/load-cert'
+const certLoadPath = process.env.CERTLOAD_PATH || '/aegis/load-cert'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const checkIpHostname = process.env.CHECKIPHOST || 'checkip.amazonaws.com'
 const domain =
@@ -41,7 +41,7 @@ const sslEnabled = // required in production
  */
 exports.start = async function (app) {
   /** Authorize routes with JSON Web Tokens*/
-  AuthorizationService.protectRoutes(app, '/microlib')
+  AuthorizationService.protectRoutes(app, '/aegis')
 
   const greeting = (proto, host, port) =>
     `\n 🌎 ÆGIS listening on ${proto}://${host}:${port} \n`
@@ -282,7 +282,7 @@ exports.start = async function (app) {
   }
 
   /**
-   * start microlib and the webserver
+   * start aegis and the webserver
    *
    * this function isn't called if running in serverless mode
    */

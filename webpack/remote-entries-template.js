@@ -7,7 +7,7 @@ exports.customer = [
   {
     name: 'microservices',
     url: 'https://api.github.com',
-    repo: 'microlib-examples',
+    repo: 'aegis-examples',
     owner: 'module-federation',
     filedir: 'dist',
     branch: 'customer',
