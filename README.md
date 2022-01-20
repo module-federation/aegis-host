@@ -72,8 +72,9 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Deployment independence without distribution
 - Language independence without distribution
 - Self-deployment (_no deployment automation required!_)
-- Ubiquitous deployment (any compute primitive: vm, container, serverless)
-- Portability (frontend, backend, datacenter, edge, browser, phone, drone)
+- Deploy to: datacenter, edge, and beyond (browser, phone, drone, IoT)
+- Run on: any compute primitive: vm, container, serverless, microprocessor)
+- Run as: web server, clustered web server, serverless function
 - Zero downtime, zero installation (code streaming)
 - Transparent integration 
 - Self-forming service mesh
