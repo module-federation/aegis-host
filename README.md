@@ -68,12 +68,27 @@ The goal of MicroLib is to provide an alternative to distributed systems and the
 
 In addtion to zero-install, hot deployment and local eventing, MicroLib promotes strong boundaries between, and prevents coupling of, collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
 
+### Highlights
+- Deployment independence without distribution
+- Language independence without distribution
+- Self-deployment (no deployment automation required)
+- Zero downtime, zero installation (code streaming)
+- Portability (datacenter, edge, browser, phone, drone)
+- Transparent integration 
+- Self-forming service mesh
+- Runtime binding of services and adapters
+- Multithreading for CPU-bound workloads (e.g. AI inference)
+- Distributed data / object cache
+- Hexagonal architecture
+
+### Detail
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Dynamic, independent persistence of federated modules
 - Runtime port generation
-- Runtime port-adapter binding
-- Runtime adapter-service binding
-- Runtime dynamic linking of WebAssembly ports, adapters and service modules
+- Runtime binding (port-adapter binding, adapter-service binding)
+- Zero deployment automation required (install to any compute primitive)
+- Self-forming Service Mesh
+- Runtime linking of WebAssembly modules
 - [Hot deployment of federated modules](#zero-downtime---zero-install-deployment-api-generation)
 - Configuration-based service integration
 - Configuration-based service orchestration
@@ -101,7 +116,6 @@ In addtion to zero-install, hot deployment and local eventing, MicroLib promotes
 - Polyglossia - write components in any lang with a WASM compile target
 - Eventually MLOps - ci/cd pipeline for machine learning deployment
 - Sooner than later AIOps - deep learning for adaptive, lights-outs operations
-
 
 
 ---
