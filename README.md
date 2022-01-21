@@ -74,13 +74,14 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Self-deployment (_no deployment automation required!_)
 - Run on: any compute primitive: vm, container, serverless, microprocessor
 - Run as: web server, clustered web server, serverless function
+- Containerless, secure, near-native performance using WebAssembly
 - Zero downtime, zero installation (code streaming)
-- Transparent integration 
+- Transparent integration and persistence
 - Self-forming, in-process service mesh
 - Runtime binding of services and adapters
 - Multithreading for CPU-bound workloads (e.g. AI inference)
 - Distributed data / object cache
-- Hexagonal architecture
+- Hexagonal architecture enforcing strong component boundaries
 
 ### Detail
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
