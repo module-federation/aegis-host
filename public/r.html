@@ -1,0 +1,18 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/json2html/2.1.0/json2html.min.js"></script>
+ 
+<script>
+    
+    let data = [
+        {"title":"Heat","year":"1995"},
+        {"title":"Snatch","year":"2000"},
+        {"title":"Up","year":"2009"},
+        {"title":"Unforgiven","year":"1992"},
+        {"title":"Amadeus","year":"1984"}
+    ];
+    
+    let template = {'<>':'div','html':'${title} ${year}'};
+    
+    //render
+    document.write( json2html.render(data,template) );
+    
+</script>

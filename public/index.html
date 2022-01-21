@@ -1,32 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="aegis.png" />
 
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
-      crossorigin="anonymous"
-    />
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="aegis.png" />
 
-    <title>ÆGIS Domain Model API</title>
-  </head>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
-  <body style="background-color: black">
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
-      crossorigin="anonymous"
-    ></script>
 
-    <nav class="navbar navbar-dark">
-      <div class="container-lg">
+  <title>ÆGIS Domain Model API</title>
+</head>
+
+<!-- <body style="background-color: black"> -->
+
+<body class="bg-dark">
+
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+
+  <nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="aegis.png" alt="aegis" width="26" height="26" />
+        <span class="navbar-brand mb-0 h1 text-warning">ÆGIS</span>
+        <span class="navbar-brand text-light mb-0">Domain Model API</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
+        aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExample01">
+        <ul class="navbar-nav me-auto mb-2">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis/api/config">models</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis.config.json">config</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=data">data</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=threads">threadpools</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/module-federation/aegis" target="_blank" rel="n  oopener">
+              <span class="navbar-link text-light mb-0">source</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="aegis.log" target="_blank">
+              <span class="navbar-link text-light mb-0">log</span>
+            </a>
+          </li>
+        </ul>
+        <form>
+          <input class="form-control" type="text" placeholder="reload" aria-label="reload">
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <!-- <nav class="navbar navbar-dark">
         <a class="navbar-brand" href="#">
           <img src="aegis.png" alt="aegis" width="26" height="26" />
           <span class="navbar-brand mb-0 h1 text-warning">ÆGIS</span>
@@ -59,111 +101,70 @@
             <span class="navbar-link text-muted mb-0">ÆGIS on GitHub</span>
           </a>
         </div>
-      </div>
-    </nav>
-    <div class="container-lg">
-      <div class="row">
-        <div class="col-md-5">
-          <div class="form-floating mb-3 input-group">
-            <input
-              class="form-control bg-dark text-white"
-              id="model"
-              list="modelList"
-              placeholder="Type to search..."
-            />
-            <label for="model" class="form-label text-white">Model</label>
-            <datalist id="modelList"></datalist>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearModelButton"
-            >
-              Clear
-            </button>
-          </div>
+      
+    </nav> -->
+  <div class="container-lg">
+    <div class="row">
+      <div class="col-md-5">
+        <div class="form-floating mb-3 input-group">
+          <input class="form-control bg-dark text-white" id="model" list="modelList" placeholder="Type to search..." />
+          <label for="model" class="form-label text-white">Model</label>
+          <datalist id="modelList"></datalist>
+          <button class="btn btn-outline-light" type="button" id="clearModelButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3 input-group">
-            <input
-              class="form-control bg-dark text-white"
-              id="modelId"
-              placeholder="Model ID"
-            />
-            <label for="modelId" class="form-label text-white">Model ID</label>
-            <button class="btn btn-outline-light" type="button" id="copyButton">
-              Copy
-            </button>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearIdButton"
-            >
-              Clear
-            </button>
-          </div>
+        <div class="form-floating mb-3 input-group">
+          <input class="form-control bg-dark text-white" id="modelId" placeholder="Model ID" />
+          <label for="modelId" class="form-label text-white">Model ID</label>
+          <button class="btn btn-outline-light" type="button" id="copyButton">
+            Copy
+          </button>
+          <button class="btn btn-outline-light" type="button" id="clearIdButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3 input-group">
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              list="paramList"
-              id="parameter"
-              placeholder="approve"
-            />
-            <label for="parameter" class="form-label text-white"
-              >Parameter</label
-            >
-            <datalist id="paramList">
-              <option value="approve">Checkout</option>
-              <option value="cancel"></option>
-              <option value="serviceMeshNotify"></option>
-              <option value="serviceMeshListen"></option>
-            </datalist>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearParamButton"
-            >
-              Clear
-            </button>
-          </div>
+        <div class="form-floating mb-3 input-group">
+          <input type="text" class="form-control bg-dark text-white" list="paramList" id="parameter"
+            placeholder="approve" />
+          <label for="parameter" class="form-label text-white">Parameter</label>
+          <datalist id="paramList">
+            <option value="approve">Checkout</option>
+            <option value="cancel"></option>
+            <option value="serviceMeshNotify"></option>
+            <option value="serviceMeshListen"></option>
+          </datalist>
+          <button class="btn btn-outline-light" type="button" id="clearParamButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3 input-group">
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              list="queryList"
-              id="query"
-              placeholder="command=decrypt"
-            />
-            <label for="query" class="form-label text-white">Query</label>
-            <datalist id="queryList">
-              <option value="command=decrypt"></option>
-              <option value="command=runFibonacci"></option>
-              <option value="command=commandEx"></option>
-              <option value="relation=customer"></option>
-              <option value="relation=orders"></option>
-              <option value="count=all"></option>
-              <option value="count=today"></option>
-              <option value="count=1"></option>
-              <option value="count=orderStatus:COMPLETE"></option>
-              <option value="orderStatus=COMPLETE"></option>
-            </datalist>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearQueryButton"
-            >
-              Clear
-            </button>
-          </div>
+        <div class="form-floating mb-3 input-group">
+          <input type="text" class="form-control bg-dark text-white" list="queryList" id="query"
+            placeholder="command=decrypt" />
+          <label for="query" class="form-label text-white">Query</label>
+          <datalist id="queryList">
+            <option value="command=decrypt"></option>
+            <option value="command=runFibonacci"></option>
+            <option value="command=commandEx"></option>
+            <option value="relation=customer"></option>
+            <option value="relation=orders"></option>
+            <option value="count=all"></option>
+            <option value="count=today"></option>
+            <option value="count=1"></option>
+            <option value="count=orderStatus:COMPLETE"></option>
+            <option value="orderStatus=COMPLETE"></option>
+          </datalist>
+          <button class="btn btn-outline-light" type="button" id="clearQueryButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3">
-            <textarea
-              class="form-control bg-dark text-white overflow-auto"
-              style="height: 150px; white-space: pre"
-              placeholder="{}"
-              id="payload"
-            >
+        <div class="form-floating mb-3">
+          <textarea class="form-control bg-dark text-white overflow-auto" style="height: 150px; white-space: pre"
+            placeholder="{}" id="payload">
             {
               "firstName":"Alan",
               "lastName":"Turing",
@@ -180,46 +181,39 @@
               "fibonacci":"20",
               "saveShippingDetails":false,
               "customerId":null
-            }</textarea
-            >
-            <label for="payload" class="text-white">Payload</label>
-          </div>
-
-          <div class="mb-3">
-            <button id="post" class="btn btn-outline-light" title="post">
-              Post
-            </button>
-            <button id="patch" class="btn btn-outline-light" title="patch">
-              Patch
-            </button>
-            <button id="get" class="btn btn-outline-light" title="get">
-              Get
-            </button>
-            <button id="delete" class="btn btn-outline-light" title="delete">
-              Delete
-            </button>
-            <button id="clear" class="btn btn-outline-light" title="clear">
-              Clear
-            </button>
-          </div>
+            }</textarea>
+          <label for="payload" class="text-white">Payload</label>
         </div>
 
-        <div class="col-md-7">
-          <pre
-            id="url"
-            class="text-warning text-decoration-underline mb-3"
-          ></pre>
-          <pre
-            id="messages"
-            class="text-light mb-3 overflow-scroll"
-            style="height: 80vh"
-            hover="postion: relative; width: 700px; z-index: 99"
-          >
-          <code id="jsonCode"></code>
-        </pre>
+        <div class="mb-3">
+          <button id="post" class="btn btn-outline-light" title="post">
+            Post
+          </button>
+          <button id="patch" class="btn btn-outline-light" title="patch">
+            Patch
+          </button>
+          <button id="get" class="btn btn-outline-light" title="get">
+            Get
+          </button>
+          <button id="delete" class="btn btn-outline-light" title="delete">
+            Delete
+          </button>
+          <button id="clear" class="btn btn-outline-light" title="clear">
+            Clear
+          </button>
         </div>
       </div>
+
+      <div class="col-md-7">
+        <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
+        <pre id="messages" class="text-light mb-3 overflow-scroll" style="height: 80vh"
+          hover="postion: relative; width: 700px; z-index: 99">
+          <code id="jsonCode"></code>
+        </pre>
+      </div>
     </div>
-    <script src="app.js"></script>
-  </body>
+  </div>
+  <script src="app.js"></script>
+</body>
+
 </html>
