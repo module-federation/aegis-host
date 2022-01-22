@@ -2,35 +2,31 @@
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/png" href="aegis.png" />
 
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
 
   <title>ÆGIS Domain Model API</title>
 </head>
 
-<!-- <body style="background-color: black"> -->
-
 <body class="bg-dark">
 
-  <!-- Option 1: Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"></script>
 
-  <nav class="navbar navbar-dark bg-dark" aria-label="First navbar example">
+  <nav class="navbar navbar-dark bg-dark" aria-label="navbar">
     <div class="container-fluid">
+
       <a class="navbar-brand" href="#">
         <img src="aegis.png" alt="aegis" width="26" height="26" />
         <span class="navbar-brand mb-0 h1 text-warning">ÆGIS</span>
         <span class="navbar-brand text-light mb-0">Domain Model API</span>
       </a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
         aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -39,77 +35,44 @@
       <div class="collapse navbar-collapse" id="navbarsExample01">
         <ul class="navbar-nav me-auto mb-2">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis/api/config">models</a>
+            <a class="nav-link active" aria-current="page" href="aegis/api/config">Models</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis.config.json">config</a>
+            <a class="nav-link active" aria-current="page" href="aegis.config.json">Config</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=data">data</a>
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=data">Data</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=threads">threadpools</a>
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=threads">ThreadPools</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="https://github.com/module-federation/aegis" target="_blank" rel="n  oopener">
-              <span class="navbar-link text-light mb-0">source</span>
+              <span class="navbar-link text-light mb-0">Source</span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="aegis.log" target="_blank">
-              <span class="navbar-link text-light mb-0">log</span>
+              <span class="navbar-link text-light mb-0">Log</span>
             </a>
           </li>
         </ul>
-        <form>
-          <input class="form-control" type="text" placeholder="reload" aria-label="reload">
-        </form>
       </div>
+
     </div>
   </nav>
 
-  <!-- <nav class="navbar navbar-dark">
-        <a class="navbar-brand" href="#">
-          <img src="aegis.png" alt="aegis" width="26" height="26" />
-          <span class="navbar-brand mb-0 h1 text-warning">ÆGIS</span>
-          <span class="navbar-brand text-muted mb-0">Domain Model API</span>
-        </a>
-        <div>
-          <a class="nav-link" href="wsapp.html" target="_blank">
-            <img src="aegis.png" alt="WebSwitch" width="24" height="24" />
-            <span class="navbar-link text-muted mb:-0">Service Mesh Listener</span>
-          </a>
-        </div>
-        <div>
-          <a class="nav-link" href="aegis.log" target="_blank">
-            <span class="navbar-link text-muted mb-0">View Log</span>
-          </a>
-        </div>
-        <div>
-          <a
-            class="nav-link"
-            href="https://github.com/module-federation/aegis"
-            target="_blank"
-            rel="noopener"
-          >
-            <img
-              src="https://github.com/fluidicon.png"
-              alt="GitHub"
-              width="24"
-              height="24"
-            />
-            <span class="navbar-link text-muted mb-0">ÆGIS on GitHub</span>
-          </a>
-        </div>
-      
-    </nav> -->
   <div class="container-lg">
     <div class="row">
+
       <div class="col-md-5">
         <div class="form-floating mb-3 input-group">
           <input class="form-control bg-dark text-white" id="model" list="modelList" placeholder="Type to search..." />
           <label for="model" class="form-label text-white">Model</label>
           <datalist id="modelList"></datalist>
+          <button class="btn btn-outline-light" type="button" id="reloadModelButton">
+            Load
+          </button>
           <button class="btn btn-outline-light" type="button" id="clearModelButton">
             Clear
           </button>
@@ -211,9 +174,12 @@
           <code id="jsonCode"></code>
         </pre>
       </div>
+
     </div>
   </div>
+
   <script src="app.js"></script>
+  
 </body>
 
 </html>

@@ -16,6 +16,7 @@
   const clearQueryButton = document.querySelector('#clearQueryButton')
   const clearModelButton = document.querySelector('#clearModelButton')
   const clearParamButton = document.querySelector('#clearParamButton')
+  const reloadModelButton = document.querySelector('#reloadModelButton')
 
   // Include JWT access token in header for auth check
   let authHeader = {}
@@ -89,7 +90,7 @@
   function displayUrl (url) {
     document.getElementById(
       'url'
-    ).textContent = `${location.protocol}//${location.host}/${url}`
+    ).textContent = `${location.protocol}/${location.host}/${url}`
   }
 
   function getUrl () {
@@ -215,6 +216,21 @@
     document.getElementById('query').value = ''
     getUrl()
   })
+
+  reloadModelButton.onclick = function () {
+    const endpoint = document.getElementById('model').value
+    const len = endpoint.length
+    const modelName = endpoint.slice(0, len - 1)
+    fetch(`${modelApiPath}/reload?modelName=${modelName}`, {
+      method: 'PUT',
+      headers: getHeaders()
+    })
+      .then(handleResponse)
+      .then(showMessage)
+      .catch(function (err) {
+        showMessage(err.message)
+      })
+  }
 
   window.addEventListener('load', async function () {
     // if enabled, request fresh access token and store in auth header
