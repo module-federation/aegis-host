@@ -89,10 +89,19 @@
         "rateLimit": true,
         "jwksRequestsPerMinute": 5,
         "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
-        "audience": "https://Aegis.io/",
+        "audience": "https://microlib.io/",
         "issuer": "https://dev-2fe2iar6.us.auth0.com/",
         "algorithms": ["RS256"]
       }
+    },
+    "token": {
+      "desc": "info to acquire token",
+      "authEnabled": false,
+      "oauthUri": "https://server.us.auth0.com/oauth/token",
+      "client_id": "__client_id__",
+      "client_secret": "__client_secret__",
+      "audience": "https://aegis.io/",
+      "grant_type": "__client_credentials__"
     },
     "cert": {
       "webRoot": "public",

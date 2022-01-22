@@ -42,9 +42,9 @@
    * Need CORS for this.
    */
   async function refreshAccessToken () {
-    const file = await fetch('app.json')
+    const file = await fetch('aegis.config.json')
     const text = await file.text()
-    const config = JSON.parse(text)
+    const config = JSON.parse(text).services.token
     let token = { access_token: '' }
     if (config.authEnabled) {
       const data = await fetch(config.oauthUri, {
