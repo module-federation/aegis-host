@@ -17,6 +17,11 @@
   const clearModelButton = document.querySelector('#clearModelButton')
   const clearParamButton = document.querySelector('#clearParamButton')
   const reloadModelButton = document.querySelector('#reloadModelButton')
+  const progressBarControl = document.querySelector('#progressBarControl')
+  const progressBarControlBar = document.querySelector('#progressBarControlBar')
+
+  var exampleEl = document.getElementById('reloadModelButton')
+  var tooltip = new bootstrap.Tooltip(exampleEl)
 
   // Include JWT access token in header for auth check
   let authHeader = {}
@@ -137,13 +142,122 @@
     }
   }
 
+  function makeProgress (stop) {
+    var stop = false
+    var i = 0
+    //progressElem.style.visibility = 'visible'
+    var bar = document.querySelector('.progress-bar')
+    function progress () {
+      if (i < 100) {
+        i = i + 1
+        bar.style.width = i + '%'
+        bar.innerText = i + '%'
+      }
+      // Wait for sometime before running this script again
+      setTimeout(() => {
+        if (!stop) progress()
+        else {
+          bar.style.width = 100 + '%'
+          bar.innerText = 100 + '%'
+          //setTimeout(() => (progressElem.style.visibility = 'hidden'), 100)
+        }
+      }, 100)
+    }
+
+    return {
+      done () {
+        stop = true
+      },
+      progress
+    }
+  }
+
+  const progressController = stop => {
+    //const modalControl = new bootstrap.Modal(document.getElementById('modal'))
+    //const collapsable = document.querySelector('')
+    if (stop) {
+      return {
+        hide () {}
+      }
+    }
+    const progressBarControl = document.querySelector('.progress')
+    const progressControl = makeProgress(stop)
+    const collapse = new bootstrap.Collapse(progressBarControl)
+
+    return {
+      show () {
+        collapse.show()
+        progressControl.progress()
+        //modalControl.show()
+      },
+      hide () {
+        stop = true
+        collapse.hide()
+        progressControl.done()
+        //amodalControl.hide()
+      },
+      dispose () {
+        collapse.dispose()
+      }
+    }
+  }
+  let loaded = false
+  let reloaded = false
+
+  reloadModelButton.onclick = function () {
+    const endpoint = document.getElementById('model').value
+    const len = endpoint.length
+    let modelName = endpoint
+    if (endpoint.charAt(len - 1) === 's') modelName = endpoint.slice(0, len - 1)
+
+    // let stop = false
+    // const controller = progressController(stop)
+    // let timerId
+    // if (!reloaded) {
+    //   timerId = setTimeout(() => controller.show(), 2000)
+    // }
+    fetch(`${modelApiPath}/reload?modelName=${modelName}`, {
+      method: 'PUT',
+      headers: getHeaders()
+    })
+      // .then(response => {
+      //   if (!reloaded) {
+      //     clearTimeout(timerId)
+      //     controller.hide()
+      //     reloaded = true
+      //   }
+      //   return response
+      // })
+      .then(handleResponse)
+      .then(showMessage)
+      .catch(function (err) {
+        showMessage(err.message)
+      })
+  }
+
   postButton.onclick = function () {
     document.getElementById('modelId').value = ''
+    // let stop = false
+    // const controller = progressController(stop)
+    // let timerId
+    // if (!loaded) {
+    //   timerId = setTimeout(() => controller.show(), 2000)
+    // }
+
     fetch(getUrl(), {
       method: 'POST',
       body: document.getElementById('payload').value,
       headers: getHeaders()
     })
+      // .then(response => {
+      //   if (!loaded) {
+      //     clearTimeout(timerId)
+      //     controller.hide()
+      //     controller.dispose()
+      //     loaded = true
+      //   }
+      //   return response
+      // })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -216,21 +330,6 @@
     document.getElementById('query').value = ''
     getUrl()
   })
-
-  reloadModelButton.onclick = function () {
-    const endpoint = document.getElementById('model').value
-    const len = endpoint.length
-    const modelName = endpoint.slice(0, len - 1)
-    fetch(`${modelApiPath}/reload?modelName=${modelName}`, {
-      method: 'PUT',
-      headers: getHeaders()
-    })
-      .then(handleResponse)
-      .then(showMessage)
-      .catch(function (err) {
-        showMessage(err.message)
-      })
-  }
 
   window.addEventListener('load', async function () {
     // if enabled, request fresh access token and store in auth header

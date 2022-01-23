@@ -36,6 +36,8 @@ remoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
 
+      parentPort.postMessage({ signal: 'aegis-up' })
+
       parentPort.on('message', async event => {
         if (typeof messages[event.name] === 'function') {
           console.info('worker calling', event.name)
