@@ -12,7 +12,7 @@
  * @property {string} path local path where compiled files are written
  * @property {"model"|"adapter"|"service"} type the type of components in the module
  * @property {function():Promise<object>} importRemote the function to call to import
- * @property {boolean} wasm is this a WebAssembly module?
+ * @property {boolean} [wasm] is this a WebAssembly module?
  * @property {remoteEntry} model location of the model for webAssembly modules
  * - `await import("microservices/models")` imports models based on the below webpack.config.js
  * ```js
@@ -31,6 +31,8 @@
  *   },
  * }),
  * ```
+ * @property {boolean} [preload] if true, the threadpool creates threads
+ * at startup instead of when the first request for the model is processed
  */
 
 /** @type {remoteEntry[]} */

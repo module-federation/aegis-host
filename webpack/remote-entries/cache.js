@@ -1,4 +1,4 @@
-module.exports = [
+exports.cache = [
   {
     name: 'distributed-cache',
     url: 'https://api.github.com',

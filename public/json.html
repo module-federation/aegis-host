@@ -1,0 +1,27 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/json2html/2.1.0/json2html.min.js"></script>
+ 
+<script>
+    (async function () {
+    //let data = await fetch('/aegis/api/config?details=threads')
+    //let data = require('./aegis.config.json')
+    let data = `{
+  "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
+  "adapters": {
+    "desc": "adapter config",
+    "cacheSize": 3000,
+    "defaultDatasource": "DataSourceFile",
+    "datasources": {
+      "DataSourceMemory": {
+        "desc": "Non-persistent, in-memory storage",
+        "enabled": true
+      },
+    },
+  },
+`
+    
+    let template = {'<>':'div','html':'${desc} ${general.fqdn}'};
+    
+    //render
+    document.write( json2html.render(data,template) );
+      }  )()
+</script>                                                                           

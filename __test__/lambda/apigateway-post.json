@@ -1,6 +1,6 @@
 {
-  "resource": "/microlib/api/models/{any+}",
-  "path": "/microlib/api/models/orders",
+  "resource": "/Aegis/api/models/{any+}",
+  "path": "/Aegis/api/models/orders",
   "httpMethod": "POST",
   "headers": {
     "Accept-Encoding": "gzip, deflate, br"

@@ -50,10 +50,10 @@ const server = env => {
         },
         plugins: [
           new ModuleFederationPlugin({
-            name: 'microlib',
+            name: 'Aegis',
             filename: 'remoteEntry.js',
             library: {
-              name: 'microlib',
+              name: 'Aegis',
               type: 'commonjs-module'
             },
             remoteType: 'commonjs-module',
@@ -109,10 +109,10 @@ const client = env => {
         plugins: [
           new NodePolyfillPlugin(),
           new ModuleFederationPlugin({
-            name: 'microlib',
+            name: 'Aegis',
             filename: 'remoteEntry.js',
             library: {
-              name: 'microlib',
+              name: 'Aegis',
               type: 'commonjs-module'
             },
             remoteType: 'commonjs-module',

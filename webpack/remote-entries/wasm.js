@@ -1,7 +1,7 @@
 'use strict'
 
 /**
- * @typedef {import("./remote-entries-type")} entries
+ * @typedef {import("../remote-entries-type")} entries
  */
 
 const {
@@ -9,7 +9,7 @@ const {
 } = require('@module-federation/aegis').adapters.webassembly
 
 /** @type {entries} */
-const entries = [
+exports.wasm = [
   {
     name: 'wasm',
     url: 'https://api.github.com',
@@ -17,13 +17,12 @@ const entries = [
     owner: 'module-federation',
     filedir: 'wasm/build',
     branch: 'main',
+    preload: false,
+    wasm: true,
     path: __dirname,
     type: 'model',
-    wasm: true,
-    importRemote() {
+    importRemote () {
       return importWebAssembly(this, 'model')
     }
   }
 ]
-
-module.exports = entries

@@ -5,7 +5,7 @@
   "installConfig": {
     "pnp": false
   },
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "config": {
     "s3BucketName": "aegisserverless2",
     "region": "us-east-1",
@@ -18,16 +18,17 @@
   },
   "scripts": {
     "postinstall": "[ -s ~/aegis-host/install.log ] || (echo \". ~/.aegis\" >> ~/.zshrc && echo \". ~/.aegis\" >> ~/.bashrc && echo \"installed on `date`\" > ~/aegis-host/install.log && yarn cmd-log && yarn cmd-tail && yarn cmd-status && yarn cmd-start && yarn cmd-stop && echo \"~/aegis-host/status.sh\" >> ~/.aegis && yarn cmd-env)",
+    "transpile": "babel src/worker.js -d dist",
     "prebuild": "yarn clean && yarn transpile",
     "build": "yarn prebuild && webpack --config webpack.config.js",
     "build-order": "yarn prebuild && webpack --config webpack.config.js --env order",
-    "start": "node --title aegis dist/index.js",
+    "start": "node --title aegis dist/main.js",
     "start-order": "yarn start 8080",
     "start-customer": "yarn start 8071",
     "restart": "yarn build && yarn start",
     "restart-order": "yarn build-order && yarn start-order",
     "restart-customer": "yarn build-customer && yarn start-customer",
-    "hot-reload": "curl http://localhost/microlib/reload",
+    "hot-reload": "curl http://localhost/aegis/api/models?modelName=*",
     "login-status": "echo \"~/aegis-host/status.sh\" >> ~/.aegis && echo \". ~/.aegis\"",
     "cmd-log": "echo \"alias log='view ~/aegis-host/public/aegis.log'\" >> ~/.aegis",
     "cmd-tail": "echo \"alias tail='tail -f ~/aegis-host/public/aegis.log'\" >> ~/.aegis",
@@ -41,7 +42,6 @@
     "deploy-lambda": "yarn clean  npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "mesh-start": "node --title appmesh ./node_modules/@module-federation/aegis/lib/services/mesh-switch.js",
     "mesh-status": "node ./node_modules/@module-federation/aegis/lib/services/webswitch-status.mjs",
-    "transpile": "babel src/index.js -d dist",
     "dev-start": "nodemon --watch src --exec npm restart",
     "clean": "rimraf dist",
     "test-mocha": "mocha --recursive -r esm",
@@ -51,7 +51,7 @@
     "demo-ssl": "open https://localhost:443",
     "demo-aws": "open https://aegis.module-federation.org",
     "refresh-token": "./accessToken.sh",
-    "hot-reload-reset": "curl http://localhost/microlib/reload-reset",
+    "hot-reload-reset": "curl http://localhost/Aegis/reload-reset",
     "serverless-deploy": "serverless deploy",
     "serverless-invoke-local-api-post": "serverless invoke local --function aegis --path ./test/lambda/apigateway-post.json",
     "serverless-invoke-local-api-getid": "serverless invoke local --function aegis --path ./test/lambda/apigateway-getid.json",
@@ -82,7 +82,9 @@
     "mongodb": "^3.6.6",
     "nanoid": "^3.1.20",
     "nats": "^2.2.0",
+    "node-json2html": "^2.2.0",
     "regenerator-runtime": "^0.13.7",
+    "segfault-handler": "^1.3.0",
     "ws": "^8.2.0"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 {
-  "resource": "/microlib/api/domain/{any+}",
-  "path": "/microlib/api/models/orders/9f1e89a7-2c7d-4021-94b8-1648ea0410d8",
+  "resource": "/Aegis/api/domain/{any+}",
+  "path": "/aegis/api/models/orders/9f1e89a7-2c7d-4021-94b8-1648ea0410d8",
   "httpMethod": "GET",
   "headers": {
     "Accept-Encoding": "gzip, deflate, br"

@@ -1,5 +1,5 @@
 ;(function () {
-  const apiRoot = 'microlib/api'
+  const apiRoot = 'aegis/api'
   const modelApiPath = apiRoot + '/models'
   const messages = document.querySelector('#messages')
   const postButton = document.querySelector('#post')
@@ -16,6 +16,12 @@
   const clearQueryButton = document.querySelector('#clearQueryButton')
   const clearModelButton = document.querySelector('#clearModelButton')
   const clearParamButton = document.querySelector('#clearParamButton')
+  const reloadModelButton = document.querySelector('#reloadModelButton')
+  const progressBarControl = document.querySelector('#progressBarControl')
+  const progressBarControlBar = document.querySelector('#progressBarControlBar')
+
+  var exampleEl = document.getElementById('reloadModelButton')
+  var tooltip = new bootstrap.Tooltip(exampleEl)
 
   // Include JWT access token in header for auth check
   let authHeader = {}
@@ -41,9 +47,9 @@
    * Need CORS for this.
    */
   async function refreshAccessToken () {
-    const file = await fetch('app.json')
+    const file = await fetch('aegis.config.json')
     const text = await file.text()
-    const config = JSON.parse(text)
+    const config = JSON.parse(text).services.token
     let token = { access_token: '' }
     if (config.authEnabled) {
       const data = await fetch(config.oauthUri, {
@@ -89,7 +95,7 @@
   function displayUrl (url) {
     document.getElementById(
       'url'
-    ).textContent = `${location.protocol}//${location.host}/${url}`
+    ).textContent = `${location.protocol}/${location.host}/${url}`
   }
 
   function getUrl () {
@@ -136,13 +142,122 @@
     }
   }
 
+  function makeProgress (stop) {
+    var stop = false
+    var i = 0
+    //progressElem.style.visibility = 'visible'
+    var bar = document.querySelector('.progress-bar')
+    function progress () {
+      if (i < 100) {
+        i = i + 1
+        bar.style.width = i + '%'
+        bar.innerText = i + '%'
+      }
+      // Wait for sometime before running this script again
+      setTimeout(() => {
+        if (!stop) progress()
+        else {
+          bar.style.width = 100 + '%'
+          bar.innerText = 100 + '%'
+          //setTimeout(() => (progressElem.style.visibility = 'hidden'), 100)
+        }
+      }, 100)
+    }
+
+    return {
+      done () {
+        stop = true
+      },
+      progress
+    }
+  }
+
+  const progressController = stop => {
+    //const modalControl = new bootstrap.Modal(document.getElementById('modal'))
+    //const collapsable = document.querySelector('')
+    if (stop) {
+      return {
+        hide () {}
+      }
+    }
+    const progressBarControl = document.querySelector('.progress')
+    const progressControl = makeProgress(stop)
+    const collapse = new bootstrap.Collapse(progressBarControl)
+
+    return {
+      show () {
+        collapse.show()
+        progressControl.progress()
+        //modalControl.show()
+      },
+      hide () {
+        stop = true
+        collapse.hide()
+        progressControl.done()
+        //amodalControl.hide()
+      },
+      dispose () {
+        collapse.dispose()
+      }
+    }
+  }
+  let loaded = false
+  let reloaded = false
+
+  reloadModelButton.onclick = function () {
+    const endpoint = document.getElementById('model').value
+    const len = endpoint.length
+    let modelName = endpoint
+    if (endpoint.charAt(len - 1) === 's') modelName = endpoint.slice(0, len - 1)
+
+    // let stop = false
+    // const controller = progressController(stop)
+    // let timerId
+    // if (!reloaded) {
+    //   timerId = setTimeout(() => controller.show(), 2000)
+    // }
+    fetch(`${modelApiPath}/reload?modelName=${modelName}`, {
+      method: 'PUT',
+      headers: getHeaders()
+    })
+      // .then(response => {
+      //   if (!reloaded) {
+      //     clearTimeout(timerId)
+      //     controller.hide()
+      //     reloaded = true
+      //   }
+      //   return response
+      // })
+      .then(handleResponse)
+      .then(showMessage)
+      .catch(function (err) {
+        showMessage(err.message)
+      })
+  }
+
   postButton.onclick = function () {
     document.getElementById('modelId').value = ''
+    // let stop = false
+    // const controller = progressController(stop)
+    // let timerId
+    // if (!loaded) {
+    //   timerId = setTimeout(() => controller.show(), 2000)
+    // }
+
     fetch(getUrl(), {
       method: 'POST',
       body: document.getElementById('payload').value,
       headers: getHeaders()
     })
+      // .then(response => {
+      //   if (!loaded) {
+      //     clearTimeout(timerId)
+      //     controller.hide()
+      //     controller.dispose()
+      //     loaded = true
+      //   }
+      //   return response
+      // })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -220,7 +335,7 @@
     // if enabled, request fresh access token and store in auth header
     await refreshAccessToken()
     // get list of all models and add to datalist for model input control
-    const data = await fetch('microlib/api/config?isCached=false', {
+    const data = await fetch('aegis/api/config?isCached=false', {
       headers: getHeaders()
     })
     const models = await data.json()
