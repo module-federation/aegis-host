@@ -28,7 +28,7 @@
     "restart": "yarn build && yarn start",
     "restart-order": "yarn build-order && yarn start-order",
     "restart-customer": "yarn build-customer && yarn start-customer",
-    "hot-reload": "curl http://localhost/Aegis/reload",
+    "hot-reload": "curl http://localhost/aegis/api/models?modelName=*",
     "login-status": "echo \"~/aegis-host/status.sh\" >> ~/.aegis && echo \". ~/.aegis\"",
     "cmd-log": "echo \"alias log='view ~/aegis-host/public/aegis.log'\" >> ~/.aegis",
     "cmd-tail": "echo \"alias tail='tail -f ~/aegis-host/public/aegis.log'\" >> ~/.aegis",
