@@ -85,7 +85,8 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 
 ### Detail
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
-- Dynamic, independent persistence of federated modules
+- Dynamic, indvidualized storage adapter generation 
+- Automatic persistence of federated modules
 - Runtime port generation
 - Runtime binding (port-adapter binding, adapter-service binding)
 - Zero deployment automation required (install to any compute primitive)
@@ -103,7 +104,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - [Zero downtime, "zero install" deployment](#zero-downtime---zero-install-deployment-api-generation)
 - Evergreen deployment and semantic versioning
 - Dynamic A/B testing
-- Host runs as a Server, Cluster or Severless Function
+- Exhaustive deployment options (run as a Server, Cluster or Severless Function)
 - Vendor-agnostic serverless deployment (no vendor lock-in)
 - Fast deployment - no-install deployment is the shortest path
 - Self-deployment - built-in deployment automation
@@ -112,10 +113,10 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
 - Automatated CA certifcate setup and renewal
-- Built-in, pluggable service mesh
+- Self-forming, built-in, pluggable service mesh
 - Support for WebAssembly modules as models, adapters, services
 - WebAssembly workflow - pipe modules togther to form control flows
-- Polyglossia - write components in any lang with a WASM compile target
+- Polyglossia - write components in any lang with a Wasm compile target
 - Eventually MLOps - ci/cd pipeline for machine learning deployment
 - Sooner than later AIOps - deep learning for adaptive, lights-outs operations
 
@@ -140,7 +141,7 @@ A [service](https://github.com/module-federation/aegis-Example/blob/master/src/s
 
 ## Persistence
 
-The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data source.
+The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data sink.
 
 A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only are data federated, **but so are related domain models**.
 
