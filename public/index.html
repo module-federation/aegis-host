@@ -20,9 +20,11 @@
   <nav class="navbar navbar-dark bg-dark" aria-label="navbar">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
-        <img src="aegis.png" alt="aegis" width="26" height="26" />
-        <span class="navbar-brand mb-0 h1 text-warning">ÆGIS</span>
-        <span class="navbar-brand text-light mb-0">Domain Model API</span>
+        <img src="aegis-logo.png" alt="aegis" width="30" height="30" />
+        <span class="navbar-brand mb-0 text-warning h1">ÆGIS</span>
+        <span class="navbar-brand text-light mb-0 navbar-toggler" data-bs-toggle="collapse"
+          data-bs-target="#navbarsExample01" aria-controls="navbarsE  xample01" aria-expanded="false">Domain Model
+          API</span>
       </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
@@ -33,24 +35,27 @@
       <div class="collapse navbar-collapse" id="navbarsExample01">
         <ul class="navbar-nav me-auto mb-2">
           <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="wsapp.html">Service Mesh</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="aegis/api/config">Models</a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="aegis.config.json">Config</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=threads">Thread Pools</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="aegis/api/config?details=data">Data</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=threads">ThreadPools</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/module-federation/aegis" target="_blank" rel="n  oopener">
+            <a class="nav-link" href="https://github.com/module-federation/aegis" target="_blank" rel="noopener">
               <span class="navbar-link text-light mb-0">Source</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="aegis.log" target="_blank">
+            <a class="nav-link" href="aegis.log">
               <span class="navbar-link text-light mb-0">Log</span>
             </a>
           </li>
@@ -178,27 +183,8 @@
       </div>
     </div>
   </div>
-  <div class="modal" tabindex="-1" id="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Starting thread</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="m-4">
-            <!-- Progress bar HTML -->
-            <div class="progress">
-              <div class="progress-bar progress-bar-striped" style="min-width: 20px;"></div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-    <script src="app.js"></script>
+
+  <script src="app.js"></script>
 </body>
 
 </html>
