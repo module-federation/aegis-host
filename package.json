@@ -1,6 +1,6 @@
 {
   "name": "aegis-host",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Federated Application Host",
   "installConfig": {
     "pnp": false
@@ -69,7 +69,7 @@
   "license": "MIT",
   "dependencies": {
     "@assemblyscript/loader": "^0.19.12",
-    "@module-federation/aegis": "^1.0.1-beta.0",
+    "@module-federation/aegis": "^1.0.1-beta",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "assemblyscript": "^0.19.12",
