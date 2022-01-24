@@ -29,7 +29,7 @@ if [ "$IPADDR_PUBLIC" == "$IPADDR_DOMAIN2" ]; then
 fi
 
 # print current running process
-SUDO=sudo 
+SUDO=sudo
 $SUDO lsof -P -i | grep LISTEN | grep aegis
 
 # get process ID of aegis
