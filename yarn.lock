@@ -1148,9 +1148,9 @@
     "@types/yargs" "^16.0.0"
     "chalk" "^4.0.0"
 
-"@module-federation/aegis@^1.0.0-beta.90":
+"@module-federation/aegis@^1.0.1-beta":
   "resolved" "file:../aegis"
-  "version" "1.0.0-beta.90"
+  "version" "1.0.1-beta"
   dependencies:
     "@assemblyscript/loader" "0.19.20"
     "@octokit/core" "3.5.1"
@@ -4563,6 +4563,11 @@
   "integrity" "sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0="
   "resolved" "https://registry.npmjs.org/jsesc/-/jsesc-0.5.0.tgz"
   "version" "0.5.0"
+
+"json-formatter-js@^2.3.4":
+  "integrity" "sha512-gmAzYRtPRmYzeAT4T7+t3NhTF89JOAIioCVDddl9YDb3ls3kWcskirafw/MZGJaRhEU6fRimGJHl7CC7gaAI2Q=="
+  "resolved" "https://registry.npmjs.org/json-formatter-js/-/json-formatter-js-2.3.4.tgz"
+  "version" "2.3.4"
 
 "json-parse-better-errors@^1.0.2":
   "integrity" "sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw=="
