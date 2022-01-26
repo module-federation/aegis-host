@@ -18,11 +18,11 @@
     crossorigin="anonymous"></script>
 
   <nav class="navbar navbar-dark bg-dark" aria-label="navbar">
-    <div class="container-fluid">
+    <div class="container-lg">
       <a class="navbar-brand" href="#">
         <img src="aegis-logo.png" alt="aegis" width="50" height="50" />
         <span class="navbar-brand mb-0 text-warning h1 navbar-toggler" data-bs-toggle="collapse"
-        data-bs-target="#navbarsExample01" aria-controls="navbarsE  xample01" aria-expanded="false">ÆGIS</span>
+        data-bs-target="#navbarsExample01" aria-controls="navbarsExample01" aria-expanded="false">ÆGIS</span>
         <span class="navbar-brand text-light mb-0" >Domain Model API</span>
       </a>
 
@@ -67,16 +67,18 @@
     <div class="row">
       <div class="col-md-5">
 
-        <!-- Progress bar HTML -->
-        <div class="progress collapse mb-3">
-          <div class="progress-bar progress-bar-striped" style="min-width: 20px;"></div>
+        <div class="progress collapse mb-3" id="progresscntrl" >
+          <div class="progress-bar bg-warning" role="progressbar"
+          aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width:10%; color:black;" id="progressbar">
+            hot deployment runnning...
+          </div>
         </div>
         <div class="form-floating mb-3 input-group">
           <input class="form-control bg-dark text-white" id="model" list="modelList" placeholder="Type to search..." />
           <label for="model" class="form-label text-white">Model</label>
           <datalist id="modelList"></datalist>
           <button class="btn btn-outline-light" type="button" id="reloadModelButton" data-bs-toggle="tooltip"
-            data-bs-offset="11,0" data-bs-placement="top" title="Update the model.">
+            data-bs-offset="11,0" data-bs-placement="bottom" title="Update the model.">
             Load
           </button>
           <button class="btn btn-outline-light" type="button" id="clearModelButton">

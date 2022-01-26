@@ -17,11 +17,90 @@
   const clearModelButton = document.querySelector('#clearModelButton')
   const clearParamButton = document.querySelector('#clearParamButton')
   const reloadModelButton = document.querySelector('#reloadModelButton')
-  const progressBarControl = document.querySelector('#progressBarControl')
-  const progressBarControlBar = document.querySelector('#progressBarControlBar')
+  const progresscntrl = document.getElementById('progresscntrl')
+  const progressbar = document.getElementById('progressbar')
+  const reloadTip = document.getElementById('reloadModelButton')
+  const progressbarCollapse = new bootstrap.Collapse(progresscntrl, {
+    toggle: false
+  })
 
-  var exampleEl = document.getElementById('reloadModelButton')
-  var tooltip = new bootstrap.Tooltip(exampleEl)
+  new bootstrap.Tooltip(reloadTip)
+
+  class ProgressBar {
+    constructor (progressbar, events, collapse) {
+      this.progressbar = progressbar // Progress Bar
+      this.events = events // Step Complete Btns
+      this.collapse = collapse // hide/show bar
+      this.progress = 0 // Tracking Progress
+    }
+
+    init () {
+      const context = this
+      // Reference to the instantiated object.
+      this.events.forEach(function (event) {
+        // add events
+        window.addEventListener(event, function (e) {
+          context.makeProgress(e)
+        })
+      })
+    }
+
+    makeProgress (e) {
+      this.progressbar.style.width = e.detail.progress + '%'
+      this.progressbar.setAttribute('aria-valuenow', e.detail.progress)
+    }
+  }
+
+  const progressBar = new ProgressBar(
+    // passing in reference to progress-bar div
+    progressbar,
+    // array of events to subscribe to
+    ['fetch-connect', 'fetch-read', 'fetch-done'],
+    // collapsable div to hide bar unitl needed
+    progressbarCollapse
+  )
+
+  progressBar.init()
+
+  async function instrumentedFetch (url, options) {
+    window.dispatchEvent(
+      new CustomEvent('fetch-connect', { detail: { progress: 25 } })
+    )
+    let response = await fetch(url, options)
+    window.dispatchEvent(
+      new CustomEvent('fetch-connect', { detail: { progress: 50 } })
+    )
+    const reader = response.body.getReader()
+    const contentLength = response.headers.get('Content-Length')
+    let receivedLength = 0
+    let ratio = 0
+    let chunks = []
+
+    while (true) {
+      const { done, value } = await reader.read()
+      receivedLength += value.length
+      if (done) {
+        window.dispatchEvent(
+          new CustomEvent('fetch-done', { detail: { progress: 100 } })
+        )
+        break
+      }
+      chunks.push(value)
+      ratio = (contentLength / receivedLength) * 100
+      window.dispatchEvent(
+        new CustomEvent('fetch-read', { detail: { progress: ratio / 2 + 50 } })
+      )
+    }
+
+    let chunksAll = new Uint8Array(receivedLength)
+    let position = 0
+    for (let chunk of chunks) {
+      chunksAll.set(chunk, position)
+      position += chunk.length
+    }
+    let result = new TextDecoder('utf-8').decode(chunksAll)
+    return JSON.parse(result)
+  }
 
   // Include JWT access token in header for auth check
   let authHeader = {}
@@ -142,94 +221,25 @@
     }
   }
 
-  function makeProgress (stop) {
-    var stop = false
-    var i = 0
-    //progressElem.style.visibility = 'visible'
-    var bar = document.querySelector('.progress-bar')
-    function progress () {
-      if (i < 100) {
-        i = i + 1
-        bar.style.width = i + '%'
-        bar.innerText = i + '%'
-      }
-      // Wait for sometime before running this script again
-      setTimeout(() => {
-        if (!stop) progress()
-        else {
-          bar.style.width = 100 + '%'
-          bar.innerText = 100 + '%'
-          //setTimeout(() => (progressElem.style.visibility = 'hidden'), 100)
-        }
-      }, 100)
-    }
-
-    return {
-      done () {
-        stop = true
-      },
-      progress
-    }
-  }
-
-  const progressController = stop => {
-    //const modalControl = new bootstrap.Modal(document.getElementById('modal'))
-    //const collapsable = document.querySelector('')
-    if (stop) {
-      return {
-        hide () {}
-      }
-    }
-    const progressBarControl = document.querySelector('.progress')
-    const progressControl = makeProgress(stop)
-    const collapse = new bootstrap.Collapse(progressBarControl)
-
-    return {
-      show () {
-        collapse.show()
-        progressControl.progress()
-        //modalControl.show()
-      },
-      hide () {
-        stop = true
-        collapse.hide()
-        progressControl.done()
-        //amodalControl.hide()
-      },
-      dispose () {
-        collapse.dispose()
-      }
-    }
-  }
-  let loaded = false
-  let reloaded = false
-
-  reloadModelButton.onclick = function () {
+  function modelNameFromEndpoint () {
     const endpoint = document.getElementById('model').value
     const len = endpoint.length
-    let modelName = endpoint
-    if (endpoint.charAt(len - 1) === 's') modelName = endpoint.slice(0, len - 1)
+    if (endpoint.charAt(len - 1) === 's') return endpoint.slice(0, len - 1)
+    return endpoint
+  }
 
-    // let stop = false
-    // const controller = progressController(stop)
-    // let timerId
-    // if (!reloaded) {
-    //   timerId = setTimeout(() => controller.show(), 2000)
-    // }
-    fetch(`${modelApiPath}/reload?modelName=${modelName}`, {
+  reloadModelButton.onclick = function () {
+    progressbarCollapse.show() // show progress bar
+    const modelName = modelNameFromEndpoint()
+    instrumentedFetch(`${modelApiPath}/reload?modelName=${modelName}`, {
       method: 'PUT',
       headers: getHeaders()
     })
-      // .then(response => {
-      //   if (!reloaded) {
-      //     clearTimeout(timerId)
-      //     controller.hide()
-      //     reloaded = true
-      //   }
-      //   return response
-      // })
       .then(handleResponse)
-      .then(showMessage)
+      .then(data => {
+        showMessage(data)
+        setTimeout(progressbarCollapse.hide, 1000)
+      })
       .catch(function (err) {
         showMessage(err.message)
       })
@@ -237,27 +247,11 @@
 
   postButton.onclick = function () {
     document.getElementById('modelId').value = ''
-    // let stop = false
-    // const controller = progressController(stop)
-    // let timerId
-    // if (!loaded) {
-    //   timerId = setTimeout(() => controller.show(), 2000)
-    // }
-
     fetch(getUrl(), {
       method: 'POST',
       body: document.getElementById('payload').value,
       headers: getHeaders()
     })
-      // .then(response => {
-      //   if (!loaded) {
-      //     clearTimeout(timerId)
-      //     controller.hide()
-      //     controller.dispose()
-      //     loaded = true
-      //   }
-      //   return response
-      // })
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
