@@ -17,9 +17,9 @@
   const clearModelButton = document.querySelector('#clearModelButton')
   const clearParamButton = document.querySelector('#clearParamButton')
   const reloadModelButton = document.querySelector('#reloadModelButton')
+  const reloadTip = document.getElementById('reloadModelButton')
   const progresscntrl = document.getElementById('progresscntrl')
   const progressbar = document.getElementById('progressbar')
-  const reloadTip = document.getElementById('reloadModelButton')
   const progressbarCollapse = new bootstrap.Collapse(progresscntrl, {
     toggle: false
   })
@@ -249,12 +249,18 @@
 
   postButton.onclick = function () {
     document.getElementById('modelId').value = ''
-    fetch(getUrl(), {
+    const timerId = setTimeout(() => progressbarCollapse.show(), 1000)
+    instrumentedFetch(getUrl(), {
       method: 'POST',
       body: document.getElementById('payload').value,
       headers: getHeaders()
     })
-      .then(handleResponse)
+      .then(data => {
+        clearTimeout(timerId)
+        setTimeout(() => progressbarCollapse.hide(), 1000)
+        updateModelId(data.modelId)
+        return data
+      })
       .then(showMessage)
       .catch(function (err) {
         showMessage(err.message)
