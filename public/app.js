@@ -27,10 +27,9 @@
   new bootstrap.Tooltip(reloadTip)
 
   class ProgressBar {
-    constructor (progressbar, events, collapse) {
+    constructor (progressbar, events) {
       this.progressbar = progressbar // Progress Bar
       this.events = events // Step Complete Btns
-      this.collapse = collapse // hide/show bar
       this.progress = 0 // Tracking Progress
     }
 
@@ -40,14 +39,14 @@
       this.events.forEach(function (event) {
         // add events
         window.addEventListener(event, function (e) {
-          context.makeProgress(e)
+          context.makeProgress(e.detail.progress)
         })
       })
     }
 
-    makeProgress (e) {
-      this.progressbar.style.width = e.detail.progress + '%'
-      this.progressbar.setAttribute('aria-valuenow', e.detail.progress)
+    makeProgress (progress) {
+      this.progressbar.style.width = progress + '%'
+      this.progressbar.setAttribute('aria-valuenow', progress)
     }
   }
 
@@ -55,21 +54,22 @@
     // passing in reference to progress-bar div
     progressbar,
     // array of events to subscribe to
-    ['fetch-connect', 'fetch-read', 'fetch-done'],
-    // collapsable div to hide bar unitl needed
-    progressbarCollapse
+    ['fetch-connect', 'fetch-read', 'fetch-done']
   )
 
   progressBar.init()
 
   async function instrumentedFetch (url, options) {
     window.dispatchEvent(
-      new CustomEvent('fetch-connect', { detail: { progress: 25 } })
+      new CustomEvent('fetch-connect', { detail: { progress: 35 } })
     )
+
     let response = await fetch(url, options)
+
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 50 } })
     )
+
     const reader = response.body.getReader()
     const contentLength = response.headers.get('Content-Length')
     let receivedLength = 0
@@ -78,20 +78,19 @@
 
     while (true) {
       const { done, value } = await reader.read()
-      receivedLength += value.length
+
       if (done) {
-        window.dispatchEvent(
-          new CustomEvent('fetch-done', { detail: { progress: 100 } })
-        )
         break
       }
+      receivedLength += value.length
       chunks.push(value)
+
       ratio = (contentLength / receivedLength) * 100
       window.dispatchEvent(
         new CustomEvent('fetch-read', { detail: { progress: ratio / 2 + 50 } })
       )
     }
-
+    console.debug({ receivedLength })
     let chunksAll = new Uint8Array(receivedLength)
     let position = 0
     for (let chunk of chunks) {
@@ -99,6 +98,12 @@
       position += chunk.length
     }
     let result = new TextDecoder('utf-8').decode(chunksAll)
+    console.debug({ result })
+
+    window.dispatchEvent(
+      new CustomEvent('fetch-done', { detail: { progress: 100 } })
+    )
+
     return JSON.parse(result)
   }
 
@@ -235,11 +240,8 @@
       method: 'PUT',
       headers: getHeaders()
     })
-      .then(handleResponse)
-      .then(data => {
-        showMessage(data)
-        setTimeout(progressbarCollapse.hide, 1000)
-      })
+      .then(showMessage)
+      .then(() => setTimeout(() => progressbarCollapse.hide(), 1000))
       .catch(function (err) {
         showMessage(err.message)
       })
