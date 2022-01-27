@@ -90,7 +90,6 @@
         new CustomEvent('fetch-read', { detail: { progress: ratio / 2 + 50 } })
       )
     }
-    console.debug({ receivedLength })
     let chunksAll = new Uint8Array(receivedLength)
     let position = 0
     for (let chunk of chunks) {
@@ -233,6 +232,18 @@
     return endpoint
   }
 
+  window.addEventListener('fetch-connect', function (e) {
+    const btn = document.querySelector('#reloadModelButton')
+    btn.disabled = true
+    btn.ariaBusy = true
+  })
+
+  window.addEventListener('fetch-done', function (e) {
+    const btn = document.querySelector('#reloadModelButton')
+    btn.disabled = false
+    btn.ariaBusy = false
+  })
+
   reloadModelButton.onclick = function () {
     progressbarCollapse.show() // show progress bar
     const modelName = modelNameFromEndpoint()
@@ -243,6 +254,7 @@
       .then(showMessage)
       .then(() => setTimeout(() => progressbarCollapse.hide(), 1000))
       .catch(function (err) {
+        progressbarCollapse.hide()
         showMessage(err.message)
       })
   }
@@ -263,6 +275,7 @@
       })
       .then(showMessage)
       .catch(function (err) {
+        progressbarCollapse.hide()
         showMessage(err.message)
       })
   }
