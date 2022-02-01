@@ -17,25 +17,20 @@
   const clearModelButton = document.querySelector('#clearModelButton')
   const clearParamButton = document.querySelector('#clearParamButton')
   const reloadModelButton = document.querySelector('#reloadModelButton')
-  const reloadTip = document.getElementById('reloadModelButton')
-  const progresscntrl = document.getElementById('progresscntrl')
-  const progressbar = document.getElementById('progressbar')
-  const progressbarCollapse = new bootstrap.Collapse(progresscntrl, {
-    toggle: false
-  })
-
-  new bootstrap.Tooltip(reloadTip)
 
   class ProgressBar {
-    constructor (progressbar, events) {
-      this.progressbar = progressbar // Progress Bar
-      this.events = events // Step Complete Btns
-      this.progress = 0 // Tracking Progress
-    }
-
-    init () {
-      const context = this
+    constructor (events) {
+      this.progresscntrl = document.getElementById('progresscntrl')
+      this.progressbar = document.getElementById('progressbar')
+      this.collapse = new bootstrap.Collapse(this.progresscntrl, {
+        toggle: false
+      })
+      this.events = events
+      this.progress = 0
+      this.progressbar.style.width = '0%'
+      this.progressbar.setAttribute('aria-valuenow', 0)
       // Reference to the instantiated object.
+      const context = this
       this.events.forEach(function (event) {
         // add events
         window.addEventListener(event, function (e) {
@@ -44,20 +39,19 @@
       })
     }
 
+    show () {
+      this.collapse.show()
+    }
+
+    hide () {
+      this.collapse.hide()
+    }
+
     makeProgress (progress) {
       this.progressbar.style.width = progress + '%'
       this.progressbar.setAttribute('aria-valuenow', progress)
     }
   }
-
-  const progressBar = new ProgressBar(
-    // passing in reference to progress-bar div
-    progressbar,
-    // array of events to subscribe to
-    ['fetch-connect', 'fetch-read', 'fetch-done']
-  )
-
-  progressBar.init()
 
   async function instrumentedFetch (url, options) {
     window.dispatchEvent(
@@ -97,7 +91,6 @@
       position += chunk.length
     }
     let result = new TextDecoder('utf-8').decode(chunksAll)
-    console.debug({ result })
 
     window.dispatchEvent(
       new CustomEvent('fetch-done', { detail: { progress: 100 } })
@@ -232,6 +225,8 @@
     return endpoint
   }
 
+  const fetchEvents = ['fetch-connect', 'fetch-read', 'fetch-done']
+
   window.addEventListener('fetch-connect', function (e) {
     const btn = document.querySelector('#reloadModelButton')
     btn.disabled = true
@@ -244,40 +239,34 @@
     btn.ariaBusy = false
   })
 
-  reloadModelButton.onclick = function () {
-    progressbarCollapse.show() // show progress bar
+  reloadModelButton.onclick = async function () {
+    const bar = new ProgressBar(fetchEvents)
+    bar.show()
     const modelName = modelNameFromEndpoint()
-    instrumentedFetch(`${modelApiPath}/reload?modelName=${modelName}`, {
-      method: 'PUT',
-      headers: getHeaders()
-    })
-      .then(showMessage)
-      .then(() => setTimeout(() => progressbarCollapse.hide(), 1000))
-      .catch(function (err) {
-        progressbarCollapse.hide()
-        showMessage(err.message)
-      })
+    const response = await instrumentedFetch(
+      `${modelApiPath}/reload?modelName=${modelName}`,
+      {
+        method: 'PUT',
+        headers: getHeaders()
+      }
+    )
+    showMessage(response)
+    setTimeout(() => bar.hide(), 3000)
   }
 
-  postButton.onclick = function () {
+  postButton.onclick = async function () {
     document.getElementById('modelId').value = ''
-    const timerId = setTimeout(() => progressbarCollapse.show(), 1000)
-    instrumentedFetch(getUrl(), {
+    const bar = new ProgressBar(fetchEvents)
+    const timerId = setTimeout(() => bar.show(), 1000)
+    const response = await instrumentedFetch(getUrl(), {
       method: 'POST',
       body: document.getElementById('payload').value,
       headers: getHeaders()
     })
-      .then(data => {
-        clearTimeout(timerId)
-        setTimeout(() => progressbarCollapse.hide(), 1000)
-        updateModelId(data.modelId)
-        return data
-      })
-      .then(showMessage)
-      .catch(function (err) {
-        progressbarCollapse.hide()
-        showMessage(err.message)
-      })
+    clearTimeout(timerId)
+    setTimeout(() => bar.hide(), 1000)
+    updateModelId(response.modelId)
+    showMessage(response)
   }
 
   patchButton.onclick = function () {
