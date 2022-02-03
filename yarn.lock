@@ -1502,10 +1502,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@module-federation/aegis@^1.0.3-beta":
-  version "1.0.3-beta"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.0.3-beta.tgz#9a812dcb08853ebc140927d89d4c03ea0fb59978"
-  integrity sha512-TgxZKmYGu2E2ooOOQLMtPWKS5586UI8UiDh76xYIUO/osCP2BtUu1NQ9efRV1Y5+pbkUTeUGIMSr7ezWFA9KMw==
+"@module-federation/aegis@^1.0.5-beta":
+  version "1.0.5-beta"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.0.5-beta.tgz#b0c6e380e0d9ff686ab0fa27efda2c7a8a099ae8"
+  integrity sha512-y0upYguicxsVxP/TEP5cyQYU69HPGhcL9lB2r4UzmL8PYPt8K/PFtQD+zolbhH9qyfY1u9q+xqIexPxN3dipRQ==
   dependencies:
     "@assemblyscript/loader" "0.19.22"
     "@octokit/core" "3.5.1"

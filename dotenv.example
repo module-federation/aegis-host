@@ -33,9 +33,6 @@ DATASOURCE_ADAPTER=DataSourceFile
 # Maximum number of instances to cache per model
 CACHE_SIZE=2000 
 
-# Enable cache events for transparent integration
-DISTRIBUTED_CACHE_ENABLED=true
-
 # URL root level path
 API_ROOT=/aegis/api
 

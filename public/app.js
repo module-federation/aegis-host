@@ -29,7 +29,6 @@
       this.progress = 0
       this.progressbar.style.width = '0%'
       this.progressbar.setAttribute('aria-valuenow', 0)
-      // Reference to the instantiated object.
       const context = this
       this.events.forEach(function (event) {
         // add events
@@ -171,7 +170,7 @@
   function displayUrl (url) {
     document.getElementById(
       'url'
-    ).textContent = `${location.protocol}/${location.host}/${url}`
+    ).textContent = `${location.protocol}//${location.host}/${url}`
   }
 
   function getUrl () {
