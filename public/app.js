@@ -75,20 +75,24 @@
       if (done) {
         break
       }
-      receivedLength += value.length
+
       chunks.push(value)
 
+      receivedLength += value.length
       ratio = (contentLength / receivedLength) * 100
       window.dispatchEvent(
         new CustomEvent('fetch-read', { detail: { progress: ratio / 2 + 50 } })
       )
     }
+
     let chunksAll = new Uint8Array(receivedLength)
+
     let position = 0
     for (let chunk of chunks) {
       chunksAll.set(chunk, position)
       position += chunk.length
     }
+
     let result = new TextDecoder('utf-8').decode(chunksAll)
 
     window.dispatchEvent(
@@ -250,13 +254,35 @@
       }
     )
     showMessage(response)
-    setTimeout(() => bar.hide(), 3000)
+    setTimeout(() => bar.hide(), 2000)
+  }
+
+  async function deployConditions (poolName) {
+    const response = await fetch(`${apiRoot}/config?details=threads`)
+    const pools = await response.json()
+    const pool = pools.find(pool => pool.name === poolName)
+    return (
+      !pool ||
+      pool.total === 0 ||
+      (pool.total < pool.max && pool.queueRate > pool.tolerance)
+    )
   }
 
   postButton.onclick = async function () {
     document.getElementById('modelId').value = ''
+    const model = document.getElementById('model').value
+    if (!model || model === '') {
+      showMessage({ error: 'no model selected' })
+      return
+    }
     const bar = new ProgressBar(fetchEvents)
-    const timerId = setTimeout(() => bar.show(), 1000)
+    const timerId = setTimeout(
+      async () =>
+        (await deployConditions(
+          modelNameFromEndpoint(document.getElementById('model').value)
+        )) && bar.show(),
+      1000
+    )
     const response = await instrumentedFetch(getUrl(), {
       method: 'POST',
       body: document.getElementById('payload').value,
