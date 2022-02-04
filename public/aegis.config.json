@@ -16,7 +16,7 @@
   "adapters": {
     "desc": "adapter config",
     "cacheSize": 3000,
-    "defaultDatasource": "DataSourceFile",
+    "defaultDatasource": "DataSourceMemory",
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",
@@ -53,10 +53,13 @@
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
         "enabled": true,
-        "isSwitch": false,
+        "isSwitch": true,
         "heartbeat": 3000,
         "uplink": null,
-        "debug": false
+        "debug": false,
+        "host": "aegis.module-federation.org",
+        "port": 443,
+        "protocol": "wss"
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
