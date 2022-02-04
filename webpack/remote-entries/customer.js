@@ -1,8 +1,8 @@
 /**
- * @typedef {import("./remote-entries-type")} entry
+ * @typedef {import("../remote-entries-type").remoteEntry} entry
  */
 
-/** @type {entry} */
+/** @type {entry[]} */
 exports.customer = [
   {
     name: 'microservices',

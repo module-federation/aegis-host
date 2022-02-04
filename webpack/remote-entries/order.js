@@ -1,17 +1,16 @@
 'use strict'
 
 /**
- * @typedef {import("./remote-entries-type")} entry
+ * @typedef {import("../remote-entries-type").remoteEntry} entry
  */
 
-/** @type {entry} */
+/** @type {entry[]} */
 exports.order = [
   {
     name: 'microservices',
     url: 'https://api.github.com',
     repo: 'aegis-application',
     owner: 'module-federation',
-    preload: false,
     filedir: 'dist',
     branch: 'master',
     path: __dirname,
