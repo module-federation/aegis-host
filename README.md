@@ -141,7 +141,7 @@ A [service](https://github.com/module-federation/aegis-application/blob/master/s
 
 ## Persistence
 
-The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data sink.
+The framework automatically persists domain models as JSON documents either using the default adapter configured for the server or an adapter specifically configured for the model in the _ModelSpec_. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data sink.
 
 A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only are data federated, **but so are related domain models**.
 
