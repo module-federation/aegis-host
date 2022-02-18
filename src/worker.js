@@ -6,11 +6,12 @@ const { adapters, services, domain } = require('@module-federation/aegis')
 const remote = require('../dist/remoteEntry')
 
 const modelName = workerData.modelName
-const { importRemotes, UseCaseService } = domain
+const { importRemotes, UseCaseService, EventBrokerFactory } = domain
 const { StorageService } = services
 const { StorageAdapter } = adapters
 const { find, save } = StorageAdapter
 const overrides = { find, save, StorageService }
+const broker = EventBrokerFactory.getInstance()
 
 const remoteEntries = remote.aegis
   .get('./remoteEntries')
@@ -25,9 +26,14 @@ async function init (remotes) {
   }
 }
 
-const messages = {
-  shutdown: n => process.exit(n || 0),
-  disconnect: () => parentPort.close()
+/**
+ *
+ * @param {MessagePort} port
+ */
+function connectEventChannel (port) {
+  port.onmessage = msg =>
+    broker.notify(msg.data.name, msg.data, { from: 'main' })
+  broker.on(/.*/, event => port.postMessage(event))
 }
 
 remoteEntries.then(remotes => {
@@ -35,18 +41,18 @@ remoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
+      broker.on('shutdown', n => process.exit(n || 0), { from: 'main' })
 
-      parentPort.on('message', async event => {
-        if (typeof messages[event.name] === 'function') {
-          console.info('worker calling', event.name)
-          messages[event.name](event.data)
+      parentPort.on('message', async message => {
+        if (message.eventPort instanceof MessagePort) {
+          connectEventChannel(message.eventPort)
         }
 
-        if (typeof service[event.name] === 'function') {
-          const result = await service[event.name](event.data)
+        if (typeof service[message.name] === 'function') {
+          const result = await service[message.name](message.data)
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
         } else {
-          console.warn('not a service function', event.name)
+          console.warn('not a service function', message.name)
         }
       })
     })
