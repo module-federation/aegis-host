@@ -112,7 +112,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
-- Automatated CA certifcate setup and renewal
+- Automated CA certifcate setup and renewal with zero downtime
 - Self-forming, built-in, pluggable service mesh
 - Support for WebAssembly modules as models, adapters, services
 - WebAssembly workflow - pipe modules togther to form control flows
