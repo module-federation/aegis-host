@@ -127,7 +127,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 
 ## Components
 
-Aegis uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. aegis modules fall into three categories: `model`, `adapter` and `service`.
+Aegis uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. Aegis modules fall into three categories: `model`, `adapter` and `service`.
 
 A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the Aegis [ModelSpecification](https://github.com/module-federation/aegis-application/blob/master/src/config/order.js) interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
