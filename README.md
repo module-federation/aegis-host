@@ -80,7 +80,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Self-forming, high-speed, in-process service mesh (no side car)
 - Runtime binding of services and adapters
 - Multithreading for CPU-bound workloads (e.g. AI inference)
-- Distributed data / object fabric across datacenter, edge, and beyond
+- Distributed data / object fabric across datacenter, edge, mobile, IoT / embedded
 - Fractal, hexagonal architecture enforcing strong component boundaries
 
 ### Detail
