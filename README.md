@@ -81,7 +81,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Runtime binding of services and adapters
 - Multithreading for CPU-bound workloads (e.g. AI inference)
 - Distributed data / object fabric across datacenter, edge, and beyond
-- Hexagonal architecture enforcing strong component boundaries
+- Fractal, hexagonal architecture enforcing strong component boundaries
 
 ### Detail
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
