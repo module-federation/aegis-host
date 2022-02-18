@@ -221,7 +221,7 @@
     }
   }
 
-  function modelNameFromEndpoint () {
+  function endpointModelName () {
     const endpoint = document.getElementById('model').value
     const len = endpoint.length
     if (endpoint.charAt(len - 1) === 's') return endpoint.slice(0, len - 1)
@@ -245,7 +245,7 @@
   reloadModelButton.onclick = async function () {
     const bar = new ProgressBar(fetchEvents)
     bar.show()
-    const modelName = modelNameFromEndpoint()
+    const modelName = endpointModelName()
     const response = await instrumentedFetch(
       `${modelApiPath}/reload?modelName=${modelName}`,
       {
@@ -278,7 +278,7 @@
     const bar = new ProgressBar(fetchEvents)
     const timerId = setTimeout(
       async () =>
-        (await deployConditions(modelNameFromEndpoint(model))) && bar.show(),
+        (await deployConditions(endpointModelName(model))) && bar.show(),
       1000
     )
     const response = await instrumentedFetch(getUrl(), {
