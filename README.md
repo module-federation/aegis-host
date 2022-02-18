@@ -75,7 +75,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Run on: any compute primitive: vm, container, serverless, microprocessor
 - Run as: single process, cluster, or serverless function
 - Containerless, secure, near-native performance using WebAssembly
-- Zero downtime, zero installation (code streaming)
+- Zero downtime, zero storage, zero installation (code streaming)
 - Transparent integration and persistence
 - Self-forming, high-speed, in-process service mesh (no side car)
 - Runtime binding of services and adapters
