@@ -75,13 +75,13 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Run on: any compute primitive: vm, container, serverless, microprocessor
 - Run as: single process, cluster, or serverless function
 - Containerless, secure, near-native performance using WebAssembly
-- Zero downtime, zero installation (code streaming)
-- Transparent integration and persistence
-- Self-forming, in-process service mesh
-- Runtime binding of services and adapters
+- Zero downtime, zero storage, zero installation runtime (using code streaming)
+- Transparent integration and persistence (same code works whether components are local or remote)
+- Self-forming, high-speed, in-process service mesh (no side car)
+- Runtime binding of services and adapters (add, modify features and fixes live in prod)
 - Multithreading for CPU-bound workloads (e.g. AI inference)
-- Distributed data / object fabric across datacenter, edge, and beyond
-- Hexagonal architecture enforcing strong component boundaries
+- Distributed data / object fabric across datacenter, edge, mobile, IoT / embedded
+- Fractal, hexagonal architecture for high composability and strong component boundaries
 
 ### Detail
 - [Dynamic API generation for federated modules](#zero-downtime---zero-install-deployment-api-generation)
@@ -112,7 +112,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Clustering for availability and scalibilty
 - Cluster cache synchronization
 - Polyrepo code reuse (the answer to the shared code question)
-- Automatated CA certifcate setup and renewal
+- Automated CA certifcate setup and renewal with zero downtime
 - Self-forming, built-in, pluggable service mesh
 - Support for WebAssembly modules as models, adapters, services
 - WebAssembly workflow - pipe modules togther to form control flows
@@ -127,13 +127,13 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 
 ## Components
 
-Aegis uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. aegis modules fall into three categories: `model`, `adapter` and `service`.
+Aegis uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. Aegis modules fall into three categories: `model`, `adapter` and `service`.
 
-A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the Aegis [ModelSpecification](https://github.com/module-federation/aegis-Example/blob/master/src/config/order.js) interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
+A `model` is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. It also implements the Aegis [ModelSpecification](https://github.com/module-federation/aegis-application/blob/master/src/config/order.js) interface. The interface has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
-One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An [adapter](https://github.com/module-federation/Aegis-Example/blob/master/src/adapters/event-adapter.js) implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be hot-added, -replaced or -removed, in which case the framework automatically rebinds their adapters as needed. Adapters by themselves can also be hot-replaced and rebound.
+One such capability is port generation. In a hexagonal or port-adapter architecture, ports handle I/O between the application and domain layers. An [adapter](https://github.com/module-federation/aegis-application/blob/master/src/adapters/event-adapter.js) implements the port ’s interface, facilitating communication with the outside world. As a property of models, ports are configurable and can be added, modified and deleted on the fly at runtime. Same goes for adapters. The framework automatically rebinds adapters to ports as needed, again with no downtime or restart required.
 
-A [service](https://github.com/module-federation/aegis-Example/blob/master/src/services/event-service.js) provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern, binding to the outside-facing end of the adapter. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime.
+A [service](https://github.com/module-federation/aegis-application/blob/master/src/services/event-service.js) provides an optional layer of abstraction for adapters and usually implements a client library. When an adapter is written to satisfy a common integration pattern, a service implements a particular instance of that pattern. For example, an event adapter implements pub/sub functionality, which works with Kafka, Nats, or RabbitMQ. Simply bind the corresponding service to the outside-facing end of the adapter to enable the desired messaging provider. Like adapters to ports, the framework dynamically imports and binds services to adapters at runtime, which means, in our example, you change from Kakfa to Nats, or add Nats and use both, without ever taking the system offline.
 
 ---
 
@@ -141,7 +141,7 @@ A [service](https://github.com/module-federation/aegis-Example/blob/master/src/s
 
 ## Persistence
 
-The framework automatically persists domain models as JSON documents using the default adapter configured for the server. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data sink.
+The framework automatically persists domain models as JSON documents either using the default adapter configured for the server or an adapter specifically configured for the model in the _ModelSpec_. In-memory, filesystem, and MongoDB adapters are provided. Adapters can be extended and individualized per model. Additionally, de/serialization can be customized. Finally, every write operation generates an event that can be forwarded to an external event or data sink.
 
 A common datasource factory manages adapters and provides access to each service’s individual datasource. The factory supports federated schemas (think GraphQL) through relations defined between datasources in the _ModelSpec_. With local caching, not only are data federated, **but so are related domain models**.
 
@@ -152,6 +152,8 @@ const creditCard = customer.decrypt().creditCardNumber;
 ```
 
 Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
+
+It's important to note that this automtatic persistence feature, while providing fairly sophisticated extensibility in and of itself, does not limit you from creating your own solution using ports and adapters, which more demanding use cases might call for; rather, it is merely an optional convenience that should prove effective in many common scenarios, saving you from boilerplate code. However, when writing a custom adapter, to be consistent with the design of the framework, local caching and object-relational APIs should be used to make your data available to the distributed cache (or data fabric), which supports performant, federated data access, as well as transparent integration.
 
 ---
 <img width="124" alt="eventing" src="https://user-images.githubusercontent.com/38910830/144235314-608d49c3-858e-4582-81f7-0355e965ae5e.png">
@@ -164,11 +166,11 @@ When ports are configured in the `ModelSpecification`, the framework dynamically
 
 Ports can be instrumented for exceptions and timeouts to extend the framework’s circuit breaker, retry and compensation logic. They can also be piped together in control flows by specifying the output event of one port as the input or triggering event of another.
 
-An adapter either implements an external interface or exposes an interface for external clients to consume. On the port end, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to environmental concerns.
+An adapter either implements an external interface or exposes an interface for external clients to consume. On the port end, an adapter always implements the port interface; never the other way around. Ports are a function of the domain logic, which is orthogonal to environment-specific implementation details. By design, the domain has no knowledge of anything beyond the port. That which invokes an inbound port or that which is invoked by an outbound port - where the data comes from or where it goes - is irrelavent. Only the shape of the data (as defined by the domain interface) matters.
 
 Ports optionally specify a callback to process data received on the port before control is returned to the caller. The callback is passed as an argument to the port function. Ports can be configured to run on receipt of an event, API request, or called directly from code.
 
-Ports also have an undo callback for implementing compensating logic. The framework remembers the order in which ports are invoked and runs the undo callback of each port in reverse order, starting at the point of failure. This allows transactions across multiple services to be rolled back.
+Ports also have an undo callback for implementing compensating logic in the event of a downstream transaction failure. The framework remembers the order in which ports are invoked and runs the undo callback of each port in reverse order, starting at the point of failure. This allows transactions across multiple services to be rolled back.
 
 ### Local & Remote Events
 
@@ -198,7 +200,7 @@ Callbacks specified for ports in the _ModelSpec_ can process data received on a 
 
 ## Service Mesh
 
-Aegis provides an in-process service mesh that ties Aegis instances together in an application and data fabric, where data, code and workload can be distributed and deployed dynamically in response to functional or non-functional requirements and conditions. As opposed to a sid car, the service mesh is built directly into the federation host and runs on the same port as the API, but using the Websockets protocol. External clients can connect to the mesh this way (e.g. to request status, observe traffic, etc). The mesh enables transparent integration of aegis components, such that component developers can write business logic that is valid regardless of where components are deployed. The service mesh is pluggable. It is straightforward to plug in another implementation. Default implementation is "webswitch" a switched mesh based on websockets. Nats and a QUIC-based implementation are planned.
+Aegis provides an in-process service mesh that ties Aegis instances together forming an data/object fabric, where data is federated, and workload can be distributed and deployed dynamically in response to functional or non-functional requirements and conditions. As opposed to a side car, the service mesh is built directly into the federation host and runs on the same port as the API, but uses the Websockets protocol. External clients can connect to the ws mesh interface to integrate with, observe or control any aegis component. The mesh enables federated data access and transparent integration of aegis components, such that component developers can write business logic that is valid regardless of where components are deployed. The service mesh itself is pluggable, allowing different implementations to be turned on and off (and to coexist in different parts of the mesh). The default implementation, "webswitch" is a self-forming, switched mesh based on websockets. A Nats and QUIC-based implementation are planned.
 
 See <http://localhost/aegis.config.json>
 
@@ -215,7 +217,7 @@ See above TL;DS section for a simplied install. Get up and running in about 60 s
 In the default configuaton, aegis uses the local filesystem for default persistence. Alternatively, you can install MongoDB and update the .env accordingly to change the default to Mongo. You can also update an individual model's datasource in the ModelSpec.
 
 ```shell
-brew install mongodb-community
+brew tap mongodb/brew
 mongod
 ```
 
