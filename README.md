@@ -153,7 +153,7 @@ const creditCard = customer.decrypt().creditCardNumber;
 
 Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
 
-Its important to note that this automtatic persistence feature, while providing fairly sophisticated extensibility in and of itself, does not limit you from creating your own solution using ports and adapters, which more demanding use cases might call for; rather, it is merely a convenience that should prove effective in many common scenarios.
+It's important to note that this automtatic persistence feature, while providing fairly sophisticated extensibility in and of itself, does not limit you from creating your own solution using ports and adapters, which more demanding use cases might call for; rather, it is merely a convenience that should prove effective in many common scenarios. However, when writing a custom adapter, to be consistent with the design of the framework, local caching and relation APIs should be used to make your data available to the distributed cache (or data fabric), which supports performant, federated data access, as well as transparent integration.
 
 ---
 <img width="124" alt="eventing" src="https://user-images.githubusercontent.com/38910830/144235314-608d49c3-858e-4582-81f7-0355e965ae5e.png">
