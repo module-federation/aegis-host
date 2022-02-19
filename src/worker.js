@@ -31,9 +31,13 @@ async function init (remotes) {
  * @param {MessagePort} port
  */
 function connectEventChannel (port) {
+  // recv from main
   port.onmessage = msg =>
     broker.notify(msg.data.name, msg.data, { from: 'main' })
+  // send to main
   broker.on(/.*/, event => port.postMessage(event))
+  //
+  broker.onSubscription(modelName, info => port.postMessage(info))
 }
 
 remoteEntries.then(remotes => {
