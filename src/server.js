@@ -288,8 +288,6 @@ exports.start = async function (app) {
    */
   async function startService () {
     try {
-      app.use(express.json())
-      app.use(express.static('public'))
       rollingRestart()
       startWebServer()
     } catch (e) {

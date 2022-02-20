@@ -61,7 +61,7 @@ exports.crowdcontrol = [
     branch: 'beta',
     path: __dirname,
     type: 'model',
-    importRemote: async () => import('crowdcontrol/models')
+    importRemote: () => import('crowdcontrol/models')
   },
   {
     name: 'livestream',
@@ -69,8 +69,9 @@ exports.crowdcontrol = [
     path: __dirname,
     type: 'adapter',
     wasm: true,
-    importRemote: importWebAssembly(this)
-  },
+    importRemote () {
+      importWebAssembly(this)
+    },
   {
     name: 'computervision',
     url: 'https://machinelearning.cdn?asset=vision.wasm',
@@ -79,6 +80,8 @@ exports.crowdcontrol = [
     wasm: true,
     threads: 2,
     preload: true,
-    importRemote: importWebAssembly(this)
+    importRemote () {
+      importWebAssembly(this)
+    }
   }
 ]

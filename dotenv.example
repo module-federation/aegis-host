@@ -23,15 +23,6 @@ SSL_ENABLED=false
 SSL_PORT=443
 PORT=80
 
-# Default datasource for models that do not specify one
-#DATASOURCE_ADAPTER=DataSourceMemory 
-DATASOURCE_ADAPTER=DataSourceFile 
-#DATASOURCE_ADAPTER=DataSourceMongoDb 
-#DATASOURCE_ADAPTER=DataSourceIpfs
-#DATASOURCE_ADAPTER=DataSourceEtherium
-
-# Maximum number of instances to cache per model
-CACHE_SIZE=2000 
 
 # URL root level path
 API_ROOT=/aegis/api
