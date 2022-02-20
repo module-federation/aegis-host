@@ -70,7 +70,7 @@ exports.crowdcontrol = [
     type: 'adapter',
     wasm: true,
     importRemote () {
-      importWebAssembly(this)
+      return importWebAssembly(this)
     },
   {
     name: 'computervision',
@@ -81,7 +81,7 @@ exports.crowdcontrol = [
     threads: 2,
     preload: true,
     importRemote () {
-      importWebAssembly(this)
+      return importWebAssembly(this)
     }
   }
 ]
