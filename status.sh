@@ -29,11 +29,10 @@ if [ "$IPADDR_PUBLIC" == "$IPADDR_DOMAIN2" ]; then
 fi
 
 # print current running process
-SUDO=sudo
-$SUDO lsof -P -i | grep LISTEN | grep aegis
+sudo lsof -P -i | grep LISTEN | grep aegis
 
 # get process ID of aegis
-PID=$($SUDO lsof -P -i | grep LISTEN | grep aegis | awk '{print $2}')
+PID=$(sudo lsof -P -i | grep LISTEN | grep aegis | awk '{print $2}')
 
 if [[ ${PID} ]]; then
   echo -e "${GREEN}server is up $NC"
