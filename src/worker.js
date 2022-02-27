@@ -36,8 +36,8 @@ function connectEventChannel (port) {
     broker.notify(msg.data.name, msg.data, { from: 'main' })
   // send to main
   broker.on(/.*/, event => port.postMessage(event))
-  //
-  broker.onSubscription(modelName, info => port.postMessage(info))
+  // subscribe to subscription event, forwared to main
+  broker.onSubscription(modelName, event => port.postMessage(event))
 }
 
 remoteEntries.then(remotes => {
