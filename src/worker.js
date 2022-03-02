@@ -51,7 +51,8 @@ remoteEntries.then(remotes => {
       parentPort.on('message', async message => {
         if (message.eventPort instanceof MessagePort) {
           connectEventChannel(message.eventPort)
-
+          return
+        }
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
