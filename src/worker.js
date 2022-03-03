@@ -6,7 +6,12 @@ const { adapters, services, domain } = require('@module-federation/aegis')
 const remote = require('../dist/remoteEntry')
 
 const modelName = workerData.modelName
-const { importRemotes, UseCaseService, EventBrokerFactory } = domain
+const {
+  importRemotes,
+  UseCaseService,
+  EventBrokerFactory,
+  DistributedCache
+} = domain
 const { StorageService } = services
 const { StorageAdapter } = adapters
 const { find, save } = StorageAdapter
@@ -41,7 +46,10 @@ function connectEventChannel (eventPort) {
     eventPort.postMessage({ event, modelName })
   )
   // send to main
-  broker.on(/.*/, event => eventPort.postMessage(event))
+  broker.on(/.*/, event => {
+    console.debug({ fn: 'broker.on: sending to main', event })
+    eventPort.postMessage(event)
+  })
 }
 
 remoteEntries.then(remotes => {
