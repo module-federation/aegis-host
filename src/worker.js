@@ -31,9 +31,9 @@ async function init (remotes) {
  */
 function connectEventChannel (eventPort) {
   // recv from main
-  eventPort.onmessage = msg => {
+  eventPort.onmessage = async msg => {
     console.debug({ fn: 'worker' + onmessage.name, msg })
-    broker.notify(msg.data.name, msg.data, { from: 'main' })
+    await broker.notify(msg.data.eventName, msg.data, { from: 'main' })
   }
 
   // subscribe to subscription event and send to main
