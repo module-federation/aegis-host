@@ -6,12 +6,7 @@ const { adapters, services, domain } = require('@module-federation/aegis')
 const remote = require('../dist/remoteEntry')
 
 const modelName = workerData.modelName
-const {
-  importRemotes,
-  UseCaseService,
-  EventBrokerFactory,
-  DistributedCache
-} = domain
+const { importRemotes, UseCaseService, EventBrokerFactory } = domain
 const { StorageService } = services
 const { StorageAdapter } = adapters
 const { find, save } = StorageAdapter
@@ -35,21 +30,25 @@ async function init (remotes) {
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
-  // recv from main
-  eventPort.onmessage = async msg => {
-    console.debug({ fn: 'worker' + onmessage.name, msg })
-    await broker.notify(msg.data.eventName, msg.data, { from: 'main' })
-  }
+  try {
+    // recv from main
+    eventPort.onmessage = async msg => {
+      console.debug({ fn: 'worker' + onmessage.name, msg })
+      await broker.notify(msg.data.eventName, msg.data)
+    }
 
-  // subscribe to subscription event and send to main
-  broker.onSubscription(modelName, event =>
-    eventPort.postMessage({ event, modelName })
-  )
-  // send to main
-  broker.on(/.*/, event => {
-    console.debug({ fn: 'broker.on: sending to main', event })
-    eventPort.postMessage(event)
-  })
+    // subscribe to subscription event and send to main
+    broker.onSubscription(modelName, event =>
+      eventPort.postMessage({ event, modelName })
+    )
+    // send to main
+    broker.on(/.*/, event => {
+      console.debug({ fn: 'broker.on: sending to main', event })
+      eventPort.postMessage(event)
+    })
+  } catch (error) {
+    console.error({ fn: connectEventChannel.name, error })
+  }
 }
 
 remoteEntries.then(remotes => {
@@ -57,7 +56,7 @@ remoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
-      broker.on('shutdown', n => process.exit(n || 0), { from: 'main' })
+      broker.on('shutdown', n => process.exit(n || 0))
 
       parentPort.on('message', async message => {
         if (message.eventPort instanceof MessagePort) {
