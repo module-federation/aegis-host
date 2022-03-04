@@ -34,7 +34,7 @@ function connectEventChannel (eventPort) {
     // recv from main
     eventPort.onmessage = async msg => {
       console.debug({ fn: 'worker' + onmessage.name, msg })
-      await broker.notify(msg.data.eventName, msg.data)
+      await broker.notify(msg.data.eventName, msg.data, { from: 'main' })
     }
 
     // subscribe to subscription event and send to main
@@ -56,7 +56,7 @@ remoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
-      broker.on('shutdown', n => process.exit(n || 0))
+      broker.on('shutdown', n => process.exit(n || 0), { from: 'main' })
 
       parentPort.on('message', async message => {
         if (message.eventPort instanceof MessagePort) {
