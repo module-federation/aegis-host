@@ -36,7 +36,7 @@ async function init (remotes) {
  * dedicated to sending and receivng events. Connect the thread-
  * local event broker on either side to the channel such that
  * all worker-generated events are forwarded to main and all main-
- * generated events are forwarded to workers (without looping).s
+ * generated events are forwarded to workers (without looping).
  *
  * @param {MessagePort} eventPort
  */
@@ -65,7 +65,7 @@ remoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
-      broker.on('shutdown', n => process.exit(n || 0), { from: 'main' })
+      broker.on('shutdown', n => process.exit(n || 0))
 
       parentPort.on('message', async message => {
         // The event port is transfered
