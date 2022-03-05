@@ -17,6 +17,11 @@ const remoteEntries = remote.aegis
   .get('./remoteEntries')
   .then(factory => factory())
 
+/**
+ * Import federated modules and bind them as ports, adapters or services
+ * @param {import('../webpack/remote-entries-type.js').remoteEntry} remotes
+ * @returns
+ */
 async function init (remotes) {
   try {
     await importRemotes(remotes, overrides)
@@ -27,23 +32,27 @@ async function init (remotes) {
 }
 
 /**
+ * Create a subchannel between this thread and the main thread
+ * dedicated to sending and receivng events. Connect the thread-
+ * local event broker on either side to the channel such that
+ * all worker-generated events are forwarded to main and all main-
+ * generated events are forwarded to workers (without looping).s
+ *
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
   try {
-    // recv from main
+    // recv external events from main
     eventPort.onmessage = async msg => {
-      console.debug({ fn: 'worker' + onmessage.name, msg })
-      await broker.notify(msg.data.eventName, msg.data, { from: 'main' })
+      console.debug('from main to', modelName, msg)
+      await broker.notify(msg.data.eventName, msg.data, {
+        forwarded: true
+      })
     }
 
-    // subscribe to subscription event and send to main
-    broker.onSubscription(modelName, event =>
-      eventPort.postMessage({ event, modelName })
-    )
-    // send to main
+    // forward internal events to main
     broker.on(/.*/, event => {
-      console.debug({ fn: 'broker.on: sending to main', event })
+      console.debug('to main from', modelName, event)
       eventPort.postMessage(event)
     })
   } catch (error) {
@@ -59,10 +68,13 @@ remoteEntries.then(remotes => {
       broker.on('shutdown', n => process.exit(n || 0), { from: 'main' })
 
       parentPort.on('message', async message => {
+        // The event port is transfered
         if (message.eventPort instanceof MessagePort) {
           connectEventChannel(message.eventPort)
           return
         }
+
+        // Call the use case service named in the message                                                                                                                                                                                                                        q
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))

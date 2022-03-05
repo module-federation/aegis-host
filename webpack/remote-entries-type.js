@@ -1,9 +1,9 @@
 /**
- * @typedef {object} remoteEntry points to a remote container (remoteEntry.js) of bundled modules
- * exposed for consumption at runtime as an import. Note .wasm files are not contained
- * in these bundles - the .wasm file is already optimized for size and statically linked to its
- * dependencies before frontend compilation. It can, however, be dynamically "linked" to other
- * modules at runtime via the Aegis framework, i.e. events, ports/adapters, relations, commands, etc
+ * @typedef {object} remoteEntry points to a manifest (remoteEntry.js) of remote modules
+ * exposed for consumption at runtime. Note .wasm files are not contained in these bundles
+ * as they are already optimized for size and statically linked to their dependencies.
+ * It can, however, be dynamically "linked" to other modules at runtime via the Aegis
+ * framework, i.e. events, ports/adapters, relations, commands, etc
  * @property {string} name descriptive name of the entry
  * @property {string} [serviceName] optional name of the service to which the module belongs
  * - use to group model, adapaters and services together
@@ -71,7 +71,8 @@ exports.crowdcontrol = [
     wasm: true,
     importRemote () {
       return importWebAssembly(this)
-    },
+    }
+  },
   {
     name: 'computervision',
     url: 'https://machinelearning.cdn?asset=vision.wasm',
