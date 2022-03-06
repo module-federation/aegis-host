@@ -42,19 +42,23 @@ async function init (remotes) {
  */
 function connectEventChannel (eventPort) {
   try {
-    // recv external events from main
+    // fire external events from main
     eventPort.onmessage = async msg => {
       console.debug('from main to', modelName, msg)
       await broker.notify(msg.data.eventName, msg.data, {
-        forwarded: true
+        origin: 'main'
       })
     }
 
     // forward internal events to main
-    broker.on(/.*/, event => {
-      console.debug('to main from', modelName, event)
-      eventPort.postMessage(event)
-    })
+    broker.on(
+      /.*/,
+      event => {
+        console.debug('to main from', modelName, event)
+        eventPort.postMessage(event)
+      },
+      { origin: 'worker' }
+    )
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
