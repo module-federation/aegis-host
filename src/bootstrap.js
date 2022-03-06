@@ -14,7 +14,6 @@ const ServerlessAdapter = adapters.ServerlessAdapter
 if (!isServerless) {
   app.use(express.json())
   app.use(express.static('public'))
-
   aegis.init(remotes, app).then(() => server.start(app))
 }
 
