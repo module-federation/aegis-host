@@ -27,7 +27,7 @@
         "enabled": true
       },
       "DataSourceMongoDb": {
-        "desc": "Persist`ent NoSQL, JSON document storage",
+        "desc": "Persistent NoSQL, JSON document storage",
         "enabled": true,
         "url": "mongodb://localhost:27017",
         "cacheSize": 3000
@@ -53,13 +53,13 @@
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
         "enabled": true,
-        "isSwitch": true,
+        "isSwitch": false,
         "heartbeat": 3000,
         "uplink": null,
         "debug": false,
-        "host": "localhost",
-        "port": 80,
-        "protocol": "ws"
+        "host": "aegis.module-federation.org",
+        "port": 443,
+        "protocol": "wss"
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
