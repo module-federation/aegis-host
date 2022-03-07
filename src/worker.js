@@ -7,9 +7,10 @@ const remote = require('../dist/remoteEntry')
 
 const modelName = workerData.modelName
 const { importRemotes, UseCaseService, EventBrokerFactory } = domain
+const { StorageAdapter, controllers } = adapters
 const { StorageService } = services
-const { StorageAdapter } = adapters
 const { find, save } = StorageAdapter
+const { initCache } = controllers
 const overrides = { find, save, StorageService }
 const broker = EventBrokerFactory.getInstance()
 
@@ -18,22 +19,25 @@ const remoteEntries = remote.aegis
   .then(factory => factory())
 
 /**
- * Import federated modules and bind them as ports, adapters or services
+ * Import and bind remote modules: models, adapters and services
  * @param {import('../webpack/remote-entries-type.js').remoteEntry} remotes
  * @returns
  */
 async function init (remotes) {
   try {
+    const cache = initCache()
     await importRemotes(remotes, overrides)
-    return UseCaseService(modelName)
+    const service = UseCaseService(modelName)
+    await cache.load()
+    return service
   } catch (error) {
     console.error({ fn: init.name, error })
   }
 }
 
 /**
- * Create a subchannel between this thread and the main thread
- * dedicated to sending and receivng events. Connect the thread-
+ * Create a subchannel between this thread and the main thread that
+ * is dedicated to sending and receivng events. Connect the thread-
  * local event broker on either side to the channel such that
  * all worker-generated events are forwarded to main and all main-
  * generated events are forwarded to workers (without looping).
@@ -43,11 +47,11 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire external events from main
-    eventPort.onmessage = async msg =>
-      await broker.notify('EVENT_FROM_MESH', msg.data)
+    eventPort.onmessage = async event =>
+      await broker.notify(event.data.eventName, event.data)
 
     // forward internal events to main
-    broker.on('EVENT_FROM_WORKER', event => eventPort.postMessage(event))
+    broker.on(/.*/, event => eventPort.postMessage(event))
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
