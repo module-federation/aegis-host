@@ -34,11 +34,10 @@ async function init (remotes) {
     console.error({ fn: init.name, error })
   }
 }
-
 /**
  * Create a subchannel between this thread and the main thread that
  * is dedicated to sending and receivng events. Connect the thread-
- * local event broker on either side to the channel such that
+ * local event broker of each thread to the channel such that
  * all worker-generated events are forwarded to main and all main-
  * generated events are forwarded to workers (without looping).
  *
@@ -48,13 +47,19 @@ function connectEventChannel (eventPort) {
   try {
     // fire external events from main
     eventPort.onmessage = async event =>
-      await broker.notify(event.data.eventName, event.data)
+      await broker.notify('EXTERNAL', event.data)
 
     // forward internal events to main
-    broker.on(/.*/, event => eventPort.postMessage(event))
+    broker.on(/.*/, event => eventPort.postMessage(event), {
+      ignore: ['EXTERNAL']
+    })
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
+}
+
+const externalEvents = {
+  shutdown: n => process.exit(n || 0)
 }
 
 remoteEntries.then(remotes => {
@@ -62,7 +67,7 @@ remoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
-      broker.on('shutdown', n => process.exit(n || 0))
+      broker.on('EXTERNAL', e => externalEvents[e.name](e.data))
 
       parentPort.on('message', async message => {
         // The event port is transfered
