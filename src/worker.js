@@ -7,10 +7,9 @@ const remote = require('../dist/remoteEntry')
 
 const modelName = workerData.modelName
 const { importRemotes, UseCaseService, EventBrokerFactory } = domain
-const { StorageAdapter, controllers } = adapters
+const { StorageAdapter } = adapters
 const { StorageService } = services
 const { find, save } = StorageAdapter
-const { initCache } = controllers
 const overrides = { find, save, StorageService }
 const broker = EventBrokerFactory.getInstance()
 
@@ -25,34 +24,39 @@ const remoteEntries = remote.aegis
  */
 async function init (remotes) {
   try {
-    const cache = initCache()
     await importRemotes(remotes, overrides)
     const service = UseCaseService(modelName)
-    await cache.load()
     return service
   } catch (error) {
     console.error({ fn: init.name, error })
   }
 }
+
 /**
  * Create a subchannel between this thread and the main thread that
  * is dedicated to sending and receivng events. Connect the thread-
  * local event broker of each thread to the channel such that
- * all worker-generated events are forwarded to main and all main-
- * generated events are forwarded to workers (without looping).
+ * all worker-generated events are forwarded to main, except those
+ * sent by main, which are to be handled as commands to the thread.
  *
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
   try {
     // fire external events from main
-    eventPort.onmessage = async event =>
-      await broker.notify('EXTERNAL', event.data)
+    eventPort.onmessage = async event => await broker.notify('EXTERNAL', event)
 
     // forward internal events to main
-    broker.on(/.*/, event => eventPort.postMessage(event), {
-      ignore: ['EXTERNAL']
-    })
+    broker.on(
+      /.*/,
+      function (eventData) {
+        console.debug('worker event fired, fwd to main', eventData)
+        return eventPort.postMessage(JSON.parse(JSON.stringify(eventData)))
+      },
+      {
+        ignore: ['EXTERNAL']
+      }
+    )
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
