@@ -54,7 +54,7 @@ function connectEventChannel (eventPort) {
         return eventPort.postMessage(JSON.parse(JSON.stringify(eventData)))
       },
       {
-        ignore: ['EXTERNAL']
+        ignore: ['EXTERNAL'],
       }
     )
   } catch (error) {
