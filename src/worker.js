@@ -50,7 +50,7 @@ function connectEventChannel (eventPort) {
     broker.on(
       /.*/,
       function (eventData) {
-        console.debug('worker event fired, fwd to main', eventData)
+        console.debug('worker event fired, forward to main', eventData)
         return eventPort.postMessage(JSON.parse(JSON.stringify(eventData)))
       },
       {
@@ -63,7 +63,8 @@ function connectEventChannel (eventPort) {
 }
 
 const externalEvents = {
-  shutdown: n => process.exit(n || 0)
+  shutdown: signal => process.exit(signal || 0),
+  dispatch: event => broker.notify(event.eventName, event)
 }
 
 remoteEntries.then(remotes => {

@@ -268,6 +268,28 @@
     )
   }
 
+  function postForm (path, params, method) {
+    method = method || 'post'
+
+    var form = document.createElement('form')
+    form.setAttribute('method', method)
+    form.setAttribute('action', path)
+
+    for (var key in params) {
+      if (params.hasOwnProperty(key)) {
+        var hiddenField = document.createElement('input')
+        hiddenField.setAttribute('type', 'hidden')
+        hiddenField.setAttribute('name', key)
+        hiddenField.setAttribute('value', params[key])
+
+        form.appendChild(hiddenField)
+      }
+    }
+
+    document.body.appendChild(form)
+    form.submit()
+  }
+
   postButton.onclick = async function () {
     document.getElementById('modelId').value = ''
     const model = document.getElementById('model').value
@@ -289,6 +311,7 @@
     clearTimeout(timerId)
     setTimeout(() => bar.hide(), 1000)
     updateModelId(response.modelId)
+
     showMessage(response)
   }
 
@@ -307,6 +330,11 @@
   }
 
   getButton.onclick = function () {
+    const query = document.getElementById('query').value
+    if (/html=true/i.test(query)) {
+      window.open(getUrl())
+      return
+    }
     document.getElementById('parameter').value = ''
     fetch(getUrl(), { headers: getHeaders() })
       .then(handleResponse)
