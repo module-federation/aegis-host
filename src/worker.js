@@ -11,6 +11,7 @@ const { StorageAdapter } = adapters
 const { StorageService } = services
 const { find, save } = StorageAdapter
 const overrides = { find, save, StorageService }
+/** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
 const broker = EventBrokerFactory.getInstance()
 
 const remoteEntries = remote.aegis
@@ -18,7 +19,7 @@ const remoteEntries = remote.aegis
   .then(factory => factory())
 
 /**
- * Import and bind remote modules: models, adapters and services
+ * Import and bind remote modules: i.e models, adapters and services
  * @param {import('../webpack/remote-entries-type.js').remoteEntry} remotes
  * @returns
  */
@@ -44,17 +45,16 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire external events from main
-    eventPort.onmessage = async event => await broker.notify('EXTERNAL', event)
-
+    eventPort.onmessage = async msgEvent => await broker.notify('external', msgEvent)
     // forward internal events to main
     broker.on(
       /.*/,
-      function (eventData) {
-        console.debug('worker event fired, forward to main', eventData)
-        return eventPort.postMessage(JSON.parse(JSON.stringify(eventData)))
+      event => {
+        console.debug('worker event fired, forward to main', event)
+        return eventPort.postMessage(JSON.parse(JSON.stringify(event)))
       },
       {
-        ignore: ['EXTERNAL'],
+        ignore: ['external']
       }
     )
   } catch (error) {
@@ -64,18 +64,18 @@ function connectEventChannel (eventPort) {
 
 const externalEvents = {
   shutdown: signal => process.exit(signal || 0),
-  dispatch: event => broker.notify(event.eventName, event)
+  dispatch: event => broker.notify(event.eventName, event, { regexOff: true })
 }
 
 remoteEntries.then(remotes => {
-  try {
+  try { 
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
-      broker.on('EXTERNAL', e => externalEvents[e.name](e.data))
+      broker.on('external', event => externalEvents[event.name](event.data))
 
       parentPort.on('message', async message => {
-        // The event port is transfered
+        // The message port is transfered
         if (message.eventPort instanceof MessagePort) {
           connectEventChannel(message.eventPort)
           return
