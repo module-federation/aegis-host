@@ -9,6 +9,7 @@ const modelName = workerData.modelName
 const { importRemotes, UseCaseService, EventBrokerFactory } = domain
 const { StorageAdapter } = adapters
 const { StorageService } = services
+const { initCache } = adapters.controllers
 const { find, save } = StorageAdapter
 const overrides = { find, save, StorageService }
 /** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
@@ -25,8 +26,10 @@ const remoteEntries = remote.aegis
  */
 async function init (remotes) {
   try {
+    const cache = initCache()
     await importRemotes(remotes, overrides)
     const service = UseCaseService(modelName)
+    cache.load()
     return service
   } catch (error) {
     console.error({ fn: init.name, error })
@@ -45,18 +48,14 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire external events from main
-    eventPort.onmessage = async msgEvent => await broker.notify('external', msgEvent)
+    eventPort.onmessage = async msgEvent =>
+      await broker.notify('from_main', msgEvent)
+
     // forward internal events to main
-    broker.on(
-      /.*/,
-      event => {
-        console.debug('worker event fired, forward to main', event)
-        return eventPort.postMessage(JSON.parse(JSON.stringify(event)))
-      },
-      {
-        ignore: ['external']
-      }
-    )
+    broker.on('to_main', event => {
+      console.debug('worker event fired, forward to main', event)
+      return eventPort.postMessage(JSON.parse(JSON.stringify(event)))
+    })
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
@@ -68,7 +67,7 @@ const externalEvents = {
 }
 
 remoteEntries.then(remotes => {
-  try { 
+  try {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
