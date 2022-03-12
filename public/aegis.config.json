@@ -16,7 +16,7 @@
   "adapters": {
     "desc": "adapter config",
     "cacheSize": 3000,
-    "defaultDatasource": "DataSourceMongoDb",
+    "defaultDatasource": "DataSourceMemory",
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",

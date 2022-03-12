@@ -26,10 +26,8 @@ const remoteEntries = remote.aegis
  */
 async function init (remotes) {
   try {
-    const cache = initCache()
     await importRemotes(remotes, overrides)
     const service = UseCaseService(modelName)
-    cache.load()
     return service
   } catch (error) {
     console.error({ fn: init.name, error })
@@ -48,9 +46,10 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire external events from main
-    eventPort.onmessage = async msgEvent =>
-      await broker.notify('from_main', msgEvent)
-
+    eventPort.onmessage = async msgEvent => {
+      console.debug('message from main', msgEvent.data)
+      await broker.notify('from_main', msgEvent.data)
+    }
     // forward internal events to main
     broker.on('to_main', event => {
       console.debug('worker event fired, forward to main', event)
@@ -76,6 +75,8 @@ remoteEntries.then(remotes => {
       parentPort.on('message', async message => {
         // The message port is transfered
         if (message.eventPort instanceof MessagePort) {
+          const cache = initCache()
+          await cache.load()
           connectEventChannel(message.eventPort)
           return
         }
