@@ -53,16 +53,15 @@ function connectEventChannel (eventPort) {
     // forward internal events to main
     broker.on('to_main', event => {
       console.debug('worker event fired, forward to main', event)
-      return eventPort.postMessage(JSON.parse(JSON.stringify(event)))
+      eventPort.postMessage(JSON.parse(JSON.stringify(event)))
     })
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
 }
 
-const externalEvents = {
-  shutdown: signal => process.exit(signal || 0),
-  dispatch: event => broker.notify(event.eventName, event, { regexOff: true })
+const commands = {
+  shutdown: signal => process.exit(signal || 0)
 }
 
 remoteEntries.then(remotes => {
@@ -70,7 +69,11 @@ remoteEntries.then(remotes => {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
-      broker.on('external', event => externalEvents[event.name](event.data))
+
+      broker.on('from_main', event => {
+        if (typeof commands[event.name] === 'function')
+          commands[event.name](event.data)
+      })
 
       parentPort.on('message', async message => {
         // The message port is transfered
