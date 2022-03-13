@@ -27,8 +27,7 @@ const remoteEntries = remote.aegis
 async function init (remotes) {
   try {
     await importRemotes(remotes, overrides)
-    const service = UseCaseService(modelName)
-    return service
+    return UseCaseService(modelName)
   } catch (error) {
     console.error({ fn: init.name, error })
   }
@@ -36,9 +35,9 @@ async function init (remotes) {
 
 /**
  * Create a subchannel between this thread and the main thread that
- * is dedicated to sending and receivng events. Connect the thread-
- * local event broker of each thread to the channel such that
- * all worker-generated events are forwarded to main, except those
+ * is dedicated to sending and receivng events. Connect each thread-
+ * local event broker to the channel by subcribing and publishing to
+ * lpdldsssdSA,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,<<<<<<<<<<<<<<<<<SSSSSworker-generated events are forwarded to main, except those
  * sent by main, which are to be handled as commands to the thread.
  *
  * @param {MessagePort} eventPort
@@ -47,12 +46,12 @@ function connectEventChannel (eventPort) {
   try {
     // fire external events from main
     eventPort.onmessage = async msgEvent => {
-      console.debug('message from main', msgEvent.data)
+      console.debug('worker: from main', msgEvent.data)
       await broker.notify('from_main', msgEvent.data)
     }
     // forward internal events to main
     broker.on('to_main', event => {
-      console.debug('worker event fired, forward to main', event)
+      console.debug('worker: to main', event)
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
     })
   } catch (error) {
