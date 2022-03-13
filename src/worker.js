@@ -37,7 +37,7 @@ async function init (remotes) {
  * Create a subchannel between this thread and the main thread that
  * is dedicated to sending and receivng events. Connect each thread-
  * local event broker to the channel by subcribing and publishing to
- * lpdldsssdSA,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,<<<<<<<<<<<<<<<<<SSSSSworker-generated events are forwarded to main, except those
+ * worker-generated events are forwarded to main, except those
  * sent by main, which are to be handled as commands to the thread.
  *
  * @param {MessagePort} eventPort
