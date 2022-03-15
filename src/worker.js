@@ -50,6 +50,7 @@ async function init (remotes) {
 function rehydrateObject (msgEvent) {
   const event = msgEvent.data
   const model = event.model
+  if (!model) return
   const modelName = model.modelName
   const datasource = DataSourceFactory.getDataSource(modelName)
   return ModelFactory.loadModel(broker, datasource, model, modelName)
