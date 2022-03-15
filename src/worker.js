@@ -43,11 +43,10 @@ async function init (remotes) {
  */
 function connectEventChannel (eventPort) {
   try {
-    // fire external events from main
+    // fire events from main in worker threads
     eventPort.onmessage = async msgEvent =>
       await broker.notify('from_main', msgEvent.data)
-
-    // forward internal events to main
+    // forward worker events to the main thread
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
     )
@@ -84,6 +83,7 @@ remoteEntries.then(remotes => {
         // Call the use case function by `name`                                                                                                                                                                                                                       q
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
+          // serialize & deserialize the result to get rid of functions
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
         } else {
           console.warn('not a service function', message.name)
