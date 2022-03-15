@@ -1,17 +1,23 @@
 'use strict'
 
 require('regenerator-runtime')
+const { domain, adapters, services } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
-const { adapters, services, domain } = require('@module-federation/aegis')
 const remote = require('../dist/remoteEntry')
 
-const modelName = workerData.modelName
-const { importRemotes, UseCaseService, EventBrokerFactory } = domain
+const {
+  importRemotes,
+  UseCaseService,
+  EventBrokerFactory,
+  DataSourceFactory,
+  default: ModelFactory
+} = domain
 const { StorageAdapter } = adapters
 const { StorageService } = services
-const { initCache } = adapters.controllers
 const { find, save } = StorageAdapter
+const { initCache } = adapters.controllers
 const overrides = { find, save, StorageService }
+const modelName = workerData.modelName
 
 /** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
 const broker = EventBrokerFactory.getInstance()
@@ -34,10 +40,25 @@ async function init (remotes) {
   }
 }
 
+/** @typedef {import('@module-federation/aegis/lib/domain/event').Event} Event */
+
+/**
+ * Unmarshall tbe `Model` object in {@link Event}.
+ * @param {MessageEvent<Event>} msgEvent
+ * @returns
+ */
+function rehydrateObject (msgEvent) {
+  const event = msgEvent.data
+  const model = event.model
+  const modelName = model.modelName
+  const datasource = DataSourceFactory.getDataSource(modelName)
+  return ModelFactory.loadModel(broker, datasource, model, modelName)
+}
+
 /**
  * Create a subchannel between this thread and the main thread that
  * is dedicated to sending and receivng events. Connect each thread-
- * local event {@link broker} to the channel using pub/sub functions
+ * local event {@link broker} to the channel as pub/sub `eventNames`
  *
  * @param {MessagePort} eventPort
  */
@@ -45,7 +66,7 @@ function connectEventChannel (eventPort) {
   try {
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent =>
-      await broker.notify('from_main', msgEvent.data)
+      await broker.notify('from_main', rehydrateObject(msgEvent))
     // forward worker events to the main thread
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
