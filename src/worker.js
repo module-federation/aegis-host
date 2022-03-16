@@ -47,10 +47,11 @@ async function init (remotes) {
  * @param {MessageEvent<Event>} msgEvent
  * @returns
  */
-function rehydrateObject (msgEvent) {
-  const event = msgEvent.data
+function rehydrateObject (event) {
   const model = event.model
   if (!model) return
+
+  
   const modelName = model.modelName
   const datasource = DataSourceFactory.getDataSource(modelName)
   return ModelFactory.loadModel(broker, datasource, model, modelName)
@@ -67,7 +68,7 @@ function connectEventChannel (eventPort) {
   try {
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent =>
-      await broker.notify('from_main', msgEvent.data)
+      await broker.notify('from_main', rehydrateObject(msgEvent.data))
     // forward worker events to the main thread
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
