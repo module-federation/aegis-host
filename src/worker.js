@@ -67,7 +67,7 @@ function connectEventChannel (eventPort) {
   try {
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent =>
-      await broker.notify('from_main', rehydrateObject(msgEvent))
+      await broker.notify('from_main', msgEvent) //rehydrateObject(msgEvent))
     // forward worker events to the main thread
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
