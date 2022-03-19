@@ -48,12 +48,22 @@ async function init (remotes) {
  * @returns
  */
 function rehydrateObject (event) {
-  const model = event.model
+  const model = event.modenl
   if (!model) return
 
   const modelName = model.modelName
   const datasource = DataSourceFactory.getDataSource(modelName)
   return ModelFactory.loadModel(broker, datasource, model, modelName)
+}
+
+const commands = {
+  shutdown: signal => process.exit(signal || 0),
+  showData: modelName => {
+    console.debug({ fn: 'showData', modelName })
+    return DataSourceFactory.getDataSource(modelName).listSync()
+    //.filt11er(m => typeof m['getName'] !== 'function')
+  },
+  showEvents: () => broker.getEvents()
 }
 
 /**
@@ -66,8 +76,20 @@ function rehydrateObject (event) {
 function connectEventChannel (eventPort) {
   try {
     // fire events from main in worker threads
-    eventPort.onmessage = async msgEvent =>
-      await broker.notify('from_main', msgEvent.data)
+    eventPort.onmessage = async msgEvent => {
+      const event = msgEvent.data
+      console.debug({ fn: connectEventChannel.name, event })
+
+      if (typeof commands[event.name] === 'function') {
+        const result = await commands[event.name](event.data)
+        if (result) {
+          return eventPort.postMessage(JSON.parse(JSON.stringify(result)))
+        }
+        return
+      }
+
+      broker.notify('from_main', { ...msgEvent.data, eventPort })
+    }
     // forward worker events to the main thread
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
@@ -77,20 +99,11 @@ function connectEventChannel (eventPort) {
   }
 }
 
-const commands = {
-  shutdown: signal => process.exit(signal || 0)
-}
-
 remoteEntries.then(remotes => {
   try {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
       parentPort.postMessage({ signal: 'aegis-up' })
-
-      broker.on('from_main', event => {
-        if (typeof commands[event.name] === 'function')
-          commands[event.name](event.data)
-      })
 
       parentPort.on('message', async message => {
         // The message port is transfered
