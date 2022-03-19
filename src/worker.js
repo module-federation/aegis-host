@@ -48,7 +48,7 @@ async function init (remotes) {
  * @returns
  */
 function rehydrateObject (event) {
-  const model = event.modenl
+  const model = event.model
   if (!model) return
 
   const modelName = model.modelName
@@ -80,15 +80,14 @@ function connectEventChannel (eventPort) {
       const event = msgEvent.data
       console.debug({ fn: connectEventChannel.name, event })
 
+      await broker.notify('from_main', msgEvent.data)
+
       if (typeof commands[event.name] === 'function') {
         const result = await commands[event.name](event.data)
         if (result) {
-          return eventPort.postMessage(JSON.parse(JSON.stringify(result)))
+          eventPort.postMessage(JSON.parse(JSON.stringify(result)))
         }
-        return
       }
-
-      broker.notify('from_main', { ...msgEvent.data, eventPort })
     }
     // forward worker events to the main thread
     broker.on('to_main', event =>
@@ -115,7 +114,7 @@ remoteEntries.then(remotes => {
           return
         }
 
-        // Call the use case function by `name`                                                                                                                                                                                                                       q
+        // Call the use case function by `name`
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
           // serialize & deserialize the result to get rid of functions

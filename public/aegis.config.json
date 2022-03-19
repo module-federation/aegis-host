@@ -2,7 +2,7 @@
   "desc": "hot-reloadable configurtion variables, see https://github.com/module-federatio/aegis",
   "general": {
     "desc": "live-updateable environmental vars",
-    "fqdn": "aegis.module-federation.org",
+    "fqdn": "localhost",
     "remoteServices": "aegis-services",
     "resumeWorkflow": true,
     "checkIpHost": "https://checkip.amazonaws.com",
@@ -57,10 +57,13 @@
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
         "enabled": true,
-        "isSwitch": true,
+        "isSwitch": false,
         "heartbeat": 3000,
         "uplink": null,
-        "debug": false
+        "debug": false,
+        "host": "aegis.module-federation.org",
+        "port": 443,
+        "protocol": "wss"
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
