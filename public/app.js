@@ -258,14 +258,18 @@
   }
 
   async function deployConditions (poolName) {
-    const response = await fetch(`${apiRoot}/config?details=threads`)
-    const pools = await response.json()
-    const pool = pools.find(pool => pool.name === poolName)
-    return (
-      !pool ||
-      pool.total === 0 ||
-      (pool.total < pool.max && pool.queueRate > pool.tolerance)
-    )
+    try {
+      const response = await fetch(`${apiRoot}/config?details=threads`)
+      const pools = await response.json()
+      const pool = pools.find(pool => pool.name === poolName)
+      return (
+        !pool ||
+        pool.total === 0 ||
+        (pool.total < pool.max && pool.queueRate > pool.queueTolerance)
+      )
+    } catch (error) {
+      return false
+    }
   }
 
   postButton.onclick = async function () {
