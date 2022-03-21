@@ -9,6 +9,7 @@ const {
   importRemotes,
   UseCaseService,
   EventBrokerFactory,
+  /** @type {import('@module-federation/aegis/lib/domain/datasource-factory').default} */
   DataSourceFactory,
   default: ModelFactory
 } = domain
@@ -43,27 +44,19 @@ async function init (remotes) {
 /** @typedef {import('@module-federation/aegis/lib/domain/event').Event} Event */
 
 /**
- * Unmarshall tbe `Model` object in {@link Event}.
- * @param {MessageEvent<Event>} msgEvent
- * @returns
+ * Functions called via the event channel.
  */
-function rehydrateObject (event) {
-  const model = event.model
-  if (!model) return
-
-  const modelName = model.modelName
-  const datasource = DataSourceFactory.getDataSource(modelName)
-  return ModelFactory.loadModel(broker, datasource, model, modelName)
-}
-
 const commands = {
   shutdown: signal => process.exit(signal || 0),
-  showData: modelName => {
-    console.debug({ fn: 'showData', modelName })
-    return DataSourceFactory.getDataSource(modelName).listSync()
-    //.filt11er(m => typeof m['getName'] !== 'function')
-  },
-  showEvents: () => broker.getEvents()
+  showData: () =>
+    DataSourceFactory.listDataSources().map(([k]) =>
+      DataSourceFactory.getDataSource(k).listSync()
+    ),
+  showEvents: () =>
+    [...broker.getEvents()].map(([k, v]) => ({
+      name: k,
+      handlers: v.map(v => v.toString())
+    }))
 }
 
 /**
