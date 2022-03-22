@@ -56,7 +56,8 @@ const commands = {
     [...broker.getEvents()].map(([k, v]) => ({
       name: k,
       handlers: v.map(v => v.toString())
-    }))
+    })),
+  showModels: () => ModelFactory.getModelSpecs()
 }
 
 /**
@@ -71,15 +72,11 @@ function connectEventChannel (eventPort) {
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent => {
       const event = msgEvent.data
-      console.debug({ fn: connectEventChannel.name, event })
-
-      await broker.notify('from_main', msgEvent.data)
+      await broker.notify('from_main', event)
 
       if (typeof commands[event.name] === 'function') {
         const result = await commands[event.name](event.data)
-        if (result) {
-          eventPort.postMessage(JSON.parse(JSON.stringify(result)))
-        }
+        if (result) eventPort.postMessage(JSON.parse(JSON.stringify(result)))
       }
     }
     // forward worker events to the main thread
