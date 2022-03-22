@@ -9,7 +9,6 @@ const {
   importRemotes,
   UseCaseService,
   EventBrokerFactory,
-  /** @type {import('@module-federation/aegis/lib/domain/datasource-factory').default} */
   DataSourceFactory,
   default: ModelFactory
 } = domain
@@ -49,9 +48,10 @@ async function init (remotes) {
 const commands = {
   shutdown: signal => process.exit(signal || 0),
   showData: () =>
-    DataSourceFactory.listDataSources().map(([k]) =>
-      DataSourceFactory.getDataSource(k).listSync()
-    ),
+    DataSourceFactory.listDataSources().map(([k, v]) => ({
+      dsname: k,
+      records: [...v.dataSource].length
+    })),
   showEvents: () =>
     [...broker.getEvents()].map(([k, v]) => ({
       name: k,
