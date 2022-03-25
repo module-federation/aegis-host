@@ -54,10 +54,11 @@ const commands = {
     })),
   showEvents: () =>
     [...broker.getEvents()].map(([k, v]) => ({
-      name: k,
-      handlers: v.map(v => v.toString())
+      eventName: k,
+      handlers: v.length
     })),
-  showModels: () => ModelFactory.getModelSpecs()
+  showModels: () => ModelFactory.getModelSpecs(),
+  fireEvent: event => broker.notify(event.evenName, event)
 }
 
 /**
@@ -72,13 +73,26 @@ function connectEventChannel (eventPort) {
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent => {
       const event = msgEvent.data
-      await broker.notify('from_main', event)
 
+      // check first if this is known command
       if (typeof commands[event.name] === 'function') {
         const result = await commands[event.name](event.data)
         if (result) eventPort.postMessage(JSON.parse(JSON.stringify(result)))
+        return
       }
+
+      await broker.notify('from_main', event)
     }
+
+    broker.onSubcribe(eventName =>
+      eventPort.postMessage({
+        metaEvent: 'subscribe',
+        eventName,
+        eventSource: modelName,
+        existingEvents: commands.showEvents()
+      })
+    )
+
     // forward worker events to the main thread
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
@@ -92,13 +106,15 @@ remoteEntries.then(remotes => {
   try {
     init(remotes).then(async service => {
       console.info('aegis worker thread running')
-      parentPort.postMessage({ signal: 'aegis-up' })
+      // load distributed cache and register its events
+      await initCache().load()
+      // notify main we are up + register our events with event router
+      parentPort.postMessage({ metaEvent: 'aegis-up' })
 
+      // handle requests from main
       parentPort.on('message', async message => {
         // The message port is transfered
         if (message.eventPort instanceof MessagePort) {
-          // load distributed cache
-          await initCache().load()
           // send/recv events to/from main thread
           connectEventChannel(message.eventPort)
           return

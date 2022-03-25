@@ -6,9 +6,7 @@
  * @typedef {import("../remote-entries-type").remoteEntry} entries
  */
 
-const {
-  importWebAssembly
-} = require('@module-federation/aegis').adapters.webassembly
+const { importPython } = require('@module-federation/aegis').adapters.python
 
 /**
  * @typedef {import("../remote-entries-type").remoteEntry} entry
@@ -27,7 +25,7 @@ exports.order = [
     wasm: true,
     type: 'model',
     importRemote () {
-      return importWebAssembly(this)
+      return importPython(this)
     }
   }
 ]

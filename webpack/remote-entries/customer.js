@@ -5,7 +5,7 @@
 /** @type {entry[]} */
 exports.customer = [
   {
-    name: 'microservices',
+    name: 'customer',
     url: 'https://api.github.com',
     repo: 'aegis-application',
     owner: 'module-federation',
@@ -13,7 +13,7 @@ exports.customer = [
     branch: 'customer',
     path: __dirname,
     type: 'model',
-    importRemote: async () => import('microservices/models')
+    importRemote: async () => import('customer/models')
   },
   {
     name: 'adapters',
@@ -24,7 +24,7 @@ exports.customer = [
     branch: 'customer',
     path: __dirname,
     type: 'adapter',
-    importRemote: async () => import('microservices/adapters')
+    importRemote: async () => import('customer/adapters')
   },
   {
     name: 'services',
@@ -35,6 +35,6 @@ exports.customer = [
     branch: 'customer',
     path: __dirname,
     type: 'service',
-    importRemote: async () => import('microservices/services')
+    importRemote: async () => import('customer/services')
   }
 ]

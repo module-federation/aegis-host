@@ -7,15 +7,15 @@
 /** @type {entry[]} */
 exports.order = [
   {
-    name: 'microservices',
+    name: 'order',
     url: 'https://api.github.com',
     repo: 'aegis-application',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'master',
+    branch: 'order',
     path: __dirname,
     type: 'model',
-    importRemote: async () => import('microservices/models')
+    importRemote: async () => import('order/models')
   },
   {
     name: 'adapters',
@@ -23,10 +23,10 @@ exports.order = [
     repo: 'aegis-application',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'master',
+    branch: 'order',
     path: __dirname,
     type: 'adapter',
-    importRemote: async () => import('microservices/adapters')
+    importRemote: async () => import('order/adapters')
   },
   {
     name: 'services',
@@ -34,9 +34,9 @@ exports.order = [
     repo: 'aegis-application',
     owner: 'module-federation',
     filedir: 'dist',
-    branch: 'master',
+    branch: 'order',
     path: __dirname,
     type: 'service',
-    importRemote: async () => import('microservices/services')
+    importRemote: async () => import('order/services')
   }
 ]
