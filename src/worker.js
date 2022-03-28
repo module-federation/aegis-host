@@ -45,7 +45,7 @@ async function init (remotes) {
 /**
  * Functions called via the event channel.
  */
-const commands = {
+const command = {
   shutdown: signal => process.exit(signal || 0),
   showData: () =>
     DataSourceFactory.listDataSources().map(([k, v]) => ({
@@ -58,7 +58,7 @@ const commands = {
       handlers: v.length
     })),
   showModels: () => ModelFactory.getModelSpecs(),
-  fireEvent: event => broker.notify(event.evenName, event)
+  emitEvent: async event => (await broker.notify('from_main', event)) || 'fired'
 }
 
 /**
@@ -76,22 +76,13 @@ function connectEventChannel (eventPort) {
 
       // check first if this is known command
       if (typeof commands[event.name] === 'function') {
-        const result = await commands[event.name](event.data)
+        const result = commands[event.name](event.data)
         if (result) eventPort.postMessage(JSON.parse(JSON.stringify(result)))
         return
       }
 
       await broker.notify('from_main', event)
     }
-
-    broker.onSubcribe(eventName =>
-      eventPort.postMessage({
-        metaEvent: 'subscribe',
-        eventName,
-        eventSource: modelName,
-        existingEvents: commands.showEvents()
-      })
-    )
 
     // forward worker events to the main thread
     broker.on('to_main', event =>
@@ -125,7 +116,14 @@ remoteEntries.then(remotes => {
           const result = await service[message.name](message.data)
           // serialize & deserialize the result to get rid of functions
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+        } else if (typeof command[message.name] === 'function') {
+          const result = await command[message.name](message.data)
+          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
         } else {
+          console.debug({
+            type: typeof command[message.name] === 'function',
+            value: message.name
+          })
           console.warn('not a service function', message.name)
         }
       })
