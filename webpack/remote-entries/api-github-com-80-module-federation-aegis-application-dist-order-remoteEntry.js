@@ -31782,7 +31782,7 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 /***/ }),
 
-/***/ "webpack/container/entry/microservices":
+/***/ "webpack/container/entry/order":
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -32105,7 +32105,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=aegis-application&filedir=dist&branch=master";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=aegis-application&filedir=dist&branch=order";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
@@ -32405,7 +32405,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			578: 0
+/******/ 			637: 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -32468,7 +32468,7 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__("webpack/container/entry/microservices");
+/******/ 	return __webpack_require__("webpack/container/entry/order");
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map
