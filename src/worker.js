@@ -58,7 +58,10 @@ const command = {
       handlers: v.length
     })),
   showModels: () => ModelFactory.getModelSpecs(),
-  emitEvent: async event => (await broker.notify('from_main', event)) || 'fired'
+  showRelations: () => ModelFactory.getModelSpec(modelName).relations,
+  showPorts: () => ModelFactory.getModelSpec(modelName).ports,
+  showCommands: () => ModelFactory.getModelSpec(modelName).commands,
+  emitEvent: event => broker.notify('from_main', event)
 }
 
 /**
@@ -76,8 +79,10 @@ function connectEventChannel (eventPort) {
 
       // check first if this is known command
       if (typeof command[event.name] === 'function') {
+        let res = 'complete'
         const result = command[event.name](event.data)
-        if (result) eventPort.postMessage(JSON.parse(JSON.stringify(result)))
+        if (result) res = result
+        eventPort.postMessage(JSON.parse(JSON.stringify(res)))
         return
       }
 
@@ -120,10 +125,6 @@ remoteEntries.then(remotes => {
           const result = await command[message.name](message.data)
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
         } else {
-          console.debug({
-            type: typeof command[message.name] === 'function',
-            value: message.name
-          })
           console.warn('not a service function', message.name)
         }
       })

@@ -31782,7 +31782,7 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 /***/ }),
 
-/***/ "webpack/container/entry/customer":
+/***/ "webpack/container/entry/distributed-cache":
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -31792,14 +31792,17 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 "use strict";
 var moduleMap = {
-	"./models": () => {
+	"./model-cache": () => {
 		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(583)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	},
-	"./adapters": () => {
+	"./adapter-cache": () => {
 		return __webpack_require__.e(610).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
-	"./services": () => {
+	"./service-cache": () => {
 		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(662)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+	},
+	"./event-bus": () => {
+		return Promise.all([__webpack_require__.e(610), __webpack_require__.e(778)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
 	}
 };
 var get = (module) => {
@@ -32402,7 +32405,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			727: 0
+/******/ 			325: 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -32465,7 +32468,7 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__("webpack/container/entry/customer");
+/******/ 	return __webpack_require__("webpack/container/entry/distributed-cache");
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map
