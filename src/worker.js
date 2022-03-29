@@ -75,8 +75,8 @@ function connectEventChannel (eventPort) {
       const event = msgEvent.data
 
       // check first if this is known command
-      if (typeof commands[event.name] === 'function') {
-        const result = commands[event.name](event.data)
+      if (typeof command[event.name] === 'function') {
+        const result = command[event.name](event.data)
         if (result) eventPort.postMessage(JSON.parse(JSON.stringify(result)))
         return
       }
