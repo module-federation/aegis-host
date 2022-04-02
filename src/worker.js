@@ -18,16 +18,18 @@ const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const overrides = { find, save, StorageService }
 const modelName = workerData.modelName
+const SharedMap = require('sharedmap')
 
 /** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
-const broker = EventBrokerFactory.getInstance()
 
 const remoteEntries = remote.aegis
   .get('./remoteEntries')
   .then(factory => factory())
 
 /**
- * Import and bind remote modules: i.e models, adapters and services
+ * - Import and bind remote models, adapters and services
+ * - Generate service endpoints and storage adapters
+ *
  * @param {import('../webpack/remote-entries-type.js').remoteEntry} remotes
  * @returns
  */
@@ -39,8 +41,6 @@ async function init (remotes) {
     console.error({ fn: init.name, error })
   }
 }
-
-/** @typedef {import('@module-federation/aegis/lib/domain/event').Event} Event */
 
 /**
  * Functions called via the event channel.
@@ -61,7 +61,8 @@ const command = {
   showRelations: () => ModelFactory.getModelSpec(modelName).relations,
   showPorts: () => ModelFactory.getModelSpec(modelName).ports,
   showCommands: () => ModelFactory.getModelSpec(modelName).commands,
-  emitEvent: event => broker.notify('from_main', event)
+  emitEvent: event =>
+    EventBrokerFactory.getInstance().notify('from_main', event)
 }
 
 /**
@@ -79,10 +80,8 @@ function connectEventChannel (eventPort) {
 
       // check first if this is known command
       if (typeof command[event.name] === 'function') {
-        let res = 'complete'
         const result = command[event.name](event.data)
-        if (result) res = result
-        eventPort.postMessage(JSON.parse(JSON.stringify(res)))
+        eventPort.postMessage(JSON.parse(JSON.stringify(result || [])))
         return
       }
 
@@ -98,35 +97,48 @@ function connectEventChannel (eventPort) {
   }
 }
 
+async function mapSharedMem () {
+  console.log(workerData)
+  Object.setPrototypeOf(workerData.sharedMap, SharedMap.prototype)
+
+  const ds = DataSourceFactory.getDataSource(workerData.modelName, {
+    dsMap: workerData.sharedMap
+  })
+  return ds.save(1, { test: 1 })
+}
+
 remoteEntries.then(remotes => {
   try {
-    init(remotes).then(async service => {
-      console.info('aegis worker thread running')
-      // load distributed cache and register its events
-      await initCache().load()
-      // notify main we are up + register our events with event router
-      parentPort.postMessage({ metaEvent: 'aegis-up' })
+    mapSharedMem().then(val => {
+      console.log(val)
+      init(remotes).then(async service => {
+        console.info('aegis worker thread running')
+        // load distributed cache and register its events
+        await initCache().load()
+        // notify main we are up + register our events with event router
+        parentPort.postMessage({ metaEvent: 'aegis-up' })
 
-      // handle requests from main
-      parentPort.on('message', async message => {
-        // The message port is transfered
-        if (message.eventPort instanceof MessagePort) {
-          // send/recv events to/from main thread
-          connectEventChannel(message.eventPort)
-          return
-        }
+        // handle requests from main
+        parentPort.on('message', async message => {
+          // The message port is transfered
+          if (message.eventPort instanceof MessagePort) {
+            // send/recv events to/from main thread
+            connectEventChannel(message.eventPort)
+            return
+          }
 
-        // Call the use case function by `name`
-        if (typeof service[message.name] === 'function') {
-          const result = await service[message.name](message.data)
-          // serialize & deserialize the result to get rid of functions
-          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
-        } else if (typeof command[message.name] === 'function') {
-          const result = await command[message.name](message.data)
-          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
-        } else {
-          console.warn('not a service function', message.name)
-        }
+          // Call the use case function by `name`
+          if (typeof service[message.name] === 'function') {
+            const result = await service[message.name](message.data)
+            // serialize & deserialize the result to get rid of functions
+            parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+          } else if (typeof command[message.name] === 'function') {
+            const result = await command[message.name](message.data)
+            parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+          } else {
+            console.warn('not a service function', message.name)
+          }
+        })
       })
     })
   } catch (error) {
