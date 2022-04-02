@@ -67,8 +67,8 @@ const command = {
 
 async function runCommand (message) {
   const result = command[message.name](message.data)
-  const message = result?.then ? await result : result
-  parentPort.postMessage(JSON.parse(JSON.stringify(message || [])))
+  const response = result?.then ? await result : result
+  parentPort.postMessage(JSON.parse(JSON.stringify(response || [])))
 }
 
 /**
@@ -79,6 +79,7 @@ async function runCommand (message) {
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
+  const broker = EventBrokerFactory.getInstance()
   try {
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent => {
@@ -102,47 +103,36 @@ function connectEventChannel (eventPort) {
   }
 }
 
-async function mapSharedMem () {
-  console.log(workerData)
-  Object.setPrototypeOf(workerData.sharedMap, SharedMap.prototype)
-
-  const ds = DataSourceFactory.getDataSource(workerData.modelName, {
-    dsMap: workerData.sharedMap
-  })
-  return ds.save(1, { test: 1 })
-}
-
 remoteEntries.then(remotes => {
   try {
-    mapSharedMem().then(val => {
-      console.log(val)
-      init(remotes).then(async service => {
-        console.info('aegis worker thread running')
-        // load distributed cache and register its events
-        await initCache().load()
-        // notify main we are up + register our events with event router
-        parentPort.postMessage({ metaEvent: 'aegis-up' })
+    init(remotes).then(async service => {
+      console.info('aegis worker thread running')
+      // load distributed cache and register its events
+      await initCache().load()
+      // notify main we are up + register our events with event router
+      parentPort.postMessage({ metaEvent: 'aegis-up' })
 
-        // handle requests from main
-        parentPort.on('message', async message => {
-          // The message port is transfered
-          if (message.eventPort instanceof MessagePort) {
-            // send/recv events to/from main thread
-            connectEventChannel(message.eventPort)
-            return
-          }
+      // handle requests from main
+      parentPort.on('message', async message => {
+        // The message port is transfered
+        if (message.eventPort instanceof MessagePort) {
+          // send/recv events to/from main thread
+          connectEventChannel(message.eventPort)
+          return
+        }
 
-          // Call the use case function by `name`
-          if (typeof service[message.name] === 'function') {
-            const result = await service[message.name](message.data)
-            // serialize & deserialize the result to get rid of functions
-            parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
-          } else if (typeof command[message.name] === 'function') {
-            runCommand(message)
-          } else {
-            console.warn('not a service function', message.name)
-          }
-        })
+        // Call the use case function by `name`
+        if (typeof service[message.name] === 'function') {
+          const result = await service[message.name](message.data)
+          // serialize & deserialize the result to get rid of functionsss
+          // parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
+          parentPort.postMessage(JSON.stringify({status:'OK', id: result. }))
+
+        } else if (typeof command[message.name] === 'function') {
+          runCommand(message)
+        } else {
+          console.warn('not a service function', message.name)
+        }
       })
     })
   } catch (error) {
