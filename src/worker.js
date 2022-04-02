@@ -65,6 +65,12 @@ const command = {
     EventBrokerFactory.getInstance().notify('from_main', event)
 }
 
+async function runCommand (message) {
+  const result = command[message.name](message.data)
+  const message = result?.then ? await result : result
+  parentPort.postMessage(JSON.parse(JSON.stringify(message || [])))
+}
+
 /**
  * Create a subchannel between this thread and the main thread that
  * is dedicated to sending and receivng events. Connect each thread-
@@ -80,17 +86,16 @@ function connectEventChannel (eventPort) {
 
       // check first if this is known command
       if (typeof command[event.name] === 'function') {
-        const result = command[event.name](event.data)
-        eventPort.postMessage(JSON.parse(JSON.stringify(result || [])))
-        return
+        await runCommand(message)
       }
 
-      await broker.notify('from_main', event)
+      event && (await broker.notify('from_main', event))
     }
 
     // forward worker events to the main thread
-    broker.on('to_main', event =>
-      eventPort.postMessage(JSON.parse(JSON.stringify(event)))
+    broker.on(
+      'to_main',
+      event => event && eventPort.postMessage(JSON.parse(JSON.stringify(event)))
     )
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
@@ -131,10 +136,9 @@ remoteEntries.then(remotes => {
           if (typeof service[message.name] === 'function') {
             const result = await service[message.name](message.data)
             // serialize & deserialize the result to get rid of functions
-            parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+            parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
           } else if (typeof command[message.name] === 'function') {
-            const result = await command[message.name](message.data)
-            parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+            runCommand(message)
           } else {
             console.warn('not a service function', message.name)
           }
