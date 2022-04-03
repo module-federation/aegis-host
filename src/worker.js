@@ -50,10 +50,10 @@ const command = {
   showData: () =>
     DataSourceFactory.listDataSources().map(([k, v]) => ({
       dsname: k,
-      records: [...v.dataSource].length
+      records: v.map.size()
     })),
   showEvents: () =>
-    [...broker.getEvents()].map(([k, v]) => ({
+    [...EventBrokerFactory.getInstance().getEvents()].map(([k, v]) => ({
       eventName: k,
       handlers: v.length
     })),
@@ -79,15 +79,17 @@ async function runCommand (message) {
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
-  const broker = EventBrokerFactory.getInstance()
   try {
+    const broker = EventBrokerFactory.getInstance()
+
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent => {
       const event = msgEvent.data
 
       // check first if this is known command
       if (typeof command[event.name] === 'function') {
-        await runCommand(message)
+        await runCommand(event)
+        return
       }
 
       event && (await broker.notify('from_main', event))
@@ -125,11 +127,12 @@ remoteEntries.then(remotes => {
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
           // serialize & deserialize the result to get rid of functionsss
-          // parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
-          parentPort.postMessage(JSON.stringify({status:'OK', id: result. }))
-
+          parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
+          //parentPsort.postMessage(JSON.stringify({status:'OK', id: result. }))
         } else if (typeof command[message.name] === 'function') {
+          console.debug({ fn: 'worker command', message })
           runCommand(message)
+          return
         } else {
           console.warn('not a service function', message.name)
         }
