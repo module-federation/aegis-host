@@ -9955,6 +9955,11 @@ shallow-clone@^3.0.0:
   dependencies:
     kind-of "^6.0.2"
 
+sharedmap@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/sharedmap/-/sharedmap-1.2.0.tgz#773aec3db18e57415e6a07c5d7a03a058e090c27"
+  integrity sha512-HFG0kIrNP/gr7kX8/HagXYMs7c/1txpLeru0pVmOpxjkdwVQVhpBw5XghKhSXwAPY+8BKON9rHKJkWPASZ1mhA==
+
 shebang-command@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/shebang-command/-/shebang-command-1.2.0.tgz"

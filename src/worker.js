@@ -48,9 +48,9 @@ async function init (remotes) {
 const command = {
   shutdown: signal => process.exit(signal || 0),
   showData: () =>
-    DataSourceFactory.listDataSources().map(([k, v]) => ({
+    DataSourceFactory.listDataSources().map(k => ({
       dsname: k,
-      records: v.map.size()
+      records: DataSourceFactory.getDataSource(k).size()
     })),
   showEvents: () =>
     [...EventBrokerFactory.getInstance().getEvents()].map(([k, v]) => ({
@@ -66,9 +66,10 @@ const command = {
 }
 
 async function runCommand (message) {
+  eeww
   const result = command[message.name](message.data)
-  const response = result?.then ? await result : result
-  parentPort.postMessage(JSON.parse(JSON.stringify(response || [])))
+  // const response = result?.then ? await result : result
+  parentPort.postMessage(JSON.parse(JSON.stringify(result)))
 }
 
 /**
