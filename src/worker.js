@@ -17,10 +17,7 @@ const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const overrides = { find, save, StorageService }
-const modelName = workerData.modelName
-const SharedMap = require('sharedmap')
-
-/** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
+const modelName = String(workerData.modelName).toUpperCase()
 
 const remoteEntries = remote.aegis
   .get('./remoteEntries')
@@ -47,11 +44,7 @@ async function init (remotes) {
  */
 const command = {
   shutdown: signal => process.exit(signal || 0),
-  showData: () =>
-    DataSourceFactory.listDataSources().map(k => ({
-      dsname: k,
-      records: DataSourceFactory.getDataSource(k).size()
-    })),
+  showData: () => DataSourceFactory.getDataSource(modelName),
   showEvents: () =>
     [...EventBrokerFactory.getInstance().getEvents()].map(([k, v]) => ({
       eventName: k,
@@ -66,10 +59,9 @@ const command = {
 }
 
 async function runCommand (message) {
-  eeww
   const result = command[message.name](message.data)
-  // const response = result?.then ? await result : result
-  parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+  const response = result?.then ? await result : result
+  parentPort.postMessage(JSON.parse(JSON.stringify(response)))
 }
 
 /**
@@ -86,16 +78,13 @@ function connectEventChannel (eventPort) {
     // fire events from main in worker threads
     eventPort.onmessage = async msgEvent => {
       const event = msgEvent.data
-
       // check first if this is known command
       if (typeof command[event.name] === 'function') {
         await runCommand(event)
         return
       }
-
       event && (await broker.notify('from_main', event))
     }
-
     // forward worker events to the main thread
     broker.on(
       'to_main',
@@ -129,11 +118,8 @@ remoteEntries.then(remotes => {
           const result = await service[message.name](message.data)
           // serialize & deserialize the result to get rid of functionsss
           parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
-          //parentPsort.postMessage(JSON.stringify({status:'OK', id: result. }))
         } else if (typeof command[message.name] === 'function') {
-          console.debug({ fn: 'worker command', message })
-          runCommand(message)
-          return
+          return runCommand(message)
         } else {
           console.warn('not a service function', message.name)
         }
