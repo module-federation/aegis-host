@@ -44,7 +44,11 @@ async function init (remotes) {
  */
 const command = {
   shutdown: signal => process.exit(signal || 0),
-  showData: () => DataSourceFactory.getDataSource(modelName),
+  showData: () =>
+    [DataSourceFactory.getDataSource(modelName)].map(ds => ({
+      dsname: ds.name,
+      records: ds.totalRecords()
+    })),
   showEvents: () =>
     [...EventBrokerFactory.getInstance().getEvents()].map(([k, v]) => ({
       eventName: k,
@@ -116,7 +120,7 @@ remoteEntries.then(remotes => {
         // Call the use case function by `name`
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
-          // serialize & deserialize the result to get rid of functionsss
+          // serialize & deserialize the result to get rid of functions
           parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
         } else if (typeof command[message.name] === 'function') {
           return runCommand(message)
