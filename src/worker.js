@@ -2,14 +2,15 @@
 
 require('regenerator-runtime')
 const { domain, adapters, services } = require('@module-federation/aegis')
+const { SharedMap } = require('sharedmap')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
 const {
   importRemotes,
   UseCaseService,
-  EventBrokerFactory,
   DataSourceFactory,
+  EventBrokerFactory,
   default: ModelFactory
 } = domain
 const { StorageAdapter } = adapters
@@ -32,8 +33,14 @@ const remoteEntries = remote.aegis
  */
 async function init (remotes) {
   try {
+    Object.setPrototypeOf(workerData.sharedMap, SharedMap.prototype)
+    const ds = DataSourceFactory.getDataSource(workerData.modelName, {
+      sharedMap: workerData.sharedMap
+    })
+    await ds.save(1, { test: 1 })
+
     await importRemotes(remotes, overrides)
-    return UseCaseService(modelName)
+    return UseCaseService(workerData.modelName)
   } catch (error) {
     console.error({ fn: init.name, error })
   }
@@ -79,13 +86,18 @@ async function runCommand (message) {
 }
 
 /**
- * Create a subchannel between this thread and the main thread that
- * is dedicated to sending and receivng events. Connect each thread-
- * local event {@link broker} to the channel as pub/sub `eventNames`
+ * Create a subchannel between this thread and the main thread that is dedicated
+ * to inter-thread and inter-host eveaaants; that is, locally generated and handled
+ * events and events from the service mesh. Connect both ends of the channel to
+ * the thread-local {@link broker} via pub & sub events. Do not include {@link Model}s
+ * in event payloads. Save any updates to the datasource, which is using shared
+ * memory under the covers. So, apart from network communiation to the service mesh,
+ * read and write upates to the datasource when raising or responding to events.
  *
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
+  const broker = EventBrokerFactory.getInstance()
   try {
     const broker = EventBrokerFactory.getInstance()
 
@@ -112,12 +124,12 @@ remoteEntries.then(remotes => {
       console.info('aegis worker thread running')
       // load distributed cache and register its events
       await initCache().load()
-      // notify main we are up + register our events with event router
+      // notify main we are up
       parentPort.postMessage({ metaEvent: 'aegis-up' })
 
-      // handle requests from main
+      // handle API requests from main
       parentPort.on('message', async message => {
-        // The message port is transfered
+        // The "event port" is transfered
         if (message.eventPort instanceof MessagePort) {
           // send/recv events to/from main thread
           connectEventChannel(message.eventPort)
@@ -125,7 +137,7 @@ remoteEntries.then(remotes => {
         }
 
         // Call the use case function by `name`
-        if (typeof service[message.name] === 'function') {
+        if (typeof service[message.name] === 'fuction') {
           const result = await service[message.name](message.data)
           // serialize & deserialize the result to get  xid of functions
           parentPort.postMessage(parse(result || []))
