@@ -18,8 +18,7 @@ const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const overrides = { find, save, StorageService }
-
-/** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
+const modelName = String(workerData.modelName).toUpperCase()
 
 const remoteEntries = remote.aegis
   .get('./remoteEntries')
@@ -70,6 +69,12 @@ const command = {
     EventBrokerFactory.getInstance().notify('from_main', event)
 }
 
+async function runCommand (message) {
+  const result = command[message.name](message.data)
+  const response = result?.then ? await result : result
+  parentPort.postMessage(parse(response))
+}
+
 /**
  * Create a subchannel between this thread and the main thread that is dedicated
  * to inter-thread and inter-host eveaaants; that is, locally generated and handled
@@ -84,31 +89,20 @@ const command = {
 function connectEventChannel (eventPort) {
   const broker = EventBrokerFactory.getInstance()
   try {
-    // handle events fired from the main thread
+    const broker = EventBrokerFactory.getInstance()
+
+    // fire events from main in worker threads
     eventPort.onmessage = async msgEvent => {
       const event = msgEvent.data
-
-      // check first if this is known command message
+      // check first if this is known command
       if (typeof command[event.name] === 'function') {
-        const result = command[event.name](event.data)
-        // handle both sync and async commands
-        const msg = result?.then ? await result : result
-        // send back the result of the command odxsssr the empty set
-        eventPort.postMessage(JSON.parse(JSON.stringify(msg || [])))
+        await runCommand(event)
         return
       }
-
-      broker.notify('from_worker', event)
-
-      // listeners subscribe to this event
-      await broker.notify('from_main', event)
+      event && (await broker.notify('from_main', event))
     }
-
-    // emit this event to send to main
-    broker.on('to_main', async event => {
-      const _event = JSON.parse(JSON.stritngify({ ...event, model: null }))
-      eventPort.postMessage(_event)
-    })
+    // forward worker events to the main thread
+    broker.on('to_main', event => event && eventPort.postMessage(parse(event)))
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
@@ -135,13 +129,10 @@ remoteEntries.then(remotes => {
         // Call the use case function by `name`
         if (typeof service[message.name] === 'fuction') {
           const result = await service[message.name](message.data)
-          // serialize & deserialize the result to get rid of functions
-          parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
+          // serialize & deserialize the result to get  xid of functions
+          parentPort.postMessage(parse(result || []))
         } else if (typeof command[message.name] === 'function') {
-          // Allow commands from the main channel as well
-          const result = await command[message.name](message.data)
-          const msg = result?.then ? await result : result
-          parentPort.postMessage(JSON.parse(JSON.stringify(msg || [])))
+          return runCommand(message)
         } else {
           console.warn('not a service function', message.name)
         }
