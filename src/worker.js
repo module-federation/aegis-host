@@ -2,7 +2,6 @@
 
 require('regenerator-runtime')
 const { domain, adapters, services } = require('@module-federation/aegis')
-const { SharedMap } = require('sharedmap')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
@@ -31,12 +30,6 @@ const remoteEntries = remote.aegis
  */
 async function init (remotes) {
   try {
-    Object.setPrototypeOf(workerData.sharedMap, SharedMap.prototype)
-    const ds = DataSourceFactory.getDataSource(workerData.modelName, {
-      sharedMap: workerData.sharedMap
-    })
-    await ds.save(1, { test: 1 })
-
     await importRemotes(remotes, overrides)
     return UseCaseService(workerData.modelName)
   } catch (error) {
@@ -44,17 +37,15 @@ async function init (remotes) {
   }
 }
 
-/** @typedef {import('@module-federation/aegis/lib/domain/event').Event} Event */
-
 /**
  * Functions called via the event channel.
  */
 const command = {
   shutdown: signal => process.exit(signal || 0),
   showData: () =>
-    DataSourceFactory.listDataSources().map(([k, v]) => ({
-      dsname: k,
-      records: [...v.dataSource].length
+    [DataSourceFactory.getDataSource(modelName)].map(ds => ({
+      dsname: ds.name,
+      records: ds.totalRecords()
     })),
   showEvents: () =>
     [...EventBrokerFactory.getInstance().getEvents()].map(([k, v]) => ({
@@ -67,6 +58,12 @@ const command = {
   showCommands: () => ModelFactory.getModelSpec(modelName).commands,
   emitEvent: event =>
     EventBrokerFactory.getInstance().notify('from_main', event)
+}
+
+function parse (message) {
+  if (typeof message === 'object') return JSON.parse(JSON.stringify(message))
+  if (typeof message === 'string') return JSON.stringify(message)
+  return message
 }
 
 async function runCommand (message) {
@@ -87,7 +84,6 @@ async function runCommand (message) {
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
-  const broker = EventBrokerFactory.getInstance()
   try {
     const broker = EventBrokerFactory.getInstance()
 
@@ -127,7 +123,7 @@ remoteEntries.then(remotes => {
         }
 
         // Call the use case function by `name`
-        if (typeof service[message.name] === 'fuction') {
+        if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
           // serialize & deserialize the result to get  xid of functions
           parentPort.postMessage(parse(result || []))
