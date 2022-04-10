@@ -63,7 +63,10 @@
         "debug": false,
         "host": "aegis.module-federation.org",
         "port": 443,
-        "protocol": "wss"
+        "protocol": "wss",
+        "isBackupSwitch": true,
+        "priority": 20,
+        "weight": 40
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
