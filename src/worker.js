@@ -18,15 +18,21 @@ const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const overrides = { find, save, StorageService }
+<<<<<<< HEAD
+const modelName = String(workerData.modelName).toUpperCase()
+=======
 
 /** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
+>>>>>>> master
 
 const remoteEntries = remote.aegis
   .get('./remoteEntries')
   .then(factory => factory())
 
 /**
- * Import and bind remote modules: i.e models, adapters and services
+ * - Import and bind remote models, adapters and services
+ * - Generate service endpoints and storage adapters
+ *
  * @param {import('../webpack/remote-entries-type.js').remoteEntry} remotes
  * @returns
  */
@@ -45,7 +51,15 @@ async function init (remotes) {
   }
 }
 
-/** @typedef {import('@module-federation/aegis/lib/domain/event').Event} Event */
+function parse (event) {
+  try {
+    if (typeof event === 'object') return JSON.parse(JSON.stringify(event))
+    if (typeof event === 'string') return JSON.stringify(event)
+  } catch (error) {
+    console.log({ fn: parse.name, error })
+  }
+  return event
+}
 
 /**
  * Functions called via the event channel.
@@ -53,9 +67,9 @@ async function init (remotes) {
 const command = {
   shutdown: signal => process.exit(signal || 0),
   showData: () =>
-    DataSourceFactory.listDataSources().map(([k, v]) => ({
-      dsname: k,
-      records: [...v.dataSource].length
+    [DataSourceFactory.getDataSource(modelName)].map(ds => ({
+      dsname: ds.name,
+      records: ds.totalRecords()
     })),
   showEvents: () =>
     [...EventBrokerFactory.getInstance().getEvents()].map(([k, v]) => ({
@@ -68,6 +82,15 @@ const command = {
   showCommands: () => ModelFactory.getModelSpec(modelName).commands,
   emitEvent: event =>
     EventBrokerFactory.getInstance().notify('from_main', event)
+<<<<<<< HEAD
+}
+
+async function runCommand (message) {
+  const result = command[message.name](message.data)
+  const response = result?.then ? await result : result
+  parentPort.postMessage(parse(response))
+=======
+>>>>>>> master
 }
 
 /**
@@ -84,6 +107,22 @@ const command = {
 function connectEventChannel (eventPort) {
   const broker = EventBrokerFactory.getInstance()
   try {
+<<<<<<< HEAD
+    const broker = EventBrokerFactory.getInstance()
+
+    // fire events from main in worker threads
+    eventPort.onmessage = async msgEvent => {
+      const event = msgEvent.data
+      // check first if this is known command
+      if (typeof command[event.name] === 'function') {
+        await runCommand(event)
+        return
+      }
+      event && (await broker.notify('from_main', event))
+    }
+    // forward worker events to the main thread
+    broker.on('to_main', event => event && eventPort.postMessage(parse(event)))
+=======
     // handle events fired from the main thread
     eventPort.onmessage = async msgEvent => {
       const event = msgEvent.data
@@ -109,6 +148,7 @@ function connectEventChannel (eventPort) {
       const _event = JSON.parse(JSON.stritngify({ ...event, model: null }))
       eventPort.postMessage(_event)
     })
+>>>>>>> master
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
@@ -135,6 +175,12 @@ remoteEntries.then(remotes => {
         // Call the use case function by `name`
         if (typeof service[message.name] === 'fuction') {
           const result = await service[message.name](message.data)
+<<<<<<< HEAD
+          // serialize & deserialize the result to get  xid of functions
+          parentPort.postMessage(parse(result || []))
+        } else if (typeof command[message.name] === 'function') {
+          return runCommand(message)
+=======
           // serialize & deserialize the result to get rid of functions
           parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
         } else if (typeof command[message.name] === 'function') {
@@ -142,6 +188,7 @@ remoteEntries.then(remotes => {
           const result = await command[message.name](message.data)
           const msg = result?.then ? await result : result
           parentPort.postMessage(JSON.parse(JSON.stringify(msg || [])))
+>>>>>>> master
         } else {
           console.warn('not a service function', message.name)
         }

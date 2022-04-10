@@ -77,7 +77,10 @@
     "nanoid": "^3.1.20",
     "nats": "^2.2.0",
     "regenerator-runtime": "^0.13.7",
+<<<<<<< HEAD
+=======
     "require-fresh": "^1.1.0",
+>>>>>>> master
     "sharedmap": "^1.2.0",
     "ws": "^8.2.0"
   },
