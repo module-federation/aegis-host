@@ -39,6 +39,16 @@ async function init (remotes) {
   }
 }
 
+function parse (event) {
+  try {
+    if (typeof event === 'object') return JSON.parse(JSON.stringify(event))
+    if (typeof event === 'string') return JSON.stringify(event)
+  } catch (error) {
+    console.log({ fn: parse.name, error })
+  }
+  return event
+}
+
 /**
  * Functions called via the event channel.
  */
@@ -65,7 +75,7 @@ const command = {
 async function runCommand (message) {
   const result = command[message.name](message.data)
   const response = result?.then ? await result : result
-  parentPort.postMessage(JSON.parse(JSON.stringify(response)))
+  parentPort.postMessage(parse(response))
 }
 
 /**
@@ -90,10 +100,7 @@ function connectEventChannel (eventPort) {
       event && (await broker.notify('from_main', event))
     }
     // forward worker events to the main thread
-    broker.on(
-      'to_main',
-      event => event && eventPort.postMessage(JSON.parse(JSON.stringify(event)))
-    )
+    broker.on('to_main', event => event && eventPort.postMessage(parse(event)))
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
@@ -120,8 +127,8 @@ remoteEntries.then(remotes => {
         // Call the use case function by `name`
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
-          // serialize & deserialize the result to get rid of functions
-          parentPort.postMessage(JSON.parse(JSON.stringify(result || [])))
+          // serialize & deserialize the result to get  xid of functions
+          parentPort.postMessage(parse(result || []))
         } else if (typeof command[message.name] === 'function') {
           return runCommand(message)
         } else {
