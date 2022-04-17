@@ -31,8 +31,10 @@ const forceTimeout = 3000 // time to wait for conn to drop before closing server
 const certLoadPath = process.env.CERTLOAD_PATH || '/aegis/load-cert'
 const clusterEnabled = /true/i.test(process.env.CLUSTER_ENABLED)
 const checkIpHostname = process.env.CHECKIPHOST || 'checkip.amazonaws.com'
+
 const domain =
   require('../public/aegis.config.json').general.fqdn || process.env.DOMAIN
+
 const sslEnabled = // required in production
   /prod/i.test(process.env.NODE_ENV) || /true/i.test(process.env.SSL_ENABLED)
 
