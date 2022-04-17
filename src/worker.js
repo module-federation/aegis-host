@@ -5,19 +5,21 @@ const { domain, adapters, services } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
-const {
-  importRemotes,
-  UseCaseService,
-  DataSourceFactory,
-  EventBrokerFactory,
-  default: ModelFactory
-} = domain
+const { importRemotes, UseCaseService, EventBrokerFactory } = domain
 const { StorageAdapter } = adapters
 const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const overrides = { find, save, StorageService }
-const modelName = String(workerData.modelName).toUpperCase()
+const modelName = workerData.modelName?.toUpperCase()
+
+if (!modelName) {
+  console.error('no modelName specified!')
+  process.exit(1)
+}
+
+/** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
+const broker = EventBrokerFactory.getInstance()
 
 const remoteEntries = remote.aegis
   .get('./remoteEntries')
@@ -31,74 +33,30 @@ const remoteEntries = remote.aegis
 async function init (remotes) {
   try {
     await importRemotes(remotes, overrides)
-    return UseCaseService(workerData.modelName)
+    return UseCaseService(modelName)
   } catch (error) {
+    w
     console.error({ fn: init.name, error })
   }
 }
 
 /**
- * Functions called via the event channel.
- */
-const command = {
-  shutdown: signal => process.exit(signal || 0),
-  showData: () =>
-    [DataSourceFactory.getDataSource(modelName)].map(ds => ({
-      dsname: ds.name,
-      records: ds.totalRecords()
-    })),
-  showEvents: () =>
-    [...EventBrokerFactory.getInstance().getEvents()].map(([k, v]) => ({
-      eventName: k,
-      handlers: v.length
-    })),
-  showModels: () => ModelFactory.getModelSpecs(),
-  showRelations: () => ModelFactory.getModelSpec(modelName).relations,
-  showPorts: () => ModelFactory.getModelSpec(modelName).ports,
-  showCommands: () => ModelFactory.getModelSpec(modelName).commands,
-  emitEvent: event =>
-    EventBrokerFactory.getInstance().notify('from_main', event)
-}
-
-function parse (message) {
-  if (typeof message === 'object') return JSON.parse(JSON.stringify(message))
-  if (typeof message === 'string') return JSON.stringify(message)
-  return message
-}
-
-async function runCommand (message) {
-  const result = command[message.name](message.data)
-  const response = result?.then ? await result : result
-  parentPort.postMessage(parse(response))
-}
-
-/**
  * Create a subchannel between this thread and the main thread that is dedicated
- * to inter-thread and inter-host eveaaants; that is, locally generated and handled
+ * to inter-thread and inter-host events; that is, locally generated and handled
  * events and events from the service mesh. Connect both ends of the channel to
- * the thread-local {@link broker} via pub & sub events. Do not include {@link Model}s
- * in event payloads. Save any updates to the datasource, which is using shared
- * memory under the covers. So, apart from network communiation to the service mesh,
- * read and write upates to the datasource when raising or responding to events.
+ * the thread-local {@link broker} via pub & sub events.
  *
  * @param {MessagePort} eventPort
  */
 function connectEventChannel (eventPort) {
   try {
-    const broker = EventBrokerFactory.getInstance()
-
     // fire events from main in worker threads
-    eventPort.onmessage = async msgEvent => {
-      const event = msgEvent.data
-      // check first if this is known command
-      if (typeof command[event.name] === 'function') {
-        await runCommand(event)
-        return
-      }
-      event && (await broker.notify('from_main', event))
-    }
+    eventPort.onmessage = async msgEvent =>
+      broker.notify('from_main', msgEvent.data)
     // forward worker events to the main thread
-    broker.on('to_main', event => event && eventPort.postMessage(parse(event)))
+    broker.on('to_main', event =>
+      eventPort.postMessage(JSON.parse(JSON.stringify(event)))
+    )
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
@@ -115,22 +73,17 @@ remoteEntries.then(remotes => {
 
       // handle API requests from main
       parentPort.on('message', async message => {
-        // The "event port" is transfered
-        if (message.eventPort instanceof MessagePort) {
-          // send/recv events to/from main thread
-          connectEventChannel(message.eventPort)
-          return
-        }
-
         // Call the use case function by `name`
         if (typeof service[message.name] === 'function') {
           const result = await service[message.name](message.data)
-          // serialize & deserialize the result to get  xid of functions
-          parentPort.postMessage(parse(result || []))
-        } else if (typeof command[message.name] === 'function') {
-          return runCommand(message)
+          // serialize to get rid of functions/0
+          parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
+        } // The "event port" is transfered
+        else if (message.eventPort instanceof MessagePort) {
+          // send/recv events to/from main thread
+          connectEventChannel(message.eventPort)
         } else {
-          console.warn('not a service function', message.name)
+          console.warn('not a service function', message)
         }
       })
     })
