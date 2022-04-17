@@ -83,7 +83,10 @@ remoteEntries.then(remotes => {
           // send/recv events to/from main thread
           connectEventChannel(message.eventPort)
         } else {
-          console.warn('not a service function', message)
+          const errMsg='not a service function'
+          console.warn(errMsg, message)
+          // main is expecting a res
+          parentPort.postMessage({errMsg, message})
         }
       })
     })
