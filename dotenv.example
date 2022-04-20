@@ -23,6 +23,8 @@ SSL_ENABLED=false
 SSL_PORT=443
 PORT=80
 
+# is this instance an ægis webswitch?
+SWITCH=false
 
 # URL root level path
 API_ROOT=/aegis/api

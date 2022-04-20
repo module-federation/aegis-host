@@ -35,7 +35,6 @@ async function init (remotes) {
     await importRemotes(remotes, overrides)
     return UseCaseService(modelName)
   } catch (error) {
-    w
     console.error({ fn: init.name, error })
   }
 }
@@ -50,10 +49,10 @@ async function init (remotes) {
  */
 function connectEventChannel (eventPort) {
   try {
-    // fire events from main in worker threads
+    // fire events from main
     eventPort.onmessage = async msgEvent =>
-      broker.notify('from_main', msgEvent.data)
-    // forward worker events to the main thread
+      broker.notify('from_main', msgEvent)
+    // forward events to main
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
     )
@@ -73,20 +72,21 @@ remoteEntries.then(remotes => {
 
       // handle API requests from main
       parentPort.on('message', async message => {
-        // Call the use case function by `name`
+        // Look for a use case function called `message.name`
         if (typeof service[message.name] === 'function') {
+          // invoke the use case function
           const result = await service[message.name](message.data)
-          // serialize to get rid of functions/0
+          // serialize `result` to get rid of any functions
           parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
-        } // The "event port" is transfered
-        else if (message.eventPort instanceof MessagePort) {
+          // The "event port" is transfered
+        } else if (message.eventPort instanceof MessagePort) {
           // send/recv events to/from main thread
           connectEventChannel(message.eventPort)
         } else {
-          const errMsg='not a service function'
+          const errMsg = 'not a service function'
           console.warn(errMsg, message)
-          // main is expecting a res
-          parentPort.postMessage({errMsg, message})
+          // main is expecting a response
+          parentPort.postMessage({ errMsg, message })
         }
       })
     })
