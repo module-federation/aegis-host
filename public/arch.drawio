@@ -1,9 +1,207 @@
-<mxfile host="65bd71144e">
-    <diagram name="Copy of SUBSTRATE" id="inw7r7KWAVXeLQ4Ddhs8">
-        <mxGraphModel dx="2370" dy="484" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+<mxfile host="65bd71144e" scale="2" border="0">
+    <diagram name="AIOT" id="C57_Dr-gr5Sgo95vxOue">
+        <mxGraphModel dx="616" dy="283" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+            <root>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-0"/>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-1" parent="yZtqZgkybrvEYegP9EMW-0"/>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-2" value="" style="whiteSpace=wrap;html=1;fillColor=#E6E6E6;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="40" y="210" width="590" height="610" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-3" value="&lt;p&gt;&lt;span style=&quot;font-size: 12px ; font-weight: normal&quot;&gt;Async I/O using QUIC protocol handles real time data streams&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;CPU-intensive workloads, like AI inference, run on dedicated threads as WebAssembly modules that are AoT-compiled to native&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="58" y="259" width="212" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-4" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;labelBackgroundColor=#33FFFF;fontSize=12;strokeColor=#FFFFFF;strokeWidth=1;fillColor=default;size=80;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="120" y="670" width="470" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-5" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;labelBackgroundColor=#33FFFF;fontSize=12;strokeColor=#FFFFFF;strokeWidth=1;fillColor=default;size=80;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="120" y="613" width="470" height="127" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-6" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;labelBackgroundColor=#33FFFF;fontSize=12;strokeColor=#FFFFFF;strokeWidth=1;fillColor=default;size=80;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="120" y="560" width="470" height="125" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-7" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="279" y="348.75" width="151" height="81.25" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-8" value="LiveStream" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="196" y="544" width="90" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-9" value="ComputerVision" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="417.5" y="544" width="90" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-10" value="&lt;b&gt;&lt;font style=&quot;font-size: 14px&quot;&gt;CPU-bound&lt;/font&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="498.5" y="443.94" width="91.5" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-11" value="Thread Pool" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="213.25" y="546" width="55.5" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-12" value="Thread Pool" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="433.25" y="544" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-13" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-19" target="yZtqZgkybrvEYegP9EMW-40" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="420" y="463" as="sourcePoint"/>
+                        <Array as="points">
+                            <mxPoint x="458" y="454"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-15" value="Main Thread" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="376" y="355" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-19" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=5.93352148056033;rotation=-90;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="402" y="421.31" width="30.5" height="65.69" as="geometry"/>
+                </mxCell>
+                <mxCell id="KcKZiUSEn5o6-_HKCoM8-11" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-21" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="370" y="429" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="370" y="454"/>
+                            <mxPoint x="370" y="429"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-21" value="&lt;font style=&quot;font-size: 10px&quot;&gt;Message&lt;br&gt;Channel&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="392" y="440" width="59" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-22" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=12;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="319" y="360" width="60" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-23" value="HTTP&lt;br&gt;Server" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="325" y="382" width="60" height="24" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-24" value="" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="285" y="230" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-25" value="" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;endArrow=none;endFill=0;" parent="yZtqZgkybrvEYegP9EMW-1" target="yZtqZgkybrvEYegP9EMW-24" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="345" y="360" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-26" value="HTTP / WS" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yZtqZgkybrvEYegP9EMW-25" vertex="1" connectable="0">
+                    <mxGeometry x="0.343" y="-3" relative="1" as="geometry">
+                        <mxPoint y="1" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-27" value="LiDAR&lt;br&gt;WebRTC&lt;br&gt;CCTV" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="124.5" y="360" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-28" value="" style="group;glass=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1" connectable="0">
+                    <mxGeometry x="299" y="540" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-29" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" parent="yZtqZgkybrvEYegP9EMW-28" vertex="1">
+                    <mxGeometry width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-30" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" parent="yZtqZgkybrvEYegP9EMW-28" vertex="1">
+                    <mxGeometry x="10" y="10" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-31" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;shadow=0;" parent="yZtqZgkybrvEYegP9EMW-28" vertex="1">
+                    <mxGeometry x="20" y="20" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-32" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=60;entryDy=0;entryPerimeter=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-40" target="yZtqZgkybrvEYegP9EMW-29" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-33" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-34" target="yZtqZgkybrvEYegP9EMW-31" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-34" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="176" y="480" width="117" height="58" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-35" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="226" y="484" width="60" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-36" value="QUIC&lt;br&gt;Server" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="246.5" y="512.5" width="30" height="5" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-37" value="&lt;span style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;I/O-bound&lt;/b&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="96" y="443.94" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-38" value="" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;endArrow=none;endFill=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-35" target="yZtqZgkybrvEYegP9EMW-27" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="190" y="554" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-39" value="QUIC&amp;nbsp;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yZtqZgkybrvEYegP9EMW-38" vertex="1" connectable="0">
+                    <mxGeometry x="0.0383" y="3" relative="1" as="geometry">
+                        <mxPoint x="4" y="-4" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-40" value="e" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="399" y="479" width="117" height="58" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-41" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="407" y="485" width="60" height="48" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-42" value="Worker Thread" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="169" y="505" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-44" value="Wasm &lt;br&gt;Module" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="438" y="505" width="9" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-45" value="Node.js, v8, WasmEdge" style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="200" y="640" width="390" height="43" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-46" value="&lt;h1&gt;Designed for AIoT&lt;/h1&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="58" y="224" width="235" height="36" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-47" value="seL4 Kernel, Linux, MacOS, Windows, OpenHarmony, iOS, Android, Browser" style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="200" y="695" width="390" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-48" value="Cloud, On-Prem, Frontend, Backend, Edge, Mobile, Embedded / IoT" style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="200" y="750" width="390" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-61" value="Worker Thread" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="462" y="503.5" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-43" value="Shared Memory" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="314.5" y="600" width="110" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="KcKZiUSEn5o6-_HKCoM8-6" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=5.93352148056033;rotation=-90;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="276.5" y="421.31" width="30.5" height="65.69" as="geometry"/>
+                </mxCell>
+                <mxCell id="KcKZiUSEn5o6-_HKCoM8-7" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-20" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="330" y="430" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="330" y="452"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="KcKZiUSEn5o6-_HKCoM8-10" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0;entryDx=25;entryDy=0;entryPerimeter=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-20" target="yZtqZgkybrvEYegP9EMW-35" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="251" y="452"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-20" value="&lt;font style=&quot;font-size: 10px&quot;&gt;Message&lt;br&gt;Channel&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="266" y="439" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="KcKZiUSEn5o6-_HKCoM8-12" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="346" y="470"/>
+                            <mxPoint x="346" y="470"/>
+                        </Array>
+                        <mxPoint x="346" y="430" as="sourcePoint"/>
+                        <mxPoint x="346" y="550" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="KcKZiUSEn5o6-_HKCoM8-14" value="Readonly" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="KcKZiUSEn5o6-_HKCoM8-12" vertex="1" connectable="0">
+                    <mxGeometry x="0.1556" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="AppFabric" id="inw7r7KWAVXeLQ4Ddhs8">
+        <mxGraphModel dx="2535" dy="840" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#E6E6E6" math="0" shadow="0">
             <root>
                 <mxCell id="8p3KyEh_AJBPqRqYQa0D-0"/>
                 <mxCell id="8p3KyEh_AJBPqRqYQa0D-1" parent="8p3KyEh_AJBPqRqYQa0D-0"/>
+                <mxCell id="1" value="" style="rounded=0;whiteSpace=wrap;html=1;glass=0;strokeWidth=1;fillColor=none;" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
+                    <mxGeometry x="-1660" y="50" width="770" height="1020" as="geometry"/>
+                </mxCell>
                 <object placeholders="1" c4Type="ÆGIS Service Mesh" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-2">
                     <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
                         <mxGeometry x="-1516" y="929.44" width="240" height="120" as="geometry"/>
@@ -17,7 +215,7 @@
                 <mxCell id="rJ1jcZtcRkf2op3N6MFy-13" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="8p3KyEh_AJBPqRqYQa0D-1" source="8p3KyEh_AJBPqRqYQa0D-4" target="8p3KyEh_AJBPqRqYQa0D-37" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <object placeholders="1" c4Type="ÆGIS AppStream" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-4">
+                <object placeholders="1" c4Type="ÆGIS AppFabric" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-4">
                     <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
                         <mxGeometry x="-1560" y="906" width="240" height="120" as="geometry"/>
                     </mxCell>
@@ -118,13 +316,13 @@
                         <Array as="points"/>
                     </mxGeometry>
                 </mxCell>
-                <object placeholders="1" c4Name="ÆGIS Federation Host" c4Type="Container" c4Technology="e.g. SpringBoot, ElasticSearch, etc." c4Description="Description of container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-22">
+                <object placeholders="1" c4Name="ÆGIS Federation Host" c4Type="Container" c4Technology="" c4Description="Provides zero downtime, zero install, rapid independent deployment to any compute primative. Abstracts non-functional concerns for 100% business logic in hosted code." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-22">
                     <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
                         <mxGeometry x="-1248" y="696" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Gantry" c4Type="SystemScopeBoundary" c4Application="Federation Server" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;[%c4Application%]&lt;/div&gt;" Description="" id="8p3KyEh_AJBPqRqYQa0D-23">
-                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
+                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];glass=0;strokeWidth=1;" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
                         <mxGeometry x="-1600" y="242" width="620" height="638" as="geometry"/>
                     </mxCell>
                 </object>
@@ -171,7 +369,7 @@
                 <mxCell id="rJ1jcZtcRkf2op3N6MFy-8" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="8p3KyEh_AJBPqRqYQa0D-1" source="8p3KyEh_AJBPqRqYQa0D-32" target="8p3KyEh_AJBPqRqYQa0D-38" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-32">
+                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Implements a port interface on one end and a client or service on the other to enable communcation between the application core and the outside world." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-32">
                     <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
                         <mxGeometry x="-1260" y="272" width="240" height="120" as="geometry"/>
                     </mxCell>
@@ -207,7 +405,7 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-38">
+                <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. NATS, Kafka" c4Description="Provide an additional layer of abstraction for port adapters, where port adapters support an integration pattern and services implement specific instances of that pattern." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="8p3KyEh_AJBPqRqYQa0D-38">
                     <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="8p3KyEh_AJBPqRqYQa0D-1" vertex="1">
                         <mxGeometry x="-1571" y="271" width="240" height="120" as="geometry"/>
                     </mxCell>
@@ -216,101 +414,101 @@
         </mxGraphModel>
     </diagram>
     <diagram name="SUBSTRATE" id="fN4ieMEDc-ZKQFQIhmPi">
-        <mxGraphModel dx="3146" dy="969" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2356" dy="660" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="293OsQBbbWcmS34-qIi4-0"/>
                 <mxCell id="293OsQBbbWcmS34-qIi4-1" parent="293OsQBbbWcmS34-qIi4-0"/>
                 <object placeholders="1" c4Type="ÆGIS Service Mesh" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="kOv3a6BpkoPm77_4ioXi-8">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1506" y="923.44" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Service Mesh" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="kOv3a6BpkoPm77_4ioXi-6">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1525" y="911.44" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Substrate" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="kOv3a6BpkoPm77_4ioXi-7">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1550" y="900" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-34">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1224" y="921.44" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-32">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1234" y="911.44" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-33">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1234" y="911.44" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-31">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1545" y="90" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-30">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1555" y="80" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-18">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1550" y="292" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-13">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1560" y="282" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-14">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1560" y="282" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-4">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1216" y="272" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-3">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1226" y="262" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="kOv3a6BpkoPm77_4ioXi-1">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1550" y="522" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="kOv3a6BpkoPm77_4ioXi-0">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1560" y="512" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-2">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1236" y="252" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="293OsQBbbWcmS34-qIi4-5" value="deploys,&lt;br&gt;hosts" style="edgeStyle=none;html=1;exitX=0.533;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8" target="293OsQBbbWcmS34-qIi4-4">
+                <mxCell id="293OsQBbbWcmS34-qIi4-5" value="deploys,&lt;br&gt;hosts" style="edgeStyle=none;html=1;exitX=0.533;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8" target="293OsQBbbWcmS34-qIi4-4" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1124" y="530" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="293OsQBbbWcmS34-qIi4-6" value="streams" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8" target="293OsQBbbWcmS34-qIi4-19">
+                <mxCell id="293OsQBbbWcmS34-qIi4-6" value="streams" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8" target="293OsQBbbWcmS34-qIi4-19" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-950" y="572" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="293OsQBbbWcmS34-qIi4-7" value="deploys,&amp;nbsp;&lt;br&gt;binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8">
+                <mxCell id="293OsQBbbWcmS34-qIi4-7" value="deploys,&amp;nbsp;&lt;br&gt;binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="-1280" y="582"/>
@@ -319,20 +517,20 @@
                         <mxPoint x="-1310" y="582" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="kOv3a6BpkoPm77_4ioXi-3" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8" target="kOv3a6BpkoPm77_4ioXi-2">
+                <mxCell id="kOv3a6BpkoPm77_4ioXi-3" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-8" target="kOv3a6BpkoPm77_4ioXi-2" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Federation Host" c4Type="Container" c4Technology="e.g. SpringBoot, ElasticSearch, etc." c4Description="Description of container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-8">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1244" y="522" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Gantry" c4Type="SystemScopeBoundary" c4Application="Federation Server" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;[%c4Application%]&lt;/div&gt;" Description="Federated app server instance" id="293OsQBbbWcmS34-qIi4-11">
-                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1600" y="242" width="620" height="628" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="293OsQBbbWcmS34-qIi4-15" value="invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.91;exitY=-0.033;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="293OsQBbbWcmS34-qIi4-1">
+                <mxCell id="293OsQBbbWcmS34-qIi4-15" value="invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.91;exitY=-0.033;exitDx=0;exitDy=0;exitPerimeter=0;" parent="293OsQBbbWcmS34-qIi4-1" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1230" y="356" as="targetPoint"/>
                         <Array as="points">
@@ -342,20 +540,20 @@
                         <mxPoint x="-1341.6" y="508.03999999999996" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="293OsQBbbWcmS34-qIi4-16" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.418;entryY=1.053;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.439;exitY=0.006;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-18" target="293OsQBbbWcmS34-qIi4-31">
+                <mxCell id="293OsQBbbWcmS34-qIi4-16" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.418;entryY=1.053;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.439;exitY=0.006;exitDx=0;exitDy=0;exitPerimeter=0;" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-18" target="293OsQBbbWcmS34-qIi4-31" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="293OsQBbbWcmS34-qIi4-17" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="293OsQBbbWcmS34-qIi4-16">
+                <mxCell id="293OsQBbbWcmS34-qIi4-17" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="293OsQBbbWcmS34-qIi4-16" vertex="1" connectable="0">
                     <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-19">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1244" y="901.44" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="293OsQBbbWcmS34-qIi4-20" style="html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="293OsQBbbWcmS34-qIi4-1">
+                <mxCell id="293OsQBbbWcmS34-qIi4-20" style="html=1;edgeStyle=orthogonalEdgeStyle;" parent="293OsQBbbWcmS34-qIi4-1" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="-1260" y="382"/>
@@ -365,27 +563,27 @@
                         <mxPoint x="-1310" y="530" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="293OsQBbbWcmS34-qIi4-21" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="293OsQBbbWcmS34-qIi4-20">
+                <mxCell id="293OsQBbbWcmS34-qIi4-21" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="293OsQBbbWcmS34-qIi4-20" vertex="1" connectable="0">
                     <mxGeometry x="0.0177" y="-2" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-22">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1565" y="70" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="293OsQBbbWcmS34-qIi4-23" value="binds to,&lt;br&gt;invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" target="293OsQBbbWcmS34-qIi4-18">
+                <mxCell id="293OsQBbbWcmS34-qIi4-23" value="binds to,&lt;br&gt;invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="293OsQBbbWcmS34-qIi4-1" target="293OsQBbbWcmS34-qIi4-18" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1430" y="500" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-24">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1570" y="502" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="293OsQBbbWcmS34-qIi4-28" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-24" target="293OsQBbbWcmS34-qIi4-22">
+                <mxCell id="293OsQBbbWcmS34-qIi4-28" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" parent="293OsQBbbWcmS34-qIi4-1" source="293OsQBbbWcmS34-qIi4-24" target="293OsQBbbWcmS34-qIi4-22" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1420" y="302" as="sourcePoint"/>
                         <mxPoint x="-1420" y="220.00000000000006" as="targetPoint"/>
@@ -395,26 +593,26 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="293OsQBbbWcmS34-qIi4-29" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="293OsQBbbWcmS34-qIi4-28">
+                <mxCell id="293OsQBbbWcmS34-qIi4-29" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="293OsQBbbWcmS34-qIi4-28" vertex="1" connectable="0">
                     <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="kOv3a6BpkoPm77_4ioXi-5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="kOv3a6BpkoPm77_4ioXi-2">
+                <mxCell id="kOv3a6BpkoPm77_4ioXi-5" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="293OsQBbbWcmS34-qIi4-1" source="kOv3a6BpkoPm77_4ioXi-2" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1440" y="900" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="kOv3a6BpkoPm77_4ioXi-10" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="293OsQBbbWcmS34-qIi4-1" source="kOv3a6BpkoPm77_4ioXi-2" target="293OsQBbbWcmS34-qIi4-24">
+                <mxCell id="kOv3a6BpkoPm77_4ioXi-10" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="293OsQBbbWcmS34-qIi4-1" source="kOv3a6BpkoPm77_4ioXi-2" target="293OsQBbbWcmS34-qIi4-24" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <object placeholders="1" c4Type="ÆGIS Substrate" c4Container="Container " c4Technology="ÆGIS WebSwitch, NATS, Kafka, etc" c4Description="Service Mesh client/server" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="kOv3a6BpkoPm77_4ioXi-2">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1560" y="690" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="293OsQBbbWcmS34-qIi4-12">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="293OsQBbbWcmS34-qIi4-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="293OsQBbbWcmS34-qIi4-1" vertex="1">
                         <mxGeometry x="-1570" y="272" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
@@ -422,36 +620,36 @@
         </mxGraphModel>
     </diagram>
     <diagram id="10aUSzvnxTdDbNSpX-zc" name="GANTRY">
-        <mxGraphModel dx="2543" dy="565" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2720" dy="1027" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="enWEEhmoHNX8pK1gdTGj-0"/>
                 <mxCell id="enWEEhmoHNX8pK1gdTGj-1" parent="enWEEhmoHNX8pK1gdTGj-0"/>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-2">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1236" y="252" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-3">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1226" y="262" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-4">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1216" y="272" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-5" value="deploys,&lt;br&gt;hosts" style="edgeStyle=none;html=1;exitX=0.533;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-8" target="enWEEhmoHNX8pK1gdTGj-4">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-5" value="deploys,&lt;br&gt;hosts" style="edgeStyle=none;html=1;exitX=0.533;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-8" target="enWEEhmoHNX8pK1gdTGj-4" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1124" y="530" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-6" value="streams" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-8" target="enWEEhmoHNX8pK1gdTGj-17">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-6" value="streams" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-8" target="enWEEhmoHNX8pK1gdTGj-17" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-950" y="572" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-7" value="deploys,&amp;nbsp;&lt;br&gt;binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-8" target="enWEEhmoHNX8pK1gdTGj-29">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-7" value="deploys,&amp;nbsp;&lt;br&gt;binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-8" target="enWEEhmoHNX8pK1gdTGj-29" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="-1280" y="582"/>
@@ -460,11 +658,11 @@
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Federation Host" c4Type="Container" c4Technology="e.g. SpringBoot, ElasticSearch, etc." c4Description="Description of container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-8">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1244" y="522" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-9" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" target="enWEEhmoHNX8pK1gdTGj-4" source="enWEEhmoHNX8pK1gdTGj-17">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-9" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-17" target="enWEEhmoHNX8pK1gdTGj-4" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-830" y="512" as="sourcePoint"/>
                         <Array as="points">
@@ -473,32 +671,32 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-10" value="source for" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="enWEEhmoHNX8pK1gdTGj-9">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-10" value="source for" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="enWEEhmoHNX8pK1gdTGj-9" vertex="1" connectable="0">
                     <mxGeometry x="-0.4849" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Gantry" c4Type="SystemScopeBoundary" c4Application="Federation Server" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;[%c4Application%]&lt;/div&gt;" Description="Federated app server instance" id="enWEEhmoHNX8pK1gdTGj-11">
-                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1600" y="242" width="620" height="470" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-12">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1570" y="272" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-13">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1560" y="282" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-14">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1560" y="282" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-15" value="invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.91;exitY=-0.033;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-28">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-15" value="invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.91;exitY=-0.033;exitDx=0;exitDy=0;exitPerimeter=0;" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-28" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1230" y="356" as="targetPoint"/>
                         <Array as="points">
@@ -507,25 +705,25 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-24" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.418;entryY=1.053;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.439;exitY=0.006;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-16" target="enWEEhmoHNX8pK1gdTGj-36">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-24" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.418;entryY=1.053;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.439;exitY=0.006;exitDx=0;exitDy=0;exitPerimeter=0;" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-16" target="enWEEhmoHNX8pK1gdTGj-36" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-32" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="enWEEhmoHNX8pK1gdTGj-24">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-32" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="enWEEhmoHNX8pK1gdTGj-24" vertex="1" connectable="0">
                     <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-16">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1550" y="292" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-17">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1244" y="760" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-18" style="html=1;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-18" style="html=1;edgeStyle=orthogonalEdgeStyle;" parent="enWEEhmoHNX8pK1gdTGj-1" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="-1260" y="382"/>
@@ -535,42 +733,42 @@
                         <mxPoint x="-1310" y="530" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-19" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="enWEEhmoHNX8pK1gdTGj-18">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-19" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="enWEEhmoHNX8pK1gdTGj-18" vertex="1" connectable="0">
                     <mxGeometry x="0.0177" y="-2" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-20">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1565" y="70" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-31" value="binds to,&lt;br&gt;invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" target="enWEEhmoHNX8pK1gdTGj-16">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-31" value="binds to,&lt;br&gt;invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="enWEEhmoHNX8pK1gdTGj-1" target="enWEEhmoHNX8pK1gdTGj-16" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1430" y="500" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-26">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1570" y="502" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-27">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1560" y="512" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-28">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1560" y="512" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-29">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1550" y="522" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-33" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-26" target="enWEEhmoHNX8pK1gdTGj-20">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-33" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" parent="enWEEhmoHNX8pK1gdTGj-1" source="enWEEhmoHNX8pK1gdTGj-26" target="enWEEhmoHNX8pK1gdTGj-20" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1420" y="302" as="sourcePoint"/>
                         <mxPoint x="-1420" y="220.00000000000006" as="targetPoint"/>
@@ -580,234 +778,41 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="enWEEhmoHNX8pK1gdTGj-34" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="enWEEhmoHNX8pK1gdTGj-33">
+                <mxCell id="enWEEhmoHNX8pK1gdTGj-34" value="integrates,&lt;br&gt;abstracts" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="enWEEhmoHNX8pK1gdTGj-33" vertex="1" connectable="0">
                     <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-35">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1555" y="80" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-36">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1545" y="90" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-37">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1234" y="770" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-39">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1234" y="770" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="enWEEhmoHNX8pK1gdTGj-40">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="enWEEhmoHNX8pK1gdTGj-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="enWEEhmoHNX8pK1gdTGj-1" vertex="1">
                         <mxGeometry x="-1224" y="780" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
             </root>
         </mxGraphModel>
     </diagram>
-    <diagram name="aiot" id="C57_Dr-gr5Sgo95vxOue">
-        <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
-            <root>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-0"/>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-1" parent="yZtqZgkybrvEYegP9EMW-0"/>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-2" value="" style="whiteSpace=wrap;html=1;fillColor=#E6E6E6;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="40" y="210" width="590" height="610" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-3" value="&lt;p&gt;&lt;span style=&quot;font-size: 12px ; font-weight: normal&quot;&gt;Async I/O using QUIC protocol handles real time data streams&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;CPU-intensive workloads, like AI inference, run on dedicated threads as WebAssembly modules that are AoT-compiled to native&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="58" y="259" width="212" height="120" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-4" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;labelBackgroundColor=#33FFFF;fontSize=12;strokeColor=#FFFFFF;strokeWidth=1;fillColor=default;size=80;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="120" y="670" width="470" height="120" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-5" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;labelBackgroundColor=#33FFFF;fontSize=12;strokeColor=#FFFFFF;strokeWidth=1;fillColor=default;size=80;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="120" y="613" width="470" height="127" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-6" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;labelBackgroundColor=#33FFFF;fontSize=12;strokeColor=#FFFFFF;strokeWidth=1;fillColor=default;size=80;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="120" y="560" width="470" height="125" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-7" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="279" y="348.75" width="151" height="81.25" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-8" value="LiveStream" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="196" y="544" width="90" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-9" value="ComputerVision" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="417.5" y="544" width="90" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-10" value="&lt;b&gt;&lt;font style=&quot;font-size: 14px&quot;&gt;CPU-bound&lt;/font&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="498.5" y="443.94" width="91.5" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-11" value="Thread Pool" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="213.25" y="546" width="55.5" height="26" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-12" value="Thread Pool" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="433.25" y="544" width="60" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-13" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-19" target="yZtqZgkybrvEYegP9EMW-40" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="420" y="463" as="sourcePoint"/>
-                        <Array as="points">
-                            <mxPoint x="458" y="454"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-15" value="Main Thread" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="376" y="355" width="60" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-19" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=5.93352148056033;rotation=-90;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="402" y="421.31" width="30.5" height="65.69" as="geometry"/>
-                </mxCell>
-                <mxCell id="KcKZiUSEn5o6-_HKCoM8-11" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-21" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="370" y="429" as="targetPoint"/>
-                        <Array as="points">
-                            <mxPoint x="370" y="454"/>
-                            <mxPoint x="370" y="429"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-21" value="Message&lt;br&gt;Channel" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="392" y="441" width="59" height="28" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-22" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=12;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="319" y="360" width="60" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-23" value="HTTP&lt;br&gt;Server" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="325" y="382" width="60" height="24" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-24" value="" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="285" y="230" width="120" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-25" value="" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;endArrow=none;endFill=0;" parent="yZtqZgkybrvEYegP9EMW-1" target="yZtqZgkybrvEYegP9EMW-24" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="345" y="360" as="sourcePoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-26" value="HTTP / WS" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yZtqZgkybrvEYegP9EMW-25" vertex="1" connectable="0">
-                    <mxGeometry x="0.343" y="-3" relative="1" as="geometry">
-                        <mxPoint y="1" as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-27" value="CCTV&lt;br&gt;WebRTC&lt;br&gt;NDI" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="124.5" y="360" width="120" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-28" value="" style="group;glass=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1" connectable="0">
-                    <mxGeometry x="299" y="540" width="100" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-29" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" parent="yZtqZgkybrvEYegP9EMW-28" vertex="1">
-                    <mxGeometry width="80" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-30" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" parent="yZtqZgkybrvEYegP9EMW-28" vertex="1">
-                    <mxGeometry x="10" y="10" width="80" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-31" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;shadow=0;" parent="yZtqZgkybrvEYegP9EMW-28" vertex="1">
-                    <mxGeometry x="20" y="20" width="80" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-32" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=60;entryDy=0;entryPerimeter=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-40" target="yZtqZgkybrvEYegP9EMW-29" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-33" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-34" target="yZtqZgkybrvEYegP9EMW-31" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-34" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="176" y="480" width="117" height="58" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-35" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="226" y="484" width="60" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-36" value="QUIC&lt;br&gt;Server" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="246.5" y="512.5" width="30" height="5" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-37" value="&lt;span style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;I/O-bound&lt;/b&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="96" y="443.94" width="80" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-38" value="" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;endArrow=none;endFill=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-35" target="yZtqZgkybrvEYegP9EMW-27" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="190" y="554" as="sourcePoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-39" value="QUIC&amp;nbsp;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yZtqZgkybrvEYegP9EMW-38" vertex="1" connectable="0">
-                    <mxGeometry x="0.0383" y="3" relative="1" as="geometry">
-                        <mxPoint x="4" y="-4" as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-40" value="e" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="399" y="479" width="117" height="58" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-41" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="407" y="485" width="60" height="48" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-42" value="Worker Thread" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="169" y="505" width="60" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-44" value="Wasm &lt;br&gt;Module" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="438" y="505" width="9" height="20" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-45" value="Node.js, v8, WasmEdge" style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="200" y="640" width="390" height="43" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-46" value="&lt;h1&gt;Designed for AIoT&lt;/h1&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="58" y="224" width="235" height="36" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-47" value="seL4 Kernel, Linux, MacOS, Windows, OpenHarmony, iOS, Android, Browser" style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="200" y="695" width="390" height="45" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-48" value="Cloud, On-Prem, Frontend, Backend, Edge, Mobile, Embedded / IoT" style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="200" y="750" width="390" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-61" value="Worker Thread" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="462" y="503.5" width="60" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-43" value="Shared Memory" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="314.5" y="600" width="110" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="KcKZiUSEn5o6-_HKCoM8-6" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=5.93352148056033;rotation=-90;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="276.5" y="421.31" width="30.5" height="65.69" as="geometry"/>
-                </mxCell>
-                <mxCell id="KcKZiUSEn5o6-_HKCoM8-7" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.391;entryY=1.016;entryDx=0;entryDy=0;entryPerimeter=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-20" target="yZtqZgkybrvEYegP9EMW-7" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="340" y="430" as="targetPoint"/>
-                        <Array as="points">
-                            <mxPoint x="338" y="452"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="KcKZiUSEn5o6-_HKCoM8-10" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0;entryDx=25;entryDy=0;entryPerimeter=0;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-20" target="yZtqZgkybrvEYegP9EMW-35" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="251" y="452"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-20" value="Message&lt;br&gt;Channel" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="266" y="439" width="60" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="KcKZiUSEn5o6-_HKCoM8-12" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" source="yZtqZgkybrvEYegP9EMW-7" target="yZtqZgkybrvEYegP9EMW-30" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="349" y="470"/>
-                            <mxPoint x="349" y="470"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="KcKZiUSEn5o6-_HKCoM8-14" value="Readonly" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="KcKZiUSEn5o6-_HKCoM8-12" vertex="1" connectable="0">
-                    <mxGeometry x="0.1556" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
     <diagram name="Copy of aiot" id="yJj1XUXcazomdC_tBfNG">
-        <mxGraphModel dx="1003" dy="339" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+        <mxGraphModel dx="835" dy="840" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
             <root>
                 <mxCell id="AuSbvBtrGsZNzhbvUUVo-0"/>
                 <mxCell id="AuSbvBtrGsZNzhbvUUVo-1" parent="AuSbvBtrGsZNzhbvUUVo-0"/>
@@ -1004,7 +1009,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="qr28_eZ3ZXFbfzW0-tDH" name="logo">
-        <mxGraphModel dx="1003" dy="339" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="459" dy="462" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="XiFiY8d14CUnxNZEIxho-0"/>
                 <mxCell id="XiFiY8d14CUnxNZEIxho-1" parent="XiFiY8d14CUnxNZEIxho-0"/>
@@ -1015,7 +1020,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="9OvleWoG_n5-Iy7mdOHa" name="logo ideas">
-        <mxGraphModel dx="1853" dy="339" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1768" dy="924" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="h_ngC8WSSTxwbMSJ3hNI-0"/>
                 <mxCell id="h_ngC8WSSTxwbMSJ3hNI-1" parent="h_ngC8WSSTxwbMSJ3hNI-0"/>
@@ -1155,7 +1160,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="_Z8jxQ0VX7EyFw_JwXuR" name="errata">
-        <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2312" dy="616" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="qMq4osNZtV3V3CkjHfBm-0"/>
                 <mxCell id="qMq4osNZtV3V3CkjHfBm-1" parent="qMq4osNZtV3V3CkjHfBm-0"/>
@@ -2112,29 +2117,29 @@
                     <mxGeometry x="985.7850000000001" y="915.935" width="105.03" height="108.54" as="geometry"/>
                 </mxCell>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-1">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1366" y="182" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-2">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1356" y="192" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-3">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1346" y="202" width="200" height="170" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-9" value="deploys,&lt;br&gt;hosts" style="edgeStyle=none;html=1;" edge="1" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-8" target="FkDA2_dnmqs8zSHV_brH-3">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-9" value="deploys,&lt;br&gt;hosts" style="edgeStyle=none;html=1;" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-8" target="FkDA2_dnmqs8zSHV_brH-3" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-12" value="imports" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-8" target="FkDA2_dnmqs8zSHV_brH-23">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-12" value="imports" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-8" target="FkDA2_dnmqs8zSHV_brH-23" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1070" y="502" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-18" value="deploys,&amp;nbsp;&lt;br&gt;binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-8" target="FkDA2_dnmqs8zSHV_brH-22">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-18" value="deploys,&amp;nbsp;&lt;br&gt;binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-8" target="FkDA2_dnmqs8zSHV_brH-22" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="-1390" y="502"/>
@@ -2143,11 +2148,11 @@
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Federation Host" c4Type="Container" c4Technology="e.g. SpringBoot, ElasticSearch, etc." c4Description="Description of container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-8">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1364" y="452" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-14" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="qMq4osNZtV3V3CkjHfBm-1" target="FkDA2_dnmqs8zSHV_brH-3">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-14" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="qMq4osNZtV3V3CkjHfBm-1" target="FkDA2_dnmqs8zSHV_brH-3" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-949.9999999999998" y="442" as="sourcePoint"/>
                         <Array as="points">
@@ -2155,32 +2160,32 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-15" value="source for" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="FkDA2_dnmqs8zSHV_brH-14">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-15" value="source for" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="FkDA2_dnmqs8zSHV_brH-14" vertex="1" connectable="0">
                     <mxGeometry x="-0.4849" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="System name" c4Type="SystemScopeBoundary" c4Application="Software System" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;[%c4Application%]&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-11">
-                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1690" y="172" width="590" height="470" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-13">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1680" y="432" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-19">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1670" y="442" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-21">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1670" y="442" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-24" value="invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-22">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-24" value="invokes" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-22" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1360" y="287" as="targetPoint"/>
                         <Array as="points">
@@ -2189,29 +2194,29 @@
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-22">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1660" y="452" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
                 <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-23">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1070" y="452" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-26" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.78;entryY=-0.028;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.084;exitY=0.705;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-3" target="FkDA2_dnmqs8zSHV_brH-22">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-26" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.78;entryY=-0.028;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.084;exitY=0.705;exitDx=0;exitDy=0;exitPerimeter=0;" parent="qMq4osNZtV3V3CkjHfBm-1" source="FkDA2_dnmqs8zSHV_brH-3" target="FkDA2_dnmqs8zSHV_brH-22" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="-1473" y="322"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="FkDA2_dnmqs8zSHV_brH-27" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="FkDA2_dnmqs8zSHV_brH-26">
+                <mxCell id="FkDA2_dnmqs8zSHV_brH-27" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="FkDA2_dnmqs8zSHV_brH-26" vertex="1" connectable="0">
                     <mxGeometry x="0.0177" y="-2" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="FkDA2_dnmqs8zSHV_brH-28">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" vertex="1" parent="qMq4osNZtV3V3CkjHfBm-1">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="qMq4osNZtV3V3CkjHfBm-1" vertex="1">
                         <mxGeometry x="-1690" y="30" width="240" height="120" as="geometry"/>
                     </mxCell>
                 </object>

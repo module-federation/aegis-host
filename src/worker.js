@@ -50,8 +50,10 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire events from main
+    //eventPort.onmessage = async msgEvent => broker.notify('from_main', msgEvent)
     eventPort.onmessage = async msgEvent =>
-      broker.notify('from_main', msgEvent)
+      broker.notify(msgEvent.data.eventName, msgEvent.data)
+
     // forward events to main
     broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
@@ -76,6 +78,7 @@ remoteEntries.then(remotes => {
         if (typeof service[message.name] === 'function') {
           // invoke the use case function
           const result = await service[message.name](message.data)
+
           // serialize `result` to get rid of any functions
           parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
           // The "event port" is transfered
