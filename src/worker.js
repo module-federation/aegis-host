@@ -11,7 +11,7 @@ const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const overrides = { find, save, StorageService }
-const modelName = workerData.modelName?.toUpperCase()
+const modelName = workerData.modelName.toUpperCase()
 
 if (!modelName) {
   console.error('no modelName specified!')
@@ -50,7 +50,6 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire events from main
-    //eventPort.onmessage = async msgEvent => broker.notify('from_main', msgEvent)
     eventPort.onmessage = async msgEvent =>
       broker.notify(msgEvent.data.eventName, msgEvent.data)
 
@@ -76,20 +75,22 @@ remoteEntries.then(remotes => {
       parentPort.on('message', async message => {
         // Look for a use case function called `message.name`
         if (typeof service[message.name] === 'function') {
-          // invoke the use case function
-          const result = await service[message.name](message.data)
-
-          // serialize `result` to get rid of any functions
-          parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
+          try {
+            // invoke the use case function
+            const result = await service[message.name](message.data)
+            // serialize `result` to get rid of any functions
+            parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
+          } catch (error) {
+            console.error('worker:', error)
+          }
           // The "event port" is transfered
         } else if (message.eventPort instanceof MessagePort) {
           // send/recv events to/from main thread
           connectEventChannel(message.eventPort)
         } else {
-          const errMsg = 'not a service function'
-          console.warn(errMsg, message)
+          console.warn('not a service function', message)
           // main is expecting a response
-          parentPort.postMessage({ errMsg, message })
+          parentPort.postMessage({ error: 'not a function', message })
         }
       })
     })

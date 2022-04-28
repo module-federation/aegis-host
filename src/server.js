@@ -276,7 +276,7 @@ exports.start = async function (app) {
         process.send({ cmd: 'reload-reset' })
         res.send('reload status reset...try again')
       })
-      app.use(hotReloadPath, async function (_req, res) {
+      app.use(hotReloadPath, function (_req, res) {
         res.send('<h1>starting cluster reload</h1>')
         process.send({ cmd: 'reload' })
       })
