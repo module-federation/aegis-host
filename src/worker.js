@@ -10,7 +10,7 @@ const { StorageAdapter } = adapters
 const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
-const overrides = { find, save, StorageService }
+const overrides = { find, save, ...StorageService }
 const modelName = workerData.modelName.toUpperCase()
 
 if (!modelName) {
