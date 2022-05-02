@@ -62,22 +62,17 @@
   "author": "Tyson Midboe",
   "license": "MIT",
   "dependencies": {
-    "@assemblyscript/loader": "^0.19.12",
     "@module-federation/aegis": "^1.0.8-beta",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
-    "assemblyscript": "^0.19.12",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
     "import-fresh": "^3.3.0",
     "jwks-rsa": "^2.0.1",
     "log-timestamp": "^0.3.0",
-    "mongodb": "^3.6.6",
     "nanoid": "^3.1.20",
-    "nats": "^2.2.0",
     "regenerator-runtime": "^0.13.7",
-    "sharedmap": "^1.2.0",
     "ws": "^8.2.0"
   },
   "devDependencies": {
