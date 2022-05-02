@@ -60,7 +60,7 @@
     "aws-setup": "npm install && (cross-var aws s3api get-bucket-location --bucket $npm_package_config_s3BucketName --region $npm_package_config_region || npm run create-bucket) && npm run package-deploy"
   },
   "author": "Tyson Midboe",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@module-federation/aegis": "^1.0.8-beta",
     "@octokit/core": "^3.4.0",
