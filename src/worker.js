@@ -47,14 +47,15 @@ async function init (remotes) {
  *
  * The event channel has no synchronous response like the main channel. Don't confuse
  * the event loop and async functions, which support concurrency, with the transaction
- * context. The client receives a synchronous response.
+ * context. The client receives a synchronous response from the main channel.
  *
  * The event channel can kick off work that sends events back to main (e.g. destined
- * for the service mesh). Therefore, waiting for an event to complete could result
- * in a deadlock. For this reason, unlike the main channel, we do not await a downstream
- * response. We do however use the pool's thread managment algorithm to select an idle
- * thread initially. But we release it immediately by responding back the main thread
- * and let the event loop sort out the execution.
+ * for the service mesh). Therefore, with shared memory waiting for an event to complete
+ * could result in a deadlock. For this reason, unlike the main channel, we do not await
+ * a downstream response. We do however use the pool's thread managment algorithm to select
+ * an idle thread initially. But we release it immediately because we fire and forget the event.
+ * This gives us the best blend of workload scheduling, maximizing load balance while avoiding
+ * worker event loop blocking and shared resource deadlocks.
  *
  * @param {MessagePort} eventPort
  */
@@ -62,9 +63,9 @@ function connectEventChannel (eventPort) {
   try {
     // fire events from main
     eventPort.onmessage = async msgEvent => {
-      // don't wait for the task to complete
+      // don't `await` the task
+      console.debug({ fn: 'eventPort.onmessage', data: msgEvent.data })
       broker.notify(msgEvent.data.eventName, msgEvent.data)
-      eventPort.postMessage({ msg: 'continue' })
     }
 
     // forward events to main
