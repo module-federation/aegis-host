@@ -32,7 +32,9 @@ const remoteEntries = remote.aegis
  */
 async function init (remotes) {
   try {
+    // import federated modules
     await importRemotes(remotes, overrides)
+    // instantiate inbound ports (aka use cases)
     return UseCaseService(modelName)
   } catch (error) {
     console.error({ fn: init.name, error })
@@ -47,15 +49,13 @@ async function init (remotes) {
  *
  * The event channel has no synchronous response like the main channel. Don't confuse
  * the event loop and async functions, which support concurrency, with the transaction
- * context. The client receives a synchronous response from the main channel.
+ * context. The client receives a synchronous response from the main channel; not so here.
  *
- * The event channel can kick off work that sends events back to main (e.g. destined
- * for the service mesh). Therefore, with shared memory waiting for an event to complete
- * could result in a deadlock. For this reason, unlike the main channel, we do not await
- * a downstream response. We do however use the pool's thread managment algorithm to select
- * an idle thread initially. But we release it immediately because we fire and forget the event.
- * This gives us the best blend of workload scheduling, maximizing load balance while avoiding
- * worker event loop blocking and shared resource deadlocks.
+ * If a synchronous event response is needed, use:
+ *
+ * ```js
+ * ThreadPool.run(jobName, jobData, { channel: EVENTCHANNEL })
+ * ```
  *
  * @param {MessagePort} eventPort
  */
@@ -64,7 +64,7 @@ function connectEventChannel (eventPort) {
     // fire events from main
     eventPort.onmessage = async msgEvent => {
       // don't `await` the task
-      console.debug({ fn: 'eventPort.onmessage', data: msgEvent.data })
+      console.debug({ fn: 'worker: eventPort.onmessage', data: msgEvent.data })
       broker.notify(msgEvent.data.eventName, msgEvent.data)
     }
 
@@ -79,7 +79,7 @@ function connectEventChannel (eventPort) {
 
 remoteEntries.then(remotes => {
   try {
-    init(remotes).then(async service => {
+    init(remotes).then(async domainPort => {
       console.info('aegis worker thread running')
       // load distributed cache and register its events
       await initCache().load()
@@ -89,10 +89,10 @@ remoteEntries.then(remotes => {
       // handle API requests from main
       parentPort.on('message', async message => {
         // Look for a use case function called `message.name`
-        if (typeof service[message.name] === 'function') {
+        if (typeof domainPort[message.name] === 'function') {
           try {
-            // invoke the use case function
-            const result = await service[message.name](message.data)
+            // invoke an inbound port (a.k.a use case function)
+            const result = await domainPort[message.name](message.data)
             // serialize `result` to get rid of any functions
             parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
           } catch (error) {
