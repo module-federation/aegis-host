@@ -30,7 +30,7 @@
         width: 100%;
         opacity: 0;
         transition: 0.3s ease;
-        background-color: black;
+        background-color: lightgrey;
       }
 
       .container:hover .overlay {
@@ -38,14 +38,16 @@
       }
 
       .icon {
-        color: white;
+        color: lightgray;
         font-size: 100px;
         position: absolute;
-        top: 50%;
-        left: 50%;
+        top: 127%;
+        left: -8%;
         transform: translate(-50%, -50%);
         -ms-transform: translate(-50%, -50%);
         text-align: center;
+        height: 100px;
+        width: 100px;
       }
 
       .fa-user:hover {
@@ -56,18 +58,12 @@
       }
     </style>
   </head>
-  <body background="black">
+  <body>
     <div class="container">
-      <img
-        src="https://aegis.module-federation.org/arch.png"
-        alt="arch aiot"
-        class="image"
-      />
+      <img src="arch.png" alt="architecture" class="image" />
       <div class="overlay">
-        <img
-          src="https://aegis.module-federation.org/c4-aegis.png"
-          class="image"
-        />
+        <img src="c4.png" alt="C4" class="image" />
+        <!-- <img src="logo.png" alt="logo" class="icon" /> -->
       </div>
     </div>
   </body>
