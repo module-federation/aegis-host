@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <style>
+      .container {
+        position: relative;
+        width: 60%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .image {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        width: 100%;
+        opacity: 0;
+        transition: 0.3s ease;
+        background-color: lightgrey;
+      }
+
+      .container:hover .overlay {
+        opacity: 1;
+      }
+
+      .icon {
+        color: lightgray;
+        font-size: 100px;
+        position: absolute;
+        top: 127%;
+        left: -8%;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        text-align: center;
+        height: 100px;
+        width: 100px;
+      }
+
+      .fa-user:hover {
+        color: #eee;
+      }
+      P {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="arch.png" alt="architecture" class="image" />
+      <div class="overlay">
+        <img src="c4.png" alt="C4" class="image" />
+        <!-- <img src="logo.png" alt="logo" class="icon" /> -->
+      </div>
+    </div>
+  </body>
+</html>
