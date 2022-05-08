@@ -20,6 +20,7 @@
   "adapters": {
     "desc": "adapter config",
     "cacheSize": 3000,
+    "enableFederatedQueries": false,
     "defaultDatasource": "DataSourceMemory",
     "datasources": {
       "DataSourceMemory": {
