@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="1.5" border="0">
     <diagram name="c4" id="8JoluLsr5rRwba4acvXE">
-        <mxGraphModel dx="2562" dy="643" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#E6E6E6" math="0" shadow="0">
+        <mxGraphModel dx="2217" dy="183" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#E6E6E6" math="0" shadow="0">
             <root>
                 <mxCell id="xVd8jDNDeQ8bvFG07IMr-0"/>
                 <mxCell id="xVd8jDNDeQ8bvFG07IMr-1" parent="xVd8jDNDeQ8bvFG07IMr-0"/>
@@ -240,7 +240,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="qr28_eZ3ZXFbfzW0-tDH" name="logo">
-        <mxGraphModel dx="791" dy="386" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1293" dy="458" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="XiFiY8d14CUnxNZEIxho-0"/>
                 <mxCell id="XiFiY8d14CUnxNZEIxho-1" parent="XiFiY8d14CUnxNZEIxho-0"/>
@@ -251,7 +251,7 @@
         </mxGraphModel>
     </diagram>
     <diagram name="AIOT" id="C57_Dr-gr5Sgo95vxOue">
-        <mxGraphModel dx="678" dy="311" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+        <mxGraphModel dx="517" dy="183" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
             <root>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-0"/>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-1" parent="yZtqZgkybrvEYegP9EMW-0"/>
@@ -446,7 +446,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="9OvleWoG_n5-Iy7mdOHa" name="logo ideas">
-        <mxGraphModel dx="1528" dy="311" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2143" dy="458" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="h_ngC8WSSTxwbMSJ3hNI-0"/>
                 <mxCell id="h_ngC8WSSTxwbMSJ3hNI-1" parent="h_ngC8WSSTxwbMSJ3hNI-0"/>
