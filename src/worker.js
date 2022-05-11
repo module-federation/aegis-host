@@ -69,9 +69,10 @@ function connectEventChannel (eventPort) {
     }
 
     // forward events to main
-    broker.on('to_main', event =>
+    broker.on('to_main', event => {
+      console.debug({ fn: 'worker:on:to_main', event })
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
-    )
+    })
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
