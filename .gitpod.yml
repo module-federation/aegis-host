@@ -10,8 +10,9 @@ github:
     addBadge: true
 tasks:
   - name: build & start host
-    init: yarn && yarn build
-    command: yarn start
+    before: yarn
+    init: yarn link @module-federation/aegis
+    command: yarn build 
     env:
       SERVERLESS: false
       CLUSTER_ENABLED: false
