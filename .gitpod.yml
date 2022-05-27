@@ -1,29 +1,29 @@
 
-github:
-  prebuilds:
-    master: true
-    branches: true
-    pullRequests: true
-    pullRequestsFromForks: true
-    addCheck: false
-    addComment: false
-    addBadge: true
+# aegis host and lib
+# multi-repo
+additionalRepositories:
+  - url: https://github.com/module-federation/aegis
+    checkoutLocation: aegis
+
 tasks:
-  - name: build & start host
-    before: yarn
-    init: yarn link @module-federation/aegis
-    command: yarn build 
-    env:
-      SERVERLESS: false
-      CLUSTER_ENABLED: false
-      AUTH_ENABLED: false
-      SSL_ENABLED: false
-      SSL_PORT: 4430
-      PORT: 8080
-ports:
-  - port: 8080
-    onOpen: open-preview
-  - port: 4430
-    onOpen: open-preview
-  - port: 5353 # multicast DNS
-    onOpen: ignore 
+  - name: lib
+    before: |
+      yarn
+    init: |
+      yarn build
+    command: |
+      yarn link
+
+  - name: host
+    before: |
+      cd ../aegis-host
+      yarn
+    init: |
+      yarn link @module-federation/aegis
+    command: |
+      # configure the frontend for CORS
+      yarn build
+
+workspaceLocation: aegis/aegis.code-workspace
+
+
