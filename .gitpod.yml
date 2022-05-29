@@ -1,29 +1,28 @@
+# # aegis host and lib
+# # multi-repo
+# additionalRepositories:
+#   - url: https://github.com/module-federation/aegis
+#     checkoutLocation: aegis
+#
+# tasks:
+#   - name: lib
+#     before: |
+#       yarn
+#     init: |
+#       yarn build
+#       ./mongo.sh
+#     command: |
+#       yarn link
+#
+#   - name: host
+#     before: |
+#       cd ../aegis-host
+#       yarn
+#     init: |
+#       yarn link @module-federation/aegis
+#     command: |
+#       yarn build
+#
+# workspaceLocation: aegis/aegis.code-workspace
 
-# aegis host and lib
-# multi-repo
-additionalRepositories:
-  - url: https://github.com/module-federation/aegis
-    checkoutLocation: aegis
-
-tasks:
-  - name: lib
-    before: |
-      yarn
-    init: |
-      yarn build
-    command: |
-      yarn link
-
-  - name: host
-    before: |
-      cd ../aegis-host
-      yarn
-    init: |
-      yarn link @module-federation/aegis
-    command: |
-      # configure the frontend for CORS
-      yarn build
-
-workspaceLocation: aegis/aegis.code-workspace
-
-
+mainConfiguration: https://github.com/briteliteimmersive/ocvibe-litehouse-federated
