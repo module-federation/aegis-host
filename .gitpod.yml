@@ -27,9 +27,4 @@ tasks:
     command: |
       yarn build
 
-  - name: app
-    init: |
-      cd ../aegis-app
-      yarn
-
 workspaceLocation: aegis-app/aegis-app.code-workspace
