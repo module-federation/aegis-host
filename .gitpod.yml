@@ -7,6 +7,7 @@ additionalRepositories:
 tasks:
   - name: lib
     before: |
+      yarn cache clean
       rm -rf yarn.lock
       yarn upgrade
       yarn
@@ -19,7 +20,8 @@ tasks:
   - name: host
     before: |
       cd ../aegis-host
-      m -rf yarn.lock
+      yarn cache clean
+      rm -rf yarn.lock
       yarn upgrade
       yarn
     init: |
