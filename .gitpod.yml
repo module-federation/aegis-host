@@ -3,7 +3,6 @@
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
     checkoutLocation: aegis
-  - url: https://github.com/module-federation/aegis-host
 
 tasks:
   - name: lib
