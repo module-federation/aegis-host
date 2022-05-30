@@ -7,6 +7,8 @@ additionalRepositories:
 tasks:
   - name: lib
     before: |
+      rm -rf yarn.lock
+      yarn upgrade
       yarn
     init: |
       yarn build
@@ -17,6 +19,8 @@ tasks:
   - name: host
     before: |
       cd ../aegis-host
+      m -rf yarn.lock
+      yarn upgrade
       yarn
     init: |
       yarn link @module-federation/aegis
