@@ -1,2 +1,32 @@
 
-mainConfiguration: https://github.com/briteliteimmersive/ocvibe-litehouse-federated
+# multi-repo
+additionalRepositories:
+  - url: https://github.com/module-federation/aegis
+    checkoutLocation: aegis
+  - url: https://github.com/module-federation/aegis-host
+
+tasks:
+  - name: lib
+    before: |
+      yarn
+    init: |
+      yarn build
+      yarn mongo
+    command: |
+      yarn link
+
+  - name: host
+    before: |
+      cd ../aegis-host
+      yarn
+    init: |
+      yarn link @module-federation/aegis
+    command: |
+      yarn build
+
+  - name: app
+    init: |
+      cd ../aegis-app
+      yarn
+
+workspaceLocation: aegis-app/aegis-app.code-workspace
