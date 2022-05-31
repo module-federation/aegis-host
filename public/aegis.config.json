@@ -21,7 +21,7 @@
     "desc": "adapter config",
     "cacheSize": 3000,
     "enableFederatedQueries": false,
-    "defaultDatasource": "DataSourceMemory",
+    "defaultDatasource": "DataSourceMongoDb",
     "datasources": {
       "DataSourceMemory": {
         "desc": "Non-persistent, in-memory storage",
@@ -48,6 +48,10 @@
       "DataSourceEtherium": {
         "desc": "blockchain storage based on solidity",
         "enabled": false
+      },
+      "DataSourceAppFabric": {
+        "desc": "Aegis ",
+        "enabled": false
       }
     }
   },
@@ -65,7 +69,7 @@
         "host": "aegis.module-federation.org",
         "port": 443,
         "protocol": "wss",
-        "isBackupSwitch": true,
+        "isBackupSwitch": false,
         "priority": 20,
         "weight": 40
       },

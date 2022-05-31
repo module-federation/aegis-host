@@ -153,6 +153,12 @@ const creditCard = customer.decrypt().creditCardNumber;
 
 Access to data and objects requires explicit permission, otherwise services cannot access one another’s code or data. Queries execute against an in-memory copy of the data. Datasources leverage this cache by extending the in-memory adapter.
 
+Note that the non-local cache or distributed cache is itself a storage option depending on the number of nodes in the service mesh and/or their attached storage. See the section on service mesh below.
+
+### A note about external services and the Aegis fabric. 
+When you deploy the same application model to multiple aegis instances, the application becomes a distributed application. If each application integrates with a different instance of a particular service, that service effectively becomes a single clustered instance. For example, deploying two Aegis instances that talk to two separate MongoDb instances, will cause the db instances to be synchronized.  
+
+### Data fabric (distributed object cache) vs custom adapter
 It's important to note that this automtatic persistence feature, while providing fairly sophisticated extensibility in and of itself, does not limit you from creating your own solution using ports and adapters, which more demanding use cases might call for; rather, it is merely an optional convenience that should prove effective in many common scenarios, saving you from boilerplate code. However, when writing a custom adapter, to be consistent with the design of the framework, local caching and object-relational APIs should be used to make your data available to the distributed cache (or data fabric), which supports performant, federated data access, as well as transparent integration.
 
 ---
@@ -240,7 +246,7 @@ CLUSTER_ENABLED=true
 
 ### Serverless
 
-Alternatively, Aegis can run as a serverless function. It's rated for AWS. Support can be extended to other platforms and vendors by writing a message parser that simply amaps the input and output to request and response objects, indicating the HTTP method. See /adapters/serverless/parsers
+Alternatively, Aegis can run as a serverless function. It's rated for AWS. Support can be extended to other platforms and vendors by writing a message parser that simply maps the input and output to request and response objects, indicating the HTTP method. See /adapters/serverless/parsers
 
 ### Authorization
 

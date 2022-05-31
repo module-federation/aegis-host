@@ -7,7 +7,7 @@ const fetchRemotes = require('./webpack/fetch-remotes')
 let remoteEntries = require('./webpack/remote-entries')
 
 const server = env => {
-  processEnv(env)
+  handleEnv(env)
   return new Promise(resolve => {
     fetchRemotes(remoteEntries).then(remotes => {
       console.info(remotes)
@@ -25,7 +25,7 @@ const server = env => {
           filename: '[name].js'
         },
         resolve: {
-          extensions: ['.js', '.mjs']
+          extensions: ['.js', '.mjs', '.cjs', '.jsx']
         },
         module: {
           rules: [
@@ -65,20 +65,12 @@ const server = env => {
   })
 }
 
-function processEnv (env) {
+function handleEnv (env) {
   console.log(env)
   if (env.serverless) {
     remoteEntries.forEach(e => (e.path = 'webpack'))
     console.log(chalk.yellow('serverless build'))
   }
-  if (env.order)
-    remoteEntries = remoteEntries.filter(re =>
-      ['master', 'wasm', 'cache'].includes(re.branch)
-    )
-  if (env.customer)
-    remoteEntries = remoteEntries.filter(re =>
-      ['customer', 'wasm', 'cache'].includes(re.branch)
-    )
 }
 
 module.exports = [server]
