@@ -17,7 +17,6 @@
     "url": "https://github.com/module-federation/aegis-host"
   },
   "scripts": {
-    "postinstall": "[ -s ~/.aegis ] || (echo \". ~/.aegis\" >> ~/.zshrc && echo \". ~/.aegis\" >> ~/.bashrc && yarn cmd-log && yarn cmd-tail && yarn cmd-status && yarn cmd-start && yarn cmd-stop && echo \"/workspace/aegis-host/status.sh\" >> ~/.aegis && yarn cmd-env)",
     "transpile": "babel src/worker.js -d dist",
     "prebuild": "yarn clean && yarn transpile",
     "build": "yarn prebuild && webpack --config webpack.config.js",
