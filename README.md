@@ -1,13 +1,11 @@
   [![aegis](https://user-images.githubusercontent.com/38910830/128654405-93098731-3c31-4f52-bda0-efe95d77c5fe.png)](https://blog.federated-microservices.com)
 
+
+
+
 # ÆGIS <sub><sup>formerly _microlib_</sup></sub>
 
-N.B. This is the host - see the library [here](https://github.com/module-federation/aegis).
-
-| Repo         | Edit with GitPod   | Edit with VSCode  |
-| -------------| -------------------|-------------------|
-Host    | [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis-host) | [![Open Aegis Host in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis-host)|
-| Library | [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) | [![Open Aegis Libraru in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/module-federation/aegis)|
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) 
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 

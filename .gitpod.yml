@@ -7,26 +7,20 @@ additionalRepositories:
 tasks:
   - name: lib
     before: |
-      yarn cache clean
-      rm -rf yarn.lock
-      yarn upgrade
-      yarn
+      npm install
     init: |
-      yarn build
-      yarn mongo
+      npm run build
     command: |
-      yarn link
+      npm link
+      npm run mongo
 
   - name: host
     before: |
       cd ../aegis-host
-      yarn cache clean
-      rm -rf yarn.lock
-      yarn upgrade
-      yarn
+      npm install
     init: |
-      yarn link @module-federation/aegis
+      npm link @module-federation/aegis
     command: |
-      yarn build
+      npm run build
 
 workspaceLocation: aegis-app/aegis-app.code-workspace
