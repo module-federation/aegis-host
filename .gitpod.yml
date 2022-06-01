@@ -9,9 +9,9 @@ tasks:
     before: |
       npm install
     init: |
+      npm link
       npm run build
     command: |
-      npm link
       npm run mongo
 
   - name: host
@@ -19,8 +19,8 @@ tasks:
       cd ../aegis-host
       npm install
     init: |
-      npm link @module-federation/aegis
+      npm link "@module-federation/aegis"
     command: |
       npm run build
 
-workspaceLocation: aegis-app/aegis-app.code-workspace
+workspaceLocation: aegis/aegis-acode-workspace
