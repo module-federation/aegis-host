@@ -306,7 +306,7 @@ To import your own models, update the `webpack/remote-entries.js` to point to yo
 
 [![ref arch](https://img.youtube.com/vi/6GJYX9cmk2Q/maxresdefault.jpg)](https://youtu.be/6GJYX9cmk2Q)
 
-aegis prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the Aegis serverless function, which is the only function adapted to the vendor's platform. From that point on, Aegis handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
+Aegis prevents vendor lock-in by providing a layer of abstraction on top of vendor serverless frameworks. A vendors API gateway simply proxies requests to the Aegis serverless function, which is the only function adapted to the vendor's platform. From that point on, Aegis handles the "deployment" of functions as federated modules. Developers don't even need to know what cloud is hosting their software!
 
 ## Further Reading
 
