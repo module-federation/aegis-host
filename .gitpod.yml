@@ -1,10 +1,13 @@
 
 # multi-repo
-# additionalRepositories:
-#   - url: https://github.com/module-federation/aegis
-#     checkoutLocation: aegis
+additionalRepositories:
+  - url: https://github.com/module-federation/aegis
+    checkoutLocation: aegis
 
 tasks:
+  - name: mongo
+    init: ../aegis/mongo.sh
+
   - name: lib
     before: npm install
     init: npm run build
@@ -14,11 +17,8 @@ tasks:
     before: cd ../aegis-host && npm install
     init: npm link @module-federation/aegis
     command: npm run build
-  
-  - name: mongo
-    init: ../aegis/mongo.sh
 
   - name: start
-    command: sleep 2 && yarn start
+    command: sleep 3 && ./stop-build.sh && yarn start
 
 
