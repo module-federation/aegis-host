@@ -15,6 +15,6 @@ tasks:
 
   - name: host
     before: cd ../aegis-host && npm install
-    init: npm run build
+    init: npm link "@module-federation/aegis" && npm run build
     command: npm start 
 
