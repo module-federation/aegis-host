@@ -15,10 +15,6 @@ tasks:
 
   - name: host
     before: cd ../aegis-host && npm install
-    init: npm link @module-federation/aegis
-    command: npm run build
-
-  - name: start
-    command: sleep 3 && ./stop-build.sh && yarn start
-
+    init: npm run build
+    command: npm start 
 

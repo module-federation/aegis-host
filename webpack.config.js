@@ -8,13 +8,14 @@ let remoteEntries = require('./webpack/remote-entries')
 
 const server = env => {
   handleEnv(env)
+  exitAfterBuild()
   return new Promise(resolve => {
     fetchRemotes(remoteEntries).then(remotes => {
       console.info(remotes)
       resolve({
         externals: [nodeExternals(), 'mongodb-client-encryption'],
         target: 'async-node',
-        stats: 'verbose',
+        //stats: 'verbose',
         mode: 'development',
         devtool: 'hidden-source-map',
         entry: path.resolve(__dirname, 'src/bootstrap.js'),
@@ -71,6 +72,10 @@ function handleEnv (env) {
     remoteEntries.forEach(e => (e.path = 'webpack'))
     console.log(chalk.yellow('serverless build'))
   }
+}
+
+function exitAfterBuild () {
+  setTimeout(() => process.exit(0), 10000)
 }
 
 module.exports = [server]
