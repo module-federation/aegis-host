@@ -6,7 +6,7 @@ additionalRepositories:
 
 tasks:
   - name: mongo
-    init: ../aegis/mongo.sh
+    init: nohup ../aegis/mongo.sh > mongo.out &
 
   - name: lib
     before: npm install
