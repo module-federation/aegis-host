@@ -6,15 +6,15 @@ additionalRepositories:
 
 tasks:
   - name: mongodb
-    init: nohup ../aegis/mongo.sh 2>&1 mongo.out &
+    command: ../aegis/mongo.sh
 
   - name: aegis
     before: npm install
     init: npm run build
-    command: npm link
 
   - name: aegis-host
-    before: cd ../aegis-host && npm install
-    init: npm link "@module-federation/aegis" && npm run build
-    command: npm start 
+    init: cd ../aegis-host && npm install
+    command: |
+      npm link "@module-federation/aegis" 
+      npm run build
 
