@@ -6,7 +6,7 @@ additionalRepositories:
   
 tasks:
   - name: mongodb
-    command: ../aegis/mongo.sh
+    command: mongo.sh
 
   - name: aegis
     before: npm install
