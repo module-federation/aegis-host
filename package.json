@@ -66,7 +66,7 @@
   "author": "Tyson Midboe",
   "license": "Apache-2.0",
   "dependencies": {
-    "@module-federation/aegis": "^1.0.8-beta",
+    "@module-federation/aegis": "^1.0.9-beta",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.2",
     "dotenv": "^8.2.0",

@@ -17,4 +17,5 @@ tasks:
     command: |
       npm link "@module-federation/aegis" 
       npm run build
+      npm start
 
