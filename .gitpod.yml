@@ -19,4 +19,4 @@ tasks:
       npm run build
       npm start
 
-workspaceLocation: aegis-app
+workspaceLocation: aegis
