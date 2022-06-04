@@ -3,6 +3,8 @@
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
     checkoutLocation: aegis
+  - url: https://github.com/module-federation/aegis-app
+    checkoutLocation: aegis-app
 
 tasks:
   - name: mongodb
@@ -12,6 +14,10 @@ tasks:
     before: npm install
     init: npm run build
 
+  - name: aegis-app
+    before: cd ../aegis-app && npm install
+    init: npm run build
+
   - name: aegis-host
     init: cd ../aegis-host && npm install
     command: |
@@ -19,3 +25,4 @@ tasks:
       npm run build
       npm start
 
+workspaceLocation: aegis-app
