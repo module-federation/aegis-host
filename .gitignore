@@ -47,11 +47,10 @@ cert/certificate.pem
 cert/privatekey.pem
 cert/.prev
 aegis.pid
-webpack/api-github-com-80*
 public/.well-known/acme-challenge/*
 install.log
 public/hexanimation.gif
 public/mockup.png
 public/mockup1.png
 public/mockup3.png
-webpack/remote-entries/*
+webpack/remote-entries/*.js
