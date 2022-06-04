@@ -1,0 +1,1 @@
+This directory contains remote-entry configuration files
