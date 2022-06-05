@@ -1,6 +1,8 @@
   [![aegis](https://user-images.githubusercontent.com/38910830/128654405-93098731-3c31-4f52-bda0-efe95d77c5fe.png)](https://blog.federated-microservices.com)
 
+The ÆGIS federation host runs, deploys, and integrates federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run on the same host instance while remaining independently deployable, allowing organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect. Services can just as easily be distributed across the aegis service mesh, which can extend from datacenter to the edge and beyond. In either case, the development experience is the same. Component integration and deployment is transparent. Developers focus on domain logic and write code that is valid regardless of deployment topology.
 
+This is a federated application host based on the   based on the ÆGIS federat
 
 
 # ÆGIS <sub><sup>formerly _microlib_</sup></sub>
