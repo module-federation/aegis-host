@@ -1502,10 +1502,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@module-federation/aegis@^1.0.8-beta":
-  version "1.0.8-beta"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.0.8-beta.tgz#85a5ac9143fb29cb6b2df797d9aef729b335c319"
-  integrity sha512-jFdXLbkGoqYL+TZ1Hqw6y0o8lJw+769oi9LaaBjbSb+9l9RwPmKsNjdOhP6HjRLv5I7X6yRfgHuQ/+t77pdTVQ==
+"@module-federation/aegis@^1.0.9-beta":
+  version "1.0.9-beta"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.0.9-beta.tgz#1a54af73544de46616a2fb71b468b887d68a74ce"
+  integrity sha512-asdm5gMHyXBlbmPVEqNVyjiy3sq+it/eq9f/TdQWq3CK47b+xVyJs2bP8EE1bPeyh0XBAiqtTiWunf/o+Kt6+A==
   dependencies:
     "@assemblyscript/loader" "0.19.22"
     "@octokit/core" "3.5.1"
@@ -4815,7 +4815,7 @@ express-cli@0.0.1:
   resolved "https://registry.npmjs.org/express-cli/-/express-cli-0.0.1.tgz"
   integrity sha1-S4BTz0bqW3ilDsiSShdPnI78pS8=
 
-express-jwt@6.1.0, express-jwt@^6.0.0:
+express-jwt@6.1.0:
   version "6.1.0"
   resolved "https://registry.npmjs.org/express-jwt/-/express-jwt-6.1.0.tgz"
   integrity sha512-mmSR52Ps1FMeGwchroHzEJONWhsobd5KHVVKBffYiUEpZh9iK9wI9ZWkmzY5ROwWQtJLNGHV/VUMLh2M208s4Q==
@@ -7384,7 +7384,7 @@ jwa@^1.4.1:
     ecdsa-sig-formatter "1.0.11"
     safe-buffer "^5.0.1"
 
-jwks-rsa@2.0.5, jwks-rsa@^2.0.1:
+jwks-rsa@2.0.5:
   version "2.0.5"
   resolved "https://registry.npmjs.org/jwks-rsa/-/jwks-rsa-2.0.5.tgz"
   integrity sha512-fliHfsiBRzEU0nXzSvwnh0hynzGB0WihF+CinKbSRlaqRxbqqKf2xbBPgwc8mzf18/WgwlG8e5eTpfSTBcU4DQ==

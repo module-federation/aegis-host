@@ -10,7 +10,7 @@ tasks:
 
   - name: aegis
     before: npm install
-    init: npm run build
+    init: npm run build && npm link
 
   - name: aegis-host
     init: cd ../aegis-host && npm install
