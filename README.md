@@ -3,7 +3,9 @@
 
 # ÆGIS <sub><sup>formerly _microlib_</sup></sub>
 
-The ÆGIS federation host runs, deploys, and integrates federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run on the same host instance while remaining independently deployable, allowing organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect. Services can just as easily be distributed across the aegis service mesh, which can extend from datacenter to the edge and beyond. In either case, the development experience is the same. Component integration and deployment is transparent. Developers focus on domain logic and write code that is valid regardless of deployment topology. 
+The ÆGIS federation host deploys, runs, and integrates federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run together on the same host instance while remaining independently deployable, allowing organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect. Services can just as easily be distributed across the aegis service mesh, which can extend from datacenter to the edge and beyond. In either case, the development experience is the same. Component integration and deployment is transparent, so developers focus on domain logic and write code that is valid regardless of deployment topology. 
+
+This repo contains the host code. The aegiso
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) 
 
