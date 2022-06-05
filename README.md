@@ -5,7 +5,7 @@
 
 The ÆGIS federation host deploys, runs, and integrates federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run together on the same host instance while remaining independently deployable, allowing organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect. Services can just as easily be distributed across the aegis service mesh, which can extend from datacenter to the edge and beyond. In either case, the development experience is the same. Component integration and deployment is transparent, so developers focus on domain logic and write code that is valid regardless of deployment topology. 
 
-This repo contains the host code. The library can be found [here](github.com/module-federation/aegis).
+This repo contains the host code. The library can be found [here](https://github.com/module-federation/aegis).
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) 
 
@@ -64,7 +64,7 @@ With Aegis, then, you get the best of both worlds. You are no longer forced to c
 
 ## Features
 
-The goal of Aegis is to provide an alternative to distributed systems and the performance and operational challenges that come with them, while preserving the benefits of deployment independence. To this end, Aegis organizes components according to hexagonal architecture, such that the boundaries of, and relations between, federated components are clear and useful.
+One of the main goals of Aegis is to provide an alternative to distributed systems and the performance and operational challenges that come with them, while preserving the benefits of deployment independence. To this end, Aegis organizes components according to hexagonal architecture, such that the boundaries of, and relations between, federated components are clear and useful.
 
 In addtion to zero-install, hot deployment and local eventing, aegis promotes strong boundaries between, and prevents coupling of, collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
 
