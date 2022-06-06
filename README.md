@@ -7,7 +7,7 @@ The ÆGIS federation host deploys, runs, and integrates federated application co
 
 This repo contains the host code. The library can be found [here](https://github.com/module-federation/aegis).
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/briteliteimmersive/aegis) 
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
