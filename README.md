@@ -72,7 +72,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Deployment independence without distribution
 - Language independence without distribution
 - Self-deployment (_no deployment automation required!_)
-- Run on: any compute primitive: vm, container, serverless, microprocessor
+- Run on: any compute primitive: vm, container, raspberry pi...
 - Run as: single process, cluster, or serverless function
 - Containerless, secure, near-native performance using WebAssembly
 - Zero downtime, zero storage, zero installation runtime (using code streaming)
