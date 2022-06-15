@@ -3,7 +3,7 @@
 
 # ÆGIS <sub><sup>formerly _microlib_</sup></sub>
 
-The ÆGIS federation host deploys, runs, and integrates federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run together on the same host instance while remaining independently deployable, allowing organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect. Services can just as easily be distributed across the aegis service mesh, which can extend from datacenter to the edge and beyond. In either case, the development experience is the same. Component integration and deployment is transparent, so developers focus on domain logic and write code that is valid regardless of deployment topology. 
+The ÆGIS federation host deploys, runs, and integrates federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run together on the same host instance while remaining independently deployable. This allows organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect. Conversely, services can just as easily be distributed across the ÆGIS service mesh, which is designed to subsume the entire IT landscape, from microprocessor to microcontroller, datacenter to embedded. In either case, the development experience is the same. Because federated deployment always works the same way, regardless of vendor or compute primitive, developers don't even need to know where their code is deployed. Component deployment, integration and persistence is automated and transparent, so developers focus on domain logic and write code that is valid regardless of deployment topology. 
 
 This repo contains the host code. The library can be found [here](https://github.com/module-federation/aegis).
 
@@ -56,7 +56,7 @@ While technologies that support hot deployment have been around for some time (s
 
 Using module federation, it is possible to dynamically and efficiently import remote libraries, just as if they had been installed locally, with only a few, simple configuration steps. aegis exploits this technology to support a framework for building application components as independently deployable libraries, call them **microservice libraries**.
 
-Using webpack dependency graphs, code splitting and code streaming, Aegis supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration, promote composability and ensure components remain decoupled, aegis implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate, so intra- and interprocess communication is transparent. E.g. whether deployed locally to the same aegis host instance or remotely, its all the same to the module developer.
+Using webpack dependency graphs, code splitting and code streaming, Aegis supports hot deployment of federated modules, as well as any dependencies not present on the host, allowing development teams to deploy whenever they choose, without disrupting other components, and without having to coordinate with other teams. To simplify integration, promote composability and ensure components remain decoupled, aegis implements the port-adapter paradigm from hexagonal architecture to standardize the way modules communicate, so intra- and interprocess communication is transparent. I.e., whether deployed locally to the same aegis host instance or remotely, its all the same to the module developer.
 
 With Aegis, then, you get the best of both worlds. You are no longer forced to choose between manageability and autonomy. Rather, you avoid the microservices premium altogether by building truly modular and independently deployable component libraries that run together in the same process (or cluster of processes), in what you might call a _"polylith"_ - a monolith comprised of multiple (what would otherwise be) microservices.
 
@@ -72,7 +72,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 - Deployment independence without distribution
 - Language independence without distribution
 - Self-deployment (_no deployment automation required!_)
-- Run on: any compute primitive: vm, container, serverless, microprocessor
+- Run on: any compute primitive: vm, container, raspberry pi...
 - Run as: single process, cluster, or serverless function
 - Containerless, secure, near-native performance using WebAssembly
 - Zero downtime, zero storage, zero installation runtime (using code streaming)
