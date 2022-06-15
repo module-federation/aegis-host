@@ -18,3 +18,8 @@ tasks:
       npm link "@module-federation/aegis" 
       npm run build
       npm start
+      
+ports:
+  - port: 8080
+    visibility: public
+    onOpen: open-browser
