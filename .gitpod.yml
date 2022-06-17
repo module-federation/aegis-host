@@ -8,13 +8,12 @@ tasks:
     command: ../aegis/mongo.sh
 
   - name: aegis
-    before: yarn cache clean && yarn
+    before: yarn
     init: yarn build
 
   - name: aegis-host
     before: |
       cd ../aegis-host
-      yarn cache clean
       yarn
     init: yarn build
     command: |
