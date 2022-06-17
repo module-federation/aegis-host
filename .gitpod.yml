@@ -9,14 +9,14 @@ tasks:
 
   - name: aegis
     before: |
-      yarn --update-checksums
       yarn
+      gp sync-done yarninstall
     init: yarn build
 
   - name: aegis-host
     before: |
       cd ../aegis-host
-      yarn --update-checksums
+      gp async-await yarninstall
       yarn
     init: yarn build
     command: |
