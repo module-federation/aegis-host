@@ -30,7 +30,7 @@ tasks:
       cd ../aegis
       ./start.sh
 
-workspaceLocation: aegis/.vscode-workspace
+workspaceLocation: aegis-host/.vscode-workspace
 
 ports:
   - port: 8080
