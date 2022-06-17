@@ -11,17 +11,21 @@ tasks:
     init: |
       cd ../aegis  
       yarn
-    command: | 
-      yarn build
-      yarn link
-      gp sync-done start
+      gp sync-done install
       
+    command: | 
+      cd ../aegis
+      yarn build
+      gp sync-done build
+    
   - name: aegis-host
     init: |
       cd ../aegis-host
-      gp sync-await start
+      gp sync-await install
       yarn
     command: |
+      gp sync-await build
+      cd ../aegis-host
       yarn build
       cd ../aegis
       ./start.sh
