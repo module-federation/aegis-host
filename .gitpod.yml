@@ -2,6 +2,8 @@
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
     checkoutLocation: aegis
+additionalRepositories: 
+  - url: https://github.com/briteliteimmersive/aegis-app
 
 tasks:
   - name: mongodb
