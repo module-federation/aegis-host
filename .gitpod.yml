@@ -23,7 +23,12 @@ tasks:
       yarn
       yarn link @module-federation/aegis
     init: yarn build
-    command: yarn start
+    command: |
+      cd ../aegis
+      yarn link
+      cd ../aegis-host
+      yarn link @module-federation/aegis
+      yarn start
 
 ports:
   - port: 8080
