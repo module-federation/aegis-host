@@ -30,12 +30,12 @@ tasks:
       yarn build
       cd ../aegis
       ./start.sh
-     
- - name: aegis-app
-   command: |
-     gp sync-await build
-     cd ../aegis-app
-     yarn 
+
+  - name: aegis-host
+    command: |
+      gp sync-await build
+      cd ../aegis-app
+      yarn 
 
 workspaceLocation: aegis-host/.vscode-workspace
 
