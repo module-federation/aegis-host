@@ -1,25 +1,39 @@
-
 # multi-repo
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
     checkoutLocation: aegis
-  
+
 tasks:
   - name: mongodb
     command: ../aegis/mongo.sh
 
-  - name: aegis
-    before: npm install
-    init: npm run build && npm link
-
-  - name: aegis-host
-    init: cd ../aegis-host && npm install
-    command: |
-      npm link "@module-federation/aegis" 
-      npm run build
-      npm start
+  - name: aegis-lib
+    init: |
+      cd ../aegis  
+      yarn
+      gp sync-done install
       
+    command: | 
+      cd ../aegis
+      yarn build
+      gp sync-done build
+    
+  - name: aegis-host
+    init: |
+      cd ../aegis-host
+      gp sync-await install
+      yarn
+    command: |
+      gp sync-await build
+      cd ../aegis-host
+      yarn build
+      cd ../aegis
+      ./start.sh
+
+workspaceLocation: aegis-host/.vscode-workspace
+
 ports:
   - port: 8080
+    description: HTTP API
     visibility: public
-    onOpen: open-browser
+    onOpen: open-preview

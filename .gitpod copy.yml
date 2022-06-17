@@ -1,0 +1,30 @@
+# multi-repo
+additionalRepositories:
+  - url: https://github.com/module-federation/aegis
+    checkoutLocation: aegis
+
+tasks:
+  - name: mongodb
+    command: ../aegis/mongo.sh
+
+  - name: aegis
+    before: npm install
+    init: npm run build
+
+  - name: aegis-host
+    before: |
+      cd ../aegis-host
+      npm install
+    init: npm run build
+    command: |
+      cd ../aegis 
+      npm link
+      cd ../aegis-host
+      npm link "@module-federation/aegis" 
+      npm start
+
+ports:
+  - port: 8080
+    description: HTTP API
+    visibility: public
+    onOpen: open-preview

@@ -280,11 +280,7 @@
       return
     }
     const bar = new ProgressBar(fetchEvents)
-    const timerId = setTimeout(
-      async () =>
-        (await deployConditions(endpointModelName(model))) && bar.show(),
-      1000
-    )
+    const timerId = setTimeout(() => bar.show(), 1000)
     const response = await instrumentedFetch(getUrl(), {
       method: 'POST',
       body: document.getElementById('payload').value,
