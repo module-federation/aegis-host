@@ -25,10 +25,7 @@ tasks:
     init: yarn build
     command: |
       cd ../aegis
-      yarn link
-      cd ../aegis-host
-      yarn link @module-federation/aegis
-      yarn start
+      ./start.sh
 
 ports:
   - port: 8080
