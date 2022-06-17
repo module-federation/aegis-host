@@ -13,6 +13,7 @@ tasks:
       yarn
     init: | 
       yarn build
+      yarn link
       gp sync-done lib-yarn-install
 
   - name: aegis-host
@@ -20,8 +21,9 @@ tasks:
       cd ../aegis-host
       gp sync-await lib-yarn-install
       yarn
+      yarn link @module-federation/aegis
     init: yarn build
-    command: ../aegis/start.sh
+    command: yarn start
 
 ports:
   - port: 8080
