@@ -5,7 +5,6 @@
   "installConfig": {
     "pnp": false
   },
-  "main": "dist/main.js",
   "config": {
     "s3BucketName": "aegisserverless2",
     "region": "us-east-1",
@@ -21,6 +20,7 @@
     "prebuild": "yarn clean && yarn transpile",
     "build": "yarn prebuild && webpack --config webpack.config.js",
     "start": "node --trace-warnings --title aegis dist/main.js",
+    "demo": "open http://localhost",
     "stop": "PID=$(lsof -P -i | grep LISTEN | awk '{print $2}'); kill $PID",
     "restart": "yarn build && yarn start",
     "login-status": "echo \"/workspace/aegis-host/status.sh\" >> ~/.aegis && echo \". ~/.aegis\"",
@@ -44,7 +44,6 @@
     "clean": "rimraf dist",
     "test-mocha": "mocha --recursive -r esm",
     "test": "jest",
-    "demo": "open http://localhost",
     "demo-customer": "open http://localhost:8071",
     "demo-ssl": "open https://localhost:443",
     "demo-aws": "open https://aegis.module-federation.org",

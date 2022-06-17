@@ -5,13 +5,14 @@ const { domain, adapters, services } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
-const { importRemotes, UseCaseService, EventBrokerFactory } = domain
+const { importRemotes, EventBrokerFactory } = domain
+const DomainPorts = domain.UseCaseService
 const { StorageAdapter } = adapters
 const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const overrides = { find, save, ...StorageService }
-const modelName = workerData.modelName.toUpperCase()
+const modelName = workerData.poolName.toUpperCase()
 
 if (!modelName) {
   console.error('no modelName specified!')
@@ -34,8 +35,8 @@ async function init (remotes) {
   try {
     // import federated modules
     await importRemotes(remotes, overrides)
-    // instantiate inbound ports (aka use cases)
-    return UseCaseService(modelName)
+    // get the inbound ports for this domain model
+    return DomainPorts(modelName)
   } catch (error) {
     console.error({ fn: init.name, error })
   }
@@ -43,15 +44,27 @@ async function init (remotes) {
 
 /**
  * Create a subchannel between this thread and the main thread that is dedicated
- * to inter-thread and inter-host events; that is, locally generated and handled
- * events and events from the service mesh. Connect both ends of the channel to
- * the thread-local {@link broker} via pub & sub events.
+ * to events, both inter-thread (raised by one thread and handled by another) and
+ * inter-process (remotely generated and locally handled or vice versa). Inter-process
+ * events (event from another host instance) are transmitted over the service mesh.
+ * Custom user-defined events will also use this channel.
  *
- * The event channel has no synchronous response like the main channel. Don't confuse
- * the event loop and async functions, which support concurrency, with the transaction
- * context. The client receives a synchronous response from the main channel; not so here.
+ * Connect both ends of the channel to the thread-local {@link broker} via pub & sub events.
  *
- * If a synchronous event response is needed, use:
+ * Note that the event channel does not provide a "synchronous" response like the main channel.
+ * In the main channel, the caller receives a promise that resolves with the output of the job.
+ * This is what allows http clients to receive a response and complete a transaction in a single
+ * http session.
+ *
+ * (Don't confuse async function execution in the event loop with the overall
+ * transaction context, which starts when the server accepts a request and
+ * ends once its returned a response to that request. This is what is meant
+ * by "synchronous".
+ *
+ * If a synchronous response is needed for an event, which should be avoided,
+ * it can be done by calling the `ThreadPool.run` function andnspecifying the
+ * event channel (shown below). The event handler for this event must return
+ * a response to the main thread.
  *
  * ```js
  * ThreadPool.run(jobName, jobData, { channel: EVENTCHANNEL })
@@ -80,7 +93,7 @@ function connectEventChannel (eventPort) {
 
 remoteEntries.then(remotes => {
   try {
-    init(remotes).then(async domainPort => {
+    init(remotes).then(async domainPorts => {
       console.info('aegis worker thread running')
       // load distributed cache and register its events
       await initCache().load()
@@ -90,10 +103,10 @@ remoteEntries.then(remotes => {
       // handle API requests from main
       parentPort.on('message', async message => {
         // Look for a use case function called `message.name`
-        if (typeof domainPort[message.name] === 'function') {
+        if (typeof domainPorts[message.name] === 'function') {
           try {
             // invoke an inbound port (a.k.a use case function)
-            const result = await domainPort[message.name](message.data)
+            const result = await domainPorts[message.name](message.data)
             // serialize `result` to get rid of any functions
             parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
           } catch (error) {
@@ -104,7 +117,7 @@ remoteEntries.then(remotes => {
           // send/recv events to/from main thread
           connectEventChannel(message.eventPort)
         } else {
-          console.warn('not a service function', message)
+          console.warn('not a domain port', message)
           // main is expecting a response
           parentPort.postMessage({ error: 'not a function', message })
         }

@@ -1,9 +1,8 @@
-
 # multi-repo
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
     checkoutLocation: aegis
-  
+
 tasks:
   - name: mongodb
     command: ../aegis/mongo.sh
@@ -13,11 +12,11 @@ tasks:
     init: npm run build && npm link
 
   - name: aegis-host
-    before: cd ../aegis-host && npm install
-    init: |
+    init: cd ../aegis-host && npm install
+    command: |
       npm link "@module-federation/aegis" 
       npm run build
-    command: npm start
+      npm start
 
 ports:
   - port: 8080
