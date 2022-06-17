@@ -30,6 +30,8 @@ tasks:
       cd ../aegis
       ./start.sh
 
+workspaceLocation: ../aegis/.vscode-workspace
+
 ports:
   - port: 8080
     description: HTTP API
