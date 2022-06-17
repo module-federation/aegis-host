@@ -16,7 +16,7 @@ tasks:
   - name: aegis-host
     before: |
       cd ../aegis-host
-      gp async-await yarninstall
+      gp sync-await yarninstall
       yarn
     init: yarn build
     command: |
