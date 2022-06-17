@@ -8,23 +8,19 @@ tasks:
     command: ../aegis/mongo.sh
 
   - name: aegis
-    before: |
-      yarn
+    before: yarn
+    init: | 
+      yarn build
       gp sync-done yarninstall
-    init: yarn build
 
   - name: aegis-host
     before: |
       cd ../aegis-host
       gp sync-await yarninstall
+      yarn link "@module-federation/aegis" 
       yarn
     init: yarn build
-    command: |
-      cd ../aegis 
-      yarn link
-      cd ../aegis-host
-      yarn link "@module-federation/aegis" 
-      yarn start
+    command: yarn start
 
 ports:
   - port: 8080
