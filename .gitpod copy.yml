@@ -8,20 +8,20 @@ tasks:
     command: ../aegis/mongo.sh
 
   - name: aegis
-    before: yarn
-    init: yarn build
+    before: npm install
+    init: npm run build
 
   - name: aegis-host
     before: |
       cd ../aegis-host
-      yarn
-    init: yarn build
+      npm install
+    init: npm run build
     command: |
       cd ../aegis 
-      yarn link
+      npm link
       cd ../aegis-host
-      yarn link "@module-federation/aegis" 
-      yarn start
+      npm link "@module-federation/aegis" 
+      npm start
 
 ports:
   - port: 8080
