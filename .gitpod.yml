@@ -23,6 +23,7 @@ tasks:
       yarn
     command: |
       yarn build
+      cd ../aegis
       ./start.sh
 
 ports:
