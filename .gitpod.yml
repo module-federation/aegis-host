@@ -7,16 +7,18 @@ tasks:
   - name: mongodb
     command: ../aegis/mongo.sh
 
-  - name: aegis
-    before: yarn
+  - name: aegis-lib
+    before: |
+      cd ../aegis  
+      yarn
     init: | 
       yarn build
-      gp sync-done yarninstall
+      gp sync-done lib-yarn-install
 
   - name: aegis-host
     before: |
       cd ../aegis-host
-      gp sync-await yarninstall
+      gp sync-await lib-yarn-install
       yarn
     init: yarn build
     command: ../aegis/start.sh
