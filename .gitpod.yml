@@ -11,7 +11,7 @@ tasks:
     init: |
       cd ../aegis  
       yarn
-    common: | 
+    command: | 
       yarn build
       yarn link
       gp sync-done start
