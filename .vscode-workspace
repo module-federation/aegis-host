@@ -1,10 +1,13 @@
 {
-    "folders": [
-      {
-        "path": "../aegis"
-      },
-      {
-        "path": "../aegis-host"
-      }
-    ]
-  }
+  "folders": [
+    {
+      "path": "../aegis"
+    },
+    {
+      "path": "../aegis-host"
+    },
+    {
+      "path": "../aegis-app"
+    }
+  ]
+}
