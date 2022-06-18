@@ -31,7 +31,7 @@ tasks:
       cd ../aegis
       ./start.sh
 
-  - name: aegis-host
+  - name: aegis-app
     command: |
       gp sync-await build
       cd ../aegis-app
