@@ -1,8 +1,8 @@
 # multi-repo
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
-    checkoutLocation: aegis
-
+  - url: https://github.com/module-federation/aegis-app
+  
 tasks:
   - name: mongodb
     command: ../aegis/mongo.sh
@@ -29,6 +29,12 @@ tasks:
       yarn build
       cd ../aegis
       ./start.sh
+
+  - name: aegis-app
+    command: |
+      gp sync-await build
+      cd ../aegis-app
+      yarn 
 
 workspaceLocation: aegis-host/.vscode-workspace
 
