@@ -36,7 +36,7 @@ tasks:
       cd ../aegis-app
       yarn 
 
-workspaceLocation: aegis-host/.vscode-workspace
+workspaceLocation: aegis-host/aegis.code-workspace
 
 ports:
   - port: 8080
