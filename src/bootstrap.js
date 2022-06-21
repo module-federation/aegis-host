@@ -5,7 +5,6 @@ const importFresh = require('import-fresh')
 const express = require('express')
 const server = require('./server')
 const app = express()
-const isServerless = /true/i.test(process.env.SERVERLESS)
 
 function clearRoutes () {
   app._router.stack = app._router.stack.filter(
@@ -34,8 +33,7 @@ async function load (aegis = null) {
     })
 
     app.all('*', (req, res) => handle(req.path, req.method, req, res))
-    return handle
   })
 }
 
-load().then(handle => (isServerless ? handle : server.start(app)))
+load().then(() => server.start(app))
