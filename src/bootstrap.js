@@ -1,30 +1,41 @@
-'use strict'
+'use local'
 
-require('dotenv').config()
 require('regenerator-runtime')
+const importFresh = require('import-fresh')
 const express = require('express')
-const app = express()
-const aegis = require('@module-federation/aegis').aegis
 const server = require('./server')
-const remotes = require('../webpack/remote-entries')
-const adapters = require('@module-federation/aegis').adapters
+const app = express()
 const isServerless = /true/i.test(process.env.SERVERLESS)
-const ServerlessAdapter = adapters.ServerlessAdapter
 
-if (!isServerless) {
-  app.use(express.json())
-  app.use(express.static('public'))
-  aegis.init(remotes, app).then(() => server.start(app))
+function clearRoutes () {
+  app._router.stack = app._router.stack.filter(
+    k => !(k && k.route && k.route.path)
+  )
 }
 
-const adapter = isServerless
-  ? aegis
-      .init(remotes)
-      .then(aegis => ServerlessAdapter(aegis))
-      .then(adapter => adapter)
-  : (async (x = { handle: () => console.log('set env var SERVERLESS=true') }) =>
-      x)()
+async function load (aegis = null) {
+  if (aegis) {
+    aegis.dispose()
+    clearRoutes()
+  }
 
-exports.handleServerless = async function (...args) {
-  return adapter.then(async adapter => adapter.handle(...args))
+  const remote = importFresh('../dist/remoteEntry.js')
+  return remote.get('./hostContainer').then(async factory => {
+    const aegis = factory()
+    const remotes = (await remote.get('./remoteEntries'))()
+    const handle = await aegis.init(remotes)
+
+    app.use(express.json())
+    app.use(express.static('public'))
+
+    app.use('/reload', async (req, res) => {
+      await load(aegis)
+      res.send('<h1>reload complete</h1>')
+    })
+
+    app.all('*', (req, res) => handle(req.path, req.method, req, res))
+    return handle
+  })
 }
+
+load().then(handle => (isServerless ? handle : server.start(app)))

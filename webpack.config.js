@@ -18,7 +18,7 @@ const server = env => {
         //stats: 'verbose',
         mode: 'development',
         devtool: 'hidden-source-map',
-        entry: path.resolve(__dirname, 'src/bootstrap.js'),
+        entry: path.resolve(__dirname, 'src/noop.js'),
         output: {
           publicPath: `http://localhost`,
           path: path.resolve(__dirname, 'dist'),
@@ -31,32 +31,34 @@ const server = env => {
         module: {
           rules: [
             {
-              test: /\.js?$|\.mjs?$/,
-              exclude: /node_modules/,
-              use: {
-                loader: 'babel-loader',
-                options: {
-                  presets: ['@babel/preset-env']
-                }
-              }
+              test: /\.js?$/,
+              loader: 'babel-loader',
+              exclude: /node_modules/
             }
           ]
         },
+        // module: {
+        //   rules: [
+        //     {
+        //       test: /\.js?$|\.mjs?$/,
+        //       exclude: /node_modules/,
+        //       use: {
+        //         loader: 'babel-loader',
+        //         options: {
+        //           presets: ['@babel/preset-env']
+        //         }
+        //       }
+        //     }
+        //   ]
+        // },
         plugins: [
           new ModuleFederationPlugin({
-            name: 'aegis',
+            name: 'hostContainer',
             filename: 'remoteEntry.js',
-            library: {
-              name: 'aegis',
-              type: 'commonjs-module'
-            },
-            remoteType: 'commonjs-module',
+            library: { type: 'commonjs' },
             remotes,
             exposes: {
-              './server': './src/server',
-              './domain': '@module-federation/aegis/lib/domain',
-              './adapters': '@module-federation/aegis/lib/adapters',
-              './services': '@module-federation/aegis/lib/services',
+              './hostContainer': './src/host-container.js',
               './remoteEntries': './webpack/remote-entries'
             }
           })

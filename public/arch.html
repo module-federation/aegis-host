@@ -2,136 +2,69 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
     <style>
-      * {
-        box-sizing: border-box;
+      .container {
+        position: relative;
+        width: 60%;
+        margin-left: auto;
+        margin-right: auto;
       }
 
-      body {
-        background-color: dimgrey;
-        margin: 0;
-        font-family: Arial;
+      .image {
+        display: block;
+        width: 100%;
+        height: auto;
       }
 
-      /* The grid: Four equal columns that floats next to each other */
-      .column {
-        float: left;
-        width: 25%;
-        padding: 10px;
+      .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        width: 100%;
+        opacity: 0;
+        transition: 0.3s ease;
+        background-color: lightgrey;
       }
 
-      /* Style the images inside the grid */
-      .column img {
-        opacity: 0.8;
-        cursor: pointer;
-      }
-
-      .column img:hover {
+      .container:hover .overlay {
         opacity: 1;
       }
 
-      /* Clear floats after the columns */
-      .row:after {
-        content: "";
-        display: table;
-        clear: both;
-      }
-
-      /* The expanding image container */
-      .container {
-        position: relative;
-        display: none;
-      }
-
-      a:link {
-        color-scheme: dark;
-      }
-
-      /* Expanding image text */
-      #imgtext {
+      .icon {
+        color: lightgray;
+        font-size: 100px;
         position: absolute;
-        bottom: 15px;
-        left: 15px;
-        color: white;
-        font-size: 20px;
+        top: 127%;
+        left: -8%;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        text-align: center;
+        height: 100px;
+        width: 100px;
       }
 
-      /* Closable button inside the expanded image */
-      .closebtn {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        color: white;
-        font-size: 35px;
-        cursor: pointer;
+      .fa-user:hover {
+        color: #eee;
       }
-
-      h2 {
-        color: rgb(245, 245, 245);
-      }
-      p {
-        color: white;
+      P {
+        text-align: center;
       }
     </style>
   </head>
   <body>
-    <div style="text-align: center">
-      <h2>ÆGIS Architecture</h2>
-      <p>Click on the images below:</p>
-    </div>
-
-    <!-- The four columns -->
-    <div class="row">
-      <div class="column">
-        <img
-          src="arch.png"
-          alt="aiot"
-          style="width: 100%"
-          onclick="myFunction(this);"
-        />
-      </div>
-      <div class="column">
-        <img
-          src="c4.png"
-          alt="c4"
-          style="width: 100%"
-          onclick="myFunction(this);"
-        />
-      </div>
-      <div class="column">
-        <img
-          src="aegis-runtime.png"
-          alt="runtimes"
-          style="width: 100%"
-          onclick="myFunction(this);"
-        />
-      </div>
-      <div class="column">
-        <img
-          src="hexanimation-short.gif"
-          alt="sight bite"
-          style="width: 100%"
-          onclick="myFunction(this);"
-        />
-      </div>
-    </div>
-
     <div class="container">
-      <span onclick="this.parentElement.style.display='none'" class="closebtn"
-        >&times;</span
-      >
-      <img id="expandedImg" style="width: 100%" />
-      <div id="imgtext"></div>
+      <img src="arch.png" alt="architecture" class="image" />
+      <div class="overlay">
+        <img src="c4.png" alt="C4" class="image" />
+        <!-- <img src="logo.png" alt="logo" class="icon" /> -->
+      </div>
     </div>
-
-    <script>
-      function myFunction(imgs) {
-        var expandImg = document.getElementById("expandedImg");
-        var imgText = document.getElementById("imgtext");
-        expandImg.src = imgs.src;
-        imgText.innerHTML = imgs.alt;
-        expandImg.parentElement.style.display = "block";
-      }
-    </script>
   </body>
 </html>

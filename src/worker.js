@@ -22,9 +22,7 @@ if (!modelName) {
 /** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
 const broker = EventBrokerFactory.getInstance()
 
-const remoteEntries = remote.aegis
-  .get('./remoteEntries')
-  .then(factory => factory())
+const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
 
 /**
  * Import and bind remote modules: i.e models, adapters and services
