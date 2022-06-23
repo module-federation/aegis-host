@@ -249,7 +249,7 @@
     const response = await instrumentedFetch(
       `${modelApiPath}/reload?modelName=${modelName}`,
       {
-        method: 'PUT',
+        method: 'GET',
         headers: getHeaders()
       }
     )

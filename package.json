@@ -19,6 +19,7 @@
     "build": "yarn clean && webpack --config webpack.config.js",
     "start": "node --title aegis src/bootstrap.js",
     "demo": "open http://localhost",
+    "reload": "open http://localhost/reload",
     "stop": "PID=$(lsof -P -i | grep LISTEN | awk '{print $2}'); kill $PID",
     "restart": "yarn build && yarn start",
     "login-status": "echo \"/workspace/aegis-host/status.sh\" >> ~/.aegis && echo \". ~/.aegis\"",
@@ -45,7 +46,6 @@
     "demo-ssl": "open https://localhost:443",
     "demo-aws": "open https://aegis.module-federation.org",
     "refresh-token": "./accessToken.sh",
-    "hot-reload-reset": "curl http://localhost/Aegis/reload-reset",
     "serverless-deploy": "serverless deploy",
     "serverless-invoke-local-api-post": "serverless invoke local --function aegis --path ./test/lambda/apigateway-post.json",
     "serverless-invoke-local-api-getid": "serverless invoke local --function aegis --path ./test/lambda/apigateway-getid.json",
@@ -73,7 +73,6 @@
     "ws": "^8.8.0"
   },
   "devDependencies": {
-    "bundle-loader": "^0.5.6",
     "chalk": "^2.4.2",
     "cross-var": "^1.1.0",
     "esm": "^3.2.25",
