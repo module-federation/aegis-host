@@ -18,8 +18,8 @@ async function load (aegis = null) {
   }
 
   import('host/container').then(async aegis => {
-    //global.REMOTE_CONFIG = aegis,getConfig()
-    const handle = await aegis.init()
+    const models = await import('apps/models')
+    const handle = await aegis.init(models)
 
     app.use(express.json())
     app.use(express.static('public'))
