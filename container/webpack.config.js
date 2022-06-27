@@ -16,7 +16,6 @@ const NodeFederation = require('../node/streaming/NodeRuntime')
 const serverConfig = {
   externals: [nodeExternals(), 'mongodb-client-encryption'],
   target: false,
-  stats: 'verbose',
   mode: 'development',
   devtool: 'hidden-source-map',
   entry: path.resolve(__dirname, 'src/container.js'),
