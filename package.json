@@ -17,7 +17,8 @@
   },
   "scripts": {
     "build": "yarn clean && webpack --config webpack.config.js",
-    "start": "node --title aegis src/bootstrap.js",
+    "build:prod": "yarn clean && webpack --config webpack.config.js --mode production",
+    "start": "node --title aegis dist/main.js",
     "demo": "open http://localhost",
     "reload": "open http://localhost/reload",
     "stop": "PID=$(lsof -P -i | grep LISTEN | awk '{print $2}'); kill $PID",
@@ -63,6 +64,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.18.2",
     "@module-federation/aegis": "^1.1.9-beta",
     "babel-loader": "^8.2.2",
     "express": "^4.18.1",

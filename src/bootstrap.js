@@ -1,7 +1,6 @@
-'use local'
+'use strict'
 
 require('regenerator-runtime')
-const importFresh = require('import-fresh')
 const express = require('express')
 const server = require('./server')
 const app = express()
@@ -18,11 +17,9 @@ async function load (aegis = null) {
     clearRoutes()
   }
 
-  const remote = importFresh('../dist/remoteEntry.js')
-  return remote.get('./hostContainer').then(async factory => {
-    const aegis = factory()
-    const remotes = (await remote.get('./remoteEntries'))()
-    const handle = await aegis.init(remotes)
+  import('host/container').then(async aegis => {
+    //global.REMOTE_CONFIG = aegis,getConfig()
+    const handle = await aegis.init()
 
     app.use(express.json())
     app.use(express.static('public'))

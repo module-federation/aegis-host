@@ -1,0 +1,34 @@
+{
+  "name": "container",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "serve": "node server.js"
+  },
+  "dependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.18.2",
+    "@module-federation/aegis": "^1.1.9-beta",
+    "babel-loader": "^8.2.2",
+    "express": "^4.18.1",
+    "path-to-regexp": "^6.2.1",
+    "regenerator-runtime": "^0.13.9",
+    "require-fresh": "^1.1.0",
+    "webpack-node-externals": "^3.0.0",
+    "ws": "^8.8.0"
+  },
+  "devDependencies": {
+    "chalk": "^2.4.2",
+    "cross-var": "^1.1.0",
+    "esm": "^3.2.25",
+    "express-cli": "0.0.1",
+    "jest": "^27.0.6",
+    "mocha": "^8.2.0",
+    "rimraf": "^3.0.2",
+    "split": "^1.0.1",
+    "webpack": "5.47.1",
+    "webpack-cli": "^4.10.0"
+  }
+}

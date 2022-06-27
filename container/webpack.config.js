@@ -3,8 +3,8 @@ const path = require('path')
 const chalk = require('chalk')
 const nodeExternals = require('webpack-node-externals')
 
-const StreamingRuntime = require('./node/streaming/')
-const NodeFederation = require('./node/streaming/NodeRuntime')
+const StreamingRuntime = require('../node/streaming/')
+const NodeFederation = require('../node/streaming/NodeRuntime')
 
 // const server = env => {
 //   handleEnv(env)
@@ -16,12 +16,13 @@ const NodeFederation = require('./node/streaming/NodeRuntime')
 const serverConfig = {
   externals: [nodeExternals(), 'mongodb-client-encryption'],
   target: false,
+  stats: 'verbose',
   mode: 'development',
   devtool: 'hidden-source-map',
-  entry: path.resolve(__dirname, 'src/bootstrap.js'),
+  entry: path.resolve(__dirname, 'src/container.js'),
   output: {
     publicPath: `http://localhost`,
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'exposed'),
     libraryTarget: 'commonjs',
     filename: '[name].js'
   },
@@ -44,19 +45,17 @@ const serverConfig = {
   },
   plugins: [
     new StreamingRuntime({
-      name: 'aegis',
+      name: 'host',
       filename: 'remoteEntry.js',
-      remotes: {
-        host: 'host@http://localhost:3000/remoteEntry.js'
-        //apps: 'apps@http://localhost:3001/remoteEntry.js'
+      exposes: {
+        './container': './src/container.js'
       }
     }),
     new NodeFederation({
-      name: 'aegis',
+      name: 'host',
       filename: 'remoteEntry.js',
-      remotes: {
-        host: 'host@http://localhost:3000/remoteEntry.js'
-        //apps: 'apps@http://localhost:3001/remoteEntry.js'
+      exposes: {
+        './container': './src/container.js'
       }
     })
   ]
