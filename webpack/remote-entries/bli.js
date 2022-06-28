@@ -12,7 +12,7 @@ exports.bli = [
     repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
-    branch: 'bli',
+    branch: 'master',
     path: __dirname,
     type: 'model',
     importRemote: async () => import('bli/models')
@@ -23,7 +23,7 @@ exports.bli = [
     repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
-    branch: 'bli',
+    branch: 'master',
     path: __dirname,
     type: 'adapter',
     importRemote: async () => import('bli/adapters')
@@ -34,7 +34,7 @@ exports.bli = [
     repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
-    branch: 'bli',
+    branch: 'master',
     path: __dirname,
     type: 'service',
     importRemote: async () => import('bli/services')
