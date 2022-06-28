@@ -7,8 +7,8 @@ exports.customer = [
   {
     name: 'customer',
     url: 'https://api.github.com',
-    repo: 'briteliteimmersive',
-    owner: 'module-federation',
+    repo: 'customer',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
     path: __dirname,
@@ -18,8 +18,8 @@ exports.customer = [
   {
     name: 'adapters',
     url: 'https://api.github.com',
-    repo: 'briteliteimmersive',
-    owner: 'module-federation',
+    repo: 'customer',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
     path: __dirname,
@@ -29,8 +29,8 @@ exports.customer = [
   {
     name: 'services',
     url: 'https://api.github.com',
-    repo: 'briteliteimmersive',
-    owner: 'module-federation',
+    repo: 'customer',
+    owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
     path: __dirname,
