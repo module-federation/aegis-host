@@ -7,7 +7,7 @@ exports.customer = [
   {
     name: 'customer',
     url: 'https://api.github.com',
-    repo: 'customer',
+    repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
@@ -18,7 +18,7 @@ exports.customer = [
   {
     name: 'adapters',
     url: 'https://api.github.com',
-    repo: 'customer',
+    repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
@@ -29,7 +29,7 @@ exports.customer = [
   {
     name: 'services',
     url: 'https://api.github.com',
-    repo: 'customer',
+    repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'customer',
