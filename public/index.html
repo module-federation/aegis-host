@@ -1,279 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" href="aegis-logo.png" />
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-      crossorigin="anonymous"
-    />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="aegis-logo.png" />
 
-    <title>ÆGIS Domain Model API</title>
-  </head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
 
-  <body class="bg-dark">
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-      crossorigin="anonymous"
-    ></script>
+  <title>ÆGIS Domain Model API</title>
+</head>
 
-    <nav class="navbar navbar-dark bg-dark" aria-label="navbar">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <img src="aegis-logo.png" alt="aegis" width="65" height="65" />
-          <span
-            class="navbar-brand mb-0 text-warning h1 navbar-toggler"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarsExample01"
-            aria-controls="navbarsExample01"
-            aria-expanded="false"
-          >
-            <span class="text-warning"><b>ÆGIS</b></span>
-            <span class="text-white"> Domain Model API</span>
-          </span>
-        </a>
+<body class="bg-dark">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
 
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarsExample01"
-          aria-controls="navbarsExample01"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+  <nav class="navbar navbar-dark bg-dark" aria-label="navbar">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="aegis-logo.png" alt="aegis" width="65" height="65" />
+        <span class="navbar-brand mb-0 text-warning h1 navbar-toggler" data-bs-toggle="collapse"
+          data-bs-target="#navbarsExample01" aria-controls="navbarsExample01" aria-expanded="false">
+          <span class="text-warning"><b>ÆGIS</b></span>
+          <span class="text-white"> Domain Model API</span>
+        </span>
+      </a>
 
-        <div class="collapse navbar-collapse" id="navbarsExample01">
-          <ul class="navbar-nav me-auto mb-2">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="wsapp.html"
-                >Service Mesh</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                cccc
-                class="nav-link active"
-                aria-current="page"
-                href="aegis/api/config?details=threads&html=true"
-                >Thread Pools</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="aegis/api/config?html=true"
-                >Models</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="aegis.config.json"
-                >Config</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="aegis/api/config?details=data&html=true"
-                >Data</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="aegis/api/config?details=events&html=true"
-                >Events</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="aegis/api/config?details=ports&html=true"
-                >Ports</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="aegis/api/config?details=commands&html=true"
-                >Commands</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link active"
-                aria-current="page"
-                href="aegis/api/config?details=relations&html=true"
-                >Relations</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="aegis.log">
-                <span class="navbar-link text-light mb-0">Log</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                href="https://github.com/module-federation/aegis"
-                target="_blank"
-                rel="noopener"
-              >
-                <span class="navbar-link text-light mb-0">Source</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="arch.html">
-                <span class="navbar-link text-light mb-0">Architecture</span>
-              </a>
-            </li>
-          </ul>
-        </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
+        aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExample01">
+        <ul class="navbar-nav me-auto mb-2">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="wsapp.html">Service Mesh</a>
+          </li>
+          <li class="nav-item">
+            <a cccc class="nav-link active" aria-current="page" href="aegis/api/config?details=threads&html=true">Thread
+              Pools</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?html=true">Models</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis.config.json">Config</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=data&html=true">Data</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=events&html=true">Events</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/reload">Reload</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="aegis.log">
+              <span class="navbar-link text-light mb-0">Log</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/module-federation/aegis" target="_blank" rel="noopener">
+              <span class="navbar-link text-light mb-0">Source</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="arch.html">
+              <span class="navbar-link text-light mb-0">Architecture</span>
+            </a>
+          </li>
+        </ul>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <div class="container-fluid bg-dark">
-      <div class="row">
-        <div class="col-md-5">
-          <div class="progress collapse mb-3" id="progresscntrl">
-            <div
-              class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
-              role="progressbar"
-              aria-valuenow="10"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              style="width: 10%; color: black"
-              id="progressbar"
-            >
-              hot deployment running...
-            </div>
+  <div class="container-fluid bg-dark">
+    <div class="row">
+      <div class="col-md-5">
+        <div class="progress collapse mb-3" id="progresscntrl">
+          <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar"
+            aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 10%; color: black" id="progressbar">
+            hot deployment running...
           </div>
-          <div class="form-floating mb-3 input-group">
-            <input
-              class="form-control bg-dark text-white"
-              id="model"
-              list="modelList"
-              placeholder="Type to search..."
-            />
-            <label for="model" class="form-label text-white">Model</label>
-            <datalist id="modelList"></datalist>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="reloadModelButton"
-              title="Deploy the latest code."
-            >
-              Load
-            </button>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearModelButton"
-            >
-              Clear
-            </button>
-          </div>
+        </div>
+        <div class="form-floating mb-3 input-group">
+          <input class="form-control bg-dark text-white" id="model" list="modelList" placeholder="Type to search..." />
+          <label for="model" class="form-label text-white">Model</label>
+          <datalist id="modelList"></datalist>
+          <button class="btn btn-outline-light" type="button" id="reloadModelButton" title="Deploy the latest code.">
+            Load
+          </button>
+          <button class="btn btn-outline-light" type="button" id="clearModelButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3 input-group">
-            <input
-              class="form-control bg-dark text-white"
-              id="modelId"
-              placeholder="Model ID"
-            />
-            <label for="modelId" class="form-label text-white">Model ID</label>
-            <button class="btn btn-outline-light" type="button" id="copyButton">
-              Copy
-            </button>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearIdButton"
-            >
-              Clear
-            </button>
-          </div>
+        <div class="form-floating mb-3 input-group">
+          <input class="form-control bg-dark text-white" id="modelId" placeholder="Model ID" />
+          <label for="modelId" class="form-label text-white">Model ID</label>
+          <button class="btn btn-outline-light" type="button" id="copyButton">
+            Copy
+          </button>
+          <button class="btn btn-outline-light" type="button" id="clearIdButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3 input-group">
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              list="paramList"
-              id="parameter"
-              placeholder="approve"
-            />
-            <label for="parameter" class="form-label text-white"
-              >Parameter</label
-            >
-            <datalist id="paramList">
-              <option value="approve">Checkout</option>
-              <option value="cancel"></option>
-              <option value="serviceMeshNotify"></option>
-              <option value="serviceMeshListen"></option>
-            </datalist>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearParamButton"
-            >
-              Clear
-            </button>
-          </div>
+        <div class="form-floating mb-3 input-group">
+          <input type="text" class="form-control bg-dark text-white" list="paramList" id="parameter"
+            placeholder="approve" />
+          <label for="parameter" class="form-label text-white">Parameter</label>
+          <datalist id="paramList">
+            <option value="approve">Checkout</option>
+            <option value="cancel"></option>
+            <option value="serviceMeshNotify"></option>
+            <option value="serviceMeshListen"></option>
+          </datalist>
+          <button class="btn btn-outline-light" type="button" id="clearParamButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3 input-group">
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              list="queryList"
-              id="query"
-              placeholder="command=decrypt"
-            />
-            <label for="query" class="form-label text-white">Query</label>
-            <datalist id="queryList">
-              <option value="command=decrypt"></option>
-              <option value="command=runFibonacci"></option>
-              <option value="command=decrypt&html=true"></option>
-              <option value="html=true"></option>
-              <option value="relation=customer"></option>
-              <option value="relation=orders"></option>
-              <option value="relation=inventory"></option>
-              <option value="relation=customer&html=true"></option>
-              <option value="count=all"></option>
-              <option value="count=today"></option>
-              <option value="count=1"></option>
-              <option value="count=orderStatus:PENDING"></option>
-              <option value="orderStatus=PENDING"></option>
-            </datalist>
-            <button
-              class="btn btn-outline-light"
-              type="button"
-              id="clearQueryButton"
-            >
-              Clear
-            </button>
-          </div>
+        <div class="form-floating mb-3 input-group">
+          <input type="text" class="form-control bg-dark text-white" list="queryList" id="query"
+            placeholder="command=decrypt" />
+          <label for="query" class="form-label text-white">Query</label>
+          <datalist id="queryList">
+            <option value="command=decrypt"></option>
+            <option value="command=runFibonacci"></option>
+            <option value="command=decrypt&html=true"></option>
+            <option value="html=true"></option>
+            <option value="relation=customer"></option>
+            <option value="relation=orders"></option>
+            <option value="relation=inventory"></option>
+            <option value="relation=customer&html=true"></option>
+            <option value="count=all"></option>
+            <option value="count=today"></option>
+            <option value="count=1"></option>
+            <option value="count=orderStatus:PENDING"></option>
+            <option value="orderStatus=PENDING"></option>
+          </datalist>
+          <button class="btn btn-outline-light" type="button" id="clearQueryButton">
+            Clear
+          </button>
+        </div>
 
-          <div class="form-floating mb-3">
-            <textarea
-              class="form-control bg-dark text-white overflow-auto"
-              style="height: 150px; white-space: pre"
-              placeholder="{}"
-              id="payload"
-            >
+        <div class="form-floating mb-3">
+          <textarea class="form-control bg-dark text-white overflow-auto" style="height: 150px; white-space: pre"
+            placeholder="{}" id="payload">
             {
               "firstName":"Alan",
               "lastName":"Turing",
@@ -293,47 +170,40 @@
               "price":99.95,
               "quantity":2,
               "desc":"item description"
-            }</textarea
-            >
-            <label for="payload" class="text-white">Payload</label>
-          </div>
-
-          <div class="mb-sm-1">
-            <button id="post" class="btn btn-outline-light" title="post">
-              Post
-            </button>
-            <button id="patch" class="btn btn-outline-light" title="patch">
-              Patch
-            </button>
-            <button id="get" class="btn btn-outline-light" title="get">
-              Get
-            </button>
-            <button id="delete" class="btn btn-outline-light" title="delete">
-              Delete
-            </button>
-            <button id="clear" class="btn btn-outline-light" title="clear">
-              Clear
-            </button>
-          </div>
+            }</textarea>
+          <label for="payload" class="text-white">Payload</label>
         </div>
 
-        <div class="col-md-7">
-          <pre
-            id="url"
-            class="text-warning text-decoration-underline mb-3"
-          ></pre>
-          <pre
-            id="messages"
-            class="text-light mb-3 overflow-scroll"
-            style="height: 80vh"
-            hover="postion: relative; width: 700px; z-index: 99"
-          >
-          <code id="jsonCode"></code>
-        </pre>
+        <div class="mb-sm-1">
+          <button id="post" class="btn btn-outline-light" title="post">
+            Post
+          </button>
+          <button id="patch" class="btn btn-outline-light" title="patch">
+            Patch
+          </button>
+          <button id="get" class="btn btn-outline-light" title="get">
+            Get
+          </button>
+          <button id="delete" class="btn btn-outline-light" title="delete">
+            Delete
+          </button>
+          <button id="clear" class="btn btn-outline-light" title="clear">
+            Clear
+          </button>
         </div>
       </div>
-    </div>
 
-    <script src="app.js"></script>
-  </body>
+      <div class="col-md-7">
+        <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
+        <pre id="messages" class="text-light mb-3 overflow-scroll" style="height: 80vh"
+          hover="postion: relative; width: 700px; z-index: 99">
+          <code id="jsonCode"></code>
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
 </html>
