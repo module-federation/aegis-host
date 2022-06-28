@@ -15,7 +15,7 @@ exports.bli = [
     branch: 'bli',
     path: __dirname,
     type: 'model',
-    importRemote: async () => import('order/models')
+    importRemote: async () => import('bli/models')
   },
   {
     name: 'adapters',
@@ -26,7 +26,7 @@ exports.bli = [
     branch: 'bli',
     path: __dirname,
     type: 'adapter',
-    importRemote: async () => import('order/adapters')
+    importRemote: async () => import('bli/adapters')
   },
   {
     name: 'services',
@@ -37,6 +37,6 @@ exports.bli = [
     branch: 'bli',
     path: __dirname,
     type: 'service',
-    importRemote: async () => import('order/services')
+    importRemote: async () => import('bli/services')
   }
 ]
