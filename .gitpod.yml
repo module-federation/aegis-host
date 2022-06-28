@@ -1,3 +1,14 @@
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: false
+    addComment: false
+    addBadge: true
+    
 # multi-repo
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
