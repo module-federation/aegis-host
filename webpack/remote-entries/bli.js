@@ -7,7 +7,7 @@
 /** @type {entry[]} */
 exports.bli = [
   {
-    name: 'order',
+    name: 'bli',
     url: 'https://api.github.com',
     repo: 'aegis-app',
     owner: 'briteliteimmersive',
