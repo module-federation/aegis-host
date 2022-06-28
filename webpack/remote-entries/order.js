@@ -9,7 +9,7 @@ exports.order = [
   {
     name: 'order',
     url: 'https://api.github.com',
-    repo: 'aegis-application',
+    repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'order',
@@ -20,7 +20,7 @@ exports.order = [
   {
     name: 'adapters',
     url: 'https://api.github.com',
-    repo: 'aegis-application',
+    repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'order',
@@ -31,7 +31,7 @@ exports.order = [
   {
     name: 'services',
     url: 'https://api.github.com',
-    repo: 'aegis-application',
+    repo: 'aegis-app',
     owner: 'briteliteimmersive',
     filedir: 'dist',
     branch: 'order',
