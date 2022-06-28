@@ -3,8 +3,8 @@ const path = require('path')
 const chalk = require('chalk')
 const nodeExternals = require('webpack-node-externals')
 
-const StreamingRuntime = require('../node/streaming/')
-const NodeFederation = require('../node/streaming/NodeRuntime')
+const StreamingRuntime = require('../dist/node/streaming')
+const NodeFederation = require('../dist/node/streaming/NodeRuntime')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
 
 // const server = env => {
