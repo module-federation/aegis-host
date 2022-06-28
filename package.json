@@ -16,7 +16,7 @@
     "url": "https://github.com/module-federation/aegis-host"
   },
   "scripts": {
-    "build": "yarn clean && webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js",
     "build:prod": "yarn clean && webpack --config webpack.config.js --mode production",
     "start": "node --title aegis dist/main.js",
     "demo": "open http://localhost",

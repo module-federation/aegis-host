@@ -18,7 +18,16 @@ async function load (aegis = null) {
   }
 
   import('host/container').then(async aegis => {
-    const models = await import('apps/models')
+    // console.log({
+    //   REMOTE_CONFIG: global.REMOTE_CONFIG,
+    //   loadedRemotes: global.loadedRemotes
+    // })
+    global.REMOTE_CONFIG = {
+      ...global.REMOTE_CONFIG,
+      apps: 'apps@http://localhost:3001/remoteEntry.js'
+    }
+    console.log(global)
+
     const handle = await aegis.init(models)
 
     app.use(express.json())

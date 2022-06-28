@@ -5,6 +5,7 @@ const nodeExternals = require('webpack-node-externals')
 
 const StreamingRuntime = require('../node/streaming/')
 const NodeFederation = require('../node/streaming/NodeRuntime')
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
 
 // const server = env => {
 //   handleEnv(env)
@@ -14,15 +15,13 @@ const NodeFederation = require('../node/streaming/NodeRuntime')
 //       console.info(remotes)
 //       resolve({
 const serverConfig = {
-  externals: [nodeExternals(), 'mongodb-client-encryption'],
-  target: false,
+  target: 'async-node',
   mode: 'development',
-  devtool: 'hidden-source-map',
-  entry: path.resolve(__dirname, 'src/container.js'),
+  entry: './src/container.js',
   output: {
-    publicPath: `http://localhost`,
-    path: path.resolve(__dirname, 'exposed'),
-    libraryTarget: 'commonjs',
+    publicPath: 'http:/localhost:3000/',
+    path: path.join(process.cwd(), 'container', 'exposed'),
+    library: 'commonjs',
     filename: '[name].js'
   },
   resolve: {
@@ -46,6 +45,7 @@ const serverConfig = {
     new StreamingRuntime({
       name: 'host',
       filename: 'remoteEntry.js',
+      library: { type: 'commonjs' },
       exposes: {
         './container': './src/container.js'
       }
@@ -53,23 +53,12 @@ const serverConfig = {
     new NodeFederation({
       name: 'host',
       filename: 'remoteEntry.js',
+      library: { type: 'commonjs' },
       exposes: {
         './container': './src/container.js'
       }
     })
   ]
-}
-
-function handleEnv (env) {
-  console.log(env)
-  if (env.serverless) {
-    remoteEntries.forEach(e => (e.path = 'webpack'))
-    console.log(chalk.yellow('serverless build'))
-  }
-}
-
-function exitAfterBuild () {
-  setTimeout(() => process.exit(0), 10000)
 }
 
 module.exports = [serverConfig]

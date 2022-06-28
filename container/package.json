@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --config webpack.config.js --mode production",
+    "build": "webpack --config webpack.config.js",
     "serve": "node server.js"
   },
   "dependencies": {

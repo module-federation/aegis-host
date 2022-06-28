@@ -46,6 +46,7 @@ const serverConfig = {
     new StreamingRuntime({
       name: 'aegis',
       filename: 'remoteEntry.js',
+      library: { type: 'commonjs' },
       remotes: {
         host: 'host@http://localhost:3000/remoteEntry.js',
         apps: 'apps@http://localhost:3001/remoteEntry.js'
@@ -54,6 +55,7 @@ const serverConfig = {
     new NodeFederation({
       name: 'aegis',
       filename: 'remoteEntry.js',
+      library: { type: 'commonjs' },
       remotes: {
         host: 'host@http://localhost:3000/remoteEntry.js',
         apps: 'apps@http://localhost:3001/remoteEntry.js'
