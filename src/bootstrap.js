@@ -29,7 +29,7 @@ async function load (aegis = null) {
 
     app.use('/reload', async (req, res) => {
       await load(aegis)
-      res.send('<h1>reload complete</h1>')
+      res.send('<h1>reload complete</h1><a href="/">back</a>')
     })
 
     app.all('*', (req, res) => handle(req.path, req.method, req, res))
