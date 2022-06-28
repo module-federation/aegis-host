@@ -2,7 +2,7 @@ exports.cache = [
   {
     name: 'distributed-cache',
     url: 'https://api.github.com',
-    repo: 'aegis-application',
+    repo: 'briteliteimmersive',
     owner: 'module-federation',
     filedir: 'dist',
     branch: 'cache',
@@ -13,7 +13,7 @@ exports.cache = [
   {
     name: 'adapter-cache',
     url: 'https://api.github.com',
-    repo: 'aegis-application',
+    repo: 'briteliteimmersive',
     owner: 'module-federation',
     filedir: 'dist',
     branch: 'cache',
@@ -24,7 +24,7 @@ exports.cache = [
   {
     name: 'service-cache',
     url: 'https://api.github.com',
-    repo: 'aegis-application',
+    repo: 'briteliteimmersive',
     owner: 'module-federation',
     filedir: 'dist',
     branch: 'cache',
