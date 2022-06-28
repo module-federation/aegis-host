@@ -1,4 +1,5 @@
 exports.cache = require('./cache')
 exports.customer = require('./customer')
 exports.order = require('./order')
+exports.bli = require('./bli')
 exports.wasm = require('./wasm')
