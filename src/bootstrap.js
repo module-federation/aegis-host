@@ -1,4 +1,4 @@
-'use local'
+'use strict'
 
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
