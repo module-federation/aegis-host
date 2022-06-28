@@ -12,6 +12,14 @@ This repo contains the host code. The library can be found [here](https://github
 #### Open branch
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/bli-dev/aegis-host) 
 
+## Tutorials
+### Getting Started
+[![branchingvid](https://user-images.githubusercontent.com/38910830/176278835-1159996f-6383-45ac-a9fd-e6de608f8746.png)](https://drive.google.com/file/d/1CMWy25zT7sKWTbIUw6ftbk2DYcCcFdx_/view?usp=sharing)
+
+
+### Branching
+[![branchingvid](https://user-images.githubusercontent.com/38910830/176278420-442131c8-993d-4669-83a8-d0110f6be40f.png)](https://drive.google.com/file/d/1jrwqctZ95uVjhlNE8q2gUmebO6m_wvO5/view?usp=sharing)
+
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
 - loaded from multiple network locations and repositories at runtime;
