@@ -211,7 +211,7 @@ exports.start = async function (app) {
        * if {@link redirect} is true, redirect
        * all requests for http to https port
        */
-      app.all(function (req, res) {
+      app.use(function (req, res) {
         if (redirect && req.protocol === 'http:') {
           const redirectUrl = `https://${domain}:${sslPort}${req.url}`
           res.redirect(301, redirectUrl)

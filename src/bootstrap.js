@@ -1,5 +1,6 @@
 'use strict'
 
+require('dotenv').config()
 require('regenerator-runtime')
 const importFresh = require('import-fresh')
 const express = require('express')
