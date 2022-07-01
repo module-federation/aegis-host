@@ -1,4 +1,3 @@
-
 github:
   prebuilds:
     master: true
@@ -8,12 +7,12 @@ github:
     addCheck: false
     addComment: false
     addBadge: true
-    
+
 # multi-repo
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
   - url: https://github.com/briteliteimmersive/aegis-app
-  
+
 tasks:
   - name: mongodb
     command: ../aegis/mongo.sh
@@ -23,29 +22,34 @@ tasks:
       cd ../aegis  
       yarn
       gp sync-done install
-      
-    command: | 
+    command: |
       cd ../aegis
       yarn build
       gp sync-done build
-    
-  - name: aegis-host
-    init: |
-      cd ../aegis-host
-      gp sync-await install
-      yarn
-    command: |
-      gp sync-await build
-      cd ../aegis-host
-      yarn build
-      cd ../aegis
-      ./start.sh
 
   - name: aegis-app
+    init: |
+      gp sync-await install
+      cd ../aegis-app
+      yarn
+      gp sync-done installHost
     command: |
       gp sync-await build
       cd ../aegis-app
-      yarn 
+      yarn buildLocalRepo
+      gp sync-done buildHost
+      yarn startLocalRepo
+
+  - name: aegis-host
+    init: |
+      gp sync-await installHost
+      cd ../aegis-host
+      yarn
+    command: |
+      gp sync-await buildHost
+      cd ../aegis-host
+      yarn build
+      ../aegis/start.sh
 
 workspaceLocation: aegis-host/aegis.code-workspace
 
