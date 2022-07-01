@@ -164,7 +164,7 @@ module.exports = require("util");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=briteliteimmersive&repo=aegis-app&filedir=dist&branch=master";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=briteliteimmersive&repo=aegis-app&filedir=dist&branch=develop";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/readFile chunk loading */
