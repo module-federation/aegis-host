@@ -5,24 +5,24 @@
  */
 
 /** @type {entry[]} */
-exports.order = [
+exports.local = [
   {
-    name: 'order',
-    url: 'http://localhost:3000/',
+    name: 'local',
+    url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'model',
     importRemote: async () => import('order/models')
   },
   {
     name: 'adapters',
-    url: 'http://localhost:3000/',
+    url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'adapter',
     importRemote: async () => import('order/adapters')
   },
   {
     name: 'services',
-    url: 'http://localhost:3000/',
+    url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'service',
     importRemote: async () => import('order/services')

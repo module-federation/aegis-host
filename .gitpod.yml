@@ -1,8 +1,18 @@
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: false
+    addComment: false
+    addBadge: true
+
 # multi-repo
 additionalRepositories:
   - url: https://github.com/module-federation/aegis
   - url: https://github.com/module-federation/aegis-app
-  
+
 tasks:
   - name: mongodb
     command: ../aegis/mongo.sh
@@ -12,29 +22,33 @@ tasks:
       cd ../aegis  
       yarn
       gp sync-done install
-      
-    command: | 
+    command: |
       cd ../aegis
       yarn build
       gp sync-done build
-    
-  - name: aegis-host
+  - name: aegis-app
     init: |
-      cd ../aegis-host
       gp sync-await install
+      cd ../aegis-app
       yarn
+      gp sync-done installHost
     command: |
       gp sync-await build
+      cd ../aegis-app
+      yarn buildLocalRepo
+      gp sync-done buildHost
+      yarn startLocalRepo
+  - name: aegis-host
+    init: |
+      gp sync-await installHost
+      cd ../aegis-host
+      yarn
+    command: |
+      gp sync-await buildHost
       cd ../aegis-host
       yarn build
       cd ../aegis
       ./start.sh
-
-  - name: aegis-app
-    command: |
-      gp sync-await build
-      cd ../aegis-app
-      yarn 
 
 workspaceLocation: aegis-host/aegis.code-workspace
 
