@@ -7,10 +7,15 @@ The ÆGIS federation host deploys, runs, integrates and persists federated appli
 
 This repo contains the host code. The library can be found [here](https://github.com/module-federation/aegis).
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/briteliteimmersive/aegis-host) 
+# Developing a federated application with ÆGIS
 
-#### Open branch
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/bli-dev/aegis-host) 
+## Development Environment
+#### Open the Develop branch:
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/briteliteimmersive/aegis-app/tree/develop) 
+--------
+#### Open other branches:
+[![Open a branch Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/bli-dev/aegis-app) 
 
 ## Tutorials
 ### Getting Started
@@ -21,7 +26,6 @@ This repo contains the host code. The library can be found [here](https://github
 
 ### Relations
 [![branchingvid](https://user-images.githubusercontent.com/38910830/176278420-442131c8-993d-4669-83a8-d0110f6be40f.png)](https://drive.google.com/file/d/1cIKDawGKDdbYwrA_mMukE6rJhvISR8_s/view?usp=sharing)
-
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
