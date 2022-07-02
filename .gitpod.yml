@@ -38,6 +38,8 @@ tasks:
       yarn buildLocalRepo
       gp sync-done buildHost
       yarn startLocalRepo
+      cd ..aegis-app/dist
+      cp remoteEntry.js index.js
   - name: aegis-host
     init: |
       gp sync-await installHost
