@@ -26,6 +26,7 @@ tasks:
       cd ../aegis
       yarn build
       gp sync-done build
+
   - name: aegis-app
     init: |
       gp sync-await install
@@ -38,8 +39,7 @@ tasks:
       yarn buildLocalRepo
       gp sync-done buildHost
       yarn startLocalRepo
-      cd ..aegis-app/dist
-      cp remoteEntry.js index.js
+      
   - name: aegis-host
     init: |
       gp sync-await installHost
@@ -56,6 +56,14 @@ workspaceLocation: aegis-host/aegis.code-workspace
 
 ports:
   - port: 8080
-    description: HTTP API
+    description: http api
     visibility: public
     onOpen: open-preview
+  - port: 8000
+    description: local repo
+    visibility: public
+    onOpen: ignore
+  - port: 27017
+    description: mongodb
+    visibility: public
+    onOpen: ignore
