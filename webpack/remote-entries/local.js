@@ -11,20 +11,20 @@ exports.local = [
     url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'model',
-    importRemote: async () => import('order/models')
+    importRemote: async () => import('local/models')
   },
   {
     name: 'adapters',
     url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'adapter',
-    importRemote: async () => import('order/adapters')
+    importRemote: async () => import('local/adapters')
   },
   {
     name: 'services',
     url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'service',
-    importRemote: async () => import('order/services')
+    importRemote: async () => import('local/services')
   }
 ]
