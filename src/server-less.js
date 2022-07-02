@@ -6,8 +6,8 @@ const { ServerlessAdapter } = adapters
 const adapter = ServerlessAdapter(aegis).then(adapter => adapter)
 
 /**
- * Serverless entry point. Configure serverless platform
- * to call this method
+ * Serverless entry point. Configure the serverless platform
+ * to call this function.
  */
 exports.handleServerless = async function (...args) {
   return adapter.then(adapter => adapter.handle(...args))

@@ -6,11 +6,11 @@ const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
 const { importRemotes, EventBrokerFactory } = domain
-const DomainPorts = domain.UseCaseService
 const { StorageAdapter } = adapters
 const { StorageService } = services
 const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
+const DomainPorts = domain.UseCaseService
 const overrides = { find, save, ...StorageService }
 const modelName = workerData.poolName.toUpperCase()
 
@@ -22,16 +22,17 @@ if (!modelName) {
 /** @type {import('@module-federation/aegis/lib/domain/event-broker').EventBroker} */
 const broker = EventBrokerFactory.getInstance()
 
+/** @type {Promise<import('../webpack/remote-entries-type').remoteEntry[]>} */
 const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
 
 /**
- * Import and bind remote modules: i.e models, adapters and services
- * @param {import('../webpack/remote-entries-type.js').remoteEntry} remotes
+ * Import and bind remote modules: i.e. models, adapters and services
+ * @param {import('../webpack/remote-entries-type.js').remoteEntry[]} remotes
  * @returns
  */
 async function init (remotes) {
   try {
-    // import federated modules
+    // import federated modules; override as needed
     await importRemotes(remotes, overrides)
     // get the inbound ports for this domain model
     return DomainPorts(modelName)
@@ -49,20 +50,8 @@ async function init (remotes) {
  *
  * Connect both ends of the channel to the thread-local {@link broker} via pub & sub events.
  *
- * Note that the event channel does not provide a "synchronous" response like the main channel.
- * In the main channel, the caller receives a promise that resolves with the output of the job.
- * This is what allows http clients to receive a response and complete a transaction in a single
- * http session.
- *
- * (Don't confuse async function execution in the event loop with the overall
- * transaction context, which starts when the server accepts a request and
- * ends once its returned a response to that request. This is what is meant
- * by "synchronous".
- *
- * If a synchronous response is needed for an event, which should be avoided,
- * it can be done by calling the `ThreadPool.run` function andnspecifying the
- * event channel (shown below). The event handler for this event must return
- * a response to the main thread.
+ * Unlike the main channel, the event channel is not meant to return a response to the caller.
+ * If a response is needed, call `ThreadPool.run` as shown below.
  *
  * ```js
  * ThreadPool.run(jobName, jobData, { channel: EVENTCHANNEL })
