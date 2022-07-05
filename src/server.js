@@ -42,7 +42,7 @@ const sslEnabled = // required in production
  */
 exports.start = async function (app) {
   /** Authorize routes with JSON Web Tokens*/
-  AuthorizationService.protectRoutes(app, '/aegis')
+  AuthorizationService.protectRoutes(app, '/')
 
   const greeting = (proto, host, port) =>
     `\n 🌎 ÆGIS listening on ${proto}://${host}:${port} \n`
@@ -120,34 +120,6 @@ exports.start = async function (app) {
   }
 
   /**
-   * Attach {@link ServiceMeshAdapter} to the API listener socket.
-   * Listen for upgrade events from http server and switch
-   * client to WebSockets protocol. Clients connecting this
-   * way are using the service mesh, not the REST API. Use
-   * key + cert in {@link secureCtx} for secure connection.
-   *
-   * @param {https.Server|http.Server} server
-   * @param {tls.SecureContext} [secureCtx] if ssl enabled
-   */
-  function attachServiceMesh (server, secureCtx = {}) {
-    // const wss = new websocket.Server({
-    //   ...secureCtx,
-    //   clientTracking: false,
-    //   server: server,
-    //   maxPayload: 104857600,
-    //   verifyClient: () => {}
-    // })
-    // wss.on('upgrade', (request, socket, head) => {
-    //   wss.handleUpgrade(request, socket, head, ws =>
-    //     wss.emit('connection', ws, request)
-    //   )
-    // })
-    // ServiceMeshAdapter.attachServer(wss)
-
-    ServiceMeshAdapter.attachServer(server, secureCtx)
-  }
-
-  /**
    * Programmatically provision CA cert using RFC
    * https://datatracker.ietf.org/doc/html/rfc8555
    *
@@ -222,8 +194,7 @@ exports.start = async function (app) {
       })
     } else {
       // https disabled, so attach to http
-      //attachServiceMesh(httpServer)
-
+      /** @type {ServiceMeshAdapter}  */
       ServiceMeshAdapter.attachServer(httpServer)
     }
     httpServer.listen(port, checkPublicIpAddress)
@@ -261,9 +232,7 @@ exports.start = async function (app) {
       // graceful shutdown prevents new clients from connecting
       app.use(shutdown(httpsServer))
       // service mesh uses same port
-      //attachServiceMesh(httpsServer, secureCtx)
-
-      ServiceMeshAdapter.attachServer(httpsServer)
+      ServiceMeshAdapter.attachServer(httpsServer, secureCtx)
 
       // listen on ssl port
       httpsServer.listen(sslPort, () =>

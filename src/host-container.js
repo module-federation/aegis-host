@@ -8,8 +8,8 @@ async function init (remotes) {
 
 async function dispose () {
   await aegis.dispose()
+
   Object.keys(__non_webpack_require__.cache).forEach(k => {
-    console.debug('deleting cached module', k)
     delete __non_webpack_require__.cache[k]
   })
 }

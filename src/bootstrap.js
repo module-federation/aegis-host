@@ -27,6 +27,7 @@ async function load (aegis = null) {
 
     app.use(express.json())
     app.use(express.static('public'))
+
     app.use('/reload', async (req, res) => {
       await load(aegis)
       res.send('<h1>reload complete</h1><a href="/">back</a>')
