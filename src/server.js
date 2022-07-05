@@ -130,18 +130,21 @@ exports.start = async function (app) {
    * @param {tls.SecureContext} [secureCtx] if ssl enabled
    */
   function attachServiceMesh (server, secureCtx = {}) {
-    const wss = new websocket.Server({
-      ...secureCtx,
-      clientTracking: true,
-      server: server,
-      maxPayload: 104857600
-    })
-    wss.on('upgrade', (request, socket, head) => {
-      wss.handleUpgrade(request, socket, head, ws =>
-        wss.emit('connection', ws, request)
-      )
-    })
-    ServiceMeshAdapter.attachServer(wss)
+    // const wss = new websocket.Server({
+    //   ...secureCtx,
+    //   clientTracking: false,
+    //   server: server,
+    //   maxPayload: 104857600,
+    //   verifyClient: () => {}
+    // })
+    // wss.on('upgrade', (request, socket, head) => {
+    //   wss.handleUpgrade(request, socket, head, ws =>
+    //     wss.emit('connection', ws, request)
+    //   )
+    // })
+    // ServiceMeshAdapter.attachServer(wss)
+
+    ServiceMeshAdapter.attachServer(server, secureCtx)
   }
 
   /**
@@ -219,7 +222,9 @@ exports.start = async function (app) {
       })
     } else {
       // https disabled, so attach to http
-      attachServiceMesh(httpServer)
+      //attachServiceMesh(httpServer)
+
+      ServiceMeshAdapter.attachServer(httpServer)
     }
     httpServer.listen(port, checkPublicIpAddress)
   }
@@ -256,7 +261,9 @@ exports.start = async function (app) {
       // graceful shutdown prevents new clients from connecting
       app.use(shutdown(httpsServer))
       // service mesh uses same port
-      attachServiceMesh(httpsServer, secureCtx)
+      //attachServiceMesh(httpsServer, secureCtx)
+
+      ServiceMeshAdapter.attachServer(httpsServer)
 
       // listen on ssl port
       httpsServer.listen(sslPort, () =>
