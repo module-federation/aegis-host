@@ -174,12 +174,15 @@
   function displayUrl (url) {
     document.getElementById(
       'url'
-    ).textContent = `${location.protocol}//${location.host}/${url}`
+    ).value = `${location.protocol}//${location.host}/${url}`
   }
 
   function getUrl () {
-    const model = document.getElementById('model').value
+    if (customUrl) {
+      return document.getElementById('url').value
+    }
     const id = document.getElementById('modelId').value
+    const model = document.getElementById('model').value
     const param = document.getElementById('parameter').value
     const query = document.getElementById('query').value
     let url = `${modelApiPath}/${model}`
@@ -189,6 +192,23 @@
     displayUrl(url)
     return url
   }
+
+  let customUrl = false
+
+  function makeCustomUrl () {
+    customUrl = true
+  }
+
+  function makeAutoUrl () {
+    customUrl = false
+  }
+
+  const urlInput = document.getElementById('url')
+  urlInput.onfocus = makeCustomUrl
+  modelInput.onfocus = makeAutoUrl
+  modelIdInput.onfocus = makeAutoUrl
+  queryInput.onfocus = makeAutoUrl
+  paramInput.onfocus = makeAutoUrl
 
   modelInput.onchange = getUrl
   modelIdInput.onchange = getUrl
