@@ -18,7 +18,7 @@ const server = env => {
         //stats: 'verbose',
         mode: 'development',
         devtool: 'hidden-source-map',
-        entry: path.resolve(__dirname, 'src/noop.js'),
+        entry: path.resolve(__dirname, 'src/bootstrap.js'),
         output: {
           publicPath: `http://localhost`,
           path: path.resolve(__dirname, 'dist'),

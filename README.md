@@ -27,6 +27,9 @@ This repo contains the host code. The library can be found [here](https://github
 ### Relations
 [![branchingvid](https://user-images.githubusercontent.com/38910830/176278420-442131c8-993d-4669-83a8-d0110f6be40f.png)](https://drive.google.com/file/d/1cIKDawGKDdbYwrA_mMukE6rJhvISR8_s/view?usp=sharing)
 
+#### Open Branch:
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/module-federation/aegis-host) 
+
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
 - loaded from multiple network locations and repositories at runtime;
