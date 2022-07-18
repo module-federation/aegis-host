@@ -65,9 +65,9 @@
           reader = new FileReader()
           reader.onload = () => {
             console.log('Result: ' + reader.result)
+            reader.readAsText(event.data)
             showMessage(JSON.stringify(JSON.parse(reader.result), undefined, 2))
           }
-          reader.readAsText(event.data)
         } else {
           showMessage(JSON.stringify(JSON.parse(event.data), undefined, 2))
         }
@@ -75,8 +75,10 @@
         console.error('onmessage', event, err.message)
       }
     }
-
-    ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' }))
+    setTimeout(
+      () => ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' })),
+      1000
+    )
   }
 
   statusButton.onclick = function () {
