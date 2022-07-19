@@ -274,7 +274,7 @@
       }
     )
     showMessage(response)
-    setTimeout(() => bar.hide(), 2000)
+    setTimeout(() => bar.hide(), 1000)
   }
 
   async function deployConditions (poolName) {

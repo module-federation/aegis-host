@@ -44,7 +44,9 @@
     }
 
     const proto = /https/i.test(location.protocol) ? 'wss' : 'ws'
-    ws = new WebSocket(`${proto}://${location.hostname}:${location.port}`)
+    ws = new WebSocket(`${proto}://${location.hostname}:${location.port}`, [
+      'webswitch'
+    ])
     ws.onerror = function (e) {
       showMessage('WebSocket error', e)
     }
