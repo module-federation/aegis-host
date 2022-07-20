@@ -23,6 +23,7 @@
     "reload": "open http://localhost/reload",
     "stop": "PID=$(lsof -P -i | grep LISTEN | awk '{print $2}'); kill $PID",
     "restart": "yarn build && yarn start",
+    "gen-keys": "node cert/mesh/keys.js",
     "login-status": "echo \"/workspace/aegis-host/status.sh\" >> ~/.aegis && echo \". ~/.aegis\"",
     "cmd-log": "echo \"alias log='view ~/aegis-host/public/aegis.log'\" >> ~/.aegis",
     "cmd-tail": "echo \"alias tail='tail -f ~/aegis-host/public/aegis.log'\" >> ~/.aegis",

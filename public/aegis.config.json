@@ -62,13 +62,10 @@
       "WebSwitch": {
         "desc": "Default implementation. Switched mesh over web sockets.",
         "enabled": true,
-        "isSwitch": true,
+        "isSwitch": false,
         "heartbeat": 3000,
         "uplink": null,
         "debug": true,
-        "host": "localhost",
-        "port": 80,
-        "protocol": "ws",
         "isBackupSwitch": false,
         "priority": 20,
         "weight": 40
