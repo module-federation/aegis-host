@@ -53,3 +53,5 @@ public/hexanimation.gif
 public/mockup.png
 public/mockup1.png
 public/mockup3.pnf
+cert/mesh/privateKey.pem
+cert/mesh/publicKey.pem
