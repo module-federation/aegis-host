@@ -65,7 +65,7 @@
         "isSwitch": false,
         "heartbeat": 3000,
         "uplink": null,
-        "debug": true,
+        "debug": false,
         "isBackupSwitch": false,
         "priority": 20,
         "weight": 40
