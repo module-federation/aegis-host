@@ -47,13 +47,15 @@
     ws = new WebSocket(`${proto}://${location.hostname}:${location.port}`, [
       'webswitch'
     ])
+    ws.binaryType = 'arraybuffer'
+
     ws.onerror = function (e) {
       showMessage('WebSocket error', e)
     }
 
     ws.onopen = function () {
       showMessage('WebSocket connection established')
-      ws.send(JSON.stringify({ proto: 'webswitch', pid: 1, role: 'browser' }))
+      // ws.send({ proto: 'webswitch', pid: 1, role: 'browser' })
     }
 
     ws.onclose = function () {
@@ -63,11 +65,12 @@
 
     ws.onmessage = function (event) {
       try {
-        if (event.data instanceof Blob) {
+        if (event.data instanceof Uint8Array) {
+          const uint = event.data
+          const blob = new Blob(uint, uint.byteOffset, uint.byteLength)
           reader = new FileReader()
           reader.onload = () => {
-            console.log('Result: ' + reader.result)
-            reader.readAsText(event.data)
+            reader.readAsText(blob)
             showMessage(JSON.stringify(JSON.parse(reader.result), undefined, 2))
           }
         } else {
@@ -77,10 +80,7 @@
         console.error('onmessage', event, err.message)
       }
     }
-    setTimeout(
-      () => ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' })),
-      1000
-    )
+    setTimeout(() => ws.send({ proto: 'webswitch', pid: 'browser' }), 1000)
   }
 
   statusButton.onclick = function () {

@@ -11,6 +11,9 @@
     }
   ],
   "settings": {
-    "liveServer.settings.multiRootWorkspaceName": "aegis"
+    "liveServer.settings.multiRootWorkspaceName": "aegis",
+    "githubPullRequests.ignoredPullRequestBranches": [
+      "master"
+    ]
   }
 }
