@@ -6,6 +6,7 @@ const importFresh = require('import-fresh')
 const express = require('express')
 const server = require('./server')
 const app = express()
+const passport = require('passport-jwt')
 
 function clearRoutes () {
   app._router.stack = app._router.stack.filter(
@@ -27,6 +28,36 @@ async function load (aegis = null) {
 
     app.use(express.json())
     app.use(express.static('public'))
+
+    app.post(
+      '/profile',
+      passport.authenticate('jwt', { session: false }),
+      function (req, res) {
+        res.send(req.user.profile)
+      }
+    )
+
+    var JwtStrategy = require('passport-jwt').Strategy,
+      ExtractJwt = require('passport-jwt').ExtractJwt
+    var opts = {}
+    opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
+    opts.secretOrKey = 'secret'
+    opts.issuer = 'accounts.examplesoft.com'
+    opts.audience = 'yoursite.net'
+    passport.use(authenticate (req, res) { 
+    })
+
+
+    const router = express.Router()
+    router.route(require('myroutes'))
+    router.use(authStrategy)
+
+
+      // Passport: flexible multiple strategis
+      // routes: configurable protection
+      // strategies: configurable at runtime
+
+  
 
     app.use('/reload', async (req, res) => {
       await load(aegis)
