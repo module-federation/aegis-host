@@ -65,26 +65,18 @@
 
     ws.onmessage = function (event) {
       try {
-        if (event.data instanceof Uint8Array) {
-          const uint = event.data
-          const blob = new Blob(uint, uint.byteOffset, uint.byteLength)
-          reader = new FileReader()
-          reader.onload = () => {
-            reader.readAsText(blob)
-            showMessage(JSON.stringify(JSON.parse(reader.result), undefined, 2))
-          }
-        } else {
-          showMessage(JSON.stringify(JSON.parse(event.data), undefined, 2))
+        if (event.data instanceof ArrayBuffer) {
+          showMessage(JSON.parse(new TextDecoder().decode(event.data)))
+          return
         }
+        showMessage(JSON.parse(event))
       } catch (err) {
         console.error('onmessage', event, err.message)
       }
     }
-    setTimeout(() => ws.send({ proto: 'webswitch', pid: 'browser' }), 1000)
   }
 
   statusButton.onclick = function () {
-    console.log('sending status')
     ws.send(JSON.stringify('status'))
   }
 
