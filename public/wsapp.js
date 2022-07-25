@@ -39,8 +39,8 @@
 
   wsButton.onclick = function () {
     if (ws) {
-      ws.onerror = ws.onopen = ws.onclose = null
       ws.close()
+      ws.onerror = ws.onopen = ws.onclose = null
     }
 
     const proto = /https/i.test(location.protocol) ? 'wss' : 'ws'
