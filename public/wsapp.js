@@ -71,6 +71,7 @@
         }
         showMessage(JSON.parse(event))
       } catch (err) {
+        showMessage(err.message)
         console.error('onmessage', event, err.message)
       }
     }
