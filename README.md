@@ -28,7 +28,7 @@ This repo contains the host code. The library can be found [here](https://github
 [![branchingvid](https://user-images.githubusercontent.com/38910830/176278420-442131c8-993d-4669-83a8-d0110f6be40f.png)](https://drive.google.com/file/d/1cIKDawGKDdbYwrA_mMukE6rJhvISR8_s/view?usp=sharing)
 
 #### Open Branch:
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/module-federation/aegis-host) 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/module-federation/aegis-app) 
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
@@ -311,11 +311,11 @@ Two options are available: EASY BUTTON or DIY.
 
 #### EASY BUTTON
 
-Click [here](https://github.com/module-federation/aegis-application/generate) to generate the scaffolding for building a federated application with Aegis.
+Click [here](https://github.com/module-federation/aegis-app/generate) to generate the scaffolding for building a federated application with Aegis.
 
 #### DIY
 
-To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/aegis-Example/blob/master/webpack.config.js). Also from aegis-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/aegis-Example/tree/master/webpack).
+To import your own models, update the `webpack/remote-entries.js` to point to your remoteEntry.js file and change owner, repo, filedir, and branch accordingly, if using GitHub as a remote. You must specify these same attributes in your repo, only in webpack.config.js [publicPath as URL params](https://github.com/module-federation/aegis-Example/blob/master/webpack.config.js). Also from aegis-example, you'll need the same version of webpack and the [extensions in the webpack dir](https://github.com/module-federation/aegis-app/tree/master/webpack).
 
 ### Installation
 

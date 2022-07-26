@@ -66,9 +66,6 @@
         "heartbeat": 3000,
         "uplink": null,
         "debug": false,
-        "host": "aegis.module-federation.org",
-        "port": 443,
-        "protocol": "wss",
         "isBackupSwitch": false,
         "priority": 20,
         "weight": 40

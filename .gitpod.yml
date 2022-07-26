@@ -49,21 +49,38 @@ tasks:
       gp sync-await buildHost
       cd ../aegis-host
       yarn build
+      gp sync-done startHost
       cd ../aegis
+      ./start.sh
+
+  - name: webswitch
+    command: |
+      gp sync-await startHost
+      cd ../aegis
+      export PORT=8081
+      export SWITCH=true
       ./start.sh
 
 workspaceLocation: aegis-host/aegis.code-workspace
 
 ports:
-  - port: 8080
-    description: http api
-    visibility: public
-    onOpen: open-preview
   - port: 8000
     description: local repo
     visibility: public
     onOpen: ignore
+  - port: 8080
+    description: http api
+    visibility: public
+    onOpen: open-preview
+  - port: 8081
+    description: webswitch
+    visibility: public
+    onOpen: open-preview
   - port: 27017
     description: mongodb
+    visibility: public
+    onOpen: ignore
+  - port: 5353
+    description: multicast dns
     visibility: public
     onOpen: ignore

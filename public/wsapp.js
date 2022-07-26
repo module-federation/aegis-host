@@ -39,19 +39,23 @@
 
   wsButton.onclick = function () {
     if (ws) {
-      ws.onerror = ws.onopen = ws.onclose = null
       ws.close()
+      ws.onerror = ws.onopen = ws.onclose = null
     }
 
     const proto = /https/i.test(location.protocol) ? 'wss' : 'ws'
-    ws = new WebSocket(`${proto}://${location.hostname}:${location.port}`)
+    ws = new WebSocket(`${proto}://${location.hostname}:${location.port}`, [
+      'webswitch'
+    ])
+    ws.binaryType = 'arraybuffer'
+
     ws.onerror = function (e) {
       showMessage('WebSocket error', e)
     }
 
     ws.onopen = function () {
       showMessage('WebSocket connection established')
-      ws.send(JSON.stringify({ proto: 'webswitch', pid: 1, role: 'browser' }))
+      // ws.send({ proto: 'webswitch', pid: 1, role: 'browser' })
     }
 
     ws.onclose = function () {
@@ -61,26 +65,19 @@
 
     ws.onmessage = function (event) {
       try {
-        if (event.data instanceof Blob) {
-          reader = new FileReader()
-          reader.onload = () => {
-            console.log('Result: ' + reader.result)
-            showMessage(JSON.stringify(JSON.parse(reader.result), undefined, 2))
-          }
-          reader.readAsText(event.data)
-        } else {
-          showMessage(JSON.stringify(JSON.parse(event.data), undefined, 2))
+        if (event.data instanceof ArrayBuffer) {
+          showMessage(JSON.parse(new TextDecoder().decode(event.data)))
+          return
         }
+        showMessage(JSON.parse(event))
       } catch (err) {
+        showMessage(err.message)
         console.error('onmessage', event, err.message)
       }
     }
-
-    ws.send(JSON.stringify({ proto: 'webswitch', pid: 'browser' }))
   }
 
   statusButton.onclick = function () {
-    console.log('sending status')
     ws.send(JSON.stringify('status'))
   }
 
