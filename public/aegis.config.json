@@ -75,7 +75,7 @@
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
-        "enabled": true,
+        "enabled": false,
         "config": {
           "redis": {
             "host": "127.0.0.1",
@@ -107,6 +107,11 @@
         "audience": "https://microlib.io/",
         "issuer": "https://dev-2fe2iar6.us.auth0.com/",
         "algorithms": ["RS256"]
+      },
+      "passport":{
+        "secret":"v2e%TY(*&sri*4^js%*oj35j*^^&p25o",
+        "issuer":"https://lthscreate.com",
+        "audience":"https://lthscreate.com"
       }
     },
     "token": {
