@@ -2,2252 +2,6 @@ module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./node_modules/asap/asap.js":
-/*!***********************************!*\
-  !*** ./node_modules/asap/asap.js ***!
-  \***********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var rawAsap = __webpack_require__(/*! ./raw */ "./node_modules/asap/raw.js");
-var freeTasks = [];
-
-/**
- * Calls a task as soon as possible after returning, in its own event, with
- * priority over IO events. An exception thrown in a task can be handled by
- * `process.on("uncaughtException") or `domain.on("error")`, but will otherwise
- * crash the process. If the error is handled, all subsequent tasks will
- * resume.
- *
- * @param {{call}} task A callable object, typically a function that takes no
- * arguments.
- */
-module.exports = asap;
-function asap(task) {
-    var rawTask;
-    if (freeTasks.length) {
-        rawTask = freeTasks.pop();
-    } else {
-        rawTask = new RawTask();
-    }
-    rawTask.task = task;
-    rawTask.domain = process.domain;
-    rawAsap(rawTask);
-}
-
-function RawTask() {
-    this.task = null;
-    this.domain = null;
-}
-
-RawTask.prototype.call = function () {
-    if (this.domain) {
-        this.domain.enter();
-    }
-    var threw = true;
-    try {
-        this.task.call();
-        threw = false;
-        // If the task throws an exception (presumably) Node.js restores the
-        // domain stack for the next event.
-        if (this.domain) {
-            this.domain.exit();
-        }
-    } finally {
-        // We use try/finally and a threw flag to avoid messing up stack traces
-        // when we catch and release errors.
-        if (threw) {
-            // In Node.js, uncaught exceptions are considered fatal errors.
-            // Re-throw them to interrupt flushing!
-            // Ensure that flushing continues if an uncaught exception is
-            // suppressed listening process.on("uncaughtException") or
-            // domain.on("error").
-            rawAsap.requestFlush();
-        }
-        // If the task threw an error, we do not want to exit the domain here.
-        // Exiting the domain would prevent the domain from catching the error.
-        this.task = null;
-        this.domain = null;
-        freeTasks.push(this);
-    }
-};
-
-
-
-/***/ }),
-
-/***/ "./node_modules/asap/raw.js":
-/*!**********************************!*\
-  !*** ./node_modules/asap/raw.js ***!
-  \**********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var domain; // The domain module is executed on demand
-var hasSetImmediate = typeof setImmediate === "function";
-
-// Use the fastest means possible to execute a task in its own turn, with
-// priority over other events including network IO events in Node.js.
-//
-// An exception thrown by a task will permanently interrupt the processing of
-// subsequent tasks. The higher level `asap` function ensures that if an
-// exception is thrown by a task, that the task queue will continue flushing as
-// soon as possible, but if you use `rawAsap` directly, you are responsible to
-// either ensure that no exceptions are thrown from your task, or to manually
-// call `rawAsap.requestFlush` if an exception is thrown.
-module.exports = rawAsap;
-function rawAsap(task) {
-    if (!queue.length) {
-        requestFlush();
-        flushing = true;
-    }
-    // Avoids a function call
-    queue[queue.length] = task;
-}
-
-var queue = [];
-// Once a flush has been requested, no further calls to `requestFlush` are
-// necessary until the next `flush` completes.
-var flushing = false;
-// The position of the next task to execute in the task queue. This is
-// preserved between calls to `flush` so that it can be resumed if
-// a task throws an exception.
-var index = 0;
-// If a task schedules additional tasks recursively, the task queue can grow
-// unbounded. To prevent memory excaustion, the task queue will periodically
-// truncate already-completed tasks.
-var capacity = 1024;
-
-// The flush function processes all tasks that have been scheduled with
-// `rawAsap` unless and until one of those tasks throws an exception.
-// If a task throws an exception, `flush` ensures that its state will remain
-// consistent and will resume where it left off when called again.
-// However, `flush` does not make any arrangements to be called again if an
-// exception is thrown.
-function flush() {
-    while (index < queue.length) {
-        var currentIndex = index;
-        // Advance the index before calling the task. This ensures that we will
-        // begin flushing on the next task the task throws an error.
-        index = index + 1;
-        queue[currentIndex].call();
-        // Prevent leaking memory for long chains of recursive calls to `asap`.
-        // If we call `asap` within tasks scheduled by `asap`, the queue will
-        // grow, but to avoid an O(n) walk for every task we execute, we don't
-        // shift tasks off the queue after they have been executed.
-        // Instead, we periodically shift 1024 tasks off the queue.
-        if (index > capacity) {
-            // Manually shift all values starting at the index back to the
-            // beginning of the queue.
-            for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
-                queue[scan] = queue[scan + index];
-            }
-            queue.length -= index;
-            index = 0;
-        }
-    }
-    queue.length = 0;
-    index = 0;
-    flushing = false;
-}
-
-rawAsap.requestFlush = requestFlush;
-function requestFlush() {
-    // Ensure flushing is not bound to any domain.
-    // It is not sufficient to exit the domain, because domains exist on a stack.
-    // To execute code outside of any domain, the following dance is necessary.
-    var parentDomain = process.domain;
-    if (parentDomain) {
-        if (!domain) {
-            // Lazy execute the domain module.
-            // Only employed if the user elects to use domains.
-            domain = __webpack_require__(/*! domain */ "domain");
-        }
-        domain.active = process.domain = null;
-    }
-
-    // `setImmediate` is slower that `process.nextTick`, but `process.nextTick`
-    // cannot handle recursion.
-    // `requestFlush` will only be called recursively from `asap.js`, to resume
-    // flushing after an error is thrown into a domain.
-    // Conveniently, `setImmediate` was introduced in the same version
-    // `process.nextTick` started throwing recursion errors.
-    if (flushing && hasSetImmediate) {
-        setImmediate(flush);
-    } else {
-        process.nextTick(flush);
-    }
-
-    if (parentDomain) {
-        domain.active = process.domain = parentDomain;
-    }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/index.js":
-/*!***********************************************!*\
-  !*** ./node_modules/axios-proxy-fix/index.js ***!
-  \***********************************************/
-/*! dynamic exports */
-/*! exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/axios-proxy-fix/lib/axios.js */
-/*! runtime requirements: module, __webpack_require__ */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-module.exports = __webpack_require__(/*! ./lib/axios */ "./node_modules/axios-proxy-fix/lib/axios.js");
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/adapters/http.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/adapters/http.js ***!
-  \***********************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-var settle = __webpack_require__(/*! ./../core/settle */ "./node_modules/axios-proxy-fix/lib/core/settle.js");
-var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/axios-proxy-fix/lib/helpers/buildURL.js");
-var http = __webpack_require__(/*! http */ "http");
-var https = __webpack_require__(/*! https */ "https");
-var httpFollow = __webpack_require__(/*! follow-redirects */ "./node_modules/follow-redirects/index.js").http;
-var httpsFollow = __webpack_require__(/*! follow-redirects */ "./node_modules/follow-redirects/index.js").https;
-var url = __webpack_require__(/*! url */ "url");
-var zlib = __webpack_require__(/*! zlib */ "zlib");
-var pkg = __webpack_require__(/*! ./../../package.json */ "./node_modules/axios-proxy-fix/package.json");
-var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/axios-proxy-fix/lib/core/createError.js");
-var enhanceError = __webpack_require__(/*! ../core/enhanceError */ "./node_modules/axios-proxy-fix/lib/core/enhanceError.js");
-
-var isHttps = /https:?/;
-
-/*eslint consistent-return:0*/
-module.exports = function httpAdapter(config) {
-  return new Promise(function dispatchHttpRequest(resolve, reject) {
-    var data = config.data;
-    var headers = config.headers;
-    var timer;
-    var aborted = false;
-
-    // Set User-Agent (required by some servers)
-    // Only set header if it hasn't been set in config
-    // See https://github.com/mzabriskie/axios/issues/69
-    if (!headers['User-Agent'] && !headers['user-agent']) {
-      headers['User-Agent'] = 'axios/' + pkg.version;
-    }
-
-    if (data && !utils.isStream(data)) {
-      if (Buffer.isBuffer(data)) {
-        // Nothing to do...
-      } else if (utils.isArrayBuffer(data)) {
-        data = new Buffer(new Uint8Array(data));
-      } else if (utils.isString(data)) {
-        data = new Buffer(data, 'utf-8');
-      } else {
-        return reject(createError(
-          'Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream',
-          config
-        ));
-      }
-
-      // Add Content-Length header if data exists
-      headers['Content-Length'] = data.length;
-    }
-
-    // HTTP basic authentication
-    var auth = undefined;
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password || '';
-      auth = username + ':' + password;
-    }
-
-    // Parse url
-    var parsed = url.parse(config.url);
-    var protocol = parsed.protocol || 'http:';
-
-    if (!auth && parsed.auth) {
-      var urlAuth = parsed.auth.split(':');
-      var urlUsername = urlAuth[0] || '';
-      var urlPassword = urlAuth[1] || '';
-      auth = urlUsername + ':' + urlPassword;
-    }
-
-    if (auth) {
-      delete headers.Authorization;
-    }
-
-    var isHttpsRequest = isHttps.test(protocol);
-    var agent = isHttpsRequest ? config.httpsAgent : config.httpAgent;
-
-    var options = {
-      hostname: parsed.hostname,
-      port: parsed.port,
-      path: buildURL(parsed.path, config.params, config.paramsSerializer).replace(/^\?/, ''),
-      method: config.method,
-      headers: headers,
-      agent: agent,
-      auth: auth
-    };
-
-    var proxy = config.proxy;
-    if (!proxy) {
-      var proxyEnv = protocol.slice(0, -1) + '_proxy';
-      var proxyUrl = process.env[proxyEnv] || process.env[proxyEnv.toUpperCase()];
-      if (proxyUrl) {
-        var parsedProxyUrl = url.parse(proxyUrl);
-        proxy = {
-          host: parsedProxyUrl.hostname,
-          port: parsedProxyUrl.port
-        };
-
-        if (parsedProxyUrl.auth) {
-          var proxyUrlAuth = parsedProxyUrl.auth.split(':');
-          proxy.auth = {
-            username: proxyUrlAuth[0],
-            password: proxyUrlAuth[1]
-          };
-        }
-      }
-    }
-
-    if (proxy) {
-      options.hostname = proxy.host;
-      options.host = proxy.host;
-      options.headers.host = parsed.hostname + (parsed.port ? ':' + parsed.port : '');
-      options.port = proxy.port;
-      options.path = protocol + '//' + parsed.hostname + (parsed.port ? ':' + parsed.port : '') + options.path;
-
-      // Basic proxy authorization
-      if (proxy.auth) {
-        var base64 = new Buffer(proxy.auth.username + ':' + proxy.auth.password, 'utf8').toString('base64');
-        options.headers['Proxy-Authorization'] = 'Basic ' + base64;
-      }
-    }
-
-    var transport;
-    var isHttpsProxy = isHttpsRequest && (proxy ? isHttps.test(proxy.protocol) : true);
-    if (config.maxRedirects === 0) {
-      transport = isHttpsProxy ? https : http;
-    } else {
-      if (config.maxRedirects) {
-        options.maxRedirects = config.maxRedirects;
-      }
-      transport = isHttpsProxy ? httpsFollow : httpFollow;
-    }
-
-    // Create the request
-    var req = transport.request(options, function handleResponse(res) {
-      if (aborted) return;
-
-      // Response has been received so kill timer that handles request timeout
-      clearTimeout(timer);
-      timer = null;
-
-      // uncompress the response body transparently if required
-      var stream = res;
-      switch (res.headers['content-encoding']) {
-      /*eslint default-case:0*/
-      case 'gzip':
-      case 'compress':
-      case 'deflate':
-        // add the unzipper to the body stream processing pipeline
-        stream = stream.pipe(zlib.createUnzip());
-
-        // remove the content-encoding in order to not confuse downstream operations
-        delete res.headers['content-encoding'];
-        break;
-      }
-
-      // return the last request in case of redirects
-      var lastRequest = res.req || req;
-
-      var response = {
-        status: res.statusCode,
-        statusText: res.statusMessage,
-        headers: res.headers,
-        config: config,
-        request: lastRequest
-      };
-
-      if (config.responseType === 'stream') {
-        response.data = stream;
-        settle(resolve, reject, response);
-      } else {
-        var responseBuffer = [];
-        stream.on('data', function handleStreamData(chunk) {
-          responseBuffer.push(chunk);
-
-          // make sure the content length is not over the maxContentLength if specified
-          if (config.maxContentLength > -1 && Buffer.concat(responseBuffer).length > config.maxContentLength) {
-            reject(createError('maxContentLength size of ' + config.maxContentLength + ' exceeded',
-              config, null, lastRequest));
-          }
-        });
-
-        stream.on('error', function handleStreamError(err) {
-          if (aborted) return;
-          reject(enhanceError(err, config, null, lastRequest));
-        });
-
-        stream.on('end', function handleStreamEnd() {
-          var responseData = Buffer.concat(responseBuffer);
-          if (config.responseType !== 'arraybuffer') {
-            responseData = responseData.toString('utf8');
-          }
-
-          response.data = responseData;
-          settle(resolve, reject, response);
-        });
-      }
-    });
-
-    // Handle errors
-    req.on('error', function handleRequestError(err) {
-      if (aborted) return;
-      reject(enhanceError(err, config, null, req));
-    });
-
-    // Handle request timeout
-    if (config.timeout && !timer) {
-      timer = setTimeout(function handleRequestTimeout() {
-        req.abort();
-        reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED', req));
-        aborted = true;
-      }, config.timeout);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (aborted) {
-          return;
-        }
-
-        req.abort();
-        reject(cancel);
-        aborted = true;
-      });
-    }
-
-    // Send the request
-    if (utils.isStream(data)) {
-      data.pipe(req);
-    } else {
-      req.end(data);
-    }
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/adapters/xhr.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/adapters/xhr.js ***!
-  \**********************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-var settle = __webpack_require__(/*! ./../core/settle */ "./node_modules/axios-proxy-fix/lib/core/settle.js");
-var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/axios-proxy-fix/lib/helpers/buildURL.js");
-var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ "./node_modules/axios-proxy-fix/lib/helpers/parseHeaders.js");
-var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ "./node_modules/axios-proxy-fix/lib/helpers/isURLSameOrigin.js");
-var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/axios-proxy-fix/lib/core/createError.js");
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(/*! ./../helpers/btoa */ "./node_modules/axios-proxy-fix/lib/helpers/btoa.js");
-
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-    var loadEvent = 'onreadystatechange';
-    var xDomain = false;
-
-    // For IE 8/9 CORS support
-    // Only supports POST and GET calls and doesn't returns the response headers.
-    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-    if ( true &&
-        typeof window !== 'undefined' &&
-        window.XDomainRequest && !('withCredentials' in request) &&
-        !isURLSameOrigin(config.url)) {
-      request = new window.XDomainRequest();
-      loadEvent = 'onload';
-      xDomain = true;
-      request.onprogress = function handleProgress() {};
-      request.ontimeout = function handleTimeout() {};
-    }
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password || '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    // Listen for ready state
-    request[loadEvent] = function handleLoad() {
-      if (!request || (request.readyState !== 4 && !xDomain)) {
-        return;
-      }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-      var response = {
-        data: responseData,
-        // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
-        status: request.status === 1223 ? 204 : request.status,
-        statusText: request.status === 1223 ? 'No Content' : request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(resolve, reject, response);
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config, null, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(/*! ./../helpers/cookies */ "./node_modules/axios-proxy-fix/lib/helpers/cookies.js");
-
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-          cookies.read(config.xsrfCookieName) :
-          undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
-    }
-
-    // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
-        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
-        if (config.responseType !== 'json') {
-          throw e;
-        }
-      }
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (!request) {
-          return;
-        }
-
-        request.abort();
-        reject(cancel);
-        // Clean up request
-        request = null;
-      });
-    }
-
-    if (requestData === undefined) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/axios.js":
-/*!***************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/axios.js ***!
-  \***************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 49:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios-proxy-fix/lib/helpers/bind.js");
-var Axios = __webpack_require__(/*! ./core/Axios */ "./node_modules/axios-proxy-fix/lib/core/Axios.js");
-var defaults = __webpack_require__(/*! ./defaults */ "./node_modules/axios-proxy-fix/lib/defaults.js");
-
-/**
- * Create an instance of Axios
- *
- * @param {Object} defaultConfig The default config for the instance
- * @return {Axios} A new instance of Axios
- */
-function createInstance(defaultConfig) {
-  var context = new Axios(defaultConfig);
-  var instance = bind(Axios.prototype.request, context);
-
-  // Copy axios.prototype to instance
-  utils.extend(instance, Axios.prototype, context);
-
-  // Copy context to instance
-  utils.extend(instance, context);
-
-  return instance;
-}
-
-// Create the default instance to be exported
-var axios = createInstance(defaults);
-
-// Expose Axios class to allow class inheritance
-axios.Axios = Axios;
-
-// Factory for creating new instances
-axios.create = function create(instanceConfig) {
-  return createInstance(utils.merge(defaults, instanceConfig));
-};
-
-// Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ "./node_modules/axios-proxy-fix/lib/cancel/Cancel.js");
-axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ "./node_modules/axios-proxy-fix/lib/cancel/CancelToken.js");
-axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ "./node_modules/axios-proxy-fix/lib/cancel/isCancel.js");
-
-// Expose all/spread
-axios.all = function all(promises) {
-  return Promise.all(promises);
-};
-axios.spread = __webpack_require__(/*! ./helpers/spread */ "./node_modules/axios-proxy-fix/lib/helpers/spread.js");
-
-module.exports = axios;
-
-// Allow use of default import syntax in TypeScript
-module.exports.default = axios;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/cancel/Cancel.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/cancel/Cancel.js ***!
-  \***********************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/cancel/CancelToken.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/cancel/CancelToken.js ***!
-  \****************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var Cancel = __webpack_require__(/*! ./Cancel */ "./node_modules/axios-proxy-fix/lib/cancel/Cancel.js");
-
-/**
- * A `CancelToken` is an object that can be used to request cancellation of an operation.
- *
- * @class
- * @param {Function} executor The executor function.
- */
-function CancelToken(executor) {
-  if (typeof executor !== 'function') {
-    throw new TypeError('executor must be a function.');
-  }
-
-  var resolvePromise;
-  this.promise = new Promise(function promiseExecutor(resolve) {
-    resolvePromise = resolve;
-  });
-
-  var token = this;
-  executor(function cancel(message) {
-    if (token.reason) {
-      // Cancellation has already been requested
-      return;
-    }
-
-    token.reason = new Cancel(message);
-    resolvePromise(token.reason);
-  });
-}
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-CancelToken.prototype.throwIfRequested = function throwIfRequested() {
-  if (this.reason) {
-    throw this.reason;
-  }
-};
-
-/**
- * Returns an object that contains a new `CancelToken` and a function that, when called,
- * cancels the `CancelToken`.
- */
-CancelToken.source = function source() {
-  var cancel;
-  var token = new CancelToken(function executor(c) {
-    cancel = c;
-  });
-  return {
-    token: token,
-    cancel: cancel
-  };
-};
-
-module.exports = CancelToken;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/cancel/isCancel.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/cancel/isCancel.js ***!
-  \*************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/core/Axios.js":
-/*!********************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/core/Axios.js ***!
-  \********************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 79:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var defaults = __webpack_require__(/*! ./../defaults */ "./node_modules/axios-proxy-fix/lib/defaults.js");
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ "./node_modules/axios-proxy-fix/lib/core/InterceptorManager.js");
-var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ "./node_modules/axios-proxy-fix/lib/core/dispatchRequest.js");
-
-/**
- * Create a new instance of Axios
- *
- * @param {Object} instanceConfig The default config for the instance
- */
-function Axios(instanceConfig) {
-  this.defaults = instanceConfig;
-  this.interceptors = {
-    request: new InterceptorManager(),
-    response: new InterceptorManager()
-  };
-}
-
-/**
- * Dispatch a request
- *
- * @param {Object} config The config specific for this request (merged with this.defaults)
- */
-Axios.prototype.request = function request(config) {
-  /*eslint no-param-reassign:0*/
-  // Allow for axios('example/url'[, config]) a la fetch API
-  if (typeof config === 'string') {
-    config = utils.merge({
-      url: arguments[0]
-    }, arguments[1]);
-  }
-
-  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
-  config.method = config.method.toLowerCase();
-
-  // Hook up interceptors middleware
-  var chain = [dispatchRequest, undefined];
-  var promise = Promise.resolve(config);
-
-  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    chain.unshift(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    chain.push(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  while (chain.length) {
-    promise = promise.then(chain.shift(), chain.shift());
-  }
-
-  return promise;
-};
-
-// Provide aliases for supported request methods
-utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(utils.merge(config || {}, {
-      method: method,
-      url: url
-    }));
-  };
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, data, config) {
-    return this.request(utils.merge(config || {}, {
-      method: method,
-      url: url,
-      data: data
-    }));
-  };
-});
-
-module.exports = Axios;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/core/InterceptorManager.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/core/InterceptorManager.js ***!
-  \*********************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 52:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/core/createError.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/core/createError.js ***!
-  \**************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var enhanceError = __webpack_require__(/*! ./enhanceError */ "./node_modules/axios-proxy-fix/lib/core/enhanceError.js");
-
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, request, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, request, response);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/core/dispatchRequest.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/core/dispatchRequest.js ***!
-  \******************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-var transformData = __webpack_require__(/*! ./transformData */ "./node_modules/axios-proxy-fix/lib/core/transformData.js");
-var isCancel = __webpack_require__(/*! ../cancel/isCancel */ "./node_modules/axios-proxy-fix/lib/cancel/isCancel.js");
-var defaults = __webpack_require__(/*! ../defaults */ "./node_modules/axios-proxy-fix/lib/defaults.js");
-var isAbsoluteURL = __webpack_require__(/*! ./../helpers/isAbsoluteURL */ "./node_modules/axios-proxy-fix/lib/helpers/isAbsoluteURL.js");
-var combineURLs = __webpack_require__(/*! ./../helpers/combineURLs */ "./node_modules/axios-proxy-fix/lib/helpers/combineURLs.js");
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-}
-
-/**
- * Dispatch a request to the server using the configured adapter.
- *
- * @param {object} config The config that is to be used for the request
- * @returns {Promise} The Promise to be fulfilled
- */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Support baseURL config
-  if (config.baseURL && !isAbsoluteURL(config.url)) {
-    config.url = combineURLs(config.baseURL, config.url);
-  }
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData(
-    config.data,
-    config.headers,
-    config.transformRequest
-  );
-
-  // Flatten headers
-  config.headers = utils.merge(
-    config.headers.common || {},
-    config.headers[config.method] || {},
-    config.headers || {}
-  );
-
-  utils.forEach(
-    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-    function cleanHeaderConfig(method) {
-      delete config.headers[method];
-    }
-  );
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData(
-      response.data,
-      response.headers,
-      config.transformResponse
-    );
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData(
-          reason.response.data,
-          reason.response.headers,
-          config.transformResponse
-        );
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/core/enhanceError.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/core/enhanceError.js ***!
-  \***************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Update an Error with the specified config, error code, and response.
- *
- * @param {Error} error The error to update.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The error.
- */
-module.exports = function enhanceError(error, config, code, request, response) {
-  error.config = config;
-  if (code) {
-    error.code = code;
-  }
-  error.request = request;
-  error.response = response;
-  return error;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/core/settle.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/core/settle.js ***!
-  \*********************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var createError = __webpack_require__(/*! ./createError */ "./node_modules/axios-proxy-fix/lib/core/createError.js");
-
-/**
- * Resolve or reject a Promise based on response status.
- *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
- */
-module.exports = function settle(resolve, reject, response) {
-  var validateStatus = response.config.validateStatus;
-  // Note: status is not exposed by XDomainRequest
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
-    resolve(response);
-  } else {
-    reject(createError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      null,
-      response.request,
-      response
-    ));
-  }
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/core/transformData.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/core/transformData.js ***!
-  \****************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-module.exports = function transformData(data, headers, fns) {
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
-  });
-
-  return data;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/defaults.js":
-/*!******************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/defaults.js ***!
-  \******************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 92:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ "./node_modules/axios-proxy-fix/lib/helpers/normalizeHeaderName.js");
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(/*! ./adapters/xhr */ "./node_modules/axios-proxy-fix/lib/adapters/xhr.js");
-  } else if (typeof process !== 'undefined') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(/*! ./adapters/http */ "./node_modules/axios-proxy-fix/lib/adapters/http.js");
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/bind.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/bind.js ***!
-  \**********************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/btoa.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/btoa.js ***!
-  \**********************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
-
-var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-
-function E() {
-  this.message = 'String contains an invalid character';
-}
-E.prototype = new Error;
-E.prototype.code = 5;
-E.prototype.name = 'InvalidCharacterError';
-
-function btoa(input) {
-  var str = String(input);
-  var output = '';
-  for (
-    // initialize result and counter
-    var block, charCode, idx = 0, map = chars;
-    // if the next str index does not exist:
-    //   change the mapping table to "="
-    //   check if d has no fractional digits
-    str.charAt(idx | 0) || (map = '=', idx % 1);
-    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
-    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
-  ) {
-    charCode = str.charCodeAt(idx += 3 / 4);
-    if (charCode > 0xFF) {
-      throw new E();
-    }
-    block = block << 8 | charCode;
-  }
-  return output;
-}
-
-module.exports = btoa;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/buildURL.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/buildURL.js ***!
-  \**************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-
-function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%40/gi, '@').
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
-}
-
-/**
- * Build a URL by appending params to the end
- *
- * @param {string} url The base of the url (e.g., http://www.google.com)
- * @param {object} [params] The params to be appended
- * @returns {string} The formatted url
- */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
-  }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      }
-
-      if (!utils.isArray(val)) {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/combineURLs.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/combineURLs.js ***!
-  \*****************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Creates a new URL by combining the specified URLs
- *
- * @param {string} baseURL The base URL
- * @param {string} relativeURL The relative URL
- * @returns {string} The combined URL
- */
-module.exports = function combineURLs(baseURL, relativeURL) {
-  return relativeURL
-    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
-    : baseURL;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/cookies.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/cookies.js ***!
-  \*************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs support document.cookie
-  (function standardBrowserEnv() {
-    return {
-      write: function write(name, value, expires, path, domain, secure) {
-        var cookie = [];
-        cookie.push(name + '=' + encodeURIComponent(value));
-
-        if (utils.isNumber(expires)) {
-          cookie.push('expires=' + new Date(expires).toGMTString());
-        }
-
-        if (utils.isString(path)) {
-          cookie.push('path=' + path);
-        }
-
-        if (utils.isString(domain)) {
-          cookie.push('domain=' + domain);
-        }
-
-        if (secure === true) {
-          cookie.push('secure');
-        }
-
-        document.cookie = cookie.join('; ');
-      },
-
-      read: function read(name) {
-        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-        return (match ? decodeURIComponent(match[3]) : null);
-      },
-
-      remove: function remove(name) {
-        this.write(name, '', Date.now() - 86400000);
-      }
-    };
-  })() :
-
-  // Non standard browser env (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return {
-      write: function write() {},
-      read: function read() { return null; },
-      remove: function remove() {}
-    };
-  })()
-);
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/isAbsoluteURL.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/isAbsoluteURL.js ***!
-  \*******************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Determines whether the specified URL is absolute
- *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
- */
-module.exports = function isAbsoluteURL(url) {
-  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-  // by any combination of letters, digits, plus, period, or hyphen.
-  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/isURLSameOrigin.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/isURLSameOrigin.js ***!
-  \*********************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs have full support of the APIs needed to test
-  // whether the request URL is of the same origin as current location.
-  (function standardBrowserEnv() {
-    var msie = /(msie|trident)/i.test(navigator.userAgent);
-    var urlParsingNode = document.createElement('a');
-    var originURL;
-
-    /**
-    * Parse a URL to discover it's components
-    *
-    * @param {String} url The URL to be parsed
-    * @returns {Object}
-    */
-    function resolveURL(url) {
-      var href = url;
-
-      if (msie) {
-        // IE needs attribute set twice to normalize properties
-        urlParsingNode.setAttribute('href', href);
-        href = urlParsingNode.href;
-      }
-
-      urlParsingNode.setAttribute('href', href);
-
-      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-      return {
-        href: urlParsingNode.href,
-        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-        host: urlParsingNode.host,
-        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-        hostname: urlParsingNode.hostname,
-        port: urlParsingNode.port,
-        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-                  urlParsingNode.pathname :
-                  '/' + urlParsingNode.pathname
-      };
-    }
-
-    originURL = resolveURL(window.location.href);
-
-    /**
-    * Determine if a URL shares the same origin as the current location
-    *
-    * @param {String} requestURL The URL to test
-    * @returns {boolean} True if URL shares the same origin, otherwise false
-    */
-    return function isURLSameOrigin(requestURL) {
-      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-      return (parsed.protocol === originURL.protocol &&
-            parsed.host === originURL.host);
-    };
-  })() :
-
-  // Non standard browser envs (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return function isURLSameOrigin() {
-      return true;
-    };
-  })()
-);
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/normalizeHeaderName.js":
-/*!*************************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/normalizeHeaderName.js ***!
-  \*************************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-
-module.exports = function normalizeHeaderName(headers, normalizedName) {
-  utils.forEach(headers, function processHeader(value, name) {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = value;
-      delete headers[name];
-    }
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/parseHeaders.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/parseHeaders.js ***!
-  \******************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios-proxy-fix/lib/utils.js");
-
-// Headers whose duplicates are ignored by node
-// c.f. https://nodejs.org/api/http.html#http_message_headers
-var ignoreDuplicateOf = [
-  'age', 'authorization', 'content-length', 'content-type', 'etag',
-  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
-  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
-  'referer', 'retry-after', 'user-agent'
-];
-
-/**
- * Parse headers into an object
- *
- * ```
- * Date: Wed, 27 Aug 2014 08:58:49 GMT
- * Content-Type: application/json
- * Connection: keep-alive
- * Transfer-Encoding: chunked
- * ```
- *
- * @param {String} headers Headers needing to be parsed
- * @returns {Object} Headers parsed into an object
- */
-module.exports = function parseHeaders(headers) {
-  var parsed = {};
-  var key;
-  var val;
-  var i;
-
-  if (!headers) { return parsed; }
-
-  utils.forEach(headers.split('\n'), function parser(line) {
-    i = line.indexOf(':');
-    key = utils.trim(line.substr(0, i)).toLowerCase();
-    val = utils.trim(line.substr(i + 1));
-
-    if (key) {
-      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
-        return;
-      }
-      if (key === 'set-cookie') {
-        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
-      } else {
-        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-      }
-    }
-  });
-
-  return parsed;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/helpers/spread.js":
-/*!************************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/helpers/spread.js ***!
-  \************************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Syntactic sugar for invoking a function and expanding an array for arguments.
- *
- * Common use case would be to use `Function.prototype.apply`.
- *
- *  ```js
- *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
- *  f.apply(null, args);
- *  ```
- *
- * With `spread` this example can be re-written.
- *
- *  ```js
- *  spread(function(x, y, z) {})([1, 2, 3]);
- *  ```
- *
- * @param {Function} callback
- * @returns {Function}
- */
-module.exports = function spread(callback) {
-  return function wrap(arr) {
-    return callback.apply(null, arr);
-  };
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/lib/utils.js":
-/*!***************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/lib/utils.js ***!
-  \***************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 282:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios-proxy-fix/lib/helpers/bind.js");
-var isBuffer = __webpack_require__(/*! is-buffer */ "./node_modules/is-buffer/index.js");
-
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
- * Determine if a value is an Array
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Array, otherwise false
- */
-function isArray(val) {
-  return toString.call(val) === '[object Array]';
-}
-
-/**
- * Determine if a value is an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an ArrayBuffer, otherwise false
- */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
- * Determine if a value is a FormData
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an FormData, otherwise false
- */
-function isFormData(val) {
-  return (typeof FormData !== 'undefined') && (val instanceof FormData);
-}
-
-/**
- * Determine if a value is a view on an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
- */
-function isArrayBufferView(val) {
-  var result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
-  }
-  return result;
-}
-
-/**
- * Determine if a value is a String
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a String, otherwise false
- */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
- * Determine if a value is a Number
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Number, otherwise false
- */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
- * Determine if a value is an Object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Object, otherwise false
- */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
- * Determine if a value is a Date
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Date, otherwise false
- */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
- * Determine if a value is a File
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a File, otherwise false
- */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
- * Determine if a value is a Blob
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Blob, otherwise false
- */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
- * Determine if a value is a Function
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Function, otherwise false
- */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
- * Determine if a value is a Stream
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Stream, otherwise false
- */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
- * Determine if a value is a URLSearchParams object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a URLSearchParams object, otherwise false
- */
-function isURLSearchParams(val) {
-  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
-}
-
-/**
- * Trim excess whitespace off the beginning and end of a string
- *
- * @param {String} str The String to trim
- * @returns {String} The String freed of excess whitespace
- */
-function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-}
-
-/**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  navigator.product -> 'ReactNative'
- */
-function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
-    return false;
-  }
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined'
-  );
-}
-
-/**
- * Iterate over an Array or an Object invoking a function for each item.
- *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
- */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object' && !isArray(obj)) {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
- *
- * ```js
- * var result = merge({foo: 123}, {foo: 456});
- * console.log(result.foo); // outputs 456
- * ```
- *
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (typeof result[key] === 'object' && typeof val === 'object') {
-      result[key] = merge(result[key], val);
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Extends object a by mutably adding to it the properties of object b.
- *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
- */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  extend: extend,
-  trim: trim
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios-proxy-fix/package.json":
-/*!***************************************************!*\
-  !*** ./node_modules/axios-proxy-fix/package.json ***!
-  \***************************************************/
-/*! default exports */
-/*! export author [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export browser [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export ./lib/adapters/http.js [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export bugs [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export dependencies [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export follow-redirects [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export is-buffer [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export description [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export coveralls [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export es6-promise [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-banner [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-cli [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-contrib-clean [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-contrib-nodeunit [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-contrib-watch [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-eslint [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-karma [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-ts [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export grunt-webpack [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export istanbul-instrumenter-loader [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export jasmine-core [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-chrome-launcher [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-coverage [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-firefox-launcher [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-jasmine [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-jasmine-ajax [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-opera-launcher [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-phantomjs-launcher [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-safari-launcher [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-sauce-launcher [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-sinon [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-sourcemap-loader [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-webpack [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export load-grunt-tasks [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export minimist [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export phantomjs-prebuilt [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export sinon [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export typescript [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export url-search-params [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export webpack [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export webpack-dev-server [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export homepage [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export keywords [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 2 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 3 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export 4 [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export license [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export main [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export name [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export repository [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export type [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export scripts [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export build [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export coveralls [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export examples [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export postversion [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export start [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export test [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export version [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   other exports [not provided] [no usage info] */
-/*! export typings [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export version [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = JSON.parse("{\"name\":\"axios-proxy-fix\",\"version\":\"0.16.3\",\"description\":\"Promise based HTTP client for the browser and node.js\",\"main\":\"index.js\",\"scripts\":{\"test\":\"grunt test\",\"start\":\"node ./sandbox/server.js\",\"build\":\"NODE_ENV=production grunt build\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\",\"postversion\":\"git push && git push --tags\",\"examples\":\"node ./examples/server.js\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/mistermoe/axios.git\"},\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"author\":\"Moe Jangda\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/mistermoe/axios/issues\"},\"homepage\":\"https://github.com/mistermoe/axios\",\"devDependencies\":{\"coveralls\":\"^2.11.9\",\"es6-promise\":\"^4.0.5\",\"grunt\":\"^1.0.1\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.0.0\",\"grunt-contrib-nodeunit\":\"^1.0.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^19.0.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-ts\":\"^6.0.0-beta.3\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.0.0\",\"karma-coverage\":\"^1.0.0\",\"karma-firefox-launcher\":\"^1.0.0\",\"karma-jasmine\":\"^1.0.2\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-phantomjs-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.1.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"phantomjs-prebuilt\":\"^2.1.7\",\"sinon\":\"^1.17.4\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\",\"url-search-params\":\"^0.6.1\",\"typescript\":\"^2.0.3\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"typings\":\"./index.d.ts\",\"dependencies\":{\"follow-redirects\":\"^1.2.3\",\"is-buffer\":\"^1.1.5\"}}");
-
-/***/ }),
-
 /***/ "./node_modules/axios-retry/index.js":
 /*!*******************************************!*\
   !*** ./node_modules/axios-retry/index.js ***!
@@ -2284,6 +38,9 @@ module.exports = __webpack_require__(/*! ./lib/index */ "./node_modules/axios-re
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 exports.isNetworkError = isNetworkError;
 exports.isRetryableError = isRetryableError;
 exports.isSafeRequestError = isSafeRequestError;
@@ -2349,7 +106,7 @@ function isIdempotentRequestError(error) {
 
 /**
  * @param  {Error}  error
- * @return {boolean}
+ * @return {boolean | Promise}
  */
 function isNetworkOrIdempotentRequestError(error) {
   return isNetworkError(error) || isIdempotentRequestError(error);
@@ -2413,6 +170,29 @@ function fixConfig(axios, config) {
 }
 
 /**
+ * Checks retryCondition if request can be retried. Handles it's retruning value or Promise.
+ * @param  {number} retries
+ * @param  {Function} retryCondition
+ * @param  {Object} currentState
+ * @param  {Error} error
+ * @return {boolean}
+ */
+async function shouldRetry(retries, retryCondition, currentState, error) {
+  var shouldRetryOrPromise = currentState.retryCount < retries && retryCondition(error);
+
+  // This could be a promise
+  if ((typeof shouldRetryOrPromise === 'undefined' ? 'undefined' : _typeof(shouldRetryOrPromise)) === 'object') {
+    try {
+      await shouldRetryOrPromise;
+      return true;
+    } catch (_err) {
+      return false;
+    }
+  }
+  return shouldRetryOrPromise;
+}
+
+/**
  * Adds response interceptors to an axios instance to retry requests failed due to network issues
  *
  * @example
@@ -2471,7 +251,7 @@ function axiosRetry(axios, defaultOptions) {
     return config;
   });
 
-  axios.interceptors.response.use(null, function (error) {
+  axios.interceptors.response.use(null, async function (error) {
     var config = error.config;
 
     // If we have no information to retry the request
@@ -2491,9 +271,7 @@ function axiosRetry(axios, defaultOptions) {
 
     var currentState = getCurrentState(config);
 
-    var shouldRetry = retryCondition(error) && currentState.retryCount < retries;
-
-    if (shouldRetry) {
+    if (await shouldRetry(retries, retryCondition, currentState, error)) {
       currentState.retryCount += 1;
       var delay = retryDelay(currentState.retryCount, error);
 
@@ -2612,9 +390,16 @@ module.exports = function httpAdapter(config) {
     var headers = config.headers;
 
     // Set User-Agent (required by some servers)
-    // Only set header if it hasn't been set in config
     // See https://github.com/axios/axios/issues/69
-    if (!headers['User-Agent'] && !headers['user-agent']) {
+    if ('User-Agent' in headers || 'user-agent' in headers) {
+      // User-Agent is specified; handle case where no UA header is desired
+      if (!headers['User-Agent'] && !headers['user-agent']) {
+        delete headers['User-Agent'];
+        delete headers['user-agent'];
+      }
+      // Otherwise, use specified value
+    } else {
+      // Only set header if it hasn't been set in config
       headers['User-Agent'] = 'axios/' + pkg.version;
     }
 
@@ -2789,11 +574,13 @@ module.exports = function httpAdapter(config) {
         settle(resolve, reject, response);
       } else {
         var responseBuffer = [];
+        var totalResponseBytes = 0;
         stream.on('data', function handleStreamData(chunk) {
           responseBuffer.push(chunk);
+          totalResponseBytes += chunk.length;
 
           // make sure the content length is not over the maxContentLength if specified
-          if (config.maxContentLength > -1 && Buffer.concat(responseBuffer).length > config.maxContentLength) {
+          if (config.maxContentLength > -1 && totalResponseBytes > config.maxContentLength) {
             stream.destroy();
             reject(createError('maxContentLength size of ' + config.maxContentLength + ' exceeded',
               config, null, lastRequest));
@@ -2828,14 +615,33 @@ module.exports = function httpAdapter(config) {
 
     // Handle request timeout
     if (config.timeout) {
+      // This is forcing a int timeout to avoid problems if the `req` interface doesn't handle other types.
+      var timeout = parseInt(config.timeout, 10);
+
+      if (isNaN(timeout)) {
+        reject(createError(
+          'error trying to parse `config.timeout` to int',
+          config,
+          'ERR_PARSE_TIMEOUT',
+          req
+        ));
+
+        return;
+      }
+
       // Sometime, the response will be very slow, and does not respond, the connect event will be block by event loop system.
       // And timer callback will be fired, and abort() will be invoked before connection, then get "socket hang up" and code ECONNRESET.
       // At this time, if we have a large number of request, nodejs will hang up some socket on background. and the number will up and up.
       // And then these socket which be hang up will devoring CPU little by little.
       // ClientRequest.setTimeout will be fired on the specify milliseconds, and can make sure that abort() will be fired after connect.
-      req.setTimeout(config.timeout, function handleRequestTimeout() {
+      req.setTimeout(timeout, function handleRequestTimeout() {
         req.abort();
-        reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED', req));
+        reject(createError(
+          'timeout of ' + timeout + 'ms exceeded',
+          config,
+          config.transitional && config.transitional.clarifyTimeoutError ? 'ETIMEDOUT' : 'ECONNABORTED',
+          req
+        ));
       });
     }
 
@@ -2888,6 +694,7 @@ module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
     var requestData = config.data;
     var requestHeaders = config.headers;
+    var responseType = config.responseType;
 
     if (utils.isFormData(requestData)) {
       delete requestHeaders['Content-Type']; // Let the browser set it
@@ -2908,23 +715,14 @@ module.exports = function xhrAdapter(config) {
     // Set the request timeout in MS
     request.timeout = config.timeout;
 
-    // Listen for ready state
-    request.onreadystatechange = function handleLoad() {
-      if (!request || request.readyState !== 4) {
+    function onloadend() {
+      if (!request) {
         return;
       }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
       // Prepare the response
       var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var responseData = !responseType || responseType === 'text' ||  responseType === 'json' ?
+        request.responseText : request.response;
       var response = {
         data: responseData,
         status: request.status,
@@ -2938,7 +736,30 @@ module.exports = function xhrAdapter(config) {
 
       // Clean up request
       request = null;
-    };
+    }
+
+    if ('onloadend' in request) {
+      // Use onloadend if available
+      request.onloadend = onloadend;
+    } else {
+      // Listen for ready state to emulate onloadend
+      request.onreadystatechange = function handleLoad() {
+        if (!request || request.readyState !== 4) {
+          return;
+        }
+
+        // The request errored out and we didn't get a response, this will be
+        // handled by onerror instead
+        // With one exception: request that using file: protocol, most browsers
+        // will return status as 0 even though it's a successful request
+        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+          return;
+        }
+        // readystate handler is calling before onerror or ontimeout handlers,
+        // so we should call onloadend on the next 'tick'
+        setTimeout(onloadend);
+      };
+    }
 
     // Handle browser request cancellation (as opposed to a manual cancellation)
     request.onabort = function handleAbort() {
@@ -2968,7 +789,10 @@ module.exports = function xhrAdapter(config) {
       if (config.timeoutErrorMessage) {
         timeoutErrorMessage = config.timeoutErrorMessage;
       }
-      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
+      reject(createError(
+        timeoutErrorMessage,
+        config,
+        config.transitional && config.transitional.clarifyTimeoutError ? 'ETIMEDOUT' : 'ECONNABORTED',
         request));
 
       // Clean up request
@@ -3008,16 +832,8 @@ module.exports = function xhrAdapter(config) {
     }
 
     // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
-        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
-        if (config.responseType !== 'json') {
-          throw e;
-        }
-      }
+    if (responseType && responseType !== 'json') {
+      request.responseType = config.responseType;
     }
 
     // Handle progress if needed
@@ -3255,7 +1071,7 @@ module.exports = function isCancel(value) {
   \**********************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 95:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 148:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -3266,7 +1082,9 @@ var buildURL = __webpack_require__(/*! ../helpers/buildURL */ "./node_modules/ax
 var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ "./node_modules/axios/lib/core/InterceptorManager.js");
 var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ "./node_modules/axios/lib/core/dispatchRequest.js");
 var mergeConfig = __webpack_require__(/*! ./mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
+var validator = __webpack_require__(/*! ../helpers/validator */ "./node_modules/axios/lib/helpers/validator.js");
 
+var validators = validator.validators;
 /**
  * Create a new instance of Axios
  *
@@ -3306,20 +1124,71 @@ Axios.prototype.request = function request(config) {
     config.method = 'get';
   }
 
-  // Hook up interceptors middleware
-  var chain = [dispatchRequest, undefined];
-  var promise = Promise.resolve(config);
+  var transitional = config.transitional;
 
+  if (transitional !== undefined) {
+    validator.assertOptions(transitional, {
+      silentJSONParsing: validators.transitional(validators.boolean, '1.0.0'),
+      forcedJSONParsing: validators.transitional(validators.boolean, '1.0.0'),
+      clarifyTimeoutError: validators.transitional(validators.boolean, '1.0.0')
+    }, false);
+  }
+
+  // filter out skipped interceptors
+  var requestInterceptorChain = [];
+  var synchronousRequestInterceptors = true;
   this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+    if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
+      return;
+    }
+
+    synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
+
+    requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
   });
 
+  var responseInterceptorChain = [];
   this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    chain.push(interceptor.fulfilled, interceptor.rejected);
+    responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
   });
 
-  while (chain.length) {
-    promise = promise.then(chain.shift(), chain.shift());
+  var promise;
+
+  if (!synchronousRequestInterceptors) {
+    var chain = [dispatchRequest, undefined];
+
+    Array.prototype.unshift.apply(chain, requestInterceptorChain);
+    chain = chain.concat(responseInterceptorChain);
+
+    promise = Promise.resolve(config);
+    while (chain.length) {
+      promise = promise.then(chain.shift(), chain.shift());
+    }
+
+    return promise;
+  }
+
+
+  var newConfig = config;
+  while (requestInterceptorChain.length) {
+    var onFulfilled = requestInterceptorChain.shift();
+    var onRejected = requestInterceptorChain.shift();
+    try {
+      newConfig = onFulfilled(newConfig);
+    } catch (error) {
+      onRejected(error);
+      break;
+    }
+  }
+
+  try {
+    promise = dispatchRequest(newConfig);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+
+  while (responseInterceptorChain.length) {
+    promise = promise.then(responseInterceptorChain.shift(), responseInterceptorChain.shift());
   }
 
   return promise;
@@ -3364,7 +1233,7 @@ module.exports = Axios;
   \***********************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 52:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 54:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -3384,10 +1253,12 @@ function InterceptorManager() {
  *
  * @return {Number} An ID used to remove interceptor later
  */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+InterceptorManager.prototype.use = function use(fulfilled, rejected, options) {
   this.handlers.push({
     fulfilled: fulfilled,
-    rejected: rejected
+    rejected: rejected,
+    synchronous: options ? options.synchronous : false,
+    runWhen: options ? options.runWhen : null
   });
   return this.handlers.length - 1;
 };
@@ -3529,7 +1400,8 @@ module.exports = function dispatchRequest(config) {
   config.headers = config.headers || {};
 
   // Transform request data
-  config.data = transformData(
+  config.data = transformData.call(
+    config,
     config.data,
     config.headers,
     config.transformRequest
@@ -3555,7 +1427,8 @@ module.exports = function dispatchRequest(config) {
     throwIfCancellationRequested(config);
 
     // Transform response data
-    response.data = transformData(
+    response.data = transformData.call(
+      config,
       response.data,
       response.headers,
       config.transformResponse
@@ -3568,7 +1441,8 @@ module.exports = function dispatchRequest(config) {
 
       // Transform response data
       if (reason && reason.response) {
-        reason.response.data = transformData(
+        reason.response.data = transformData.call(
+          config,
           reason.response.data,
           reason.response.headers,
           config.transformResponse
@@ -3785,13 +1659,14 @@ module.exports = function settle(resolve, reject, response) {
   \******************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
 var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
+var defaults = __webpack_require__(/*! ./../defaults */ "./node_modules/axios/lib/defaults.js");
 
 /**
  * Transform the data for a request or a response
@@ -3802,9 +1677,10 @@ var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/util
  * @returns {*} The resulting transformed data
  */
 module.exports = function transformData(data, headers, fns) {
+  var context = this || defaults;
   /*eslint no-param-reassign:0*/
   utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
+    data = fn.call(context, data, headers);
   });
 
   return data;
@@ -3819,7 +1695,7 @@ module.exports = function transformData(data, headers, fns) {
   \********************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 98:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 134:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -3827,6 +1703,7 @@ module.exports = function transformData(data, headers, fns) {
 
 var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios/lib/utils.js");
 var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ "./node_modules/axios/lib/helpers/normalizeHeaderName.js");
+var enhanceError = __webpack_require__(/*! ./core/enhanceError */ "./node_modules/axios/lib/core/enhanceError.js");
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -3850,12 +1727,35 @@ function getDefaultAdapter() {
   return adapter;
 }
 
+function stringifySafely(rawValue, parser, encoder) {
+  if (utils.isString(rawValue)) {
+    try {
+      (parser || JSON.parse)(rawValue);
+      return utils.trim(rawValue);
+    } catch (e) {
+      if (e.name !== 'SyntaxError') {
+        throw e;
+      }
+    }
+  }
+
+  return (encoder || JSON.stringify)(rawValue);
+}
+
 var defaults = {
+
+  transitional: {
+    silentJSONParsing: true,
+    forcedJSONParsing: true,
+    clarifyTimeoutError: false
+  },
+
   adapter: getDefaultAdapter(),
 
   transformRequest: [function transformRequest(data, headers) {
     normalizeHeaderName(headers, 'Accept');
     normalizeHeaderName(headers, 'Content-Type');
+
     if (utils.isFormData(data) ||
       utils.isArrayBuffer(data) ||
       utils.isBuffer(data) ||
@@ -3872,20 +1772,32 @@ var defaults = {
       setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
       return data.toString();
     }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
+    if (utils.isObject(data) || (headers && headers['Content-Type'] === 'application/json')) {
+      setContentTypeIfUnset(headers, 'application/json');
+      return stringifySafely(data);
     }
     return data;
   }],
 
   transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
+    var transitional = this.transitional;
+    var silentJSONParsing = transitional && transitional.silentJSONParsing;
+    var forcedJSONParsing = transitional && transitional.forcedJSONParsing;
+    var strictJSONParsing = !silentJSONParsing && this.responseType === 'json';
+
+    if (strictJSONParsing || (forcedJSONParsing && utils.isString(data) && data.length)) {
       try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
+        return JSON.parse(data);
+      } catch (e) {
+        if (strictJSONParsing) {
+          if (e.name === 'SyntaxError') {
+            throw enhanceError(e, this, 'E_JSON_PARSE');
+          }
+          throw e;
+        }
+      }
     }
+
     return data;
   }],
 
@@ -4398,21 +2310,138 @@ module.exports = function spread(callback) {
 
 /***/ }),
 
+/***/ "./node_modules/axios/lib/helpers/validator.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/axios/lib/helpers/validator.js ***!
+  \*****************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 101:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var pkg = __webpack_require__(/*! ./../../package.json */ "./node_modules/axios/package.json");
+
+var validators = {};
+
+// eslint-disable-next-line func-names
+['object', 'boolean', 'number', 'function', 'string', 'symbol'].forEach(function(type, i) {
+  validators[type] = function validator(thing) {
+    return typeof thing === type || 'a' + (i < 1 ? 'n ' : ' ') + type;
+  };
+});
+
+var deprecatedWarnings = {};
+var currentVerArr = pkg.version.split('.');
+
+/**
+ * Compare package versions
+ * @param {string} version
+ * @param {string?} thanVersion
+ * @returns {boolean}
+ */
+function isOlderVersion(version, thanVersion) {
+  var pkgVersionArr = thanVersion ? thanVersion.split('.') : currentVerArr;
+  var destVer = version.split('.');
+  for (var i = 0; i < 3; i++) {
+    if (pkgVersionArr[i] > destVer[i]) {
+      return true;
+    } else if (pkgVersionArr[i] < destVer[i]) {
+      return false;
+    }
+  }
+  return false;
+}
+
+/**
+ * Transitional option validator
+ * @param {function|boolean?} validator
+ * @param {string?} version
+ * @param {string} message
+ * @returns {function}
+ */
+validators.transitional = function transitional(validator, version, message) {
+  var isDeprecated = version && isOlderVersion(version);
+
+  function formatMessage(opt, desc) {
+    return '[Axios v' + pkg.version + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
+  }
+
+  // eslint-disable-next-line func-names
+  return function(value, opt, opts) {
+    if (validator === false) {
+      throw new Error(formatMessage(opt, ' has been removed in ' + version));
+    }
+
+    if (isDeprecated && !deprecatedWarnings[opt]) {
+      deprecatedWarnings[opt] = true;
+      // eslint-disable-next-line no-console
+      console.warn(
+        formatMessage(
+          opt,
+          ' has been deprecated since v' + version + ' and will be removed in the near future'
+        )
+      );
+    }
+
+    return validator ? validator(value, opt, opts) : true;
+  };
+};
+
+/**
+ * Assert object's properties type
+ * @param {object} options
+ * @param {object} schema
+ * @param {boolean?} allowUnknown
+ */
+
+function assertOptions(options, schema, allowUnknown) {
+  if (typeof options !== 'object') {
+    throw new TypeError('options must be an object');
+  }
+  var keys = Object.keys(options);
+  var i = keys.length;
+  while (i-- > 0) {
+    var opt = keys[i];
+    var validator = schema[opt];
+    if (validator) {
+      var value = options[opt];
+      var result = value === undefined || validator(value, opt, options);
+      if (result !== true) {
+        throw new TypeError('option ' + opt + ' must be ' + result);
+      }
+      continue;
+    }
+    if (allowUnknown !== true) {
+      throw Error('Unknown option ' + opt);
+    }
+  }
+}
+
+module.exports = {
+  isOlderVersion: isOlderVersion,
+  assertOptions: assertOptions,
+  validators: validators
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/axios/lib/utils.js":
 /*!*****************************************!*\
   !*** ./node_modules/axios/lib/utils.js ***!
   \*****************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 328:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 326:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
 var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
-
-/*global toString:true*/
 
 // utils is a library of generic helper functions non-specific to axios
 
@@ -4597,7 +2626,7 @@ function isURLSearchParams(val) {
  * @returns {String} The String freed of excess whitespace
  */
 function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+  return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
 }
 
 /**
@@ -4786,7 +2815,6 @@ module.exports = {
 /*!   other exports [not provided] [no usage info] */
 /*! export description [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export bundlesize [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export coveralls [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export es6-promise [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export grunt [provided] [no usage info] [missing usage info prevents renaming] */
@@ -4803,11 +2831,9 @@ module.exports = {
 /*!   export jasmine-core [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma-chrome-launcher [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-coverage [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma-firefox-launcher [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma-jasmine [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma-jasmine-ajax [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export karma-opera-launcher [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma-safari-launcher [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma-sauce-launcher [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export karma-sinon [provided] [no usage info] [missing usage info prevents renaming] */
@@ -4817,6 +2843,7 @@ module.exports = {
 /*!   export minimist [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export mocha [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export sinon [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export terser-webpack-plugin [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export typescript [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export url-search-params [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export webpack [provided] [no usage info] [missing usage info prevents renaming] */
@@ -4857,7 +2884,7 @@ module.exports = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.21.1\",\"description\":\"Promise based HTTP client for the browser and node.js\",\"main\":\"index.js\",\"scripts\":{\"test\":\"grunt test && bundlesize\",\"start\":\"node ./sandbox/server.js\",\"build\":\"NODE_ENV=production grunt build\",\"preversion\":\"npm test\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\",\"postversion\":\"git push && git push --tags\",\"examples\":\"node ./examples/server.js\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"fix\":\"eslint --fix lib/**/*.js\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/axios/axios.git\"},\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"author\":\"Matt Zabriskie\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"homepage\":\"https://github.com/axios/axios\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"jsdelivr\":\"dist/axios.min.js\",\"unpkg\":\"dist/axios.min.js\",\"typings\":\"./index.d.ts\",\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}]}");
+module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.21.4\",\"description\":\"Promise based HTTP client for the browser and node.js\",\"main\":\"index.js\",\"scripts\":{\"test\":\"grunt test\",\"start\":\"node ./sandbox/server.js\",\"build\":\"NODE_ENV=production grunt build\",\"preversion\":\"npm test\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\",\"postversion\":\"git push && git push --tags\",\"examples\":\"node ./examples/server.js\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"fix\":\"eslint --fix lib/**/*.js\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/axios/axios.git\"},\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"author\":\"Matt Zabriskie\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"homepage\":\"https://axios-http.com\",\"devDependencies\":{\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.3.0\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^23.0.0\",\"grunt-karma\":\"^4.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^4.0.2\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^6.3.2\",\"karma-chrome-launcher\":\"^3.1.0\",\"karma-firefox-launcher\":\"^2.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^4.3.6\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.8\",\"karma-webpack\":\"^4.0.2\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^8.2.1\",\"sinon\":\"^4.5.0\",\"terser-webpack-plugin\":\"^4.2.3\",\"typescript\":\"^4.0.5\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^4.44.2\",\"webpack-dev-server\":\"^3.11.0\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"jsdelivr\":\"dist/axios.min.js\",\"unpkg\":\"dist/axios.min.js\",\"typings\":\"./index.d.ts\",\"dependencies\":{\"follow-redirects\":\"^1.14.0\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}]}");
 
 /***/ }),
 
@@ -5740,18 +3767,24 @@ exports.enable(load());
   \************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var debug;
-try {
-  /* eslint global-require: off */
-  debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/index.js")("follow-redirects");
-}
-catch (error) {
-  debug = function () { /* */ };
-}
-module.exports = debug;
+
+module.exports = function () {
+  if (!debug) {
+    try {
+      /* eslint global-require: off */
+      debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/index.js")("follow-redirects");
+    }
+    catch (error) { /* */ }
+    if (typeof debug !== "function") {
+      debug = function () { /* */ };
+    }
+  }
+  debug.apply(null, arguments);
+};
 
 
 /***/ }),
@@ -5762,7 +3795,7 @@ module.exports = debug;
   \************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 497:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 597:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var url = __webpack_require__(/*! url */ "url");
@@ -5774,8 +3807,9 @@ var assert = __webpack_require__(/*! assert */ "assert");
 var debug = __webpack_require__(/*! ./debug */ "./node_modules/follow-redirects/debug.js");
 
 // Create handlers that pass events from native requests
+var events = ["abort", "aborted", "connect", "error", "socket", "timeout"];
 var eventHandlers = Object.create(null);
-["abort", "aborted", "connect", "error", "socket", "timeout"].forEach(function (event) {
+events.forEach(function (event) {
   eventHandlers[event] = function (arg1, arg2, arg3) {
     this._redirectable.emit(event, arg1, arg2, arg3);
   };
@@ -5784,7 +3818,7 @@ var eventHandlers = Object.create(null);
 // Error types with codes
 var RedirectionError = createErrorType(
   "ERR_FR_REDIRECTION_FAILURE",
-  ""
+  "Redirected request failed"
 );
 var TooManyRedirectsError = createErrorType(
   "ERR_FR_TOO_MANY_REDIRECTS",
@@ -5827,6 +3861,11 @@ function RedirectableRequest(options, responseCallback) {
   this._performRequest();
 }
 RedirectableRequest.prototype = Object.create(Writable.prototype);
+
+RedirectableRequest.prototype.abort = function () {
+  abortRequest(this._currentRequest);
+  this.emit("abort");
+};
 
 // Writes buffered data to the current native request
 RedirectableRequest.prototype.write = function (data, encoding, callback) {
@@ -5907,40 +3946,72 @@ RedirectableRequest.prototype.removeHeader = function (name) {
 
 // Global timeout for all underlying requests
 RedirectableRequest.prototype.setTimeout = function (msecs, callback) {
-  if (callback) {
-    this.once("timeout", callback);
+  var self = this;
+
+  // Destroys the socket on timeout
+  function destroyOnTimeout(socket) {
+    socket.setTimeout(msecs);
+    socket.removeListener("timeout", socket.destroy);
+    socket.addListener("timeout", socket.destroy);
   }
 
+  // Sets up a timer to trigger a timeout event
+  function startTimer(socket) {
+    if (self._timeout) {
+      clearTimeout(self._timeout);
+    }
+    self._timeout = setTimeout(function () {
+      self.emit("timeout");
+      clearTimer();
+    }, msecs);
+    destroyOnTimeout(socket);
+  }
+
+  // Stops a timeout from triggering
+  function clearTimer() {
+    // Clear the timeout
+    if (self._timeout) {
+      clearTimeout(self._timeout);
+      self._timeout = null;
+    }
+
+    // Clean up all attached listeners
+    self.removeListener("abort", clearTimer);
+    self.removeListener("error", clearTimer);
+    self.removeListener("response", clearTimer);
+    if (callback) {
+      self.removeListener("timeout", callback);
+    }
+    if (!self.socket) {
+      self._currentRequest.removeListener("socket", startTimer);
+    }
+  }
+
+  // Attach callback if passed
+  if (callback) {
+    this.on("timeout", callback);
+  }
+
+  // Start the timer if or when the socket is opened
   if (this.socket) {
-    startTimer(this, msecs);
+    startTimer(this.socket);
   }
   else {
-    var self = this;
-    this._currentRequest.once("socket", function () {
-      startTimer(self, msecs);
-    });
+    this._currentRequest.once("socket", startTimer);
   }
 
-  this.once("response", clearTimer);
-  this.once("error", clearTimer);
+  // Clean up on events
+  this.on("socket", destroyOnTimeout);
+  this.on("abort", clearTimer);
+  this.on("error", clearTimer);
+  this.on("response", clearTimer);
 
   return this;
 };
 
-function startTimer(request, msecs) {
-  clearTimeout(request._timeout);
-  request._timeout = setTimeout(function () {
-    request.emit("timeout");
-  }, msecs);
-}
-
-function clearTimer() {
-  clearTimeout(this._timeout);
-}
-
 // Proxy all other public ClientRequest methods
 [
-  "abort", "flushHeaders", "getHeader",
+  "flushHeaders", "getHeader",
   "setNoDelay", "setSocketKeepAlive",
 ].forEach(function (method) {
   RedirectableRequest.prototype[method] = function (a, b) {
@@ -5999,28 +4070,30 @@ RedirectableRequest.prototype._performRequest = function () {
   // If specified, use the agent corresponding to the protocol
   // (HTTP and HTTPS use different types of agents)
   if (this._options.agents) {
-    var scheme = protocol.substr(0, protocol.length - 1);
+    var scheme = protocol.slice(0, -1);
     this._options.agent = this._options.agents[scheme];
   }
 
-  // Create the native request
+  // Create the native request and set up its event handlers
   var request = this._currentRequest =
         nativeProtocol.request(this._options, this._onNativeResponse);
-  this._currentUrl = url.format(this._options);
-
-  // Set up event handlers
   request._redirectable = this;
-  for (var event in eventHandlers) {
-    /* istanbul ignore else */
-    if (event) {
-      request.on(event, eventHandlers[event]);
-    }
+  for (var event of events) {
+    request.on(event, eventHandlers[event]);
   }
+
+  // RFC7230§5.3.1: When making a request directly to an origin server, […]
+  // a client MUST send only the absolute path […] as the request-target.
+  this._currentUrl = /^\//.test(this._options.path) ?
+    url.format(this._options) :
+    // When making a request to a proxy, […]
+    // a client MUST send the target URI in absolute-form […].
+    this._currentUrl = this._options.path;
 
   // End a redirected request
   // (The first request must be ended explicitly with RedirectableRequest#end)
   if (this._isRedirect) {
-    // Write the request entity and end.
+    // Write the request entity and end
     var i = 0;
     var self = this;
     var buffers = this._requestBodyBuffers;
@@ -6068,86 +4141,120 @@ RedirectableRequest.prototype._processResponse = function (response) {
   // the user agent MAY automatically redirect its request to the URI
   // referenced by the Location field value,
   // even if the specific status code is not understood.
+
+  // If the response is not a redirect; return it as-is
   var location = response.headers.location;
-  if (location && this._options.followRedirects !== false &&
-      statusCode >= 300 && statusCode < 400) {
-    // Abort the current request
-    this._currentRequest.removeAllListeners();
-    this._currentRequest.on("error", noop);
-    this._currentRequest.abort();
-    // Discard the remainder of the response to avoid waiting for data
-    response.destroy();
-
-    // RFC7231§6.4: A client SHOULD detect and intervene
-    // in cyclical redirections (i.e., "infinite" redirection loops).
-    if (++this._redirectCount > this._options.maxRedirects) {
-      this.emit("error", new TooManyRedirectsError());
-      return;
-    }
-
-    // RFC7231§6.4: Automatic redirection needs to done with
-    // care for methods not known to be safe, […]
-    // RFC7231§6.4.2–3: For historical reasons, a user agent MAY change
-    // the request method from POST to GET for the subsequent request.
-    if ((statusCode === 301 || statusCode === 302) && this._options.method === "POST" ||
-        // RFC7231§6.4.4: The 303 (See Other) status code indicates that
-        // the server is redirecting the user agent to a different resource […]
-        // A user agent can perform a retrieval request targeting that URI
-        // (a GET or HEAD request if using HTTP) […]
-        (statusCode === 303) && !/^(?:GET|HEAD)$/.test(this._options.method)) {
-      this._options.method = "GET";
-      // Drop a possible entity and headers related to it
-      this._requestBodyBuffers = [];
-      removeMatchingHeaders(/^content-/i, this._options.headers);
-    }
-
-    // Drop the Host header, as the redirect might lead to a different host
-    var previousHostName = removeMatchingHeaders(/^host$/i, this._options.headers) ||
-      url.parse(this._currentUrl).hostname;
-
-    // Create the redirected request
-    var redirectUrl = url.resolve(this._currentUrl, location);
-    debug("redirecting to", redirectUrl);
-    this._isRedirect = true;
-    var redirectUrlParts = url.parse(redirectUrl);
-    Object.assign(this._options, redirectUrlParts);
-
-    // Drop the Authorization header if redirecting to another host
-    if (redirectUrlParts.hostname !== previousHostName) {
-      removeMatchingHeaders(/^authorization$/i, this._options.headers);
-    }
-
-    // Evaluate the beforeRedirect callback
-    if (typeof this._options.beforeRedirect === "function") {
-      var responseDetails = { headers: response.headers };
-      try {
-        this._options.beforeRedirect.call(null, this._options, responseDetails);
-      }
-      catch (err) {
-        this.emit("error", err);
-        return;
-      }
-      this._sanitizeOptions(this._options);
-    }
-
-    // Perform the redirected request
-    try {
-      this._performRequest();
-    }
-    catch (cause) {
-      var error = new RedirectionError("Redirected request failed: " + cause.message);
-      error.cause = cause;
-      this.emit("error", error);
-    }
-  }
-  else {
-    // The response is not a redirect; return it as-is
+  if (!location || this._options.followRedirects === false ||
+      statusCode < 300 || statusCode >= 400) {
     response.responseUrl = this._currentUrl;
     response.redirects = this._redirects;
     this.emit("response", response);
 
     // Clean up
     this._requestBodyBuffers = [];
+    return;
+  }
+
+  // The response is a redirect, so abort the current request
+  abortRequest(this._currentRequest);
+  // Discard the remainder of the response to avoid waiting for data
+  response.destroy();
+
+  // RFC7231§6.4: A client SHOULD detect and intervene
+  // in cyclical redirections (i.e., "infinite" redirection loops).
+  if (++this._redirectCount > this._options.maxRedirects) {
+    this.emit("error", new TooManyRedirectsError());
+    return;
+  }
+
+  // Store the request headers if applicable
+  var requestHeaders;
+  var beforeRedirect = this._options.beforeRedirect;
+  if (beforeRedirect) {
+    requestHeaders = Object.assign({
+      // The Host header was set by nativeProtocol.request
+      Host: response.req.getHeader("host"),
+    }, this._options.headers);
+  }
+
+  // RFC7231§6.4: Automatic redirection needs to done with
+  // care for methods not known to be safe, […]
+  // RFC7231§6.4.2–3: For historical reasons, a user agent MAY change
+  // the request method from POST to GET for the subsequent request.
+  var method = this._options.method;
+  if ((statusCode === 301 || statusCode === 302) && this._options.method === "POST" ||
+      // RFC7231§6.4.4: The 303 (See Other) status code indicates that
+      // the server is redirecting the user agent to a different resource […]
+      // A user agent can perform a retrieval request targeting that URI
+      // (a GET or HEAD request if using HTTP) […]
+      (statusCode === 303) && !/^(?:GET|HEAD)$/.test(this._options.method)) {
+    this._options.method = "GET";
+    // Drop a possible entity and headers related to it
+    this._requestBodyBuffers = [];
+    removeMatchingHeaders(/^content-/i, this._options.headers);
+  }
+
+  // Drop the Host header, as the redirect might lead to a different host
+  var currentHostHeader = removeMatchingHeaders(/^host$/i, this._options.headers);
+
+  // If the redirect is relative, carry over the host of the last request
+  var currentUrlParts = url.parse(this._currentUrl);
+  var currentHost = currentHostHeader || currentUrlParts.host;
+  var currentUrl = /^\w+:/.test(location) ? this._currentUrl :
+    url.format(Object.assign(currentUrlParts, { host: currentHost }));
+
+  // Determine the URL of the redirection
+  var redirectUrl;
+  try {
+    redirectUrl = url.resolve(currentUrl, location);
+  }
+  catch (cause) {
+    this.emit("error", new RedirectionError(cause));
+    return;
+  }
+
+  // Create the redirected request
+  debug("redirecting to", redirectUrl);
+  this._isRedirect = true;
+  var redirectUrlParts = url.parse(redirectUrl);
+  Object.assign(this._options, redirectUrlParts);
+
+  // Drop confidential headers when redirecting to a less secure protocol
+  // or to a different domain that is not a superdomain
+  if (redirectUrlParts.protocol !== currentUrlParts.protocol &&
+     redirectUrlParts.protocol !== "https:" ||
+     redirectUrlParts.host !== currentHost &&
+     !isSubdomain(redirectUrlParts.host, currentHost)) {
+    removeMatchingHeaders(/^(?:authorization|cookie)$/i, this._options.headers);
+  }
+
+  // Evaluate the beforeRedirect callback
+  if (typeof beforeRedirect === "function") {
+    var responseDetails = {
+      headers: response.headers,
+      statusCode: statusCode,
+    };
+    var requestDetails = {
+      url: currentUrl,
+      method: method,
+      headers: requestHeaders,
+    };
+    try {
+      beforeRedirect(this._options, responseDetails, requestDetails);
+    }
+    catch (err) {
+      this.emit("error", err);
+      return;
+    }
+    this._sanitizeOptions(this._options);
+  }
+
+  // Perform the redirected request
+  try {
+    this._performRequest();
+  }
+  catch (cause) {
+    this.emit("error", new RedirectionError(cause));
   }
 };
 
@@ -6167,7 +4274,7 @@ function wrap(protocols) {
     var wrappedProtocol = exports[scheme] = Object.create(nativeProtocol);
 
     // Executes a request, following redirects
-    wrappedProtocol.request = function (input, options, callback) {
+    function request(input, options, callback) {
       // Parse parameters
       if (typeof input === "string") {
         var urlStr = input;
@@ -6202,14 +4309,20 @@ function wrap(protocols) {
       assert.equal(options.protocol, protocol, "protocol mismatch");
       debug("options", options);
       return new RedirectableRequest(options, callback);
-    };
+    }
 
     // Executes a GET request, following redirects
-    wrappedProtocol.get = function (input, options, callback) {
-      var request = wrappedProtocol.request(input, options, callback);
-      request.end();
-      return request;
-    };
+    function get(input, options, callback) {
+      var wrappedRequest = wrappedProtocol.request(input, options, callback);
+      wrappedRequest.end();
+      return wrappedRequest;
+    }
+
+    // Expose the properties on the wrapped protocol
+    Object.defineProperties(wrappedProtocol, {
+      request: { value: request, configurable: true, enumerable: true, writable: true },
+      get: { value: get, configurable: true, enumerable: true, writable: true },
+    });
   });
   return exports;
 }
@@ -6245,13 +4358,20 @@ function removeMatchingHeaders(regex, headers) {
       delete headers[header];
     }
   }
-  return lastValue;
+  return (lastValue === null || typeof lastValue === "undefined") ?
+    undefined : String(lastValue).trim();
 }
 
 function createErrorType(code, defaultMessage) {
-  function CustomError(message) {
+  function CustomError(cause) {
     Error.captureStackTrace(this, this.constructor);
-    this.message = message || defaultMessage;
+    if (!cause) {
+      this.message = defaultMessage;
+    }
+    else {
+      this.message = defaultMessage + ": " + cause.message;
+      this.cause = cause;
+    }
   }
   CustomError.prototype = new Error();
   CustomError.prototype.constructor = CustomError;
@@ -6260,43 +4380,22 @@ function createErrorType(code, defaultMessage) {
   return CustomError;
 }
 
+function abortRequest(request) {
+  for (var event of events) {
+    request.removeListener(event, eventHandlers[event]);
+  }
+  request.on("error", noop);
+  request.abort();
+}
+
+function isSubdomain(subdomain, domain) {
+  const dot = subdomain.length - domain.length - 1;
+  return dot > 0 && subdomain[dot] === "." && subdomain.endsWith(domain);
+}
+
 // Exports
 module.exports = wrap({ http: http, https: https });
 module.exports.wrap = wrap;
-
-
-/***/ }),
-
-/***/ "./node_modules/is-buffer/index.js":
-/*!*****************************************!*\
-  !*** ./node_modules/is-buffer/index.js ***!
-  \*****************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
-/***/ ((module) => {
-
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-// The _isBuffer check is for Safari 5-7 support, because it's missing
-// Object.prototype.constructor. Remove this eventually
-module.exports = function (obj) {
-  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
-}
-
-function isBuffer (obj) {
-  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-}
-
-// For Node v0.10 support. Remove this eventually.
-function isSlowBuffer (obj) {
-  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
-}
 
 
 /***/ }),
@@ -6383,7 +4482,7 @@ module.exports = function (err) {
   \***************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Kafka = __webpack_require__(/*! ./src */ "./node_modules/kafkajs/src/index.js")
@@ -6392,6 +4491,13 @@ const AssignerProtocol = __webpack_require__(/*! ./src/consumer/assignerProtocol
 const Partitioners = __webpack_require__(/*! ./src/producer/partitioners */ "./node_modules/kafkajs/src/producer/partitioners/index.js")
 const Compression = __webpack_require__(/*! ./src/protocol/message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 const ResourceTypes = __webpack_require__(/*! ./src/protocol/resourceTypes */ "./node_modules/kafkajs/src/protocol/resourceTypes.js")
+const ConfigResourceTypes = __webpack_require__(/*! ./src/protocol/configResourceTypes */ "./node_modules/kafkajs/src/protocol/configResourceTypes.js")
+const ConfigSource = __webpack_require__(/*! ./src/protocol/configSource */ "./node_modules/kafkajs/src/protocol/configSource.js")
+const AclResourceTypes = __webpack_require__(/*! ./src/protocol/aclResourceTypes */ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js")
+const AclOperationTypes = __webpack_require__(/*! ./src/protocol/aclOperationTypes */ "./node_modules/kafkajs/src/protocol/aclOperationTypes.js")
+const AclPermissionTypes = __webpack_require__(/*! ./src/protocol/aclPermissionTypes */ "./node_modules/kafkajs/src/protocol/aclPermissionTypes.js")
+const ResourcePatternTypes = __webpack_require__(/*! ./src/protocol/resourcePatternTypes */ "./node_modules/kafkajs/src/protocol/resourcePatternTypes.js")
+const Errors = __webpack_require__(/*! ./src/errors */ "./node_modules/kafkajs/src/errors.js")
 const { LEVELS } = __webpack_require__(/*! ./src/loggers */ "./node_modules/kafkajs/src/loggers/index.js")
 
 module.exports = {
@@ -6402,9 +4508,117 @@ module.exports = {
   logLevel: LEVELS,
   CompressionTypes: Compression.Types,
   CompressionCodecs: Compression.Codecs,
+  /**
+   * @deprecated
+   * @see https://github.com/tulios/kafkajs/issues/649
+   *
+   * Use ConfigResourceTypes or AclResourceTypes instead.
+   */
   ResourceTypes,
+  ConfigResourceTypes,
+  AclResourceTypes,
+  AclOperationTypes,
+  AclPermissionTypes,
+  ResourcePatternTypes,
+  ConfigSource,
+  ...Errors,
 }
 
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/package.json":
+/*!*******************************************!*\
+  !*** ./node_modules/kafkajs/package.json ***!
+  \*******************************************/
+/*! default exports */
+/*! export author [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export bugs [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   other exports [not provided] [no usage info] */
+/*! export dependencies [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   exports [not provided] [no usage info] */
+/*! export description [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export @types/node [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export @typescript-eslint/typescript-estree [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint-config-prettier [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint-config-standard [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint-plugin-import [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint-plugin-node [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint-plugin-prettier [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint-plugin-promise [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export eslint-plugin-standard [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export execa [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export glob [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export husky [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export ip [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export jest [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export jest-circus [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export jest-extended [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export jest-junit [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export jsonwebtoken [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export lint-staged [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export mockdate [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export prettier [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export semver [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export typescript [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export uuid [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   other exports [not provided] [no usage info] */
+/*! export engines [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export node [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   other exports [not provided] [no usage info] */
+/*! export homepage [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export keywords [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export 1 [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export 2 [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   other exports [not provided] [no usage info] */
+/*! export license [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export lint-staged [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export *.js [provided] [no usage info] [missing usage info prevents renaming] */
+/*!     export 0 [provided] [no usage info] [missing usage info prevents renaming] */
+/*!     export 1 [provided] [no usage info] [missing usage info prevents renaming] */
+/*!     other exports [not provided] [no usage info] */
+/*!   other exports [not provided] [no usage info] */
+/*! export main [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export name [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export repository [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export type [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export url [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   other exports [not provided] [no usage info] */
+/*! export scripts [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export format [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export jest [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export lint [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export precommit [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:debug [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:admin [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:admin:ci [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:broker [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:broker:ci [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:consumer [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:consumer:ci [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:oauthbearer [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:oauthbearer:ci [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:others [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:others:ci [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:producer [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:group:producer:ci [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:local [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:local:watch [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export test:types [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   other exports [not provided] [no usage info] */
+/*! export types [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export version [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: module */
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse("{\"name\":\"kafkajs\",\"version\":\"1.16.0\",\"description\":\"A modern Apache Kafka client for node.js\",\"author\":\"Tulio Ornelas <ornelas.tulio@gmail.com>\",\"main\":\"index.js\",\"types\":\"types/index.d.ts\",\"license\":\"MIT\",\"keywords\":[\"kafka\",\"sasl\",\"scram\"],\"engines\":{\"node\":\">=10.13.0\"},\"repository\":{\"type\":\"git\",\"url\":\"https://github.com/tulios/kafkajs.git\"},\"bugs\":{\"url\":\"https://github.com/tulios/kafkajs/issues\"},\"homepage\":\"https://kafka.js.org\",\"scripts\":{\"jest\":\"export KAFKA_VERSION=${KAFKA_VERSION:='2.4'} && NODE_ENV=test echo \\\"KAFKA_VERSION: ${KAFKA_VERSION}\\\" && KAFKAJS_DEBUG_PROTOCOL_BUFFERS=1 jest\",\"test:local\":\"yarn jest --detectOpenHandles\",\"test:debug\":\"NODE_ENV=test KAFKAJS_DEBUG_PROTOCOL_BUFFERS=1 node --inspect-brk $(yarn bin 2>/dev/null)/jest --detectOpenHandles --runInBand --watch\",\"test:local:watch\":\"yarn test:local --watch\",\"test\":\"yarn lint && JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh 'yarn jest --ci --maxWorkers=4 --no-watchman --forceExit'\",\"lint\":\"find . -path ./node_modules -prune -o -path ./coverage -prune -o -path ./website -prune -o -name '*.js' -print0 | xargs -0 eslint\",\"format\":\"find . -path ./node_modules -prune -o -path ./coverage -prune -o -path ./website -prune -o -name '*.js' -print0 | xargs -0 prettier --write\",\"precommit\":\"lint-staged\",\"test:group:broker\":\"yarn jest --forceExit --testPathPattern 'src/broker/.*'\",\"test:group:admin\":\"yarn jest --forceExit --testPathPattern 'src/admin/.*'\",\"test:group:producer\":\"yarn jest --forceExit --testPathPattern 'src/producer/.*'\",\"test:group:consumer\":\"yarn jest --forceExit --testPathPattern 'src/consumer/.*.spec.js'\",\"test:group:others\":\"yarn jest --forceExit --testPathPattern 'src/(?!(broker|admin|producer|consumer)/).*'\",\"test:group:oauthbearer\":\"OAUTHBEARER_ENABLED=1 yarn jest --forceExit src/producer/index.spec.js src/broker/__tests__/connect.spec.js src/consumer/__tests__/connection.spec.js src/broker/__tests__/disconnect.spec.js src/admin/__tests__/connection.spec.js src/broker/__tests__/reauthenticate.spec.js\",\"test:group:broker:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:broker --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:admin:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:admin --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:producer:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:producer --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:consumer:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:consumer --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:others:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml ./scripts/testWithKafka.sh \\\"yarn test:group:others --ci --maxWorkers=4 --no-watchman\\\"\",\"test:group:oauthbearer:ci\":\"JEST_JUNIT_OUTPUT_NAME=test-report.xml COMPOSE_FILE='docker-compose.2_4_oauthbearer.yml' ./scripts/testWithKafka.sh \\\"yarn test:group:oauthbearer --ci --maxWorkers=4 --no-watchman\\\"\",\"test:types\":\"tsc -p types/\"},\"devDependencies\":{\"@types/node\":\"^12.0.8\",\"@typescript-eslint/typescript-estree\":\"^1.10.2\",\"eslint\":\"^6.8.0\",\"eslint-config-prettier\":\"^6.0.0\",\"eslint-config-standard\":\"^13.0.1\",\"eslint-plugin-import\":\"^2.18.2\",\"eslint-plugin-node\":\"^11.0.0\",\"eslint-plugin-prettier\":\"^3.1.0\",\"eslint-plugin-promise\":\"^4.2.1\",\"eslint-plugin-standard\":\"^4.0.0\",\"execa\":\"^2.0.3\",\"glob\":\"^7.1.4\",\"husky\":\"^3.0.1\",\"ip\":\"^1.1.5\",\"jest\":\"^25.1.0\",\"jest-circus\":\"^25.1.0\",\"jest-extended\":\"^0.11.2\",\"jest-junit\":\"^10.0.0\",\"jsonwebtoken\":\"^8.5.1\",\"lint-staged\":\"^9.2.0\",\"mockdate\":\"^2.0.5\",\"prettier\":\"^1.18.2\",\"semver\":\"^6.2.0\",\"typescript\":\"^3.8.3\",\"uuid\":\"^3.3.2\"},\"dependencies\":{},\"lint-staged\":{\"*.js\":[\"prettier --write\",\"git add\"]}}");
 
 /***/ }),
 
@@ -6414,24 +4628,37 @@ module.exports = {
   \*************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 75:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const flatten = __webpack_require__(/*! ../utils/flatten */ "./node_modules/kafkajs/src/utils/flatten.js")
 const waitFor = __webpack_require__(/*! ../utils/waitFor */ "./node_modules/kafkajs/src/utils/waitFor.js")
+const groupBy = __webpack_require__(/*! ../utils/groupBy */ "./node_modules/kafkajs/src/utils/groupBy.js")
 const createConsumer = __webpack_require__(/*! ../consumer */ "./node_modules/kafkajs/src/consumer/index.js")
 const InstrumentationEventEmitter = __webpack_require__(/*! ../instrumentation/emitter */ "./node_modules/kafkajs/src/instrumentation/emitter.js")
 const { events, wrap: wrapEvent, unwrap: unwrapEvent } = __webpack_require__(/*! ./instrumentationEvents */ "./node_modules/kafkajs/src/admin/instrumentationEvents.js")
 const { LEVELS } = __webpack_require__(/*! ../loggers */ "./node_modules/kafkajs/src/loggers/index.js")
-const { KafkaJSNonRetriableError, KafkaJSDeleteGroupsError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
-const RESOURCE_TYPES = __webpack_require__(/*! ../protocol/resourceTypes */ "./node_modules/kafkajs/src/protocol/resourceTypes.js")
+const {
+  KafkaJSNonRetriableError,
+  KafkaJSDeleteGroupsError,
+  KafkaJSBrokerNotFound,
+  KafkaJSDeleteTopicRecordsError,
+  KafkaJSAggregateError,
+} = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
+const { staleMetadata } = __webpack_require__(/*! ../protocol/error */ "./node_modules/kafkajs/src/protocol/error.js")
+const CONFIG_RESOURCE_TYPES = __webpack_require__(/*! ../protocol/configResourceTypes */ "./node_modules/kafkajs/src/protocol/configResourceTypes.js")
+const ACL_RESOURCE_TYPES = __webpack_require__(/*! ../protocol/aclResourceTypes */ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js")
+const ACL_OPERATION_TYPES = __webpack_require__(/*! ../protocol/aclOperationTypes */ "./node_modules/kafkajs/src/protocol/aclOperationTypes.js")
+const ACL_PERMISSION_TYPES = __webpack_require__(/*! ../protocol/aclPermissionTypes */ "./node_modules/kafkajs/src/protocol/aclPermissionTypes.js")
+const RESOURCE_PATTERN_TYPES = __webpack_require__(/*! ../protocol/resourcePatternTypes */ "./node_modules/kafkajs/src/protocol/resourcePatternTypes.js")
+const { EARLIEST_OFFSET, LATEST_OFFSET } = __webpack_require__(/*! ../constants */ "./node_modules/kafkajs/src/constants.js")
 
 const { CONNECT, DISCONNECT } = events
 
 const NO_CONTROLLER_ID = -1
 
-const { values, keys } = Object
+const { values, keys, entries } = Object
 const eventNames = values(events)
 const eventKeys = keys(events)
   .map(key => `admin.events.${key}`)
@@ -6462,12 +4689,17 @@ const findTopicPartitions = async (cluster, topic) => {
     .map(({ partitionId }) => partitionId)
     .sort()
 }
+const indexByPartition = array =>
+  array.reduce(
+    (obj, { partition, ...props }) => Object.assign(obj, { [partition]: { ...props } }),
+    {}
+  )
 
 /**
  *
  * @param {Object} params
  * @param {import("../../types").Logger} params.logger
- * @param {import('../instrumentation/emitter')} [params.instrumentationEmitter]
+ * @param {InstrumentationEventEmitter} [params.instrumentationEmitter]
  * @param {import('../../types').RetryOptions} params.retry
  * @param {import("../../types").Cluster} params.cluster
  *
@@ -6508,10 +4740,11 @@ module.exports = ({
   }
 
   /**
-   * @param {array} topics
-   * @param {boolean} [validateOnly=false]
-   * @param {number} [timeout=5000]
-   * @param {boolean} [waitForLeaders=true]
+   * @param {Object} request
+   * @param {array} request.topics
+   * @param {boolean} [request.validateOnly=false]
+   * @param {number} [request.timeout=5000]
+   * @param {boolean} [request.waitForLeaders=true]
    * @return {Promise}
    */
   const createTopics = async ({ topics, validateOnly, timeout, waitForLeaders = true }) => {
@@ -6556,8 +4789,10 @@ module.exports = ({
           throw e
         }
 
-        if (e.type === 'TOPIC_ALREADY_EXISTS') {
-          return false
+        if (e instanceof KafkaJSAggregateError) {
+          if (e.errors.every(error => error.type === 'TOPIC_ALREADY_EXISTS')) {
+            return false
+          }
         }
 
         bail(e)
@@ -6770,38 +5005,94 @@ module.exports = ({
   }
 
   /**
+   * Fetch offsets for a topic or multiple topics
+   *
+   * Note: set either topic or topics but not both.
+   *
    * @param {string} groupId
-   * @param {string} topic
+   * @param {string} topic - deprecated, use the `topics` parameter. Topic to fetch offsets for.
+   * @param {string[]} topics - list of topics to fetch offsets for, defaults to `[]` which fetches all topics for `groupId`.
+   * @param {boolean} [resolveOffsets=false]
    * @return {Promise}
    */
-  const fetchOffsets = async ({ groupId, topic }) => {
+  const fetchOffsets = async ({ groupId, topic, topics, resolveOffsets = false }) => {
     if (!groupId) {
       throw new KafkaJSNonRetriableError(`Invalid groupId ${groupId}`)
     }
 
-    if (!topic) {
-      throw new KafkaJSNonRetriableError(`Invalid topic ${topic}`)
+    if (!topic && !topics) {
+      topics = []
     }
 
-    const partitions = await findTopicPartitions(cluster, topic)
-    const coordinator = await cluster.findGroupCoordinator({ groupId })
-    const partitionsToFetch = partitions.map(partition => ({ partition }))
+    if (!topic && !Array.isArray(topics)) {
+      throw new KafkaJSNonRetriableError(`Expected topic or topics array to be set`)
+    }
 
-    const { responses } = await coordinator.offsetFetch({
+    if (topic && topics) {
+      throw new KafkaJSNonRetriableError(`Either topic or topics must be set, not both`)
+    }
+
+    if (topic) {
+      topics = [topic]
+    }
+
+    const coordinator = await cluster.findGroupCoordinator({ groupId })
+    const topicsToFetch = await Promise.all(
+      topics.map(async topic => {
+        const partitions = await findTopicPartitions(cluster, topic)
+        const partitionsToFetch = partitions.map(partition => ({ partition }))
+        return { topic, partitions: partitionsToFetch }
+      })
+    )
+    let { responses: consumerOffsets } = await coordinator.offsetFetch({
       groupId,
-      topics: [{ topic, partitions: partitionsToFetch }],
+      topics: topicsToFetch,
     })
 
-    return responses
-      .filter(response => response.topic === topic)
-      .map(({ partitions }) =>
-        partitions.map(({ partition, offset, metadata }) => ({
-          partition,
-          offset,
-          metadata: metadata || null,
-        }))
+    if (resolveOffsets) {
+      consumerOffsets = await Promise.all(
+        consumerOffsets.map(async ({ topic, partitions }) => {
+          const indexedOffsets = indexByPartition(await fetchTopicOffsets(topic))
+          const recalculatedPartitions = partitions.map(({ offset, partition, ...props }) => {
+            let resolvedOffset = offset
+            if (Number(offset) === EARLIEST_OFFSET) {
+              resolvedOffset = indexedOffsets[partition].low
+            }
+            if (Number(offset) === LATEST_OFFSET) {
+              resolvedOffset = indexedOffsets[partition].high
+            }
+            return {
+              partition,
+              offset: resolvedOffset,
+              ...props,
+            }
+          })
+
+          await setOffsets({ groupId, topic, partitions: recalculatedPartitions })
+
+          return {
+            topic,
+            partitions: recalculatedPartitions,
+          }
+        })
       )
-      .pop()
+    }
+
+    const result = consumerOffsets.map(({ topic, partitions }) => {
+      const completePartitions = partitions.map(({ partition, offset, metadata }) => ({
+        partition,
+        offset,
+        metadata: metadata || null,
+      }))
+
+      return { topic, partitions: completePartitions }
+    })
+
+    if (topic) {
+      return result.pop().partitions
+    } else {
+      return result
+    }
   }
 
   /**
@@ -6890,13 +5181,32 @@ module.exports = ({
     })
   }
 
+  const isBrokerConfig = type =>
+    [CONFIG_RESOURCE_TYPES.BROKER, CONFIG_RESOURCE_TYPES.BROKER_LOGGER].includes(type)
+
+  /**
+   * Broker configs can only be returned by the target broker
+   *
+   * @see
+   * https://github.com/apache/kafka/blob/821c1ac6641845aeca96a43bc2b946ecec5cba4f/clients/src/main/java/org/apache/kafka/clients/admin/KafkaAdminClient.java#L3783
+   * https://github.com/apache/kafka/blob/821c1ac6641845aeca96a43bc2b946ecec5cba4f/clients/src/main/java/org/apache/kafka/clients/admin/KafkaAdminClient.java#L2027
+   *
+   * @param {Broker} defaultBroker. Broker used in case the configuration is not a broker config
+   */
+  const groupResourcesByBroker = ({ resources, defaultBroker }) =>
+    groupBy(resources, async ({ type, name: nodeId }) => {
+      return isBrokerConfig(type)
+        ? await cluster.findBroker({ nodeId: String(nodeId) })
+        : defaultBroker
+    })
+
   /**
    * @param {Array<ResourceConfigQuery>} resources
    * @param {boolean} [includeSynonyms=false]
    * @return {Promise}
    *
    * @typedef {Object} ResourceConfigQuery
-   * @property {ResourceType} type
+   * @property {ConfigResourceType} type
    * @property {string} name
    * @property {Array<String>} [configNames=[]]
    */
@@ -6909,7 +5219,7 @@ module.exports = ({
       throw new KafkaJSNonRetriableError('Resources array cannot be empty')
     }
 
-    const validResourceTypes = Object.values(RESOURCE_TYPES)
+    const validResourceTypes = Object.values(CONFIG_RESOURCE_TYPES)
     const invalidType = resources.find(r => !validResourceTypes.includes(r.type))
 
     if (invalidType) {
@@ -6942,9 +5252,28 @@ module.exports = ({
     return retrier(async (bail, retryCount, retryTime) => {
       try {
         await cluster.refreshMetadata()
-        const broker = await cluster.findControllerBroker()
-        const response = await broker.describeConfigs({ resources, includeSynonyms })
-        return response
+        const controller = await cluster.findControllerBroker()
+        const resourcerByBroker = await groupResourcesByBroker({
+          resources,
+          defaultBroker: controller,
+        })
+
+        const describeConfigsAction = async broker => {
+          const targetBroker = broker || controller
+          return targetBroker.describeConfigs({
+            resources: resourcerByBroker.get(targetBroker),
+            includeSynonyms,
+          })
+        }
+
+        const brokers = Array.from(resourcerByBroker.keys())
+        const responses = await Promise.all(brokers.map(describeConfigsAction))
+        const responseResources = responses.reduce(
+          (result, { resources }) => [...result, ...resources],
+          []
+        )
+
+        return { resources: responseResources }
       } catch (e) {
         if (e.type === 'NOT_CONTROLLER') {
           logger.warn('Could not describe configs', { error: e.message, retryCount, retryTime })
@@ -6962,7 +5291,7 @@ module.exports = ({
    * @return {Promise}
    *
    * @typedef {Object} ResourceConfig
-   * @property {ResourceType} type
+   * @property {ConfigResourceType} type
    * @property {string} name
    * @property {Array<ResourceConfigEntry>} configEntries
    *
@@ -6979,7 +5308,7 @@ module.exports = ({
       throw new KafkaJSNonRetriableError('Resources array cannot be empty')
     }
 
-    const validResourceTypes = Object.values(RESOURCE_TYPES)
+    const validResourceTypes = Object.values(CONFIG_RESOURCE_TYPES)
     const invalidType = resources.find(r => !validResourceTypes.includes(r.type))
 
     if (invalidType) {
@@ -7020,9 +5349,28 @@ module.exports = ({
     return retrier(async (bail, retryCount, retryTime) => {
       try {
         await cluster.refreshMetadata()
-        const broker = await cluster.findControllerBroker()
-        const response = await broker.alterConfigs({ resources, validateOnly: !!validateOnly })
-        return response
+        const controller = await cluster.findControllerBroker()
+        const resourcerByBroker = await groupResourcesByBroker({
+          resources,
+          defaultBroker: controller,
+        })
+
+        const alterConfigsAction = async broker => {
+          const targetBroker = broker || controller
+          return targetBroker.alterConfigs({
+            resources: resourcerByBroker.get(targetBroker),
+            validateOnly: !!validateOnly,
+          })
+        }
+
+        const brokers = Array.from(resourcerByBroker.keys())
+        const responses = await Promise.all(brokers.map(alterConfigsAction))
+        const responseResources = responses.reduce(
+          (result, { resources }) => [...result, ...resources],
+          []
+        )
+
+        return { resources: responseResources }
       } catch (e) {
         if (e.type === 'NOT_CONTROLLER') {
           logger.warn('Could not alter configs', { error: e.message, retryCount, retryTime })
@@ -7318,10 +5666,431 @@ module.exports = ({
   }
 
   /**
-   * @param {string} eventName
-   * @param {Function} listener
-   * @return {Function}
+   * Delete topic records up to the selected partition offsets
+   *
+   * @param {string} topic
+   * @param {Array<SeekEntry>} partitions
+   * @return {Promise}
+   *
+   * @typedef {Object} SeekEntry
+   * @property {number} partition
+   * @property {string} offset
    */
+  const deleteTopicRecords = async ({ topic, partitions }) => {
+    if (!topic || typeof topic !== 'string') {
+      throw new KafkaJSNonRetriableError(`Invalid topic "${topic}"`)
+    }
+
+    if (!partitions || partitions.length === 0) {
+      throw new KafkaJSNonRetriableError(`Invalid partitions`)
+    }
+
+    const partitionsByBroker = cluster.findLeaderForPartitions(
+      topic,
+      partitions.map(p => p.partition)
+    )
+
+    const partitionsFound = flatten(values(partitionsByBroker))
+    const topicOffsets = await fetchTopicOffsets(topic)
+
+    const leaderNotFoundErrors = []
+    partitions.forEach(({ partition, offset }) => {
+      // throw if no leader found for partition
+      if (!partitionsFound.includes(partition)) {
+        leaderNotFoundErrors.push({
+          partition,
+          offset,
+          error: new KafkaJSBrokerNotFound('Could not find the leader for the partition', {
+            retriable: false,
+          }),
+        })
+        return
+      }
+      const { low } = topicOffsets.find(p => p.partition === partition) || {
+        high: undefined,
+        low: undefined,
+      }
+      // warn in case of offset below low watermark
+      if (parseInt(offset) < parseInt(low) && parseInt(offset) !== -1) {
+        logger.warn(
+          'The requested offset is before the earliest offset maintained on the partition - no records will be deleted from this partition',
+          {
+            topic,
+            partition,
+            offset,
+          }
+        )
+      }
+    })
+
+    if (leaderNotFoundErrors.length > 0) {
+      throw new KafkaJSDeleteTopicRecordsError({ topic, partitions: leaderNotFoundErrors })
+    }
+
+    const seekEntriesByBroker = entries(partitionsByBroker).reduce(
+      (obj, [nodeId, nodePartitions]) => {
+        obj[nodeId] = {
+          topic,
+          partitions: partitions.filter(p => nodePartitions.includes(p.partition)),
+        }
+        return obj
+      },
+      {}
+    )
+
+    const retrier = createRetry(retry)
+    return retrier(async bail => {
+      try {
+        const partitionErrors = []
+
+        const brokerRequests = entries(seekEntriesByBroker).map(
+          ([nodeId, { topic, partitions }]) => async () => {
+            const broker = await cluster.findBroker({ nodeId })
+            await broker.deleteRecords({ topics: [{ topic, partitions }] })
+            // remove successful entry so it's ignored on retry
+            delete seekEntriesByBroker[nodeId]
+          }
+        )
+
+        await Promise.all(
+          brokerRequests.map(request =>
+            request().catch(e => {
+              if (e.name === 'KafkaJSDeleteTopicRecordsError') {
+                e.partitions.forEach(({ partition, offset, error }) => {
+                  partitionErrors.push({
+                    partition,
+                    offset,
+                    error,
+                  })
+                })
+              } else {
+                // then it's an unknown error, not from the broker response
+                throw e
+              }
+            })
+          )
+        )
+
+        if (partitionErrors.length > 0) {
+          throw new KafkaJSDeleteTopicRecordsError({
+            topic,
+            partitions: partitionErrors,
+          })
+        }
+      } catch (e) {
+        if (
+          e.retriable &&
+          e.partitions.some(
+            ({ error }) => staleMetadata(error) || error.name === 'KafkaJSMetadataNotLoaded'
+          )
+        ) {
+          await cluster.refreshMetadata()
+        }
+        throw e
+      }
+    })
+  }
+
+  /**
+   * @param {Array<ACLEntry>} acl
+   * @return {Promise<void>}
+   *
+   * @typedef {Object} ACLEntry
+   */
+  const createAcls = async ({ acl }) => {
+    if (!acl || !Array.isArray(acl)) {
+      throw new KafkaJSNonRetriableError(`Invalid ACL array ${acl}`)
+    }
+    if (acl.length === 0) {
+      throw new KafkaJSNonRetriableError('Empty ACL array')
+    }
+
+    // Validate principal
+    if (acl.some(({ principal }) => typeof principal !== 'string')) {
+      throw new KafkaJSNonRetriableError(
+        'Invalid ACL array, the principals have to be a valid string'
+      )
+    }
+
+    // Validate host
+    if (acl.some(({ host }) => typeof host !== 'string')) {
+      throw new KafkaJSNonRetriableError('Invalid ACL array, the hosts have to be a valid string')
+    }
+
+    // Validate resourceName
+    if (acl.some(({ resourceName }) => typeof resourceName !== 'string')) {
+      throw new KafkaJSNonRetriableError(
+        'Invalid ACL array, the resourceNames have to be a valid string'
+      )
+    }
+
+    let invalidType
+    // Validate operation
+    const validOperationTypes = Object.values(ACL_OPERATION_TYPES)
+    invalidType = acl.find(i => !validOperationTypes.includes(i.operation))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid operation type ${invalidType.operation}: ${JSON.stringify(invalidType)}`
+      )
+    }
+
+    // Validate resourcePatternTypes
+    const validResourcePatternTypes = Object.values(RESOURCE_PATTERN_TYPES)
+    invalidType = acl.find(i => !validResourcePatternTypes.includes(i.resourcePatternType))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid resource pattern type ${invalidType.resourcePatternType}: ${JSON.stringify(
+          invalidType
+        )}`
+      )
+    }
+
+    // Validate permissionTypes
+    const validPermissionTypes = Object.values(ACL_PERMISSION_TYPES)
+    invalidType = acl.find(i => !validPermissionTypes.includes(i.permissionType))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid permission type ${invalidType.permissionType}: ${JSON.stringify(invalidType)}`
+      )
+    }
+
+    // Validate resourceTypes
+    const validResourceTypes = Object.values(ACL_RESOURCE_TYPES)
+    invalidType = acl.find(i => !validResourceTypes.includes(i.resourceType))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid resource type ${invalidType.resourceType}: ${JSON.stringify(invalidType)}`
+      )
+    }
+
+    const retrier = createRetry(retry)
+
+    return retrier(async (bail, retryCount, retryTime) => {
+      try {
+        await cluster.refreshMetadata()
+        const broker = await cluster.findControllerBroker()
+        await broker.createAcls({ acl })
+
+        return true
+      } catch (e) {
+        if (e.type === 'NOT_CONTROLLER') {
+          logger.warn('Could not create ACL', { error: e.message, retryCount, retryTime })
+          throw e
+        }
+
+        bail(e)
+      }
+    })
+  }
+
+  /**
+   * @param {ACLResourceTypes} resourceType The type of resource
+   * @param {string} resourceName The name of the resource
+   * @param {ACLResourcePatternTypes} resourcePatternType The resource pattern type filter
+   * @param {string} principal The principal name
+   * @param {string} host The hostname
+   * @param {ACLOperationTypes} operation The type of operation
+   * @param {ACLPermissionTypes} permissionType The type of permission
+   * @return {Promise<void>}
+   *
+   * @typedef {number} ACLResourceTypes
+   * @typedef {number} ACLResourcePatternTypes
+   * @typedef {number} ACLOperationTypes
+   * @typedef {number} ACLPermissionTypes
+   */
+  const describeAcls = async ({
+    resourceType,
+    resourceName,
+    resourcePatternType,
+    principal,
+    host,
+    operation,
+    permissionType,
+  }) => {
+    // Validate principal
+    if (typeof principal !== 'string' && typeof principal !== 'undefined') {
+      throw new KafkaJSNonRetriableError(
+        'Invalid principal, the principal have to be a valid string'
+      )
+    }
+
+    // Validate host
+    if (typeof host !== 'string' && typeof host !== 'undefined') {
+      throw new KafkaJSNonRetriableError('Invalid host, the host have to be a valid string')
+    }
+
+    // Validate resourceName
+    if (typeof resourceName !== 'string' && typeof resourceName !== 'undefined') {
+      throw new KafkaJSNonRetriableError(
+        'Invalid resourceName, the resourceName have to be a valid string'
+      )
+    }
+
+    // Validate operation
+    const validOperationTypes = Object.values(ACL_OPERATION_TYPES)
+    if (!validOperationTypes.includes(operation)) {
+      throw new KafkaJSNonRetriableError(`Invalid operation type ${operation}`)
+    }
+
+    // Validate resourcePatternType
+    const validResourcePatternTypes = Object.values(RESOURCE_PATTERN_TYPES)
+    if (!validResourcePatternTypes.includes(resourcePatternType)) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid resource pattern filter type ${resourcePatternType}`
+      )
+    }
+
+    // Validate permissionType
+    const validPermissionTypes = Object.values(ACL_PERMISSION_TYPES)
+    if (!validPermissionTypes.includes(permissionType)) {
+      throw new KafkaJSNonRetriableError(`Invalid permission type ${permissionType}`)
+    }
+
+    // Validate resourceType
+    const validResourceTypes = Object.values(ACL_RESOURCE_TYPES)
+    if (!validResourceTypes.includes(resourceType)) {
+      throw new KafkaJSNonRetriableError(`Invalid resource type ${resourceType}`)
+    }
+
+    const retrier = createRetry(retry)
+
+    return retrier(async (bail, retryCount, retryTime) => {
+      try {
+        await cluster.refreshMetadata()
+        const broker = await cluster.findControllerBroker()
+        const { resources } = await broker.describeAcls({
+          resourceType,
+          resourceName,
+          resourcePatternType,
+          principal,
+          host,
+          operation,
+          permissionType,
+        })
+        return { resources }
+      } catch (e) {
+        if (e.type === 'NOT_CONTROLLER') {
+          logger.warn('Could not describe ACL', { error: e.message, retryCount, retryTime })
+          throw e
+        }
+
+        bail(e)
+      }
+    })
+  }
+
+  /**
+   * @param {Array<ACLFilter>} filters
+   * @return {Promise<void>}
+   *
+   * @typedef {Object} ACLFilter
+   */
+  const deleteAcls = async ({ filters }) => {
+    if (!filters || !Array.isArray(filters)) {
+      throw new KafkaJSNonRetriableError(`Invalid ACL Filter array ${filters}`)
+    }
+
+    if (filters.length === 0) {
+      throw new KafkaJSNonRetriableError('Empty ACL Filter array')
+    }
+
+    // Validate principal
+    if (
+      filters.some(
+        ({ principal }) => typeof principal !== 'string' && typeof principal !== 'undefined'
+      )
+    ) {
+      throw new KafkaJSNonRetriableError(
+        'Invalid ACL Filter array, the principals have to be a valid string'
+      )
+    }
+
+    // Validate host
+    if (filters.some(({ host }) => typeof host !== 'string' && typeof host !== 'undefined')) {
+      throw new KafkaJSNonRetriableError(
+        'Invalid ACL Filter array, the hosts have to be a valid string'
+      )
+    }
+
+    // Validate resourceName
+    if (
+      filters.some(
+        ({ resourceName }) =>
+          typeof resourceName !== 'string' && typeof resourceName !== 'undefined'
+      )
+    ) {
+      throw new KafkaJSNonRetriableError(
+        'Invalid ACL Filter array, the resourceNames have to be a valid string'
+      )
+    }
+
+    let invalidType
+    // Validate operation
+    const validOperationTypes = Object.values(ACL_OPERATION_TYPES)
+    invalidType = filters.find(i => !validOperationTypes.includes(i.operation))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid operation type ${invalidType.operation}: ${JSON.stringify(invalidType)}`
+      )
+    }
+
+    // Validate resourcePatternTypes
+    const validResourcePatternTypes = Object.values(RESOURCE_PATTERN_TYPES)
+    invalidType = filters.find(i => !validResourcePatternTypes.includes(i.resourcePatternType))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid resource pattern type ${invalidType.resourcePatternType}: ${JSON.stringify(
+          invalidType
+        )}`
+      )
+    }
+
+    // Validate permissionTypes
+    const validPermissionTypes = Object.values(ACL_PERMISSION_TYPES)
+    invalidType = filters.find(i => !validPermissionTypes.includes(i.permissionType))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid permission type ${invalidType.permissionType}: ${JSON.stringify(invalidType)}`
+      )
+    }
+
+    // Validate resourceTypes
+    const validResourceTypes = Object.values(ACL_RESOURCE_TYPES)
+    invalidType = filters.find(i => !validResourceTypes.includes(i.resourceType))
+
+    if (invalidType) {
+      throw new KafkaJSNonRetriableError(
+        `Invalid resource type ${invalidType.resourceType}: ${JSON.stringify(invalidType)}`
+      )
+    }
+
+    const retrier = createRetry(retry)
+
+    return retrier(async (bail, retryCount, retryTime) => {
+      try {
+        await cluster.refreshMetadata()
+        const broker = await cluster.findControllerBroker()
+        const { filterResponses } = await broker.deleteAcls({ filters })
+        return { filterResponses }
+      } catch (e) {
+        if (e.type === 'NOT_CONTROLLER') {
+          logger.warn('Could not delete ACL', { error: e.message, retryCount, retryTime })
+          throw e
+        }
+
+        bail(e)
+      }
+    })
+  }
+
+  /** @type {import("../../types").Admin["on"]} */
   const on = (eventName, listener) => {
     if (!eventNames.includes(eventName)) {
       throw new KafkaJSNonRetriableError(`Event name should be one of ${eventKeys}`)
@@ -7366,6 +6135,10 @@ module.exports = ({
     listGroups,
     describeGroups,
     deleteGroups,
+    describeAcls,
+    deleteAcls,
+    createAcls,
+    deleteTopicRecords,
   }
 }
 
@@ -7419,7 +6192,7 @@ module.exports = {
   \**************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 30:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 37:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Long = __webpack_require__(/*! ../utils/long */ "./node_modules/kafkajs/src/utils/long.js")
@@ -7430,10 +6203,26 @@ const { KafkaJSNonRetriableError } = __webpack_require__(/*! ../errors */ "./nod
 const apiKeys = __webpack_require__(/*! ../protocol/requests/apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
 const SASLAuthenticator = __webpack_require__(/*! ./saslAuthenticator */ "./node_modules/kafkajs/src/broker/saslAuthenticator/index.js")
 const shuffle = __webpack_require__(/*! ../utils/shuffle */ "./node_modules/kafkajs/src/utils/shuffle.js")
+const { ApiVersions: apiVersionsApiKey } = __webpack_require__(/*! ../protocol/requests/apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+const sharedPromiseTo = __webpack_require__(/*! ../utils/sharedPromiseTo */ "./node_modules/kafkajs/src/utils/sharedPromiseTo.js")
 
 const PRIVATE = {
   SHOULD_REAUTHENTICATE: Symbol('private:Broker:shouldReauthenticate'),
   SEND_REQUEST: Symbol('private:Broker:sendRequest'),
+  AUTHENTICATE: Symbol('private:Broker:authenticate'),
+}
+
+/** @type {import("../protocol/requests").Lookup} */
+const notInitializedLookup = () => {
+  throw new Error('Broker not connected')
+}
+
+/**
+ * @param request - request from protocol
+ * @returns {boolean}
+ */
+const isAuthenticatedRequest = request => {
+  return request.apiKey !== apiVersionsApiKey
 }
 
 /**
@@ -7441,17 +6230,22 @@ const PRIVATE = {
  * the high-level operations a node can perform.
  *
  * @type {import("../../types").Broker}
- * @param {Connection} connection
- * @param {Object} logger
- * @param {Object} [versions=null] The object with all available versions and APIs
- *                                 supported by this cluster. The output of broker#apiVersions
- * @param {number} [authenticationTimeout=1000]
- * @param {boolean} [allowAutoTopicCreation=true] If this and the broker config 'auto.create.topics.enable'
- *                                                are true, topics that don't exist will be created when
- *                                                fetching metadata.
- * @param {boolean} [supportAuthenticationProtocol=null] If the server supports the SASLAuthenticate protocol
  */
 module.exports = class Broker {
+  /**
+   * @param {Object} options
+   * @param {import("../network/connection")} options.connection
+   * @param {import("../../types").Logger} options.logger
+   * @param {number} [options.nodeId]
+   * @param {import("../../types").ApiVersions} [options.versions=null] The object with all available versions and APIs
+   *                                 supported by this cluster. The output of broker#apiVersions
+   * @param {number} [options.authenticationTimeout=1000]
+   * @param {number} [options.reauthenticationThreshold=10000]
+   * @param {boolean} [options.allowAutoTopicCreation=true] If this and the broker config 'auto.create.topics.enable'
+   *                                                are true, topics that don't exist will be created when
+   *                                                fetching metadata.
+   * @param {boolean} [options.supportAuthenticationProtocol=null] If the server supports the SASLAuthenticate protocol
+   */
   constructor({
     connection,
     logger,
@@ -7485,9 +6279,34 @@ module.exports = class Broker {
       description: `connect to broker ${this.brokerAddress}`,
     })
 
-    this.lookupRequest = () => {
-      throw new Error('Broker not connected')
-    }
+    this.lookupRequest = notInitializedLookup
+
+    /**
+     * @private
+     * @returns {Promise}
+     */
+    this[PRIVATE.AUTHENTICATE] = sharedPromiseTo(async () => {
+      if (this.connection.sasl && !this.isAuthenticated()) {
+        const authenticator = new SASLAuthenticator(
+          this.connection,
+          this.rootLogger,
+          this.versions,
+          this.supportAuthenticationProtocol
+        )
+
+        await authenticator.authenticate()
+        this.authenticatedAt = process.hrtime()
+        this.sessionLifetime = Long.fromValue(authenticator.sessionLifetime)
+      }
+    })
+  }
+
+  /**
+   * @public
+   * @returns {boolean}
+   */
+  isAuthenticated() {
+    return this.authenticatedAt != null && !this[PRIVATE.SHOULD_REAUTHENTICATE]()
   }
 
   /**
@@ -7496,8 +6315,7 @@ module.exports = class Broker {
    */
   isConnected() {
     const { connected, sasl } = this.connection
-    const isAuthenticated = this.authenticatedAt != null && !this[PRIVATE.SHOULD_REAUTHENTICATE]()
-    return sasl ? connected && isAuthenticated : connected
+    return sasl ? connected && this.isAuthenticated() : connected
   }
 
   /**
@@ -7534,18 +6352,7 @@ module.exports = class Broker {
         })
       }
 
-      if (this.authenticatedAt == null && this.connection.sasl) {
-        const authenticator = new SASLAuthenticator(
-          this.connection,
-          this.rootLogger,
-          this.versions,
-          this.supportAuthenticationProtocol
-        )
-
-        await authenticator.authenticate()
-        this.authenticatedAt = process.hrtime()
-        this.sessionLifetime = Long.fromValue(authenticator.sessionLifetime)
-      }
+      await this[PRIVATE.AUTHENTICATE]()
     } finally {
       await this.lock.release()
     }
@@ -7562,7 +6369,7 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @returns {Promise}
+   * @returns {Promise<import("../../types").ApiVersions>}
    */
   async apiVersions() {
     let response
@@ -7606,7 +6413,7 @@ module.exports = class Broker {
   /**
    * @public
    * @type {import("../../types").Broker['metadata']}
-   * @param {Array} [topics=[]] An array of topics to fetch metadata for.
+   * @param {string[]} [topics=[]] An array of topics to fetch metadata for.
    *                            If no topics are specified fetch metadata for all topics
    */
   async metadata(topics = []) {
@@ -7619,7 +6426,8 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {Array} topicData An array of messages per topic and per partition, example:
+   * @param {Object} request
+   * @param {Array} request.topicData An array of messages per topic and per partition, example:
    *                          [
    *                            {
    *                              topic: 'test-topic-1',
@@ -7654,15 +6462,15 @@ module.exports = class Broker {
    *                              ]
    *                            },
    *                          ]
-   * @param {number} [acks=-1] Control the number of required acks.
+   * @param {number} [request.acks=-1] Control the number of required acks.
    *                           -1 = all replicas must acknowledge
    *                            0 = no acknowledgments
    *                            1 = only waits for the leader to acknowledge
-   * @param {number} [timeout=30000] The time to await a response in ms
-   * @param {string} [transactionalId=null]
-   * @param {number} [producerId=-1] Broker assigned producerId
-   * @param {number} [producerEpoch=0] Broker assigned producerEpoch
-   * @param {Compression.Types} [compression=Compression.Types.None] Compression codec
+   * @param {number} [request.timeout=30000] The time to await a response in ms
+   * @param {string} [request.transactionalId=null]
+   * @param {number} [request.producerId=-1] Broker assigned producerId
+   * @param {number} [request.producerEpoch=0] Broker assigned producerEpoch
+   * @param {import("../../types").CompressionTypes} [request.compression=CompressionTypes.None] Compression codec
    * @returns {Promise}
    */
   async produce({
@@ -7690,15 +6498,16 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {number} replicaId=-1 Broker id of the follower. For normal consumers, use -1
-   * @param {number} isolationLevel=1 This setting controls the visibility of transactional records. Default READ_COMMITTED.
-   * @param {number} maxWaitTime=5000 Maximum time in ms to wait for the response
-   * @param {number} minBytes=1 Minimum bytes to accumulate in the response
-   * @param {number} maxBytes=10485760 Maximum bytes to accumulate in the response. Note that this is
+   * @param {Object} request
+   * @param {number} [request.replicaId=-1] Broker id of the follower. For normal consumers, use -1
+   * @param {number} [request.isolationLevel=1] This setting controls the visibility of transactional records. Default READ_COMMITTED.
+   * @param {number} [request.maxWaitTime=5000] Maximum time in ms to wait for the response
+   * @param {number} [request.minBytes=1] Minimum bytes to accumulate in the response
+   * @param {number} [request.maxBytes=10485760] Maximum bytes to accumulate in the response. Note that this is
    *                                   not an absolute maximum, if the first message in the first non-empty
    *                                   partition of the fetch is larger than this value, the message will still
    *                                   be returned to ensure that progress can be made. Default 10MB.
-   * @param {Array} topics Topics to fetch
+   * @param {Array} request.topics Topics to fetch
    *                        [
    *                          {
    *                            topic: 'topic-name',
@@ -7711,7 +6520,7 @@ module.exports = class Broker {
    *                            ]
    *                          }
    *                        ]
-   * @param {string} rackId='' A rack identifier for this client. This can be any string value which indicates where this
+   * @param {string} [request.rackId=''] A rack identifier for this client. This can be any string value which indicates where this
    *                           client is physically located. It corresponds with the broker config `broker.rack`.
    * @returns {Promise}
    */
@@ -7768,9 +6577,10 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {string} groupId The group id
-   * @param {number} groupGenerationId The generation of the group
-   * @param {string} memberId The member id assigned by the group coordinator
+   * @param {object} request
+   * @param {string} request.groupId The group id
+   * @param {number} request.groupGenerationId The generation of the group
+   * @param {string} request.memberId The member id assigned by the group coordinator
    * @returns {Promise}
    */
   async heartbeat({ groupId, groupGenerationId, memberId }) {
@@ -7780,8 +6590,9 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {string} groupId The unique group id
-   * @param {CoordinatorType} coordinatorType The type of coordinator to find
+   * @param {object} request
+   * @param {string} request.groupId The unique group id
+   * @param {import("../protocol/coordinatorTypes").CoordinatorType} request.coordinatorType The type of coordinator to find
    * @returns {Promise}
    */
   async findGroupCoordinator({ groupId, coordinatorType }) {
@@ -7792,14 +6603,15 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {string} groupId The unique group id
-   * @param {number} sessionTimeout The coordinator considers the consumer dead if it receives
+   * @param {object} request
+   * @param {string} request.groupId The unique group id
+   * @param {number} request.sessionTimeout The coordinator considers the consumer dead if it receives
    *                                no heartbeat after this timeout in ms
-   * @param {number} rebalanceTimeout The maximum time that the coordinator will wait for each member
+   * @param {number} request.rebalanceTimeout The maximum time that the coordinator will wait for each member
    *                                  to rejoin when rebalancing the group
-   * @param {string} [memberId=""] The assigned consumer id or an empty string for a new consumer
-   * @param {string} [protocolType="consumer"] Unique name for class of protocols implemented by group
-   * @param {Array} groupProtocols List of protocols that the member supports (assignment strategy)
+   * @param {string} [request.memberId=""] The assigned consumer id or an empty string for a new consumer
+   * @param {string} [request.protocolType="consumer"] Unique name for class of protocols implemented by group
+   * @param {Array} request.groupProtocols List of protocols that the member supports (assignment strategy)
    *                                [{ name: 'AssignerName', metadata: '{"version": 1, "topics": []}' }]
    * @returns {Promise}
    */
@@ -7837,8 +6649,9 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {string} groupId
-   * @param {string} memberId
+   * @param {object} request
+   * @param {string} request.groupId
+   * @param {string} request.memberId
    * @returns {Promise}
    */
   async leaveGroup({ groupId, memberId }) {
@@ -7848,10 +6661,11 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {string} groupId
-   * @param {number} generationId
-   * @param {string} memberId
-   * @param {object} groupAssignment
+   * @param {object} request
+   * @param {string} request.groupId
+   * @param {number} request.generationId
+   * @param {string} request.memberId
+   * @param {object} request.groupAssignment
    * @returns {Promise}
    */
   async syncGroup({ groupId, generationId, memberId, groupAssignment }) {
@@ -7868,9 +6682,10 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {number} replicaId=-1 Broker id of the follower. For normal consumers, use -1
-   * @param {number} isolationLevel=1 This setting controls the visibility of transactional records (default READ_COMMITTED, Kafka >0.11 only)
-   * @param {TopicPartitionOffset[]} topics e.g:
+   * @param {object} request
+   * @param {number} request.replicaId=-1 Broker id of the follower. For normal consumers, use -1
+   * @param {number} request.isolationLevel=1 This setting controls the visibility of transactional records (default READ_COMMITTED, Kafka >0.11 only)
+   * @param {TopicPartitionOffset[]} request.topics e.g:
    *
    * @typedef {Object} TopicPartitionOffset
    * @property {string} topic
@@ -7902,12 +6717,13 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {string} groupId
-   * @param {number} groupGenerationId
-   * @param {string} memberId
-   * @param {number} [retentionTime=-1] -1 signals to the broker that its default configuration
+   * @param {object} request
+   * @param {string} request.groupId
+   * @param {number} request.groupGenerationId
+   * @param {string} request.memberId
+   * @param {number} [request.retentionTime=-1] -1 signals to the broker that its default configuration
    *                                    should be used.
-   * @param {object} topics Topics to commit offsets, e.g:
+   * @param {object} request.topics Topics to commit offsets, e.g:
    *                  [
    *                    {
    *                      topic: 'topic-name',
@@ -7933,8 +6749,9 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {string} groupId
-   * @param {object} topics - If the topic array is null fetch offsets for all topics. e.g:
+   * @param {object} request
+   * @param {string} request.groupId
+   * @param {object} request.topics - If the topic array is null fetch offsets for all topics. e.g:
    *                  [
    *                    {
    *                      topic: 'topic-name',
@@ -7952,7 +6769,8 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {Array} groupIds
+   * @param {object} request
+   * @param {Array} request.groupIds
    * @returns {Promise}
    */
   async describeGroups({ groupIds }) {
@@ -7962,7 +6780,8 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {Array} topics e.g:
+   * @param {object} request
+   * @param {Array} request.topics e.g:
    *                 [
    *                   {
    *                     topic: 'topic-name',
@@ -7970,9 +6789,9 @@ module.exports = class Broker {
    *                     replicationFactor: 1
    *                   }
    *                 ]
-   * @param {boolean} [validateOnly=false] If this is true, the request will be validated, but the topic
+   * @param {boolean} [request.validateOnly=false] If this is true, the request will be validated, but the topic
    *                                       won't be created
-   * @param {number} [timeout=5000] The time in ms to wait for a topic to be completely created
+   * @param {number} [request.timeout=5000] The time in ms to wait for a topic to be completely created
    *                                on the controller node
    * @returns {Promise}
    */
@@ -7983,7 +6802,8 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {Array} topicPartitions e.g:
+   * @param {object} request
+   * @param {Array} request.topicPartitions e.g:
    *                 [
    *                   {
    *                     topic: 'topic-name',
@@ -7991,9 +6811,9 @@ module.exports = class Broker {
    *                     assignments: []
    *                   }
    *                 ]
-   * @param {boolean} [validateOnly=false] If this is true, the request will be validated, but the topic
+   * @param {boolean} [request.validateOnly=false] If this is true, the request will be validated, but the topic
    *                                       won't be created
-   * @param {number} [timeout=5000] The time in ms to wait for a topic to be completely created
+   * @param {number} [request.timeout=5000] The time in ms to wait for a topic to be completely created
    *                                on the controller node
    * @returns {Promise<void>}
    */
@@ -8006,8 +6826,9 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {Array<string>} topics An array of topics to be deleted
-   * @param {number} [timeout=5000] The time in ms to wait for a topic to be completely deleted on the
+   * @param {object} request
+   * @param {string[]} request.topics An array of topics to be deleted
+   * @param {number} [request.timeout=5000] The time in ms to wait for a topic to be completely deleted on the
    *                                controller node. Values <= 0 will trigger topic deletion and return
    *                                immediately
    * @returns {Promise}
@@ -8019,13 +6840,14 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {Array<ResourceQuery>} resources
+   * @param {object} request
+   * @param {import("../../types").ResourceConfigQuery[]} request.resources
    *                                 [{
    *                                   type: RESOURCE_TYPES.TOPIC,
    *                                   name: 'topic-name',
    *                                   configNames: ['compression.type', 'retention.ms']
    *                                 }]
-   * @param {boolean} [includeSynonyms=false]
+   * @param {boolean} [request.includeSynonyms=false]
    * @returns {Promise}
    */
   async describeConfigs({ resources, includeSynonyms = false }) {
@@ -8035,7 +6857,8 @@ module.exports = class Broker {
 
   /**
    * @public
-   * @param {Array<ResourceConfig>} resources
+   * @param {object} request
+   * @param {import("../../types").IResourceConfig[]} request.resources
    *                                 [{
    *                                  type: RESOURCE_TYPES.TOPIC,
    *                                  name: 'topic-name',
@@ -8046,7 +6869,7 @@ module.exports = class Broker {
    *                                    }
    *                                  ]
    *                                 }]
-   * @param {boolean} [validateOnly=false]
+   * @param {boolean} [request.validateOnly=false]
    * @returns {Promise}
    */
   async alterConfigs({ resources, validateOnly = false }) {
@@ -8059,8 +6882,9 @@ module.exports = class Broker {
    *
    * Request should be made to the transaction coordinator.
    * @public
-   * @param {number} transactionTimeout The time in ms to wait for before aborting idle transactions
-   * @param {number} [transactionalId] The transactional id or null if the producer is not transactional
+   * @param {object} request
+   * @param {number} request.transactionTimeout The time in ms to wait for before aborting idle transactions
+   * @param {number} [request.transactionalId] The transactional id or null if the producer is not transactional
    * @returns {Promise}
    */
   async initProducerId({ transactionalId, transactionTimeout }) {
@@ -8073,10 +6897,11 @@ module.exports = class Broker {
    *
    * Request should be made to the transaction coordinator.
    * @public
-   * @param {string} transactionalId The transactional id corresponding to the transaction.
-   * @param {number} producerId Current producer id in use by the transactional id.
-   * @param {number} producerEpoch Current epoch associated with the producer id.
-   * @param {object[]} topics e.g:
+   * @param {object} request
+   * @param {string} request.transactionalId The transactional id corresponding to the transaction.
+   * @param {number} request.producerId Current producer id in use by the transactional id.
+   * @param {number} request.producerEpoch Current epoch associated with the producer id.
+   * @param {object[]} request.topics e.g:
    *                  [
    *                    {
    *                      topic: 'topic-name',
@@ -8100,10 +6925,11 @@ module.exports = class Broker {
    *
    * Request should be made to the transaction coordinator.
    * @public
-   * @param {string} transactionalId The transactional id corresponding to the transaction.
-   * @param {number} producerId Current producer id in use by the transactional id.
-   * @param {number} producerEpoch Current epoch associated with the producer id.
-   * @param {string} groupId The unique group identifier (for the consumer group)
+   * @param {object} request
+   * @param {string} request.transactionalId The transactional id corresponding to the transaction.
+   * @param {number} request.producerId Current producer id in use by the transactional id.
+   * @param {number} request.producerEpoch Current epoch associated with the producer id.
+   * @param {string} request.groupId The unique group identifier (for the consumer group)
    * @returns {Promise}
    */
   async addOffsetsToTxn({ transactionalId, producerId, producerEpoch, groupId }) {
@@ -8118,12 +6944,13 @@ module.exports = class Broker {
    *
    * Request should be made to the consumer coordinator.
    * @public
-   * @param {OffsetCommitTopic[]} topics
-   * @param {string} transactionalId The transactional id corresponding to the transaction.
-   * @param {string} groupId The unique group identifier (for the consumer group)
-   * @param {number} producerId Current producer id in use by the transactional id.
-   * @param {number} producerEpoch Current epoch associated with the producer id.
-   * @param {OffsetCommitTopic[]} topics
+   * @param {object} request
+   * @param {OffsetCommitTopic[]} request.topics
+   * @param {string} request.transactionalId The transactional id corresponding to the transaction.
+   * @param {string} request.groupId The unique group identifier (for the consumer group)
+   * @param {number} request.producerId Current producer id in use by the transactional id.
+   * @param {number} request.producerEpoch Current epoch associated with the producer id.
+   * @param {OffsetCommitTopic[]} request.topics
    *
    * @typedef {Object} OffsetCommitTopic
    * @property {string} topic
@@ -8148,10 +6975,11 @@ module.exports = class Broker {
    *
    * Request should be made to the transaction coordinator.
    * @public
-   * @param {string} transactionalId The transactional id corresponding to the transaction.
-   * @param {number} producerId Current producer id in use by the transactional id.
-   * @param {number} producerEpoch Current epoch associated with the producer id.
-   * @param {boolean} transactionResult The result of the transaction (false = ABORT, true = COMMIT)
+   * @param {object} request
+   * @param {string} request.transactionalId The transactional id corresponding to the transaction.
+   * @param {number} request.producerId Current producer id in use by the transactional id.
+   * @param {number} request.producerEpoch Current epoch associated with the producer id.
+   * @param {boolean} request.transactionResult The result of the transaction (false = ABORT, true = COMMIT)
    * @returns {Promise}
    */
   async endTxn({ transactionalId, producerId, producerEpoch, transactionResult }) {
@@ -8173,7 +7001,7 @@ module.exports = class Broker {
 
   /**
    * Send request to delete groups
-   * @param {Array<string>} groupIds
+   * @param {string[]} groupIds
    * @public
    * @returns {Promise}
    */
@@ -8183,6 +7011,108 @@ module.exports = class Broker {
   }
 
   /**
+   * Send request to delete records
+   * @public
+   * @param {object} request
+   * @param {TopicPartitionRecords[]} request.topics
+   *                          [
+   *                            {
+   *                              topic: 'my-topic-name',
+   *                              partitions: [
+   *                                { partition: 0, offset 2 },
+   *                                { partition: 1, offset 4 },
+   *                              ],
+   *                            }
+   *                          ]
+   * @returns {Promise<Array>} example:
+   *                          {
+   *                            throttleTime: 0
+   *                           [
+   *                              {
+   *                                topic: 'my-topic-name',
+   *                                partitions: [
+   *                                 { partition: 0, lowWatermark: '2n', errorCode: 0 },
+   *                                 { partition: 1, lowWatermark: '4n', errorCode: 0 },
+   *                               ],
+   *                             },
+   *                           ]
+   *                          }
+   *
+   * @typedef {object} TopicPartitionRecords
+   * @property {string} topic
+   * @property {PartitionRecord[]} partitions
+   *
+   * @typedef {object} PartitionRecord
+   * @property {number} partition
+   * @property {number} offset
+   */
+  async deleteRecords({ topics }) {
+    const deleteRecords = this.lookupRequest(apiKeys.DeleteRecords, requests.DeleteRecords)
+    return await this[PRIVATE.SEND_REQUEST](deleteRecords({ topics }))
+  }
+
+  /**
+   * @public
+   * @param {object} request
+   * @param {import("../../types").AclEntry[]} request.acl e.g:
+   *                 [
+   *                   {
+   *                     resourceType: AclResourceTypes.TOPIC,
+   *                     resourceName: 'topic-name',
+   *                     resourcePatternType: ResourcePatternTypes.LITERAL,
+   *                     principal: 'User:bob',
+   *                     host: '*',
+   *                     operation: AclOperationTypes.ALL,
+   *                     permissionType: AclPermissionTypes.DENY,
+   *                   }
+   *                 ]
+   * @returns {Promise<void>}
+   */
+  async createAcls({ acl }) {
+    const createAcls = this.lookupRequest(apiKeys.CreateAcls, requests.CreateAcls)
+    return await this[PRIVATE.SEND_REQUEST](createAcls({ creations: acl }))
+  }
+
+  /**
+   * @public
+   * @param {import("../../types").AclEntry} aclEntry
+   * @returns {Promise<void>}
+   */
+  async describeAcls({
+    resourceType,
+    resourceName,
+    resourcePatternType,
+    principal,
+    host,
+    operation,
+    permissionType,
+  }) {
+    const describeAcls = this.lookupRequest(apiKeys.DescribeAcls, requests.DescribeAcls)
+    return await this[PRIVATE.SEND_REQUEST](
+      describeAcls({
+        resourceType,
+        resourceName,
+        resourcePatternType,
+        principal,
+        host,
+        operation,
+        permissionType,
+      })
+    )
+  }
+
+  /**
+   * @public
+   * @param {Object} request
+   * @param {import("../../types").AclEntry[]} request.filters
+   * @returns {Promise<void>}
+   */
+  async deleteAcls({ filters }) {
+    const deleteAcls = this.lookupRequest(apiKeys.DeleteAcls, requests.DeleteAcls)
+    return await this[PRIVATE.SEND_REQUEST](deleteAcls({ filters }))
+  }
+
+  /***
    * @private
    */
   [PRIVATE.SHOULD_REAUTHENTICATE]() {
@@ -8207,6 +7137,9 @@ module.exports = class Broker {
    * @private
    */
   async [PRIVATE.SEND_REQUEST](protocolRequest) {
+    if (!this.isAuthenticated() && isAuthenticatedRequest(protocolRequest.request)) {
+      await this[PRIVATE.AUTHENTICATE]()
+    }
     try {
       return await this.connection.send(protocolRequest)
     } catch (e) {
@@ -8874,7 +7807,7 @@ const Broker = __webpack_require__(/*! ../broker */ "./node_modules/kafkajs/src/
 const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const shuffle = __webpack_require__(/*! ../utils/shuffle */ "./node_modules/kafkajs/src/utils/shuffle.js")
 const arrayDiff = __webpack_require__(/*! ../utils/arrayDiff */ "./node_modules/kafkajs/src/utils/arrayDiff.js")
-const { KafkaJSBrokerNotFound } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
+const { KafkaJSBrokerNotFound, KafkaJSProtocolError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
 
 const { keys, assign, values } = Object
 const hasBrokerBeenReplaced = (broker, { host, port, rack }) =>
@@ -8884,12 +7817,14 @@ const hasBrokerBeenReplaced = (broker, { host, port, rack }) =>
 
 module.exports = class BrokerPool {
   /**
-   * @param {ConnectionBuilder} connectionBuilder
-   * @param {Logger} logger
-   * @param {Object} retry
-   * @param {number} authenticationTimeout
-   * @param {number} reauthenticationThreshold
-   * @param {number} metadataMaxAge
+   * @param {object} options
+   * @param {import("./connectionBuilder").ConnectionBuilder} options.connectionBuilder
+   * @param {import("../../types").Logger} options.logger
+   * @param {import("../../types").RetryOptions} [options.retry]
+   * @param {boolean} [options.allowAutoTopicCreation]
+   * @param {number} [options.authenticationTimeout]
+   * @param {number} [options.reauthenticationThreshold]
+   * @param {number} [options.metadataMaxAge]
    */
   constructor({
     connectionBuilder,
@@ -8915,6 +7850,9 @@ module.exports = class BrokerPool {
       })
 
     this.brokers = {}
+    /** @type {Broker | undefined} */
+    this.seedBroker = undefined
+    /** @type {import("../../types").BrokerMetadata | null} */
     this.metadata = null
     this.metadataExpireAt = null
     this.versions = null
@@ -8946,7 +7884,7 @@ module.exports = class BrokerPool {
 
   /**
    * @public
-   * @returns {Promise<null>}
+   * @returns {Promise<void>}
    */
   async connect() {
     if (this.hasConnectedBrokers()) {
@@ -8995,8 +7933,9 @@ module.exports = class BrokerPool {
 
   /**
    * @public
-   * @param {String} host
-   * @param {Number} port
+   * @param {Object} destination
+   * @param {string} destination.host
+   * @param {number} destination.port
    */
   removeBroker({ host, port }) {
     const removedBroker = values(this.brokers).find(
@@ -9086,7 +8025,7 @@ module.exports = class BrokerPool {
   }
 
   /**
-   * Only refreshes metadata if the data is stale according to the `metadataMaxAge` param
+   * Only refreshes metadata if the data is stale according to the `metadataMaxAge` param or does not contain information about the provided topics
    *
    * @public
    * @param {Array<String>} topics
@@ -9108,7 +8047,8 @@ module.exports = class BrokerPool {
 
   /**
    * @public
-   * @param {string} nodeId
+   * @param {object} options
+   * @param {string} options.nodeId
    * @returns {Promise<Broker>}
    */
   async findBroker({ nodeId }) {
@@ -9124,8 +8064,9 @@ module.exports = class BrokerPool {
 
   /**
    * @public
-   * @param {Promise<{ nodeId<String>, broker<Broker> }>} callback
-   * @returns {Promise<null>}
+   * @param {(params: { nodeId: string, broker: Broker }) => Promise<T>} callback
+   * @returns {Promise<T>}
+   * @template T
    */
   async withBroker(callback) {
     const brokers = shuffle(keys(this.brokers))
@@ -9183,13 +8124,15 @@ module.exports = class BrokerPool {
       } catch (e) {
         if (e.name === 'KafkaJSConnectionError' || e.type === 'ILLEGAL_SASL_STATE') {
           await broker.disconnect()
+        }
 
-          // Connection refused means this node is down, or the cluster is restarting,
-          // which requires metadata refresh to discover the new nodes
-          if (e.code === 'ECONNREFUSED') {
-            return bail(e)
-          }
+        // To avoid reconnecting to an unavailable host, we bail on connection errors
+        // and refresh metadata on a higher level before reconnecting
+        if (e.name === 'KafkaJSConnectionError') {
+          return bail(e)
+        }
 
+        if (e.type === 'ILLEGAL_SASL_STATE') {
           // Rebuild the connection since it can't recover from illegal SASL state
           broker.connection = await this.connectionBuilder.build({
             host: broker.connection.host,
@@ -9198,6 +8141,7 @@ module.exports = class BrokerPool {
           })
 
           this.logger.error(`Failed to connect to broker, reconnecting`, { retryCount, retryTime })
+          throw new KafkaJSProtocolError(e, { retriable: true })
         }
 
         if (e.retriable) throw e
@@ -9217,12 +8161,33 @@ module.exports = class BrokerPool {
   \***************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 4:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Connection = __webpack_require__(/*! ../network/connection */ "./node_modules/kafkajs/src/network/connection.js")
 const { KafkaJSConnectionError, KafkaJSNonRetriableError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
 
+/**
+ * @typedef {Object} ConnectionBuilder
+ * @property {(destination?: { host?: string, port?: number, rack?: string }) => Promise<Connection>} build
+ */
+
+/**
+ * @param {Object} options
+ * @param {import("../../types").ISocketFactory} [options.socketFactory]
+ * @param {string[]|(() => string[])} options.brokers
+ * @param {Object} [options.ssl]
+ * @param {Object} [options.sasl]
+ * @param {string} options.clientId
+ * @param {number} options.requestTimeout
+ * @param {boolean} [options.enforceRequestTimeout]
+ * @param {number} [options.connectionTimeout]
+ * @param {number} [options.maxInFlightRequests]
+ * @param {import("../../types").RetryOptions} [options.retry]
+ * @param {import("../../types").Logger} options.logger
+ * @param {import("../instrumentation/emitter")} [options.instrumentationEmitter]
+ * @returns {ConnectionBuilder}
+ */
 module.exports = ({
   socketFactory,
   brokers,
@@ -9233,42 +8198,54 @@ module.exports = ({
   enforceRequestTimeout,
   connectionTimeout,
   maxInFlightRequests,
-  retry,
   logger,
   instrumentationEmitter = null,
 }) => {
   let index = 0
 
-  const getBrokers = async () => {
+  const isValidBroker = broker => {
+    return broker && typeof broker === 'string' && broker.length > 0
+  }
+
+  const validateBrokers = brokers => {
     if (!brokers) {
-      throw new KafkaJSNonRetriableError(`Failed to connect: brokers parameter should not be null`)
+      throw new KafkaJSNonRetriableError(`Failed to connect: brokers should not be null`)
     }
 
-    // static list
     if (Array.isArray(brokers)) {
       if (!brokers.length) {
         throw new KafkaJSNonRetriableError(`Failed to connect: brokers array is empty`)
       }
-      return brokers
-    }
 
-    // dynamic brokers
+      brokers.forEach((broker, index) => {
+        if (!isValidBroker(broker)) {
+          throw new KafkaJSNonRetriableError(
+            `Failed to connect: broker at index ${index} is invalid "${typeof broker}"`
+          )
+        }
+      })
+    }
+  }
+
+  const getBrokers = async () => {
     let list
-    try {
-      list = await brokers()
-    } catch (e) {
-      const wrappedError = new KafkaJSConnectionError(
-        `Failed to connect: "config.brokers" threw: ${e.message}`
-      )
-      wrappedError.stack = `${wrappedError.name}\n  Caused by: ${e.stack}`
-      throw wrappedError
+
+    if (typeof brokers === 'function') {
+      try {
+        list = await brokers()
+      } catch (e) {
+        const wrappedError = new KafkaJSConnectionError(
+          `Failed to connect: "config.brokers" threw: ${e.message}`
+        )
+        wrappedError.stack = `${wrappedError.name}\n  Caused by: ${e.stack}`
+        throw wrappedError
+      }
+    } else {
+      list = brokers
     }
 
-    if (!list || list.length === 0) {
-      throw new KafkaJSConnectionError(
-        `Failed to connect: "config.brokers" returned void or empty array`
-      )
-    }
+    validateBrokers(list)
+
     return list
   }
 
@@ -9296,7 +8273,6 @@ module.exports = ({
         enforceRequestTimeout,
         maxInFlightRequests,
         instrumentationEmitter,
-        retry,
         logger,
       })
     },
@@ -9312,7 +8288,7 @@ module.exports = ({
   \***************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 41:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const BrokerPool = __webpack_require__(/*! ./brokerPool */ "./node_modules/kafkajs/src/cluster/brokerPool.js")
@@ -9337,25 +8313,28 @@ const mergeTopics = (obj, { topic, partitions }) => ({
   [topic]: [...(obj[topic] || []), ...partitions],
 })
 
-/**
- * @param {Array<string>} brokers example: ['127.0.0.1:9092', '127.0.0.1:9094']
- * @param {Object} ssl
- * @param {Object} sasl
- * @param {string} clientId
- * @param {number} connectionTimeout - in milliseconds
- * @param {number} authenticationTimeout - in milliseconds
- * @param {number} reauthenticationThreshold - in milliseconds
- * @param {number} [requestTimeout=30000] - in milliseconds
- * @param {number} metadataMaxAge - in milliseconds
- * @param {boolean} allowAutoTopicCreation
- * @param {number} maxInFlightRequests
- * @param {number} isolationLevel
- * @param {Object} retry
- * @param {Logger} logger
- * @param {Map} offsets
- * @param {InstrumentationEventEmitter} [instrumentationEmitter=null]
- */
 module.exports = class Cluster {
+  /**
+   * @param {Object} options
+   * @param {Array<string>} options.brokers example: ['127.0.0.1:9092', '127.0.0.1:9094']
+   * @param {Object} options.ssl
+   * @param {Object} options.sasl
+   * @param {string} options.clientId
+   * @param {number} options.connectionTimeout - in milliseconds
+   * @param {number} options.authenticationTimeout - in milliseconds
+   * @param {number} options.reauthenticationThreshold - in milliseconds
+   * @param {number} [options.requestTimeout=30000] - in milliseconds
+   * @param {boolean} [options.enforceRequestTimeout]
+   * @param {number} options.metadataMaxAge - in milliseconds
+   * @param {boolean} options.allowAutoTopicCreation
+   * @param {number} options.maxInFlightRequests
+   * @param {number} options.isolationLevel
+   * @param {import("../../types").RetryOptions} options.retry
+   * @param {import("../../types").Logger} options.logger
+   * @param {import("../../types").ISocketFactory} options.socketFactory
+   * @param {Map} [options.offsets]
+   * @param {import("../instrumentation/emitter")} [options.instrumentationEmitter=null]
+   */
   constructor({
     logger: rootLogger,
     socketFactory,
@@ -9378,8 +8357,7 @@ module.exports = class Cluster {
   }) {
     this.rootLogger = rootLogger
     this.logger = rootLogger.namespace('Cluster')
-    this.retry = { ...retry }
-    this.retrier = createRetry(this.retry)
+    this.retrier = createRetry(retry)
     this.connectionBuilder = connectionBuilder({
       logger: rootLogger,
       instrumentationEmitter,
@@ -9392,7 +8370,6 @@ module.exports = class Cluster {
       requestTimeout,
       enforceRequestTimeout,
       maxInFlightRequests,
-      retry,
     })
 
     this.targetTopics = new Set()
@@ -9419,7 +8396,7 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @returns {Promise<null>}
+   * @returns {Promise<void>}
    */
   async connect() {
     await this.brokerPool.connect()
@@ -9427,7 +8404,7 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @returns {Promise<null>}
+   * @returns {Promise<void>}
    */
   async disconnect() {
     await this.brokerPool.disconnect()
@@ -9435,8 +8412,9 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @param {String} host
-   * @param {Number} port
+   * @param {object} destination
+   * @param {String} destination.host
+   * @param {Number} destination.port
    */
   removeBroker({ host, port }) {
     this.brokerPool.removeBroker({ host, port })
@@ -9444,7 +8422,7 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @returns {Promise<null>}
+   * @returns {Promise<void>}
    */
   async refreshMetadata() {
     await this.brokerPool.refreshMetadata(Array.from(this.targetTopics))
@@ -9452,7 +8430,7 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @returns {Promise<null>}
+   * @returns {Promise<void>}
    */
   async refreshMetadataIfNecessary() {
     await this.brokerPool.refreshMetadataIfNecessary(Array.from(this.targetTopics))
@@ -9460,7 +8438,7 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @returns {Promise<Metadata>}
+   * @returns {Promise<import("../../types").BrokerMetadata>}
    */
   async metadata({ topics = [] } = {}) {
     return this.retrier(async (bail, retryCount, retryTime) => {
@@ -9507,7 +8485,7 @@ module.exports = class Cluster {
         try {
           await this.refreshMetadata()
         } catch (e) {
-          if (e.type === 'INVALID_TOPIC_EXCEPTION') {
+          if (e.type === 'INVALID_TOPIC_EXCEPTION' || e.type === 'UNKNOWN_TOPIC_OR_PARTITION') {
             this.targetTopics = previousTopics
           }
 
@@ -9521,8 +8499,9 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @param {string} nodeId
-   * @returns {Promise<Broker>}
+   * @param {object} options
+   * @param {string} options.nodeId
+   * @returns {Promise<import("../../types").Broker>}
    */
   async findBroker({ nodeId }) {
     try {
@@ -9532,7 +8511,7 @@ module.exports = class Cluster {
       if (
         e.name === 'KafkaJSBrokerNotFound' ||
         e.name === 'KafkaJSLockTimeout' ||
-        e.code === 'ECONNREFUSED'
+        e.name === 'KafkaJSConnectionError'
       ) {
         await this.refreshMetadata()
       }
@@ -9543,7 +8522,7 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @returns {Promise<Broker>}
+   * @returns {Promise<import("../../types").Broker>}
    */
   async findControllerBroker() {
     const { metadata } = this.brokerPool
@@ -9588,7 +8567,7 @@ module.exports = class Cluster {
   /**
    * @public
    * @param {string} topic
-   * @param {Array<number>} partitions
+   * @param {(number|string)[]} partitions
    * @returns {Object} Object with leader and partitions. For partitions 0 and 5
    *                   the result could be:
    *                     { '0': [0], '2': [5] }
@@ -9617,9 +8596,10 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @param {string} groupId
-   * @param {number} [coordinatorType=0]
-   * @returns {Promise<Broker>}
+   * @param {object} params
+   * @param {string} params.groupId
+   * @param {import("../protocol/coordinatorTypes").CoordinatorType} [params.coordinatorType=0]
+   * @returns {Promise<import("../../types").Broker>}
    */
   async findGroupCoordinator({ groupId, coordinatorType = COORDINATOR_TYPES.GROUP }) {
     return this.retrier(async (bail, retryCount, retryTime) => {
@@ -9657,8 +8637,9 @@ module.exports = class Cluster {
 
   /**
    * @public
-   * @param {string} groupId
-   * @param {number} [coordinatorType=0]
+   * @param {object} params
+   * @param {string} params.groupId
+   * @param {import("../protocol/coordinatorTypes").CoordinatorType} [params.coordinatorType=0]
    * @returns {Promise<Object>}
    */
   async findGroupCoordinatorMetadata({ groupId, coordinatorType }) {
@@ -9717,7 +8698,7 @@ module.exports = class Cluster {
    *                              fromBeginning: false
    *                            }
    *                          ]
-   * @returns {Promise<Array>} example:
+   * @returns {Promise<import("../../types").TopicOffsets[]>} example:
    *                          [
    *                            {
    *                              topic: 'my-topic-name',
@@ -9750,7 +8731,7 @@ module.exports = class Cluster {
 
       topicConfigurations[topic] = { timestamp }
 
-      keys(partitionsPerLeader).map(nodeId => {
+      keys(partitionsPerLeader).forEach(nodeId => {
         partitionsPerBroker[nodeId] = partitionsPerBroker[nodeId] || {}
         partitionsPerBroker[nodeId][topic] = partitions.filter(p =>
           partitionsPerLeader[nodeId].includes(p.partition)
@@ -9789,7 +8770,8 @@ module.exports = class Cluster {
 
   /**
    * Retrieve the object mapping for committed offsets for a single consumer group
-   * @param {string} groupId
+   * @param {object} options
+   * @param {string} options.groupId
    * @returns {Object}
    */
   committedOffsets({ groupId }) {
@@ -9802,11 +8784,11 @@ module.exports = class Cluster {
 
   /**
    * Mark offset as committed for a single consumer group's topic-partition
-   * @param {string} groupId
-   * @param {string} topic
-   * @param {string|number} partition
-   * @param {string} offset
-   * @returns {undefined}
+   * @param {object} options
+   * @param {string} options.groupId
+   * @param {string} options.topic
+   * @param {string|number} options.partition
+   * @param {string} options.offset
    */
   markOffsetAsCommitted({ groupId, topic, partition, offset }) {
     const committedOffsets = this.committedOffsets({ groupId })
@@ -10021,7 +9003,7 @@ module.exports = ({ cluster }) => ({
       const assignee = sortedMembers[i % membersCount]
 
       if (!assignment[assignee]) {
-        assignment[assignee] = []
+        assignment[assignee] = Object.create(null)
       }
 
       if (!assignment[assignee][topicPartition.topic]) {
@@ -10133,6 +9115,14 @@ module.exports = class Batch {
     return this.messagesWithinOffset.length === 0
   }
 
+  /**
+   * If the batch contained raw messages (i.e was not truely empty) but all messages were filtered out due to
+   * log compaction, control records or other reasons
+   */
+  isEmptyDueToFiltering() {
+    return this.isEmpty() && this.rawMessages.length > 0
+  }
+
   isEmptyControlRecord() {
     return (
       this.isEmpty() && this.messagesWithinOffset.some(({ isControlRecord }) => isControlRecord)
@@ -10204,7 +9194,7 @@ module.exports = class Batch {
   \************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 45:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const flatten = __webpack_require__(/*! ../utils/flatten */ "./node_modules/kafkajs/src/utils/flatten.js")
@@ -10212,13 +9202,15 @@ const sleep = __webpack_require__(/*! ../utils/sleep */ "./node_modules/kafkajs/
 const BufferedAsyncIterator = __webpack_require__(/*! ../utils/bufferedAsyncIterator */ "./node_modules/kafkajs/src/utils/bufferedAsyncIterator.js")
 const websiteUrl = __webpack_require__(/*! ../utils/websiteUrl */ "./node_modules/kafkajs/src/utils/websiteUrl.js")
 const arrayDiff = __webpack_require__(/*! ../utils/arrayDiff */ "./node_modules/kafkajs/src/utils/arrayDiff.js")
+const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
+const sharedPromiseTo = __webpack_require__(/*! ../utils/sharedPromiseTo */ "./node_modules/kafkajs/src/utils/sharedPromiseTo.js")
 
 const OffsetManager = __webpack_require__(/*! ./offsetManager */ "./node_modules/kafkajs/src/consumer/offsetManager/index.js")
 const Batch = __webpack_require__(/*! ./batch */ "./node_modules/kafkajs/src/consumer/batch.js")
 const SeekOffsets = __webpack_require__(/*! ./seekOffsets */ "./node_modules/kafkajs/src/consumer/seekOffsets.js")
 const SubscriptionState = __webpack_require__(/*! ./subscriptionState */ "./node_modules/kafkajs/src/consumer/subscriptionState.js")
 const {
-  events: { HEARTBEAT, CONNECT },
+  events: { GROUP_JOIN, HEARTBEAT, CONNECT, RECEIVED_UNSUBSCRIBED_TOPICS },
 } = __webpack_require__(/*! ./instrumentationEvents */ "./node_modules/kafkajs/src/consumer/instrumentationEvents.js")
 const { MemberAssignment } = __webpack_require__(/*! ./assignerProtocol */ "./node_modules/kafkajs/src/consumer/assignerProtocol.js")
 const {
@@ -10239,8 +9231,19 @@ const STALE_METADATA_ERRORS = [
   'UNKNOWN_TOPIC_OR_PARTITION',
 ]
 
+const isRebalancing = e =>
+  e.type === 'REBALANCE_IN_PROGRESS' || e.type === 'NOT_COORDINATOR_FOR_GROUP'
+
+const PRIVATE = {
+  JOIN: Symbol('private:ConsumerGroup:join'),
+  SYNC: Symbol('private:ConsumerGroup:sync'),
+  HEARTBEAT: Symbol('private:ConsumerGroup:heartbeat'),
+  SHAREDHEARTBEAT: Symbol('private:ConsumerGroup:sharedHeartbeat'),
+}
+
 module.exports = class ConsumerGroup {
   constructor({
+    retry,
     cluster,
     groupId,
     topics,
@@ -10254,6 +9257,7 @@ module.exports = class ConsumerGroup {
     minBytes,
     maxBytes,
     maxWaitTimeInMs,
+    autoCommit,
     autoCommitInterval,
     autoCommitThreshold,
     isolationLevel,
@@ -10268,6 +9272,7 @@ module.exports = class ConsumerGroup {
     this.topicConfigurations = topicConfigurations
     this.logger = logger.namespace('ConsumerGroup')
     this.instrumentationEmitter = instrumentationEmitter
+    this.retrier = createRetry(Object.assign({}, retry))
     this.assigners = assigners
     this.sessionTimeout = sessionTimeout
     this.rebalanceTimeout = rebalanceTimeout
@@ -10275,6 +9280,7 @@ module.exports = class ConsumerGroup {
     this.minBytes = minBytes
     this.maxBytes = maxBytes
     this.maxWaitTime = maxWaitTimeInMs
+    this.autoCommit = autoCommit
     this.autoCommitInterval = autoCommitInterval
     this.autoCommitThreshold = autoCommitThreshold
     this.isolationLevel = isolationLevel
@@ -10296,13 +9302,30 @@ module.exports = class ConsumerGroup {
      * Each of the partitions tracks the preferred read replica (`nodeId`) and a timestamp
      * until when that preference is valid.
      *
-     * @type {{[topicName: string]: {[partition: number]: {nodeId: number, expireAt: number}}}
+     * @type {{[topicName: string]: {[partition: number]: {nodeId: number, expireAt: number}}}}
      */
     this.preferredReadReplicasPerTopicPartition = {}
     this.offsetManager = null
     this.subscriptionState = new SubscriptionState()
 
     this.lastRequest = Date.now()
+
+    this[PRIVATE.SHAREDHEARTBEAT] = sharedPromiseTo(async ({ interval }) => {
+      const { groupId, generationId, memberId } = this
+      const now = Date.now()
+
+      if (memberId && now >= this.lastRequest + interval) {
+        const payload = {
+          groupId,
+          memberId,
+          groupGenerationId: generationId,
+        }
+
+        await this.coordinator.heartbeat(payload)
+        this.instrumentationEmitter.emit(HEARTBEAT, payload)
+        this.lastRequest = Date.now()
+      }
+    })
   }
 
   isLeader() {
@@ -10315,7 +9338,7 @@ module.exports = class ConsumerGroup {
     await this.cluster.refreshMetadataIfNecessary()
   }
 
-  async join() {
+  async [PRIVATE.JOIN]() {
     const { groupId, sessionTimeout, rebalanceTimeout } = this
 
     this.coordinator = await this.cluster.findGroupCoordinator({ groupId })
@@ -10347,7 +9370,7 @@ module.exports = class ConsumerGroup {
     }
   }
 
-  async sync() {
+  async [PRIVATE.SYNC]() {
     let assignment = []
     const {
       groupId,
@@ -10394,6 +9417,7 @@ module.exports = class ConsumerGroup {
     const decodedMemberAssignment = MemberAssignment.decode(memberAssignment)
     const decodedAssignment =
       decodedMemberAssignment != null ? decodedMemberAssignment.assignment : {}
+
     this.logger.debug('Received assignment', {
       groupId,
       generationId,
@@ -10405,13 +9429,18 @@ module.exports = class ConsumerGroup {
     const topicsNotSubscribed = arrayDiff(assignedTopics, topicsSubscribed)
 
     if (topicsNotSubscribed.length > 0) {
-      this.logger.warn('Consumer group received unsubscribed topics', {
+      const payload = {
         groupId,
         generationId,
         memberId,
         assignedTopics,
         topicsSubscribed,
         topicsNotSubscribed,
+      }
+
+      this.instrumentationEmitter.emit(RECEIVED_UNSUBSCRIBED_TOPICS, payload)
+      this.logger.warn('Consumer group received unsubscribed topics', {
+        ...payload,
         helpUrl: websiteUrl(
           'docs/faq',
           'why-am-i-receiving-messages-for-topics-i-m-not-subscribed-to'
@@ -10466,6 +9495,7 @@ module.exports = class ConsumerGroup {
         }),
         {}
       ),
+      autoCommit: this.autoCommit,
       autoCommitInterval: this.autoCommitInterval,
       autoCommitThreshold: this.autoCommitThreshold,
       coordinator,
@@ -10475,10 +9505,54 @@ module.exports = class ConsumerGroup {
     })
   }
 
+  joinAndSync() {
+    const startJoin = Date.now()
+    return this.retrier(async bail => {
+      try {
+        await this[PRIVATE.JOIN]()
+        await this[PRIVATE.SYNC]()
+
+        const memberAssignment = this.assigned().reduce(
+          (result, { topic, partitions }) => ({ ...result, [topic]: partitions }),
+          {}
+        )
+
+        const payload = {
+          groupId: this.groupId,
+          memberId: this.memberId,
+          leaderId: this.leaderId,
+          isLeader: this.isLeader(),
+          memberAssignment,
+          groupProtocol: this.groupProtocol,
+          duration: Date.now() - startJoin,
+        }
+
+        this.instrumentationEmitter.emit(GROUP_JOIN, payload)
+        this.logger.info('Consumer has joined the group', payload)
+      } catch (e) {
+        if (isRebalancing(e)) {
+          // Rebalance in progress isn't a retriable protocol error since the consumer
+          // has to go through find coordinator and join again before it can
+          // actually retry the operation. We wrap the original error in a retriable error
+          // here instead in order to restart the join + sync sequence using the retrier.
+          throw new KafkaJSError(e)
+        }
+
+        bail(e)
+      }
+    })
+  }
+
+  /**
+   * @param {import("../../types").TopicPartition} topicPartition
+   */
   resetOffset({ topic, partition }) {
     this.offsetManager.resetOffset({ topic, partition })
   }
 
+  /**
+   * @param {import("../../types").TopicPartitionOffset} topicPartitionOffset
+   */
   resolveOffset({ topic, partition, offset }) {
     this.offsetManager.resolveOffset({ topic, partition, offset })
   }
@@ -10488,9 +9562,7 @@ module.exports = class ConsumerGroup {
    * on the next fetch. If this API is invoked for the same topic/partition more
    * than once, the latest offset will be used on the next fetch.
    *
-   * @param {string} topic
-   * @param {number} partition
-   * @param {string} offset
+   * @param {import("../../types").TopicPartitionOffset} topicPartitionOffset
    */
   seek({ topic, partition, offset }) {
     this.seekOffset.set(topic, partition, offset)
@@ -10531,20 +9603,7 @@ module.exports = class ConsumerGroup {
   }
 
   async heartbeat({ interval }) {
-    const { groupId, generationId, memberId } = this
-    const now = Date.now()
-
-    if (memberId && now >= this.lastRequest + interval) {
-      const payload = {
-        groupId,
-        memberId,
-        groupGenerationId: generationId,
-      }
-
-      await this.coordinator.heartbeat(payload)
-      this.instrumentationEmitter.emit(HEARTBEAT, payload)
-      this.lastRequest = Date.now()
-    }
+    return this[PRIVATE.SHAREDHEARTBEAT]({ interval })
   }
 
   async fetch() {
@@ -10685,23 +9744,7 @@ module.exports = class ConsumerGroup {
               )
 
               const fetchedOffset = partitionRequestData.fetchOffset
-              const batch = new Batch(topicName, fetchedOffset, partitionData)
-
-              /**
-               * Resolve the offset to skip the control batch since `eachBatch` or `eachMessage` callbacks
-               * won't process empty batches
-               *
-               * @see https://github.com/apache/kafka/blob/9aa660786e46c1efbf5605a6a69136a1dac6edb9/clients/src/main/java/org/apache/kafka/clients/consumer/internals/Fetcher.java#L1499-L1505
-               */
-              if (batch.isEmptyControlRecord() || batch.isEmptyDueToLogCompactedMessages()) {
-                this.resolveOffset({
-                  topic: batch.topic,
-                  partition: batch.partition,
-                  offset: batch.lastOffset(),
-                })
-              }
-
-              return batch
+              return new Batch(topicName, fetchedOffset, partitionData)
             })
         })
 
@@ -10731,8 +9774,7 @@ module.exports = class ConsumerGroup {
       })
 
       await this.cluster.refreshMetadata()
-      await this.join()
-      await this.sync()
+      await this.joinAndSync()
       throw new KafkaJSError(e.message)
     }
 
@@ -10744,8 +9786,7 @@ module.exports = class ConsumerGroup {
         unknownPartitions: e.unknownPartitions,
       })
 
-      await this.join()
-      await this.sync()
+      await this.joinAndSync()
     }
 
     if (e.name === 'KafkaJSOffsetOutOfRange') {
@@ -11008,7 +10049,7 @@ const specialOffsets = [
  * @param {Object} params
  * @param {import("../../types").Cluster} params.cluster
  * @param {String} params.groupId
- * @param {import('../../types').RetryOptions} params.retry
+ * @param {import('../../types').RetryOptions} [params.retry]
  * @param {import('../../types').Logger} params.logger
  * @param {import('../../types').PartitionAssigner[]} [params.partitionAssigners]
  * @param {number} [params.sessionTimeout]
@@ -11020,7 +10061,7 @@ const specialOffsets = [
  * @param {number} [params.maxWaitTimeInMs]
  * @param {number} [params.isolationLevel]
  * @param {string} [params.rackId]
- * @param {import('../instrumentation/emitter')} [params.instrumentationEmitter]
+ * @param {InstrumentationEventEmitter} [params.instrumentationEmitter]
  * @param {number} params.metadataMaxAge
  *
  * @returns {import("../../types").Consumer}
@@ -11063,11 +10104,12 @@ module.exports = ({
     )
   }
 
-  const createConsumerGroup = ({ autoCommitInterval, autoCommitThreshold }) => {
+  const createConsumerGroup = ({ autoCommit, autoCommitInterval, autoCommitThreshold }) => {
     return new ConsumerGroup({
       logger: rootLogger,
       topics: keys(topics),
       topicConfigurations: topics,
+      retry,
       cluster,
       groupId,
       assigners,
@@ -11078,6 +10120,7 @@ module.exports = ({
       maxBytes,
       maxWaitTimeInMs,
       instrumentationEmitter,
+      autoCommit,
       autoCommitInterval,
       autoCommitThreshold,
       isolationLevel,
@@ -11122,7 +10165,13 @@ module.exports = ({
       logger.debug('consumer has stopped, disconnecting', { groupId })
       await cluster.disconnect()
       instrumentationEmitter.emit(DISCONNECT)
-    } catch (e) {}
+    } catch (e) {
+      logger.error(`Caught error when disconnecting the consumer: ${e.message}`, {
+        stack: e.stack,
+        groupId,
+      })
+      throw e
+    }
   }
 
   /** @type {import("../../types").Consumer["stop"]} */
@@ -11136,7 +10185,14 @@ module.exports = ({
       }
 
       logger.info('Stopped', { groupId })
-    } catch (e) {}
+    } catch (e) {
+      logger.error(`Caught error when stopping the consumer: ${e.message}`, {
+        stack: e.stack,
+        groupId,
+      })
+
+      throw e
+    }
   }
 
   /** @type {import("../../types").Consumer["subscribe"]} */
@@ -11198,6 +10254,7 @@ module.exports = ({
     }
 
     consumerGroup = createConsumerGroup({
+      autoCommit,
       autoCommitInterval,
       autoCommitThreshold,
     })
@@ -11238,14 +10295,10 @@ module.exports = ({
 
       await disconnect()
 
-      instrumentationEmitter.emit(CRASH, {
-        error: e,
-        groupId,
-      })
-
-      if (e.name === 'KafkaJSNumberOfRetriesExceeded' || e.retriable === true) {
-        const shouldRestart =
-          !retry ||
+      const isErrorRetriable = e.name === 'KafkaJSNumberOfRetriesExceeded' || e.retriable === true
+      const shouldRestart =
+        isErrorRetriable &&
+        (!retry ||
           !retry.restartOnFailure ||
           (await retry.restartOnFailure(e).catch(error => {
             logger.error(
@@ -11258,18 +10311,23 @@ module.exports = ({
             )
 
             return true
-          }))
+          })))
 
-        if (shouldRestart) {
-          const retryTime = e.retryTime || (retry && retry.initialRetryTime) || initialRetryTime
-          logger.error(`Restarting the consumer in ${retryTime}ms`, {
-            retryCount: e.retryCount,
-            retryTime,
-            groupId,
-          })
+      instrumentationEmitter.emit(CRASH, {
+        error: e,
+        groupId,
+        restart: shouldRestart,
+      })
 
-          setTimeout(() => restart(onCrash), retryTime)
-        }
+      if (shouldRestart) {
+        const retryTime = e.retryTime || (retry && retry.initialRetryTime) || initialRetryTime
+        logger.error(`Restarting the consumer in ${retryTime}ms`, {
+          retryCount: e.retryCount,
+          retryTime,
+          groupId,
+        })
+
+        setTimeout(() => restart(onCrash), retryTime)
       }
     }
 
@@ -11502,7 +10560,7 @@ module.exports = ({
   \********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const swapObject = __webpack_require__(/*! ../utils/swapObject */ "./node_modules/kafkajs/src/utils/swapObject.js")
@@ -11522,6 +10580,8 @@ const events = {
   DISCONNECT: consumerType('disconnect'),
   STOP: consumerType('stop'),
   CRASH: consumerType('crash'),
+  REBALANCING: consumerType('rebalancing'),
+  RECEIVED_UNSUBSCRIBED_TOPICS: consumerType('received_unsubscribed_topics'),
   REQUEST: consumerType(networkEvents.NETWORK_REQUEST),
   REQUEST_TIMEOUT: consumerType(networkEvents.NETWORK_REQUEST_TIMEOUT),
   REQUEST_QUEUE_SIZE: consumerType(networkEvents.NETWORK_REQUEST_QUEUE_SIZE),
@@ -11570,10 +10630,25 @@ const PRIVATE = {
   COMMITTED_OFFSETS: Symbol('private:OffsetManager:committedOffsets'),
 }
 module.exports = class OffsetManager {
+  /**
+   * @param {Object} options
+   * @param {import("../../../types").Cluster} options.cluster
+   * @param {import("../../../types").Broker} options.coordinator
+   * @param {import("../../../types").IMemberAssignment} options.memberAssignment
+   * @param {boolean} options.autoCommit
+   * @param {number | null} options.autoCommitInterval
+   * @param {number | null} options.autoCommitThreshold
+   * @param {{[topic: string]: { fromBeginning: boolean }}} options.topicConfigurations
+   * @param {import("../../instrumentation/emitter")} options.instrumentationEmitter
+   * @param {string} options.groupId
+   * @param {number} options.generationId
+   * @param {string} options.memberId
+   */
   constructor({
     cluster,
     coordinator,
     memberAssignment,
+    autoCommit,
     autoCommitInterval,
     autoCommitThreshold,
     topicConfigurations,
@@ -11598,6 +10673,7 @@ module.exports = class OffsetManager {
     this.generationId = generationId
     this.memberId = memberId
 
+    this.autoCommit = autoCommit
     this.autoCommitInterval = autoCommitInterval
     this.autoCommitThreshold = autoCommitThreshold
     this.lastCommit = Date.now()
@@ -11625,7 +10701,7 @@ module.exports = class OffsetManager {
   }
 
   /**
-   * @returns {Broker}
+   * @returns {Promise<import("../../../types").Broker>}
    */
   async getCoordinator() {
     if (!this.coordinator.isConnected()) {
@@ -11636,17 +10712,14 @@ module.exports = class OffsetManager {
   }
 
   /**
-   * @param {string} topic
-   * @param {number} partition
+   * @param {import("../../../types").TopicPartition} topicPartition
    */
   resetOffset({ topic, partition }) {
     this.resolvedOffsets[topic][partition] = this.committedOffsets()[topic][partition]
   }
 
   /**
-   * @param {string} topic
-   * @param {number} partition
-   * @param {string} offset
+   * @param {import("../../../types").TopicPartitionOffset} topicPartitionOffset
    */
   resolveOffset({ topic, partition, offset }) {
     this.resolvedOffsets[topic][partition] = Long.fromValue(offset)
@@ -11680,8 +10753,7 @@ module.exports = class OffsetManager {
   }
 
   /**
-   * @param {string} topic
-   * @param {number} partition
+   * @param {import("../../../types").TopicPartition} topicPartition
    */
   async setDefaultOffset({ topic, partition }) {
     const { groupId, generationId, memberId } = this
@@ -11707,12 +10779,21 @@ module.exports = class OffsetManager {
    * Commit the given offset to the topic/partition. If the consumer isn't assigned to the given
    * topic/partition this method will be a NO-OP.
    *
-   * @param {string} topic
-   * @param {number} partition
-   * @param {string} offset
+   * @param {import("../../../types").TopicPartitionOffset} topicPartitionOffset
    */
   async seek({ topic, partition, offset }) {
     if (!this.memberAssignment[topic] || !this.memberAssignment[topic].includes(partition)) {
+      return
+    }
+
+    if (!this.autoCommit) {
+      this.resolveOffset({
+        topic,
+        partition,
+        offset: Long.fromValue(offset)
+          .subtract(1)
+          .toString(),
+      })
       return
     }
 
@@ -11817,7 +10898,12 @@ module.exports = class OffsetManager {
           (obj, { partition, offset }) => assign(obj, { [partition]: offset }),
           {}
         )
-        assign(this.committedOffsets()[topic], updatedOffsets)
+
+        this[PRIVATE.COMMITTED_OFFSETS][topic] = assign(
+          {},
+          this.committedOffsets()[topic],
+          updatedOffsets
+        )
       })
 
       this.lastCommit = Date.now()
@@ -11873,8 +10959,7 @@ module.exports = class OffsetManager {
       return assign(obj, { [partition]: offset })
     }
 
-    const hasUnresolvedPartitions = () =>
-      unresolvedPartitions.filter(t => t.partitions.length > 0).length > 0
+    const hasUnresolvedPartitions = () => unresolvedPartitions.some(t => t.partitions.length > 0)
 
     let offsets = consumerOffsets
     if (hasUnresolvedPartitions()) {
@@ -11891,8 +10976,7 @@ module.exports = class OffsetManager {
 
   /**
    * @private
-   * @param {string} topic
-   * @param {number} partition
+   * @param {import("../../../types").TopicPartition} topicPartition
    */
   clearOffsets({ topic, partition }) {
     delete this.committedOffsets()[topic][partition]
@@ -11994,7 +11078,7 @@ module.exports = offset => (!offset && offset !== 0) || Long.fromValue(offset).i
 /*! CommonJS bailout: module.exports is used directly at 20:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const EventEmitter = __webpack_require__(/*! events */ "events")
+const { EventEmitter } = __webpack_require__(/*! events */ "events")
 const Long = __webpack_require__(/*! ../utils/long */ "./node_modules/kafkajs/src/utils/long.js")
 const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const limitConcurrency = __webpack_require__(/*! ../utils/concurrency */ "./node_modules/kafkajs/src/utils/concurrency.js")
@@ -12002,7 +11086,7 @@ const { KafkaJSError } = __webpack_require__(/*! ../errors */ "./node_modules/ka
 const barrier = __webpack_require__(/*! ./barrier */ "./node_modules/kafkajs/src/consumer/barrier.js")
 
 const {
-  events: { GROUP_JOIN, FETCH, FETCH_START, START_BATCH_PROCESS, END_BATCH_PROCESS },
+  events: { FETCH, FETCH_START, START_BATCH_PROCESS, END_BATCH_PROCESS, REBALANCING },
 } = __webpack_require__(/*! ./instrumentationEvents */ "./node_modules/kafkajs/src/consumer/instrumentationEvents.js")
 
 const isRebalancing = e =>
@@ -12070,42 +11154,8 @@ module.exports = class Runner extends EventEmitter {
   }
 
   async join() {
-    const startJoin = Date.now()
-    return this.retrier(async (bail, retryCount, retryTime) => {
-      try {
-        await this.consumerGroup.join()
-        await this.consumerGroup.sync()
-
-        this.running = true
-
-        const memberAssignment = this.consumerGroup
-          .assigned()
-          .reduce((result, { topic, partitions }) => ({ ...result, [topic]: partitions }), {})
-
-        const payload = {
-          groupId: this.consumerGroup.groupId,
-          memberId: this.consumerGroup.memberId,
-          leaderId: this.consumerGroup.leaderId,
-          isLeader: this.consumerGroup.isLeader(),
-          memberAssignment,
-          groupProtocol: this.consumerGroup.groupProtocol,
-          duration: Date.now() - startJoin,
-        }
-
-        this.instrumentationEmitter.emit(GROUP_JOIN, payload)
-        this.logger.info('Consumer has joined the group', payload)
-      } catch (e) {
-        if (isRebalancing(e)) {
-          // Rebalance in progress isn't a retriable error since the consumer
-          // has to go through find coordinator and join again before it can
-          // actually retry. Throwing a retriable error to allow the retrier
-          // to keep going
-          throw new KafkaJSError('The group is rebalancing')
-        }
-
-        bail(e)
-      }
-    })
+    await this.consumerGroup.joinAndSync()
+    this.running = true
   }
 
   async scheduleJoin() {
@@ -12178,7 +11228,14 @@ module.exports = class Runner extends EventEmitter {
       }
 
       try {
-        await this.eachMessage({ topic, partition, message })
+        await this.eachMessage({
+          topic,
+          partition,
+          message,
+          heartbeat: async () => {
+            await this.consumerGroup.heartbeat({ interval: this.heartbeatInterval })
+          },
+        })
       } catch (e) {
         if (!isKafkaJSError(e)) {
           this.logger.error(`Error when calling eachMessage`, {
@@ -12197,7 +11254,7 @@ module.exports = class Runner extends EventEmitter {
 
       this.consumerGroup.resolveOffset({ topic, partition, offset: message.offset })
       await this.consumerGroup.heartbeat({ interval: this.heartbeatInterval })
-      await this.consumerGroup.commitOffsetsIfNecessary()
+      await this.autoCommitOffsetsIfNecessary()
     }
   }
 
@@ -12311,6 +11368,38 @@ module.exports = class Runner extends EventEmitter {
         lastOffset: batch.lastOffset(),
       }
 
+      /**
+       * If the batch contained only control records or only aborted messages then we still
+       * need to resolve and auto-commit to ensure the consumer can move forward.
+       *
+       * We also need to emit batch instrumentation events to allow any listeners keeping
+       * track of offsets to know about the latest point of consumption.
+       *
+       * Added in #1256
+       *
+       * @see https://github.com/apache/kafka/blob/9aa660786e46c1efbf5605a6a69136a1dac6edb9/clients/src/main/java/org/apache/kafka/clients/consumer/internals/Fetcher.java#L1499-L1505
+       */
+      if (batch.isEmptyDueToFiltering()) {
+        this.instrumentationEmitter.emit(START_BATCH_PROCESS, payload)
+
+        this.consumerGroup.resolveOffset({
+          topic: batch.topic,
+          partition: batch.partition,
+          offset: batch.lastOffset(),
+        })
+        await this.autoCommitOffsetsIfNecessary()
+
+        this.instrumentationEmitter.emit(END_BATCH_PROCESS, {
+          ...payload,
+          duration: Date.now() - startBatchProcess,
+        })
+        return
+      }
+
+      if (batch.isEmpty()) {
+        return
+      }
+
       this.instrumentationEmitter.emit(START_BATCH_PROCESS, payload)
 
       if (this.eachMessage) {
@@ -12323,6 +11412,8 @@ module.exports = class Runner extends EventEmitter {
         ...payload,
         duration: Date.now() - startBatchProcess,
       })
+
+      await this.consumerGroup.heartbeat({ interval: this.heartbeatInterval })
     }
 
     const { lock, unlock, unlockWithError } = barrier()
@@ -12362,12 +11453,7 @@ module.exports = class Runner extends EventEmitter {
                 return
               }
 
-              if (batch.isEmpty()) {
-                return
-              }
-
               await onBatch(batch)
-              await this.consumerGroup.heartbeat({ interval: this.heartbeatInterval })
             } catch (e) {
               unlockWithError(e)
             } finally {
@@ -12427,12 +11513,17 @@ module.exports = class Runner extends EventEmitter {
         }
 
         if (isRebalancing(e)) {
-          this.logger.error('The group is rebalancing, re-joining', {
+          this.logger.warn('The group is rebalancing, re-joining', {
             groupId: this.consumerGroup.groupId,
             memberId: this.consumerGroup.memberId,
             error: e.message,
             retryCount,
             retryTime,
+          })
+
+          this.instrumentationEmitter.emit(REBALANCING, {
+            groupId: this.consumerGroup.groupId,
+            memberId: this.consumerGroup.memberId,
           })
 
           await this.join()
@@ -12517,7 +11608,7 @@ module.exports = class Runner extends EventEmitter {
         }
 
         if (isRebalancing(e)) {
-          this.logger.error('The group is rebalancing, re-joining', {
+          this.logger.warn('The group is rebalancing, re-joining', {
             groupId: this.consumerGroup.groupId,
             memberId: this.consumerGroup.memberId,
             error: e.message,
@@ -12525,9 +11616,14 @@ module.exports = class Runner extends EventEmitter {
             retryTime,
           })
 
+          this.instrumentationEmitter.emit(REBALANCING, {
+            groupId: this.consumerGroup.groupId,
+            memberId: this.consumerGroup.memberId,
+          })
+
           setImmediate(() => this.scheduleJoin())
 
-          bail(new KafkaJSError('The group is rebalancing'))
+          bail(new KafkaJSError(e))
         }
 
         if (e.type === 'UNKNOWN_MEMBER_ID') {
@@ -12542,7 +11638,7 @@ module.exports = class Runner extends EventEmitter {
           this.consumerGroup.memberId = null
           setImmediate(() => this.scheduleJoin())
 
-          bail(new KafkaJSError('The group is rebalancing'))
+          bail(new KafkaJSError(e))
         }
 
         if (e.name === 'KafkaJSNotImplemented') {
@@ -12759,9 +11855,12 @@ module.exports = () => ({
   !*** ./node_modules/kafkajs/src/errors.js ***!
   \********************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 181:0-14 */
-/***/ ((module) => {
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 244:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const pkgJson = __webpack_require__(/*! ../package.json */ "./node_modules/kafkajs/package.json")
+const { bugs } = pkgJson
 
 class KafkaJSError extends Error {
   constructor(e, { retriable = true } = {}) {
@@ -12778,12 +11877,13 @@ class KafkaJSNonRetriableError extends KafkaJSError {
   constructor(e) {
     super(e, { retriable: false })
     this.name = 'KafkaJSNonRetriableError'
+    this.originalError = e
   }
 }
 
 class KafkaJSProtocolError extends KafkaJSError {
-  constructor(e) {
-    super(e, { retriable: e.retriable })
+  constructor(e, { retriable = e.retriable } = {}) {
+    super(e, { retriable })
     this.type = e.type
     this.code = e.code
     this.name = 'KafkaJSProtocolError'
@@ -12943,6 +12043,65 @@ class KafkaJSUnsupportedMagicByteInMessageSet extends KafkaJSNonRetriableError {
   }
 }
 
+class KafkaJSDeleteTopicRecordsError extends KafkaJSError {
+  constructor({ partitions }) {
+    /*
+     * This error is retriable if all the errors were retriable
+     */
+    const retriable = partitions
+      .filter(({ error }) => error != null)
+      .every(({ error }) => error.retriable === true)
+
+    super('Error while deleting records', { retriable })
+    this.name = 'KafkaJSDeleteTopicRecordsError'
+    this.partitions = partitions
+  }
+}
+
+const issueUrl = bugs ? bugs.url : null
+
+class KafkaJSInvariantViolation extends KafkaJSNonRetriableError {
+  constructor(e) {
+    const message = e.message || e
+    super(`Invariant violated: ${message}. This is likely a bug and should be reported.`)
+    this.name = 'KafkaJSInvariantViolation'
+
+    if (issueUrl !== null) {
+      const issueTitle = encodeURIComponent(`Invariant violation: ${message}`)
+      this.helpUrl = `${issueUrl}/new?assignees=&labels=bug&template=bug_report.md&title=${issueTitle}`
+    }
+  }
+}
+
+class KafkaJSInvalidVarIntError extends KafkaJSNonRetriableError {
+  constructor() {
+    super(...arguments)
+    this.name = 'KafkaJSNonRetriableError'
+  }
+}
+
+class KafkaJSInvalidLongError extends KafkaJSNonRetriableError {
+  constructor() {
+    super(...arguments)
+    this.name = 'KafkaJSNonRetriableError'
+  }
+}
+
+class KafkaJSCreateTopicError extends KafkaJSProtocolError {
+  constructor(e, topicName) {
+    super(e)
+    this.topic = topicName
+    this.name = 'KafkaJSCreateTopicError'
+  }
+}
+class KafkaJSAggregateError extends Error {
+  constructor(message, errors) {
+    super(message)
+    this.errors = errors
+    this.name = 'KafkaJSAggregateError'
+  }
+}
+
 module.exports = {
   KafkaJSError,
   KafkaJSNonRetriableError,
@@ -12966,6 +12125,12 @@ module.exports = {
   KafkaJSLockTimeout,
   KafkaJSServerDoesNotSupportApiKey,
   KafkaJSUnsupportedMagicByteInMessageSet,
+  KafkaJSDeleteTopicRecordsError,
+  KafkaJSInvariantViolation,
+  KafkaJSInvalidVarIntError,
+  KafkaJSInvalidLongError,
+  KafkaJSCreateTopicError,
+  KafkaJSAggregateError,
 }
 
 
@@ -13004,6 +12169,20 @@ const PRIVATE = {
 const DEFAULT_METADATA_MAX_AGE = 300000
 
 module.exports = class Client {
+  /**
+   * @param {Object} options
+   * @param {Array<string>} options.brokers example: ['127.0.0.1:9092', '127.0.0.1:9094']
+   * @param {Object} options.ssl
+   * @param {Object} options.sasl
+   * @param {string} options.clientId
+   * @param {number} options.connectionTimeout - in milliseconds
+   * @param {number} options.authenticationTimeout - in milliseconds
+   * @param {number} options.reauthenticationThreshold - in milliseconds
+   * @param {number} [options.requestTimeout=30000] - in milliseconds
+   * @param {boolean} [options.enforceRequestTimeout]
+   * @param {import("../types").RetryOptions} [options.retry]
+   * @param {import("../types").ISocketFactory} [options.socketFactory]
+   */
   constructor({
     brokers,
     ssl,
@@ -13175,7 +12354,7 @@ module.exports = class Client {
 /*! CommonJS bailout: module.exports is used directly at 5:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const EventEmitter = __webpack_require__(/*! events */ "events")
+const { EventEmitter } = __webpack_require__(/*! events */ "events")
 const InstrumentationEvent = __webpack_require__(/*! ./event */ "./node_modules/kafkajs/src/instrumentation/event.js")
 const { KafkaJSError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
 
@@ -13201,8 +12380,8 @@ module.exports = class InstrumentationEventEmitter {
 
   /**
    * @param {string} eventName
-   * @param {Function} listener
-   * @returns {Function} removeListener
+   * @param {(...args: any[]) => void} listener
+   * @returns {import("../../types").RemoveInstrumentationEventListener<string>} removeListener
    */
   addListener(eventName, listener) {
     this.emitter.addListener(eventName, listener)
@@ -13384,10 +12563,9 @@ module.exports = {
   \********************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const createSocket = __webpack_require__(/*! ./socket */ "./node_modules/kafkajs/src/network/socket.js")
 const createRequest = __webpack_require__(/*! ../protocol/request */ "./node_modules/kafkajs/src/protocol/request.js")
 const Decoder = __webpack_require__(/*! ../protocol/decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
@@ -13400,28 +12578,29 @@ const { CONNECTION_STATUS, CONNECTED_STATUS } = __webpack_require__(/*! ./connec
 const requestInfo = ({ apiName, apiKey, apiVersion }) =>
   `${apiName}(key: ${apiKey}, version: ${apiVersion})`
 
-/**
- * @param {string} host
- * @param {number} port
- * @param {Object} logger
- * @param {string} clientId='kafkajs'
- * @param {number} requestTimeout The maximum amount of time the client will wait for the response of a request,
- *                                in milliseconds
- * @param {string} [rack=null]
- * @param {Object} [ssl=null] Options for the TLS Secure Context. It accepts all options,
- *                            usually "cert", "key" and "ca". More information at
- *                            https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
- * @param {Object} [sasl=null] Attributes used for SASL authentication. Options based on the
- *                             key "mechanism". Connection is not actively using the SASL attributes
- *                             but acting as a data object for this information
- * @param {number} [connectionTimeout=1000] The connection timeout, in milliseconds
- * @param {Object} [retry=null] Configurations for the built-in retry mechanism. More information at the
- *                              retry module inside network
- * @param {number} [maxInFlightRequests=null] The maximum number of unacknowledged requests on a connection before
- *                                            enqueuing
- * @param {InstrumentationEventEmitter} [instrumentationEmitter=null]
- */
 module.exports = class Connection {
+  /**
+   * @param {Object} options
+   * @param {string} options.host
+   * @param {number} options.port
+   * @param {import("../../types").Logger} options.logger
+   * @param {import("../../types").ISocketFactory} options.socketFactory
+   * @param {string} [options.clientId='kafkajs']
+   * @param {number} options.requestTimeout The maximum amount of time the client will wait for the response of a request,
+   *                                in milliseconds
+   * @param {string} [options.rack=null]
+   * @param {Object} [options.ssl=null] Options for the TLS Secure Context. It accepts all options,
+   *                            usually "cert", "key" and "ca". More information at
+   *                            https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
+   * @param {Object} [options.sasl=null] Attributes used for SASL authentication. Options based on the
+   *                             key "mechanism". Connection is not actively using the SASL attributes
+   *                             but acting as a data object for this information
+   * @param {number} [options.connectionTimeout=1000] The connection timeout, in milliseconds
+   * @param {boolean} [options.enforceRequestTimeout]
+   * @param {number} [options.maxInFlightRequests=null] The maximum number of unacknowledged requests on a connection before
+   *                                            enqueuing
+   * @param {import("../instrumentation/emitter")} [options.instrumentationEmitter=null]
+   */
   constructor({
     host,
     port,
@@ -13436,7 +12615,6 @@ module.exports = class Connection {
     enforceRequestTimeout = false,
     maxInFlightRequests = null,
     instrumentationEmitter = null,
-    retry = {},
   }) {
     this.host = host
     this.port = port
@@ -13449,8 +12627,6 @@ module.exports = class Connection {
     this.ssl = ssl
     this.sasl = sasl
 
-    this.retry = retry
-    this.retrier = createRetry({ ...this.retry })
     this.requestTimeout = requestTimeout
     this.connectionTimeout = connectionTimeout
 
@@ -13544,8 +12720,8 @@ module.exports = class Connection {
         })
 
         this.logError(error.message, { stack: e.stack })
-        await this.disconnect()
         this.rejectRequests(error)
+        await this.disconnect()
 
         reject(error)
       }
@@ -13556,8 +12732,8 @@ module.exports = class Connection {
         })
 
         this.logError(error.message)
-        await this.disconnect()
         this.rejectRequests(error)
+        await this.disconnect()
         reject(error)
       }
 
@@ -13889,12 +13065,13 @@ module.exports = {
   \****************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const EventEmitter = __webpack_require__(/*! events */ "events")
+const { EventEmitter } = __webpack_require__(/*! events */ "events")
 const SocketRequest = __webpack_require__(/*! ./socketRequest */ "./node_modules/kafkajs/src/network/requestQueue/socketRequest.js")
 const events = __webpack_require__(/*! ../instrumentationEvents */ "./node_modules/kafkajs/src/network/instrumentationEvents.js")
+const { KafkaJSInvariantViolation } = __webpack_require__(/*! ../../errors */ "./node_modules/kafkajs/src/errors.js")
 
 const PRIVATE = {
   EMIT_QUEUE_SIZE_EVENT: Symbol('private:RequestQueue:emitQueueSizeEvent'),
@@ -13905,12 +13082,15 @@ const REQUEST_QUEUE_EMPTY = 'requestQueueEmpty'
 
 module.exports = class RequestQueue extends EventEmitter {
   /**
-   * @param {number} maxInFlightRequests
-   * @param {number} requestTimeout
-   * @param {string} clientId
-   * @param {string} broker
-   * @param {Logger} logger
-   * @param {InstrumentationEventEmitter} [instrumentationEmitter=null]
+   * @param {Object} options
+   * @param {number} options.maxInFlightRequests
+   * @param {number} options.requestTimeout
+   * @param {boolean} options.enforceRequestTimeout
+   * @param {string} options.clientId
+   * @param {string} options.broker
+   * @param {import("../../../types").Logger} options.logger
+   * @param {import("../../instrumentation/emitter")} [options.instrumentationEmitter=null]
+   * @param {() => boolean} [options.isConnected]
    */
   constructor({
     instrumentationEmitter = null,
@@ -14000,7 +13180,7 @@ module.exports = class RequestQueue extends EventEmitter {
 
   /**
    * @typedef {Object} PushedRequest
-   * @property {RequestEntry} entry
+   * @property {import("./socketRequest").RequestEntry} entry
    * @property {boolean} expectResponse
    * @property {Function} sendRequest
    * @property {number} [requestTimeout]
@@ -14025,12 +13205,17 @@ module.exports = class RequestQueue extends EventEmitter {
       instrumentationEmitter: this.instrumentationEmitter,
       requestTimeout,
       send: () => {
+        if (this.inflight.has(correlationId)) {
+          throw new KafkaJSInvariantViolation('Correlation id already exists')
+        }
         this.inflight.set(correlationId, socketRequest)
         pushedRequest.sendRequest()
       },
       timeout: () => {
         this.inflight.delete(correlationId)
         this.checkPendingRequests()
+        // Try to emit REQUEST_QUEUE_EMPTY. Otherwise, waitForPendingRequests may stuck forever
+        this[PRIVATE.EMIT_REQUEST_QUEUE_EMPTY]()
       },
     })
 
@@ -14071,9 +13256,10 @@ module.exports = class RequestQueue extends EventEmitter {
 
   /**
    * @public
-   * @param {number} correlationId
-   * @param {Buffer} payload
-   * @param {number} size
+   * @param {object} response
+   * @param {number} response.correlationId
+   * @param {Buffer} response.payload
+   * @param {number} response.size
    */
   fulfillRequest({ correlationId, payload, size }) {
     const socketRequest = this.inflight.get(correlationId)
@@ -14248,12 +13434,15 @@ const REQUEST_STATE = {
  */
 module.exports = class SocketRequest {
   /**
-   * @param {number} requestTimeout
-   * @param {string} broker - e.g: 127.0.0.1:9092
-   * @param {RequestEntry} entry
-   * @param {boolean} expectResponse
-   * @param {Function} send
-   * @param {InstrumentationEventEmitter} [instrumentationEmitter=null]
+   * @param {Object} options
+   * @param {number} options.requestTimeout
+   * @param {string} options.broker - e.g: 127.0.0.1:9092
+   * @param {string} options.clientId
+   * @param {RequestEntry} options.entry
+   * @param {boolean} options.expectResponse
+   * @param {Function} options.send
+   * @param {() => void} options.timeout
+   * @param {import("../../instrumentation/emitter")} [options.instrumentationEmitter=null]
    */
   constructor({
     requestTimeout,
@@ -14381,9 +13570,21 @@ module.exports = class SocketRequest {
   \****************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 1:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
 /***/ ((module) => {
 
+/**
+ * @param {Object} options
+ * @param {import("../../types").ISocketFactory} options.socketFactory
+ * @param {string} options.host
+ * @param {number} options.port
+ * @param {Object} options.ssl
+ * @param {() => void} options.onConnect
+ * @param {(data: Buffer) => void} options.onData
+ * @param {() => void} options.onEnd
+ * @param {(err: Error) => void} options.onError
+ * @param {() => void} options.onTimeout
+ */
 module.exports = ({
   socketFactory,
   host,
@@ -14414,11 +13615,14 @@ module.exports = ({
   \***********************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 6:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const KEEP_ALIVE_DELAY = 60000 // in ms
 
+/**
+ * @returns {import("../../types").ISocketFactory}
+ */
 module.exports = () => {
   const net = __webpack_require__(/*! net */ "net")
   const tls = __webpack_require__(/*! tls */ "tls")
@@ -14468,7 +13672,7 @@ module.exports = topicDataForBroker => {
   \***************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 31:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 37:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const createRetry = __webpack_require__(/*! ../../retry */ "./node_modules/kafkajs/src/retry/index.js")
@@ -14499,7 +13703,13 @@ const COMMIT_RETRIABLE_PROTOCOL_ERRORS = [
 const COMMIT_STALE_COORDINATOR_PROTOCOL_ERRORS = ['COORDINATOR_NOT_AVAILABLE', 'NOT_COORDINATOR']
 
 /**
+ * @typedef {Object} EosManager
+ */
+
+/**
  * Manage behavior for an idempotent producer and transactions.
+ *
+ * @returns {EosManager}
  */
 module.exports = ({
   logger,
@@ -15042,13 +14252,13 @@ const { CONNECT, DISCONNECT } = events
  *
  * @param {Object} params
  * @param {import('../../types').Cluster} params.cluster
- * @param {import('../../types').Logger} params.Logger
+ * @param {import('../../types').Logger} params.logger
  * @param {import('../../types').ICustomPartitioner} [params.createPartitioner]
- * @param {import('../../types').RetryOptions} params.retry
+ * @param {import('../../types').RetryOptions} [params.retry]
  * @param {boolean} [params.idempotent]
  * @param {string} [params.transactionalId]
  * @param {number} [params.transactionTimeout]
- * @param {import('../instrumentation/emitter')} [params.instrumentationEmitter]
+ * @param {InstrumentationEventEmitter} [params.instrumentationEmitter]
  *
  * @returns {import('../../types').Producer}
  */
@@ -15100,11 +14310,7 @@ module.exports = ({
 
   let transactionalEosManager
 
-  /**
-   * @param {string} eventName
-   * @param {AsyncFunction} listener
-   * @return {Function} removeListener
-   */
+  /** @type {import("../../types").Producer["on"]} */
   const on = (eventName, listener) => {
     if (!eventNames.includes(eventName)) {
       throw new KafkaJSNonRetriableError(`Event name should be one of ${eventKeys}`)
@@ -15257,7 +14463,7 @@ module.exports = ({
     disconnect: async () => {
       connectionStatus = CONNECTION_STATUS.DISCONNECTING
       await cluster.disconnect()
-      connectionStatus = CONNECTION_STATUS.DISCONNECT
+      connectionStatus = CONNECTION_STATUS.DISCONNECTED
       instrumentationEmitter.emit(DISCONNECT)
     },
     isIdempotent: () => {
@@ -15341,6 +14547,7 @@ module.exports = ({
   const sendMessages = createSendMessages({
     logger,
     cluster,
+    retrier,
     partitioner,
     eosManager,
   })
@@ -15418,45 +14625,11 @@ module.exports = ({
       return merged
     }, [])
 
-    return retrier(async (bail, retryCount, retryTime) => {
-      try {
-        return await sendMessages({
-          acks,
-          timeout,
-          compression,
-          topicMessages: mergedTopicMessages,
-        })
-      } catch (error) {
-        if (error.name === 'KafkaJSConnectionClosedError') {
-          cluster.removeBroker({ host: error.host, port: error.port })
-        }
-
-        if (!cluster.isConnected()) {
-          logger.debug(`Cluster has disconnected, reconnecting: ${error.message}`, {
-            retryCount,
-            retryTime,
-          })
-          await cluster.connect()
-          await cluster.refreshMetadata()
-          throw error
-        }
-
-        // This is necessary in case the metadata is stale and the number of partitions
-        // for this topic has increased in the meantime
-        if (
-          error.name === 'KafkaJSConnectionError' ||
-          error.name === 'KafkaJSConnectionClosedError' ||
-          (error.name === 'KafkaJSProtocolError' && error.retriable)
-        ) {
-          logger.error(`Failed to send messages: ${error.message}`, { retryCount, retryTime })
-          await cluster.refreshMetadata()
-          throw error
-        }
-
-        // Skip retries for errors not related to the Kafka protocol
-        logger.error(`${error.message}`, { retryCount, retryTime })
-        bail(error)
-      }
+    return await sendMessages({
+      acks,
+      timeout,
+      compression,
+      topicMessages: mergedTopicMessages,
     })
   }
 
@@ -15604,9 +14777,12 @@ const toPositive = x => x & 0x7fffffff
  *  - If no partition or key is present choose a partition in a round-robin fashion
  */
 module.exports = murmur2 => () => {
-  let counter = randomBytes(32).readUInt32BE(0)
+  const counters = {}
 
   return ({ topic, partitionMetadata, message }) => {
+    if (!(topic in counters)) {
+      counters[topic] = randomBytes(32).readUInt32BE(0)
+    }
     const numPartitions = partitionMetadata.length
     const availablePartitions = partitionMetadata.filter(p => p.leader >= 0)
     const numAvailablePartitions = availablePartitions.length
@@ -15620,12 +14796,12 @@ module.exports = murmur2 => () => {
     }
 
     if (numAvailablePartitions > 0) {
-      const i = toPositive(++counter) % numAvailablePartitions
+      const i = toPositive(++counters[topic]) % numAvailablePartitions
       return availablePartitions[i].partitionId
     }
 
     // no partitions are available, give a non-available partition
-    return toPositive(++counter) % numPartitions
+    return toPositive(++counters[topic]) % numPartitions
   }
 }
 
@@ -15807,32 +14983,32 @@ module.exports = ({ topics }) => {
   \***********************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const createRetry = __webpack_require__(/*! ../retry */ "./node_modules/kafkajs/src/retry/index.js")
 const flatten = __webpack_require__(/*! ../utils/flatten */ "./node_modules/kafkajs/src/utils/flatten.js")
 const { KafkaJSMetadataNotLoaded } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
+const { staleMetadata } = __webpack_require__(/*! ../protocol/error */ "./node_modules/kafkajs/src/protocol/error.js")
 const groupMessagesPerPartition = __webpack_require__(/*! ./groupMessagesPerPartition */ "./node_modules/kafkajs/src/producer/groupMessagesPerPartition.js")
 const createTopicData = __webpack_require__(/*! ./createTopicData */ "./node_modules/kafkajs/src/producer/createTopicData.js")
 const responseSerializer = __webpack_require__(/*! ./responseSerializer */ "./node_modules/kafkajs/src/producer/responseSerializer.js")
 
 const { keys } = Object
-const TOTAL_INDIVIDUAL_ATTEMPTS = 5
-const staleMetadata = e =>
-  ['UNKNOWN_TOPIC_OR_PARTITION', 'LEADER_NOT_AVAILABLE', 'NOT_LEADER_FOR_PARTITION'].includes(
-    e.type
-  )
 
-module.exports = ({ logger, cluster, partitioner, eosManager }) => {
-  const retrier = createRetry({ retries: TOTAL_INDIVIDUAL_ATTEMPTS })
-
+/**
+ * @param {Object} options
+ * @param {import("../../types").Logger} options.logger
+ * @param {import("../../types").Cluster} options.cluster
+ * @param {ReturnType<import("../../types").ICustomPartitioner>} options.partitioner
+ * @param {import("./eosManager").EosManager} options.eosManager
+ * @param {import("../retry").Retrier} options.retrier
+ */
+module.exports = ({ logger, cluster, partitioner, eosManager, retrier }) => {
   return async ({ acks, timeout, compression, topicMessages }) => {
+    /** @type {Map<import("../../types").Broker, any[]>} */
     const responsePerBroker = new Map()
 
-    const topics = topicMessages.map(({ topic }) => topic)
-    await cluster.addMultipleTargetTopics(topics)
-
+    /** @param {Map<import("../../types").Broker, any[]>} responsePerBroker */
     const createProducerRequests = async responsePerBroker => {
       const topicMetadata = new Map()
 
@@ -15930,25 +15106,272 @@ module.exports = ({ logger, cluster, partitioner, eosManager }) => {
       })
     }
 
-    const makeRequests = async (bail, retryCount, retryTime) => {
+    return retrier(async (bail, retryCount, retryTime) => {
+      const topics = topicMessages.map(({ topic }) => topic)
+      await cluster.addMultipleTargetTopics(topics)
+
       try {
         const requests = await createProducerRequests(responsePerBroker)
         await Promise.all(requests)
         const responses = Array.from(responsePerBroker.values())
         return flatten(responses)
       } catch (e) {
-        if (staleMetadata(e) || e.name === 'KafkaJSMetadataNotLoaded') {
-          await cluster.refreshMetadata()
+        if (e.name === 'KafkaJSConnectionClosedError') {
+          cluster.removeBroker({ host: e.host, port: e.port })
         }
 
-        throw e
-      }
-    }
+        if (!cluster.isConnected()) {
+          logger.debug(`Cluster has disconnected, reconnecting: ${e.message}`, {
+            retryCount,
+            retryTime,
+          })
+          await cluster.connect()
+          await cluster.refreshMetadata()
+          throw e
+        }
 
-    return retrier(makeRequests).catch(e => {
-      throw e.originalError || e
+        // This is necessary in case the metadata is stale and the number of partitions
+        // for this topic has increased in the meantime
+        if (
+          staleMetadata(e) ||
+          e.name === 'KafkaJSMetadataNotLoaded' ||
+          e.name === 'KafkaJSConnectionError' ||
+          e.name === 'KafkaJSConnectionClosedError' ||
+          (e.name === 'KafkaJSProtocolError' && e.retriable)
+        ) {
+          logger.error(`Failed to send messages: ${e.message}`, { retryCount, retryTime })
+          await cluster.refreshMetadata()
+          throw e
+        }
+
+        logger.error(`${e.message}`, { retryCount, retryTime })
+        if (e.retriable) throw e
+        bail(e)
+      }
     })
   }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/aclOperationTypes.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/aclOperationTypes.js ***!
+  \****************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/***/ ((module) => {
+
+// From:
+// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/acl/AclOperation.java#L44
+
+/**
+ * @typedef {number} ACLOperationTypes
+ *
+ * Enum for ACL Operations Types
+ * @readonly
+ * @enum {ACLOperationTypes}
+ */
+module.exports = {
+  /**
+   * Represents any AclOperation which this client cannot understand, perhaps because this
+   * client is too old.
+   */
+  UNKNOWN: 0,
+  /**
+   * In a filter, matches any AclOperation.
+   */
+  ANY: 1,
+  /**
+   * ALL operation.
+   */
+  ALL: 2,
+  /**
+   * READ operation.
+   */
+  READ: 3,
+  /**
+   * WRITE operation.
+   */
+  WRITE: 4,
+  /**
+   * CREATE operation.
+   */
+  CREATE: 5,
+  /**
+   * DELETE operation.
+   */
+  DELETE: 6,
+  /**
+   * ALTER operation.
+   */
+  ALTER: 7,
+  /**
+   * DESCRIBE operation.
+   */
+  DESCRIBE: 8,
+  /**
+   * CLUSTER_ACTION operation.
+   */
+  CLUSTER_ACTION: 9,
+  /**
+   * DESCRIBE_CONFIGS operation.
+   */
+  DESCRIBE_CONFIGS: 10,
+  /**
+   * ALTER_CONFIGS operation.
+   */
+  ALTER_CONFIGS: 11,
+  /**
+   * IDEMPOTENT_WRITE operation.
+   */
+  IDEMPOTENT_WRITE: 12,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/aclPermissionTypes.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/aclPermissionTypes.js ***!
+  \*****************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/***/ ((module) => {
+
+// From:
+// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/acl/AclPermissionType.java/#L31
+
+/**
+ * @typedef {number} ACLPermissionTypes
+ *
+ * Enum for Permission Types
+ * @readonly
+ * @enum {ACLPermissionTypes}
+ */
+module.exports = {
+  /**
+   * Represents any AclPermissionType which this client cannot understand,
+   * perhaps because this client is too old.
+   */
+  UNKNOWN: 0,
+  /**
+   * In a filter, matches any AclPermissionType.
+   */
+  ANY: 1,
+  /**
+   * Disallows access.
+   */
+  DENY: 2,
+  /**
+   * Grants access.
+   */
+  ALLOW: 3,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/aclResourceTypes.js ***!
+  \***************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
+/***/ ((module) => {
+
+/**
+ * @see https://github.com/apache/kafka/blob/a15387f34d142684859c2a57fcbef25edcdce25a/clients/src/main/java/org/apache/kafka/common/resource/ResourceType.java#L25-L31
+ * @typedef {number} ACLResourceTypes
+ *
+ * Enum for ACL Resource Types
+ * @readonly
+ * @enum {ACLResourceTypes}
+ */
+
+module.exports = {
+  /**
+   * Represents any ResourceType which this client cannot understand,
+   * perhaps because this client is too old.
+   */
+  UNKNOWN: 0,
+  /**
+   * In a filter, matches any ResourceType.
+   */
+  ANY: 1,
+  /**
+   * A Kafka topic.
+   * @see http://kafka.apache.org/documentation/#topicconfigs
+   */
+  TOPIC: 2,
+  /**
+   * A consumer group.
+   * @see http://kafka.apache.org/documentation/#consumerconfigs
+   */
+  GROUP: 3,
+  /**
+   * The cluster as a whole.
+   */
+  CLUSTER: 4,
+  /**
+   * A transactional ID.
+   */
+  TRANSACTIONAL_ID: 5,
+  /**
+   * A token ID.
+   */
+  DELEGATION_TOKEN: 6,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/configResourceTypes.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/configResourceTypes.js ***!
+  \******************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 4:0-14 */
+/***/ ((module) => {
+
+/**
+ * @see https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/config/ConfigResource.java
+ */
+module.exports = {
+  UNKNOWN: 0,
+  TOPIC: 2,
+  BROKER: 4,
+  BROKER_LOGGER: 8,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/configSource.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/configSource.js ***!
+  \***********************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 4:0-14 */
+/***/ ((module) => {
+
+/**
+ * @see https://github.com/apache/kafka/blob/1f240ce1793cab09e1c4823e17436d2b030df2bc/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java#L115-L122
+ */
+module.exports = {
+  UNKNOWN: 0,
+  TOPIC_CONFIG: 1,
+  DYNAMIC_BROKER_CONFIG: 2,
+  DYNAMIC_DEFAULT_BROKER_CONFIG: 3,
+  STATIC_BROKER_CONFIG: 4,
+  DEFAULT_CONFIG: 5,
+  DYNAMIC_BROKER_LOGGER_CONFIG: 6,
 }
 
 
@@ -16268,15 +15691,17 @@ module.exports = encoder => {
   \******************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
+const { KafkaJSInvalidVarIntError, KafkaJSInvalidLongError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
 const Long = __webpack_require__(/*! ../utils/long */ "./node_modules/kafkajs/src/utils/long.js")
 
 const INT8_SIZE = 1
 const INT16_SIZE = 2
 const INT32_SIZE = 4
 const INT64_SIZE = 8
+const DOUBLE_SIZE = 8
 
 const MOST_SIGNIFICANT_BIT = 0x80 // 128
 const OTHER_BITS = 0x7f // 127
@@ -16348,6 +15773,12 @@ module.exports = class Decoder {
     return (BigInt(low) << 32n) + BigInt(high)
   }
 
+  readDouble() {
+    const value = this.buffer.readDoubleBE(this.offset)
+    this.offset += DOUBLE_SIZE
+    return value
+  }
+
   readString() {
     const byteLength = this.readInt16()
 
@@ -16365,6 +15796,19 @@ module.exports = class Decoder {
     const byteLength = this.readVarInt()
 
     if (byteLength === -1) {
+      return null
+    }
+
+    const stringBuffer = this.buffer.slice(this.offset, this.offset + byteLength)
+    const value = stringBuffer.toString('utf8')
+    this.offset += byteLength
+    return value
+  }
+
+  readUVarIntString() {
+    const byteLength = this.readUVarInt()
+
+    if (byteLength === 0) {
       return null
     }
 
@@ -16392,6 +15836,18 @@ module.exports = class Decoder {
     const byteLength = this.readVarInt()
 
     if (byteLength === -1) {
+      return null
+    }
+
+    const stringBuffer = this.buffer.slice(this.offset, this.offset + byteLength)
+    this.offset += byteLength
+    return stringBuffer
+  }
+
+  readUVarIntBytes() {
+    const byteLength = this.readUVarInt()
+
+    if (byteLength === 0) {
       return null
     }
 
@@ -16440,6 +15896,21 @@ module.exports = class Decoder {
     return array
   }
 
+  readUVarIntArray(reader) {
+    const length = this.readUVarInt()
+
+    if (length === 0) {
+      return []
+    }
+
+    const array = new Array(length - 1)
+    for (let i = 0; i < length - 1; i++) {
+      array[i] = reader(this)
+    }
+
+    return array
+  }
+
   async readArrayAsync(reader) {
     const length = this.readInt32()
 
@@ -16469,12 +15940,32 @@ module.exports = class Decoder {
     return Decoder.decodeZigZag(result)
   }
 
+  // By default JavaScript's numbers are of type float64, performing bitwise operations converts the numbers to a signed 32-bit integer
+  // Unsigned Right Shift Operator >>> ensures the returned value is an unsigned 32-bit integer
+  readUVarInt() {
+    let currentByte
+    let result = 0
+    let i = 0
+    while (((currentByte = this.buffer[this.offset++]) & MOST_SIGNIFICANT_BIT) !== 0) {
+      result |= (currentByte & OTHER_BITS) << i
+      i += 7
+      if (i > 28) {
+        throw new KafkaJSInvalidVarIntError('Invalid VarInt, must contain 5 bytes or less')
+      }
+    }
+    result |= currentByte << i
+    return result >>> 0
+  }
+
   readVarLong() {
     let currentByte
     let result = Long.fromInt(0)
     let i = 0
 
     do {
+      if (i > 63) {
+        throw new KafkaJSInvalidLongError('Invalid Long, must contain 9 bytes or less')
+      }
       currentByte = this.buffer[this.offset++]
       result = result.add(Long.fromInt(currentByte & OTHER_BITS).shiftLeft(i))
       i += 7
@@ -16501,7 +15992,7 @@ module.exports = class Decoder {
   \******************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Long = __webpack_require__(/*! ../utils/long */ "./node_modules/kafkajs/src/utils/long.js")
@@ -16510,6 +16001,7 @@ const INT8_SIZE = 1
 const INT16_SIZE = 2
 const INT32_SIZE = 4
 const INT64_SIZE = 8
+const DOUBLE_SIZE = 8
 
 const MOST_SIGNIFICANT_BIT = 0x80 // 128
 const OTHER_BITS = 0x7f // 127
@@ -16634,6 +16126,13 @@ module.exports = class Encoder {
     return this
   }
 
+  writeDouble(value) {
+    this.ensureAvailable(DOUBLE_SIZE)
+    this.buf.writeDoubleBE(value, this.offset)
+    this.offset += DOUBLE_SIZE
+    return this
+  }
+
   writeBoolean(value) {
     value ? this.writeInt8(1) : this.writeInt8(0)
     return this
@@ -16661,6 +16160,20 @@ module.exports = class Encoder {
 
     const byteLength = Buffer.byteLength(value, 'utf8')
     this.writeVarInt(byteLength)
+    this.ensureAvailable(byteLength)
+    this.buf.write(value, this.offset, byteLength, 'utf8')
+    this.offset += byteLength
+    return this
+  }
+
+  writeUVarIntString(value) {
+    if (value == null) {
+      this.writeUVarInt(0)
+      return this
+    }
+
+    const byteLength = Buffer.byteLength(value, 'utf8')
+    this.writeUVarInt(byteLength + 1)
     this.ensureAvailable(byteLength)
     this.buf.write(value, this.offset, byteLength, 'utf8')
     this.offset += byteLength
@@ -16704,6 +16217,28 @@ module.exports = class Encoder {
       const valueToWrite = String(value)
       const byteLength = Buffer.byteLength(valueToWrite, 'utf8')
       this.writeVarInt(byteLength)
+      this.ensureAvailable(byteLength)
+      this.buf.write(valueToWrite, this.offset, byteLength, 'utf8')
+      this.offset += byteLength
+    }
+
+    return this
+  }
+
+  writeUVarIntBytes(value) {
+    if (value == null) {
+      this.writeVarInt(0)
+      return this
+    }
+
+    if (Buffer.isBuffer(value)) {
+      // raw bytes
+      this.writeUVarInt(value.length + 1)
+      this.writeBufferInternal(value)
+    } else {
+      const valueToWrite = String(value)
+      const byteLength = Buffer.byteLength(valueToWrite, 'utf8')
+      this.writeUVarInt(byteLength + 1)
       this.ensureAvailable(byteLength)
       this.buf.write(valueToWrite, this.offset, byteLength, 'utf8')
       this.offset += byteLength
@@ -16804,18 +16339,32 @@ module.exports = class Encoder {
     return this
   }
 
+  writeUVarIntArray(array, type) {
+    if (type === 'object') {
+      this.writeUVarInt(array.length + 1)
+      this.writeEncoderArray(array)
+    } else {
+      const objectArray = array.filter(v => typeof v === 'object')
+      this.writeUVarInt(objectArray.length + 1)
+      this.writeEncoderArray(objectArray)
+    }
+    return this
+  }
+
   // Based on:
+  // https://en.wikipedia.org/wiki/LEB128 Using LEB128 format similar to VLQ.
   // https://github.com/addthis/stream-lib/blob/master/src/main/java/com/clearspring/analytics/util/Varint.java#L106
   writeVarInt(value) {
+    return this.writeUVarInt(Encoder.encodeZigZag(value))
+  }
+
+  writeUVarInt(value) {
     const byteArray = []
-    let encodedValue = Encoder.encodeZigZag(value)
-
-    while ((encodedValue & UNSIGNED_INT32_MAX_NUMBER) !== 0) {
-      byteArray.push((encodedValue & OTHER_BITS) | MOST_SIGNIFICANT_BIT)
-      encodedValue >>>= 7
+    while ((value & UNSIGNED_INT32_MAX_NUMBER) !== 0) {
+      byteArray.push((value & OTHER_BITS) | MOST_SIGNIFICANT_BIT)
+      value >>>= 7
     }
-
-    byteArray.push(encodedValue & OTHER_BITS)
+    byteArray.push(value & OTHER_BITS)
     this.writeBufferInternal(Buffer.from(byteArray))
     return this
   }
@@ -16859,7 +16408,7 @@ module.exports = class Encoder {
   \****************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 590:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 595:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const { KafkaJSProtocolError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
@@ -17130,7 +16679,7 @@ const errorCodes = [
     code: 42,
     retriable: false,
     message:
-      "This most likely occurs because of a request being malformed by the client library or the message was sen't to an incompatible broker. See the broker logs for more details",
+      'This most likely occurs because of a request being malformed by the client library or the message was sent to an incompatible broker. See the broker logs for more details',
   },
   {
     type: 'UNSUPPORTED_FOR_MESSAGE_FORMAT',
@@ -17451,11 +17000,17 @@ const failIfVersionNotSupported = code => {
   }
 }
 
+const staleMetadata = e =>
+  ['UNKNOWN_TOPIC_OR_PARTITION', 'LEADER_NOT_AVAILABLE', 'NOT_LEADER_FOR_PARTITION'].includes(
+    e.type
+  )
+
 module.exports = {
   failure,
   errorCodes,
   createErrorFromCode,
   failIfVersionNotSupported,
+  staleMetadata,
 }
 
 
@@ -17531,13 +17086,12 @@ module.exports = {
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 37:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 32:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const { KafkaJSNotImplemented } = __webpack_require__(/*! ../../../errors */ "./node_modules/kafkajs/src/errors.js")
 
-const MESSAGE_CODEC_MASK = 0x3
-const RECORD_BATCH_CODEC_MASK = 0x07
+const COMPRESSION_CODEC_MASK = 0x07
 
 const Types = {
   None: 0,
@@ -17562,11 +17116,7 @@ const Codecs = {
 
 const lookupCodec = type => (Codecs[type] ? Codecs[type]() : null)
 const lookupCodecByAttributes = attributes => {
-  const codec = Codecs[attributes & MESSAGE_CODEC_MASK]
-  return codec ? codec() : null
-}
-const lookupCodecByRecordBatchAttributes = attributes => {
-  const codec = Codecs[attributes & RECORD_BATCH_CODEC_MASK]
+  const codec = Codecs[attributes & COMPRESSION_CODEC_MASK]
   return codec ? codec() : null
 }
 
@@ -17575,7 +17125,7 @@ module.exports = {
   Codecs,
   lookupCodec,
   lookupCodecByAttributes,
-  lookupCodecByRecordBatchAttributes,
+  COMPRESSION_CODEC_MASK,
 }
 
 
@@ -17679,7 +17229,7 @@ module.exports = decoder => ({
 
 const Encoder = __webpack_require__(/*! ../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
 const crc32 = __webpack_require__(/*! ../../crc32 */ "./node_modules/kafkajs/src/protocol/crc32.js")
-const { Types: Compression } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const { Types: Compression, COMPRESSION_CODEC_MASK } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 
 /**
  * v0
@@ -17694,7 +17244,7 @@ const { Types: Compression } = __webpack_require__(/*! ../compression */ "./node
 module.exports = ({ compression = Compression.None, key, value }) => {
   const content = new Encoder()
     .writeInt8(0) // magicByte
-    .writeInt8(compression & 0x3)
+    .writeInt8(compression & COMPRESSION_CODEC_MASK)
     .writeBytes(key)
     .writeBytes(value)
 
@@ -17735,7 +17285,7 @@ module.exports = decoder => ({
 
 const Encoder = __webpack_require__(/*! ../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
 const crc32 = __webpack_require__(/*! ../../crc32 */ "./node_modules/kafkajs/src/protocol/crc32.js")
-const { Types: Compression } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const { Types: Compression, COMPRESSION_CODEC_MASK } = __webpack_require__(/*! ../compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 
 /**
  * v1 (supported since 0.10.0)
@@ -17751,7 +17301,7 @@ const { Types: Compression } = __webpack_require__(/*! ../compression */ "./node
 module.exports = ({ compression = Compression.None, timestamp = Date.now(), key, value }) => {
   const content = new Encoder()
     .writeInt8(1) // magicByte
-    .writeInt8(compression & 0x3)
+    .writeInt8(compression & COMPRESSION_CODEC_MASK)
     .writeInt64(timestamp)
     .writeBytes(key)
     .writeBytes(value)
@@ -18241,7 +17791,7 @@ const sizeOfHeaders = headersArray => {
 
 const Decoder = __webpack_require__(/*! ../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
 const { KafkaJSPartialMessageError } = __webpack_require__(/*! ../../../errors */ "./node_modules/kafkajs/src/errors.js")
-const { lookupCodecByRecordBatchAttributes } = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const { lookupCodecByAttributes } = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 const RecordDecoder = __webpack_require__(/*! ../record/v0/decoder */ "./node_modules/kafkajs/src/protocol/recordBatch/record/v0/decoder.js")
 const TimestampTypes = __webpack_require__(/*! ../../timestampTypes */ "./node_modules/kafkajs/src/protocol/timestampTypes.js")
 
@@ -18306,7 +17856,7 @@ module.exports = async fetchDecoder => {
       ? TimestampTypes.LOG_APPEND_TIME
       : TimestampTypes.CREATE_TIME
 
-  const codec = lookupCodecByRecordBatchAttributes(attributes)
+  const codec = lookupCodecByAttributes(attributes)
 
   const recordContext = {
     firstOffset,
@@ -18367,16 +17917,19 @@ const decodeRecord = (decoder, recordContext) => {
   \*******************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 87:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 90:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Long = __webpack_require__(/*! ../../../utils/long */ "./node_modules/kafkajs/src/utils/long.js")
 const Encoder = __webpack_require__(/*! ../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
 const crc32C = __webpack_require__(/*! ../crc32C */ "./node_modules/kafkajs/src/protocol/recordBatch/crc32C/index.js")
-const { Types: Compression, lookupCodec } = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
+const {
+  Types: Compression,
+  lookupCodec,
+  COMPRESSION_CODEC_MASK,
+} = __webpack_require__(/*! ../../message/compression */ "./node_modules/kafkajs/src/protocol/message/compression/index.js")
 
 const MAGIC_BYTE = 2
-const COMPRESSION_MASK = 3 // The lowest 3 bits
 const TIMESTAMP_MASK = 0 // The fourth lowest bit, always set this bit to 0 (since 0.10.0)
 const TRANSACTIONAL_MASK = 16 // The fifth lowest bit
 
@@ -18411,7 +17964,7 @@ const RecordBatch = async ({
   firstSequence = 0, // for idempotent messages
   records = [],
 }) => {
-  const COMPRESSION_CODEC = compression & COMPRESSION_MASK
+  const COMPRESSION_CODEC = compression & COMPRESSION_CODEC_MASK
   const IN_TRANSACTION = transactional ? TRANSACTIONAL_MASK : 0
   const attributes = COMPRESSION_CODEC | TIMESTAMP_MASK | IN_TRANSACTION
 
@@ -18496,13 +18049,18 @@ module.exports = async ({ correlationId, clientId, request: { apiKey, apiVersion
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, producerId, producerEpoch, groupId }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/response.js")
+    return { request: request({ transactionalId, producerId, producerEpoch, groupId }), response }
+  },
+  1: ({ transactionalId, producerId, producerEpoch, groupId }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/response.js")
     return { request: request({ transactionalId, producerId, producerEpoch, groupId }), response }
   },
 }
@@ -18597,19 +18155,94 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/request.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/request.js ***!
+  \**********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/request.js")
+
+/**
+ * AddOffsetsToTxn Request (Version: 1) => transactional_id producer_id producer_epoch group_id
+ *   transactional_id => STRING
+ *   producer_id => INT64
+ *   producer_epoch => INT16
+ *   group_id => STRING
+ */
+
+module.exports = ({ transactionalId, producerId, producerEpoch, groupId }) =>
+  Object.assign(
+    requestV0({
+      transactionalId,
+      producerId,
+      producerEpoch,
+      groupId,
+    }),
+    { apiVersion: 1 }
+  )
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/response.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v1/response.js ***!
+  \***********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * AddOffsetsToTxn Response (Version: 1) => throttle_time_ms error_code
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ */
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/index.js":
 /*!********************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/index.js ***!
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, producerId, producerEpoch, topics }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/response.js")
+    return { request: request({ transactionalId, producerId, producerEpoch, topics }), response }
+  },
+  1: ({ transactionalId, producerId, producerEpoch, topics }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/response.js")
     return { request: request({ transactionalId, producerId, producerEpoch, topics }), response }
   },
 }
@@ -18732,19 +18365,100 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/request.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/request.js ***!
+  \*************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/request.js")
+
+/**
+ * AddPartitionsToTxn Request (Version: 1) => transactional_id producer_id producer_epoch [topics]
+ *   transactional_id => STRING
+ *   producer_id => INT64
+ *   producer_epoch => INT16
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => INT32
+ */
+
+module.exports = ({ transactionalId, producerId, producerEpoch, topics }) =>
+  Object.assign(
+    requestV0({
+      transactionalId,
+      producerId,
+      producerEpoch,
+      topics,
+    }),
+    { apiVersion: 1 }
+  )
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/response.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v1/response.js ***!
+  \**************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * AddPartitionsToTxn Response (Version: 1) => throttle_time_ms [errors]
+ *   throttle_time_ms => INT32
+ *   errors => topic [partition_errors]
+ *     topic => STRING
+ *     partition_errors => partition error_code
+ *       partition => INT32
+ *       error_code => INT16
+ */
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/index.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/alterConfigs/index.js ***!
   \**************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ resources, validateOnly }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/response.js")
+    return { request: request({ resources, validateOnly }), response }
+  },
+  1: ({ resources, validateOnly }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/response.js")
     return { request: request({ resources, validateOnly }), response }
   },
 }
@@ -18854,6 +18568,86 @@ const parse = async data => {
   }
 
   return data
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/request.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/request.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/request.js")
+
+/**
+ * AlterConfigs Request (Version: 1) => [resources] validate_only
+ *   resources => resource_type resource_name [config_entries]
+ *     resource_type => INT8
+ *     resource_name => STRING
+ *     config_entries => config_name config_value
+ *       config_name => STRING
+ *       config_value => NULLABLE_STRING
+ *   validate_only => BOOLEAN
+ */
+
+/**
+ * @param {Array} resources An array of resources to change
+ * @param {boolean} [validateOnly=false]
+ */
+module.exports = ({ resources, validateOnly }) =>
+  Object.assign(
+    requestV0({
+      resources,
+      validateOnly,
+    }),
+    { apiVersion: 1 }
+  )
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/response.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/alterConfigs/v1/response.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * AlterConfigs Response (Version: 1) => throttle_time_ms [resources]
+ *   throttle_time_ms => INT32
+ *   resources => error_code error_message resource_type resource_name
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ *     resource_type => INT8
+ *     resource_name => STRING
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
 }
 
 module.exports = {
@@ -19146,12 +18940,15 @@ module.exports = () => ({ ...requestV0(), apiVersion: 2 })
   \*******************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse: parseV1, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/apiVersions/v1/response.js")
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/apiVersions/v1/response.js")
 
 /**
+ * Starting in version 2, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
  * ApiVersions Response (Version: 2) => error_code [api_versions] throttle_time_ms
  *   error_code => INT16
  *   api_versions => api_key min_version max_version
@@ -19161,9 +18958,252 @@ const { parse: parseV1, decode: decodeV1 } = __webpack_require__(/*! ../v1/respo
  *   throttle_time_ms => INT32
  */
 
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
 module.exports = {
-  parse: parseV1,
-  decode: decodeV1,
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/index.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/index.js ***!
+  \************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const versions = {
+  0: ({ creations }) => {
+    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/request.js")
+    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js")
+    return { request: request({ creations }), response }
+  },
+  1: ({ creations }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/response.js")
+    return { request: request({ creations }), response }
+  },
+}
+
+module.exports = {
+  versions: Object.keys(versions),
+  protocol: ({ version }) => versions[version],
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/request.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v0/request.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 32:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { CreateAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * CreateAcls Request (Version: 0) => [creations]
+ *   creations => resource_type resource_name principal host operation permission_type
+ *     resource_type => INT8
+ *     resource_name => STRING
+ *     principal => STRING
+ *     host => STRING
+ *     operation => INT8
+ *     permission_type => INT8
+ */
+
+const encodeCreations = ({
+  resourceType,
+  resourceName,
+  principal,
+  host,
+  operation,
+  permissionType,
+}) => {
+  return new Encoder()
+    .writeInt8(resourceType)
+    .writeString(resourceName)
+    .writeString(principal)
+    .writeString(host)
+    .writeInt8(operation)
+    .writeInt8(permissionType)
+}
+
+module.exports = ({ creations }) => ({
+  apiKey,
+  apiVersion: 0,
+  apiName: 'CreateAcls',
+  encode: async () => {
+    return new Encoder().writeArray(creations.map(encodeCreations))
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 40:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+
+/**
+ * CreateAcls Response (Version: 0) => throttle_time_ms [creation_responses]
+ *   throttle_time_ms => INT32
+ *   creation_responses => error_code error_message
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ */
+
+const decodeCreationResponse = decoder => ({
+  errorCode: decoder.readInt16(),
+  errorMessage: decoder.readString(),
+})
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+  const creationResponses = decoder.readArray(decodeCreationResponse)
+
+  return {
+    throttleTime,
+    creationResponses,
+  }
+}
+
+const parse = async data => {
+  const creationResponsesWithError = data.creationResponses.filter(({ errorCode }) =>
+    failure(errorCode)
+  )
+
+  if (creationResponsesWithError.length > 0) {
+    throw createErrorFromCode(creationResponsesWithError[0].errorCode)
+  }
+
+  return data
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/request.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v1/request.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { CreateAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * CreateAcls Request (Version: 1) => [creations]
+ *   creations => resource_type resource_name resource_pattern_type principal host operation permission_type
+ *     resource_type => INT8
+ *     resource_name => STRING
+ *     resource_pattern_type => INT8
+ *     principal => STRING
+ *     host => STRING
+ *     operation => INT8
+ *     permission_type => INT8
+ */
+
+const encodeCreations = ({
+  resourceType,
+  resourceName,
+  resourcePatternType,
+  principal,
+  host,
+  operation,
+  permissionType,
+}) => {
+  return new Encoder()
+    .writeInt8(resourceType)
+    .writeString(resourceName)
+    .writeInt8(resourcePatternType)
+    .writeString(principal)
+    .writeString(host)
+    .writeInt8(operation)
+    .writeInt8(permissionType)
+}
+
+module.exports = ({ creations }) => ({
+  apiKey,
+  apiVersion: 1,
+  apiName: 'CreateAcls',
+  encode: async () => {
+    return new Encoder().writeArray(creations.map(encodeCreations))
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/createAcls/v1/response.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/createAcls/v1/response.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/createAcls/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * CreateAcls Response (Version: 1) => throttle_time_ms [creation_responses]
+ *   throttle_time_ms => INT32
+ *   creation_responses => error_code error_message
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
 }
 
 
@@ -19335,12 +19375,39 @@ module.exports = ({ topicPartitions, validateOnly, timeout }) =>
 /*!************************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/createPartitions/v1/response.js ***!
   \************************************************************************************/
-/*! dynamic exports */
-/*! exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/kafkajs/src/protocol/requests/createPartitions/v0/response.js */
+/*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/createPartitions/v0/response.js")
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/createPartitions/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * CreatePartitions Response (Version: 0) => throttle_time_ms [topic_errors]
+ *   throttle_time_ms => INT32
+ *   topic_errors => topic error_code error_message
+ *     topic => STRING
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
 
 
 /***/ }),
@@ -19351,7 +19418,7 @@ module.exports = __webpack_require__(/*! ../v0/response */ "./node_modules/kafka
   \**************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -19368,6 +19435,11 @@ const versions = {
   2: ({ topics, validateOnly, timeout }) => {
     const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/request.js")
     const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/response.js")
+    return { request: request({ topics, validateOnly, timeout }), response }
+  },
+  3: ({ topics, validateOnly, timeout }) => {
+    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/request.js")
+    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/response.js")
     return { request: request({ topics, validateOnly, timeout }), response }
   },
 }
@@ -19448,11 +19520,12 @@ const encodeConfigEntries = ({ name, value }) => {
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 34:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 40:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
 const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+const { KafkaJSAggregateError, KafkaJSCreateTopicError } = __webpack_require__(/*! ../../../../errors */ "./node_modules/kafkajs/src/errors.js")
 
 /**
  * CreateTopics Response (Version: 0) => [topic_errors]
@@ -19478,7 +19551,12 @@ const decode = async rawData => {
 const parse = async data => {
   const topicsWithError = data.topicErrors.filter(({ errorCode }) => failure(errorCode))
   if (topicsWithError.length > 0) {
-    throw createErrorFromCode(topicsWithError[0].errorCode)
+    throw new KafkaJSAggregateError(
+      'Topic creation errors',
+      topicsWithError.map(
+        error => new KafkaJSCreateTopicError(createErrorFromCode(error.errorCode), error.topic)
+      )
+    )
   }
 
   return data
@@ -19564,11 +19642,11 @@ const encodeConfigEntries = ({ name, value }) => {
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v0/response.js")
 
 /**
  * CreateTopics Response (Version: 1) => [topic_errors]
@@ -19593,18 +19671,9 @@ const decode = async rawData => {
   }
 }
 
-const parse = async data => {
-  const topicsWithError = data.topicErrors.filter(({ errorCode }) => failure(errorCode))
-  if (topicsWithError.length > 0) {
-    throw createErrorFromCode(topicsWithError[0].errorCode)
-  }
-
-  return data
-}
-
 module.exports = {
   decode,
-  parse,
+  parse: parseV0,
 }
 
 
@@ -19683,6 +19752,378 @@ const decode = async rawData => {
 module.exports = {
   decode,
   parse: parseV1,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/request.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/createTopics/v3/request.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV2 = __webpack_require__(/*! ../v2/request */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/request.js")
+
+/**
+ * CreateTopics Request (Version: 3) => [create_topic_requests] timeout validate_only
+ *   create_topic_requests => topic num_partitions replication_factor [replica_assignment] [config_entries]
+ *     topic => STRING
+ *     num_partitions => INT32
+ *     replication_factor => INT16
+ *     replica_assignment => partition [replicas]
+ *       partition => INT32
+ *       replicas => INT32
+ *     config_entries => config_name config_value
+ *       config_name => STRING
+ *       config_value => NULLABLE_STRING
+ *   timeout => INT32
+ *   validate_only => BOOLEAN
+ */
+
+module.exports = ({ topics, validateOnly, timeout }) =>
+  Object.assign(requestV2({ topics, validateOnly, timeout }), { apiVersion: 3 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/createTopics/v3/response.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/createTopics/v3/response.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/createTopics/v2/response.js")
+
+/**
+ * Starting in version 3, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * CreateTopics Response (Version: 3) => throttle_time_ms [topic_errors]
+ *   throttle_time_ms => INT32
+ *   topic_errors => topic error_code error_message
+ *     topic => STRING
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV2(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/index.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/index.js ***!
+  \************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const versions = {
+  0: ({ filters }) => {
+    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/request.js")
+    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js")
+    return { request: request({ filters }), response }
+  },
+  1: ({ filters }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/response.js")
+    return { request: request({ filters }), response }
+  },
+}
+
+module.exports = {
+  versions: Object.keys(versions),
+  protocol: ({ version }) => versions[version],
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/request.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/request.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 32:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { DeleteAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * DeleteAcls Request (Version: 0) => [filters]
+ *   filters => resource_type resource_name principal host operation permission_type
+ *     resource_type => INT8
+ *     resource_name => NULLABLE_STRING
+ *     principal => NULLABLE_STRING
+ *     host => NULLABLE_STRING
+ *     operation => INT8
+ *     permission_type => INT8
+ */
+
+const encodeFilters = ({
+  resourceType,
+  resourceName,
+  principal,
+  host,
+  operation,
+  permissionType,
+}) => {
+  return new Encoder()
+    .writeInt8(resourceType)
+    .writeString(resourceName)
+    .writeString(principal)
+    .writeString(host)
+    .writeInt8(operation)
+    .writeInt8(permissionType)
+}
+
+module.exports = ({ filters }) => ({
+  apiKey,
+  apiVersion: 0,
+  apiName: 'DeleteAcls',
+  encode: async () => {
+    return new Encoder().writeArray(filters.map(encodeFilters))
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 70:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+
+/**
+ * DeleteAcls Response (Version: 0) => throttle_time_ms [filter_responses]
+ *   throttle_time_ms => INT32
+ *   filter_responses => error_code error_message [matching_acls]
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ *     matching_acls => error_code error_message resource_type resource_name principal host operation permission_type
+ *       error_code => INT16
+ *       error_message => NULLABLE_STRING
+ *       resource_type => INT8
+ *       resource_name => STRING
+ *       principal => STRING
+ *       host => STRING
+ *       operation => INT8
+ *       permission_type => INT8
+ */
+
+const decodeMatchingAcls = decoder => ({
+  errorCode: decoder.readInt16(),
+  errorMessage: decoder.readString(),
+  resourceType: decoder.readInt8(),
+  resourceName: decoder.readString(),
+  principal: decoder.readString(),
+  host: decoder.readString(),
+  operation: decoder.readInt8(),
+  permissionType: decoder.readInt8(),
+})
+
+const decodeFilterResponse = decoder => ({
+  errorCode: decoder.readInt16(),
+  errorMessage: decoder.readString(),
+  matchingAcls: decoder.readArray(decodeMatchingAcls),
+})
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+  const filterResponses = decoder.readArray(decodeFilterResponse)
+
+  return {
+    throttleTime,
+    filterResponses,
+  }
+}
+
+const parse = async data => {
+  const filterResponsesWithError = data.filterResponses.filter(({ errorCode }) =>
+    failure(errorCode)
+  )
+
+  if (filterResponsesWithError.length > 0) {
+    throw createErrorFromCode(filterResponsesWithError[0].errorCode)
+  }
+
+  for (const filterResponse of data.filterResponses) {
+    const matchingAcls = filterResponse.matchingAcls
+    const matchingAclsWithError = matchingAcls.filter(({ errorCode }) => failure(errorCode))
+
+    if (matchingAclsWithError.length > 0) {
+      throw createErrorFromCode(matchingAclsWithError[0].errorCode)
+    }
+  }
+
+  return data
+}
+
+module.exports = {
+  decodeMatchingAcls,
+  decodeFilterResponse,
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/request.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/request.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { DeleteAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * DeleteAcls Request (Version: 1) => [filters]
+ *   filters => resource_type resource_name resource_pattern_type_filter principal host operation permission_type
+ *     resource_type => INT8
+ *     resource_name => NULLABLE_STRING
+ *     resource_pattern_type_filter => INT8
+ *     principal => NULLABLE_STRING
+ *     host => NULLABLE_STRING
+ *     operation => INT8
+ *     permission_type => INT8
+ */
+
+const encodeFilters = ({
+  resourceType,
+  resourceName,
+  resourcePatternType,
+  principal,
+  host,
+  operation,
+  permissionType,
+}) => {
+  return new Encoder()
+    .writeInt8(resourceType)
+    .writeString(resourceName)
+    .writeInt8(resourcePatternType)
+    .writeString(principal)
+    .writeString(host)
+    .writeInt8(operation)
+    .writeInt8(permissionType)
+}
+
+module.exports = ({ filters }) => ({
+  apiKey,
+  apiVersion: 1,
+  apiName: 'DeleteAcls',
+  encode: async () => {
+    return new Encoder().writeArray(filters.map(encodeFilters))
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/response.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteAcls/v1/response.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ * Version 1 also introduces a new resource pattern type field.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-290%3A+Support+for+Prefixed+ACLs
+ *
+ * DeleteAcls Response (Version: 1) => throttle_time_ms [filter_responses]
+ *   throttle_time_ms => INT32
+ *   filter_responses => error_code error_message [matching_acls]
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ *     matching_acls => error_code error_message resource_type resource_name resource_pattern_type principal host operation permission_type
+ *       error_code => INT16
+ *       error_message => NULLABLE_STRING
+ *       resource_type => INT8
+ *       resource_name => STRING
+ *       resource_pattern_type => INT8
+ *       principal => STRING
+ *       host => STRING
+ *       operation => INT8
+ *       permission_type => INT8
+ */
+
+const decodeMatchingAcls = decoder => ({
+  errorCode: decoder.readInt16(),
+  errorMessage: decoder.readString(),
+  resourceType: decoder.readInt8(),
+  resourceName: decoder.readString(),
+  resourcePatternType: decoder.readInt8(),
+  principal: decoder.readString(),
+  host: decoder.readString(),
+  operation: decoder.readInt8(),
+  permissionType: decoder.readInt8(),
+})
+
+const decodeFilterResponse = decoder => ({
+  errorCode: decoder.readInt16(),
+  errorMessage: decoder.readString(),
+  matchingAcls: decoder.readArray(decodeMatchingAcls),
+})
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+  const filterResponses = decoder.readArray(decodeFilterResponse)
+
+  return {
+    throttleTime: 0,
+    clientSideThrottleTime: throttleTime,
+    filterResponses,
+  }
+}
+
+module.exports = {
+  decode,
+  parse: parseV0,
 }
 
 
@@ -19831,12 +20272,260 @@ module.exports = groupIds => Object.assign(requestV0(groupIds), { apiVersion: 1 
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const responseV0 = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteGroups/v0/response.js")
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteGroups/v0/response.js")
 
-module.exports = responseV0
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * DeleteGroups Response (Version: 1) => throttle_time_ms [results]
+ *  throttle_time_ms => INT32
+ *  results => group_id error_code
+ *    group_id => STRING
+ *    error_code => INT16
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/index.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/index.js ***!
+  \***************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const versions = {
+  0: ({ topics, timeout }) => {
+    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js")
+    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js")
+    return { request: request({ topics, timeout }), response: response({ topics }) }
+  },
+  1: ({ topics, timeout }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/response.js")
+    return { request: request({ topics, timeout }), response: response({ topics }) }
+  },
+}
+
+module.exports = {
+  versions: Object.keys(versions),
+  protocol: ({ version }) => versions[version],
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { DeleteRecords: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * DeleteRecords Request (Version: 0) => [topics] timeout_ms
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition offset
+ *       partition => INT32
+ *       offset => INT64
+ *   timeout => INT32
+ */
+module.exports = ({ topics, timeout = 5000 }) => ({
+  apiKey,
+  apiVersion: 0,
+  apiName: 'DeleteRecords',
+  encode: async () => {
+    return new Encoder()
+      .writeArray(
+        topics.map(({ topic, partitions }) => {
+          return new Encoder().writeString(topic).writeArray(
+            partitions.map(({ partition, offset }) => {
+              return new Encoder().writeInt32(partition).writeInt64(offset)
+            })
+          )
+        })
+      )
+      .writeInt32(timeout)
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js ***!
+  \*********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 62:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { KafkaJSDeleteTopicRecordsError } = __webpack_require__(/*! ../../../../errors */ "./node_modules/kafkajs/src/errors.js")
+const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+
+/**
+ * DeleteRecords Response (Version: 0) => throttle_time_ms [topics]
+ *  throttle_time_ms => INT32
+ *  topics => name [partitions]
+ *    name => STRING
+ *    partitions => partition low_watermark error_code
+ *      partition => INT32
+ *      low_watermark => INT64
+ *      error_code => INT16
+ */
+
+const topicNameComparator = (a, b) => a.topic.localeCompare(b.topic)
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  return {
+    throttleTime: decoder.readInt32(),
+    topics: decoder
+      .readArray(decoder => ({
+        topic: decoder.readString(),
+        partitions: decoder.readArray(decoder => ({
+          partition: decoder.readInt32(),
+          lowWatermark: decoder.readInt64(),
+          errorCode: decoder.readInt16(),
+        })),
+      }))
+      .sort(topicNameComparator),
+  }
+}
+
+const parse = requestTopics => async data => {
+  const topicsWithErrors = data.topics
+    .map(({ partitions }) => ({
+      partitionsWithErrors: partitions.filter(({ errorCode }) => failure(errorCode)),
+    }))
+    .filter(({ partitionsWithErrors }) => partitionsWithErrors.length)
+
+  if (topicsWithErrors.length > 0) {
+    // at present we only ever request one topic at a time, so can destructure the arrays
+    const [{ topic }] = data.topics // topic name
+    const [{ partitions: requestPartitions }] = requestTopics // requested offset(s)
+    const [{ partitionsWithErrors }] = topicsWithErrors // partition(s) + error(s)
+
+    throw new KafkaJSDeleteTopicRecordsError({
+      topic,
+      partitions: partitionsWithErrors.map(({ partition, errorCode }) => ({
+        partition,
+        error: createErrorFromCode(errorCode),
+        // attach the original offset from the request, onto the error response
+        offset: requestPartitions.find(p => p.partition === partition).offset,
+      })),
+    })
+  }
+
+  return data
+}
+
+module.exports = ({ topics }) => ({
+  decode,
+  parse: parse(topics),
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/request.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/request.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/request.js")
+
+/**
+ * DeleteRecords Request (Version: 1) => [topics] timeout_ms
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition offset
+ *       partition => INT32
+ *       offset => INT64
+ *   timeout => INT32
+ */
+module.exports = ({ topics, timeout }) =>
+  Object.assign(requestV0({ topics, timeout }), { apiVersion: 1 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/response.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/deleteRecords/v1/response.js ***!
+  \*********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const responseV0 = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * DeleteRecords Response (Version: 1) => throttle_time_ms [topics]
+ *  throttle_time_ms => INT32
+ *  topics => name [partitions]
+ *    name => STRING
+ *    partitions => partition_index low_watermark error_code
+ *      partition_index => INT32
+ *      low_watermark => INT64
+ *      error_code => INT16
+ */
+
+module.exports = ({ topics }) => {
+  const { parse, decode: decodeV0 } = responseV0({ topics })
+
+  const decode = async rawData => {
+    const decoded = await decodeV0(rawData)
+
+    return {
+      ...decoded,
+      throttleTime: 0,
+      clientSideThrottleTime: decoded.throttleTime,
+    }
+  }
+
+  return {
+    decode,
+    parse,
+  }
+}
 
 
 /***/ }),
@@ -19979,13 +20668,16 @@ module.exports = ({ topics, timeout }) =>
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
 const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/deleteTopics/v0/response.js")
 
 /**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
  * DeleteTopics Response (Version: 1) => throttle_time_ms [topic_error_codes]
  *   throttle_time_ms => INT32
  *   topic_error_codes => topic error_code
@@ -20002,8 +20694,11 @@ const topicErrors = decoder => ({
 
 const decode = async rawData => {
   const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+
   return {
-    throttleTime: decoder.readInt32(),
+    throttleTime: 0,
+    clientSideThrottleTime: throttleTime,
     topicErrors: decoder.readArray(topicErrors).sort(topicNameComparator),
   }
 }
@@ -20016,13 +20711,296 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/index.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/index.js ***!
+  \**************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const versions = {
+  0: ({ resourceType, resourceName, principal, host, operation, permissionType }) => {
+    const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/request.js")
+    const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js")
+    return {
+      request: request({ resourceType, resourceName, principal, host, operation, permissionType }),
+      response,
+    }
+  },
+  1: ({
+    resourceType,
+    resourceName,
+    resourcePatternType,
+    principal,
+    host,
+    operation,
+    permissionType,
+  }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/response.js")
+    return {
+      request: request({
+        resourceType,
+        resourceName,
+        resourcePatternType,
+        principal,
+        host,
+        operation,
+        permissionType,
+      }),
+      response,
+    }
+  },
+}
+
+module.exports = {
+  versions: Object.keys(versions),
+  protocol: ({ version }) => versions[version],
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/request.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/request.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { DescribeAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * DescribeAcls Request (Version: 0) => resource_type resource_name principal host operation permission_type
+ *   resource_type => INT8
+ *   resource_name => NULLABLE_STRING
+ *   principal => NULLABLE_STRING
+ *   host => NULLABLE_STRING
+ *   operation => INT8
+ *   permission_type => INT8
+ */
+
+module.exports = ({ resourceType, resourceName, principal, host, operation, permissionType }) => ({
+  apiKey,
+  apiVersion: 0,
+  apiName: 'DescribeAcls',
+  encode: async () => {
+    return new Encoder()
+      .writeInt8(resourceType)
+      .writeString(resourceName)
+      .writeString(principal)
+      .writeString(host)
+      .writeInt8(operation)
+      .writeInt8(permissionType)
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 55:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+
+/**
+ * DescribeAcls Response (Version: 0) => throttle_time_ms error_code error_message [resources]
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   error_message => NULLABLE_STRING
+ *   resources => resource_type resource_name [acls]
+ *     resource_type => INT8
+ *     resource_name => STRING
+ *     acls => principal host operation permission_type
+ *       principal => STRING
+ *       host => STRING
+ *       operation => INT8
+ *       permission_type => INT8
+ */
+
+const decodeAcls = decoder => ({
+  principal: decoder.readString(),
+  host: decoder.readString(),
+  operation: decoder.readInt8(),
+  permissionType: decoder.readInt8(),
+})
+
+const decodeResources = decoder => ({
+  resourceType: decoder.readInt8(),
+  resourceName: decoder.readString(),
+  acls: decoder.readArray(decodeAcls),
+})
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+  const errorCode = decoder.readInt16()
+  const errorMessage = decoder.readString()
+  const resources = decoder.readArray(decodeResources)
+
+  return {
+    throttleTime,
+    errorCode,
+    errorMessage,
+    resources,
+  }
+}
+
+const parse = async data => {
+  if (failure(data.errorCode)) {
+    throw createErrorFromCode(data.errorCode)
+  }
+
+  return data
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/request.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/request.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { DescribeAcls: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * DescribeAcls Request (Version: 1) => resource_type resource_name resource_pattern_type_filter principal host operation permission_type
+ *   resource_type => INT8
+ *   resource_name => NULLABLE_STRING
+ *   resource_pattern_type_filter => INT8
+ *   principal => NULLABLE_STRING
+ *   host => NULLABLE_STRING
+ *   operation => INT8
+ *   permission_type => INT8
+ */
+
+module.exports = ({
+  resourceType,
+  resourceName,
+  resourcePatternType,
+  principal,
+  host,
+  operation,
+  permissionType,
+}) => ({
+  apiKey,
+  apiVersion: 1,
+  apiName: 'DescribeAcls',
+  encode: async () => {
+    return new Encoder()
+      .writeInt8(resourceType)
+      .writeString(resourceName)
+      .writeInt8(resourcePatternType)
+      .writeString(principal)
+      .writeString(host)
+      .writeInt8(operation)
+      .writeInt8(permissionType)
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/response.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeAcls/v1/response.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 54:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/v0/response.js")
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ * Version 1 also introduces a new resource pattern type field.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-290%3A+Support+for+Prefixed+ACLs
+ *
+ * DescribeAcls Response (Version: 1) => throttle_time_ms error_code error_message [resources]
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   error_message => NULLABLE_STRING
+ *   resources => resource_type resource_name resource_pattern_type [acls]
+ *     resource_type => INT8
+ *     resource_name => STRING
+ *     resource_pattern_type => INT8
+ *     acls => principal host operation permission_type
+ *       principal => STRING
+ *       host => STRING
+ *       operation => INT8
+ *       permission_type => INT8
+ */
+const decodeAcls = decoder => ({
+  principal: decoder.readString(),
+  host: decoder.readString(),
+  operation: decoder.readInt8(),
+  permissionType: decoder.readInt8(),
+})
+
+const decodeResources = decoder => ({
+  resourceType: decoder.readInt8(),
+  resourceName: decoder.readString(),
+  resourcePatternType: decoder.readInt8(),
+  acls: decoder.readArray(decodeAcls),
+})
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+  const errorCode = decoder.readInt16()
+  const errorMessage = decoder.readString()
+  const resources = decoder.readArray(decodeResources)
+
+  return {
+    throttleTime: 0,
+    clientSideThrottleTime: throttleTime,
+    errorCode,
+    errorMessage,
+    resources,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/index.js":
 /*!*****************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/describeConfigs/index.js ***!
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -20034,6 +21012,11 @@ const versions = {
   1: ({ resources, includeSynonyms }) => {
     const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/request.js")
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/response.js")
+    return { request: request({ resources, includeSynonyms }), response }
+  },
+  2: ({ resources, includeSynonyms }) => {
+    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/request.js")
+    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/response.js")
     return { request: request({ resources, includeSynonyms }), response }
   },
 }
@@ -20094,11 +21077,13 @@ const encodeResource = ({ type, name, configNames = [] }) => {
   \***********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 56:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 95:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
 const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+const ConfigSource = __webpack_require__(/*! ../../../configSource */ "./node_modules/kafkajs/src/protocol/configSource.js")
+const ConfigResourceTypes = __webpack_require__(/*! ../../../configResourceTypes */ "./node_modules/kafkajs/src/protocol/configResourceTypes.js")
 
 /**
  * DescribeConfigs Response (Version: 0) => throttle_time_ms [resources]
@@ -20116,21 +21101,58 @@ const { failure, createErrorFromCode } = __webpack_require__(/*! ../../../error 
  *       is_sensitive => BOOLEAN
  */
 
-const decodeConfigEntries = decoder => ({
-  configName: decoder.readString(),
-  configValue: decoder.readString(),
-  readOnly: decoder.readBoolean(),
-  isDefault: decoder.readBoolean(),
-  isSensitive: decoder.readBoolean(),
-})
+const decodeConfigEntries = (decoder, resourceType) => {
+  const configName = decoder.readString()
+  const configValue = decoder.readString()
+  const readOnly = decoder.readBoolean()
+  const isDefault = decoder.readBoolean()
+  const isSensitive = decoder.readBoolean()
 
-const decodeResources = decoder => ({
-  errorCode: decoder.readInt16(),
-  errorMessage: decoder.readString(),
-  resourceType: decoder.readInt8(),
-  resourceName: decoder.readString(),
-  configEntries: decoder.readArray(decodeConfigEntries),
-})
+  /**
+   * Backporting ConfigSource value to v0
+   * @see https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/requests/DescribeConfigsResponse.java#L232-L242
+   */
+  let configSource
+  if (isDefault) {
+    configSource = ConfigSource.DEFAULT_CONFIG
+  } else {
+    switch (resourceType) {
+      case ConfigResourceTypes.BROKER:
+        configSource = ConfigSource.STATIC_BROKER_CONFIG
+        break
+      case ConfigResourceTypes.TOPIC:
+        configSource = ConfigSource.TOPIC_CONFIG
+        break
+      default:
+        configSource = ConfigSource.UNKNOWN
+    }
+  }
+
+  return {
+    configName,
+    configValue,
+    readOnly,
+    isDefault,
+    configSource,
+    isSensitive,
+  }
+}
+
+const decodeResources = decoder => {
+  const errorCode = decoder.readInt16()
+  const errorMessage = decoder.readString()
+  const resourceType = decoder.readInt8()
+  const resourceName = decoder.readString()
+  const configEntries = decoder.readArray(decoder => decodeConfigEntries(decoder, resourceType))
+
+  return {
+    errorCode,
+    errorMessage,
+    resourceType,
+    resourceName,
+    configEntries,
+  }
+}
 
 const decode = async rawData => {
   const decoder = new Decoder(rawData)
@@ -20210,11 +21232,12 @@ const encodeResource = ({ type, name, configNames = [] }) => {
   \***********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 58:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 69:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
 const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v0/response.js")
+const { DEFAULT_CONFIG } = __webpack_require__(/*! ../../../configSource */ "./node_modules/kafkajs/src/protocol/configSource.js")
 
 /**
  * DescribeConfigs Response (Version: 1) => throttle_time_ms [resources]
@@ -20242,14 +21265,24 @@ const decodeSynonyms = decoder => ({
   configSource: decoder.readInt8(),
 })
 
-const decodeConfigEntries = decoder => ({
-  configName: decoder.readString(),
-  configValue: decoder.readString(),
-  readOnly: decoder.readBoolean(),
-  isDefault: decoder.readBoolean(),
-  isSensitive: decoder.readBoolean(),
-  configSynonyms: decoder.readArray(decodeSynonyms),
-})
+const decodeConfigEntries = decoder => {
+  const configName = decoder.readString()
+  const configValue = decoder.readString()
+  const readOnly = decoder.readBoolean()
+  const configSource = decoder.readInt8()
+  const isSensitive = decoder.readBoolean()
+  const configSynonyms = decoder.readArray(decodeSynonyms)
+
+  return {
+    configName,
+    configValue,
+    readOnly,
+    isDefault: configSource === DEFAULT_CONFIG,
+    configSource,
+    isSensitive,
+    configSynonyms,
+  }
+}
 
 const decodeResources = decoder => ({
   errorCode: decoder.readInt16(),
@@ -20278,13 +21311,95 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/request.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/request.js ***!
+  \**********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/request.js")
+
+/**
+ * DescribeConfigs Request (Version: 1) => [resources] include_synonyms
+ *   resources => resource_type resource_name [config_names]
+ *     resource_type => INT8
+ *     resource_name => STRING
+ *     config_names => STRING
+ *   include_synonyms => BOOLEAN
+ */
+
+/**
+ * @param {Array} resources An array of config resources to be returned
+ * @param [includeSynonyms=false]
+ */
+module.exports = ({ resources, includeSynonyms }) =>
+  Object.assign(requestV1({ resources, includeSynonyms }), { apiVersion: 2 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/response.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeConfigs/v2/response.js ***!
+  \***********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/v1/response.js")
+
+/**
+ * Starting in version 2, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * DescribeConfigs Response (Version: 2) => throttle_time_ms [resources]
+ *   throttle_time_ms => INT32
+ *   resources => error_code error_message resource_type resource_name [config_entries]
+ *     error_code => INT16
+ *     error_message => NULLABLE_STRING
+ *     resource_type => INT8
+ *     resource_name => STRING
+ *     config_entries => config_name config_value read_only config_source is_sensitive [config_synonyms]
+ *       config_name => STRING
+ *       config_value => NULLABLE_STRING
+ *       read_only => BOOLEAN
+ *       config_source => INT8
+ *       is_sensitive => BOOLEAN
+ *       config_synonyms => config_name config_value config_source
+ *         config_name => STRING
+ *         config_value => NULLABLE_STRING
+ *         config_source => INT8
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/describeGroups/index.js":
 /*!****************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/describeGroups/index.js ***!
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -20296,6 +21411,11 @@ const versions = {
   1: ({ groupIds }) => {
     const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/request.js")
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/response.js")
+    return { request: request({ groupIds }), response }
+  },
+  2: ({ groupIds }) => {
+    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/request.js")
+    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/response.js")
     return { request: request({ groupIds }), response }
   },
 }
@@ -20497,19 +21617,97 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/request.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/request.js ***!
+  \*********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 8:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/request.js")
+
+/**
+ * DescribeGroups Request (Version: 2) => [group_ids]
+ *   group_ids => STRING
+ */
+
+module.exports = ({ groupIds }) => Object.assign(requestV1({ groupIds }), { apiVersion: 2 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/response.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/describeGroups/v2/response.js ***!
+  \**********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 33:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/describeGroups/v1/response.js")
+
+/**
+ * Starting in version 2, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * DescribeGroups Response (Version: 2) => throttle_time_ms [groups]
+ *   throttle_time_ms => INT32
+ *   groups => error_code group_id state protocol_type protocol [members]
+ *     error_code => INT16
+ *     group_id => STRING
+ *     state => STRING
+ *     protocol_type => STRING
+ *     protocol => STRING
+ *     members => member_id client_id client_host member_metadata member_assignment
+ *       member_id => STRING
+ *       client_id => STRING
+ *       client_host => STRING
+ *       member_metadata => BYTES
+ *       member_assignment => BYTES
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/endTxn/index.js":
 /*!********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/endTxn/index.js ***!
   \********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, producerId, producerEpoch, transactionResult }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/response.js")
+    return {
+      request: request({ transactionalId, producerId, producerEpoch, transactionResult }),
+      response,
+    }
+  },
+  1: ({ transactionalId, producerId, producerEpoch, transactionResult }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/response.js")
     return {
       request: request({ transactionalId, producerId, producerEpoch, transactionResult }),
       response,
@@ -20597,6 +21795,71 @@ const parse = async data => {
   }
 
   return data
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/request.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/endTxn/v1/request.js ***!
+  \*************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/request.js")
+
+/**
+ * EndTxn Request (Version: 1) => transactional_id producer_id producer_epoch transaction_result
+ *   transactional_id => STRING
+ *   producer_id => INT64
+ *   producer_epoch => INT16
+ *   transaction_result => BOOLEAN
+ */
+
+module.exports = ({ transactionalId, producerId, producerEpoch, transactionResult }) =>
+  Object.assign(requestV0({ transactionalId, producerId, producerEpoch, transactionResult }), {
+    apiVersion: 1,
+  })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/endTxn/v1/response.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/endTxn/v1/response.js ***!
+  \**************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 22:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/endTxn/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * EndTxn Response (Version: 1) => throttle_time_ms error_code
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
 }
 
 module.exports = {
@@ -21570,12 +22833,12 @@ const decodeMessages = async decoder => {
   const magicByte = messagesBuffer.slice(MAGIC_OFFSET).readInt8(0)
 
   if (magicByte === MAGIC_BYTE) {
-    let records = []
+    const records = []
 
     while (messagesDecoder.canReadBytes(RECORD_BATCH_OVERHEAD)) {
       try {
         const recordBatch = await RecordBatchDecoder(messagesDecoder)
-        records = [...records, ...recordBatch.records]
+        records.push(...recordBatch.records)
       } catch (e) {
         // The tail of the record batches can have incomplete records
         // due to how maxBytes works. See https://cwiki.apache.org/confluence/display/KAFKA/A+Guide+To+The+Kafka+Protocol#AGuideToTheKafkaProtocol-FetchAPI
@@ -22402,7 +23665,7 @@ module.exports = {
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const COORDINATOR_TYPES = __webpack_require__(/*! ../../coordinatorTypes */ "./node_modules/kafkajs/src/protocol/coordinatorTypes.js")
@@ -22416,6 +23679,11 @@ const versions = {
   1: ({ groupId, coordinatorType = COORDINATOR_TYPES.GROUP }) => {
     const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/request.js")
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/response.js")
+    return { request: request({ coordinatorKey: groupId, coordinatorType }), response }
+  },
+  2: ({ groupId, coordinatorType = COORDINATOR_TYPES.GROUP }) => {
+    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/request.js")
+    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/response.js")
     return { request: request({ coordinatorKey: groupId, coordinatorType }), response }
   },
 }
@@ -22603,13 +23871,79 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/request.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/request.js ***!
+  \**********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/request.js")
+
+/**
+ * FindCoordinator Request (Version: 2) => coordinator_key coordinator_type
+ *   coordinator_key => STRING
+ *   coordinator_type => INT8
+ */
+
+module.exports = ({ coordinatorKey, coordinatorType }) =>
+  Object.assign(requestV1({ coordinatorKey, coordinatorType }), { apiVersion: 2 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/response.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/findCoordinator/v2/response.js ***!
+  \***********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/v1/response.js")
+
+/**
+ * Starting in version 2, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * FindCoordinator Response (Version: 1) => throttle_time_ms error_code error_message coordinator
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   error_message => NULLABLE_STRING
+ *   coordinator => node_id host port
+ *     node_id => INT32
+ *     host => STRING
+ *     port => INT32
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/index.js":
 /*!***********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/index.js ***!
   \***********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -22626,6 +23960,22 @@ const versions = {
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v1/response.js")
     return {
       request: request({ groupId, groupGenerationId, memberId }),
+      response,
+    }
+  },
+  2: ({ groupId, groupGenerationId, memberId }) => {
+    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/request.js")
+    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js")
+    return {
+      request: request({ groupId, groupGenerationId, memberId }),
+      response,
+    }
+  },
+  3: ({ groupId, groupGenerationId, memberId, groupInstanceId }) => {
+    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/request.js")
+    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/response.js")
+    return {
+      request: request({ groupId, groupGenerationId, memberId, groupInstanceId }),
       response,
     }
   },
@@ -22776,28 +24126,176 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/request.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/request.js ***!
+  \****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v1/request.js")
+
+/**
+ * Heartbeat Request (Version: 2) => group_id generation_id member_id
+ *   group_id => STRING
+ *   generation_id => INT32
+ *   member_id => STRING
+ */
+
+module.exports = ({ groupId, groupGenerationId, memberId }) =>
+  Object.assign(requestV1({ groupId, groupGenerationId, memberId }), { apiVersion: 2 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v1/response.js")
+
+/**
+ * In version 2 on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * Heartbeat Response (Version: 2) => throttle_time_ms error_code
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ */
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/request.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/request.js ***!
+  \****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { Heartbeat: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * Version 3 adds group_instance_id to indicate member identity across restarts.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
+ *
+ * Heartbeat Request (Version: 3) => group_id generation_id member_id group_instance_id
+ *   group_id => STRING
+ *   generation_id => INT32
+ *   member_id => STRING
+ *   group_instance_id => NULLABLE_STRING
+ */
+
+module.exports = ({ groupId, groupGenerationId, memberId, groupInstanceId }) => ({
+  apiKey,
+  apiVersion: 3,
+  apiName: 'Heartbeat',
+  encode: async () => {
+    return new Encoder()
+      .writeString(groupId)
+      .writeInt32(groupGenerationId)
+      .writeString(memberId)
+      .writeString(groupInstanceId)
+  },
+})
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/response.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/heartbeat/v3/response.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 8:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/heartbeat/v2/response.js")
+
+/**
+ * Heartbeat Response (Version: 3) => throttle_time_ms error_code
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ */
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/index.js":
 /*!*************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/index.js ***!
   \*************************************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, module, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 57:48-52 */
-/*! CommonJS bailout: module.exports is used directly at 70:0-14 */
-/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 99:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const apiKeys = __webpack_require__(/*! ./apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
-const { KafkaJSServerDoesNotSupportApiKey } = __webpack_require__(/*! ../../errors */ "./node_modules/kafkajs/src/errors.js")
+const { KafkaJSServerDoesNotSupportApiKey, KafkaJSNotImplemented } = __webpack_require__(/*! ../../errors */ "./node_modules/kafkajs/src/errors.js")
 
+/**
+ * @typedef {(options?: Object) => { request: any, response: any, logResponseErrors?: boolean }} Request
+ */
+
+/**
+ * @typedef {Object} RequestDefinitions
+ * @property {string[]} versions
+ * @property {({ version: number }) => Request} protocol
+ */
+
+/**
+ * @typedef {(apiKey: number, definitions: RequestDefinitions) => Request} Lookup
+ */
+
+/** @type {RequestDefinitions} */
+const noImplementedRequestDefinitions = {
+  versions: [],
+  protocol: () => {
+    throw new KafkaJSNotImplemented()
+  },
+}
+
+/**
+ * @type {{[apiName: string]: RequestDefinitions}}
+ */
 const requests = {
   Produce: __webpack_require__(/*! ./produce */ "./node_modules/kafkajs/src/protocol/requests/produce/index.js"),
   Fetch: __webpack_require__(/*! ./fetch */ "./node_modules/kafkajs/src/protocol/requests/fetch/index.js"),
   ListOffsets: __webpack_require__(/*! ./listOffsets */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/index.js"),
   Metadata: __webpack_require__(/*! ./metadata */ "./node_modules/kafkajs/src/protocol/requests/metadata/index.js"),
-  LeaderAndIsr: {},
-  StopReplica: {},
-  UpdateMetadata: {},
-  ControlledShutdown: {},
+  LeaderAndIsr: noImplementedRequestDefinitions,
+  StopReplica: noImplementedRequestDefinitions,
+  UpdateMetadata: noImplementedRequestDefinitions,
+  ControlledShutdown: noImplementedRequestDefinitions,
   OffsetCommit: __webpack_require__(/*! ./offsetCommit */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/index.js"),
   OffsetFetch: __webpack_require__(/*! ./offsetFetch */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/index.js"),
   GroupCoordinator: __webpack_require__(/*! ./findCoordinator */ "./node_modules/kafkajs/src/protocol/requests/findCoordinator/index.js"),
@@ -22811,27 +24309,27 @@ const requests = {
   ApiVersions: __webpack_require__(/*! ./apiVersions */ "./node_modules/kafkajs/src/protocol/requests/apiVersions/index.js"),
   CreateTopics: __webpack_require__(/*! ./createTopics */ "./node_modules/kafkajs/src/protocol/requests/createTopics/index.js"),
   DeleteTopics: __webpack_require__(/*! ./deleteTopics */ "./node_modules/kafkajs/src/protocol/requests/deleteTopics/index.js"),
-  DeleteRecords: {},
+  DeleteRecords: __webpack_require__(/*! ./deleteRecords */ "./node_modules/kafkajs/src/protocol/requests/deleteRecords/index.js"),
   InitProducerId: __webpack_require__(/*! ./initProducerId */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/index.js"),
-  OffsetForLeaderEpoch: {},
+  OffsetForLeaderEpoch: noImplementedRequestDefinitions,
   AddPartitionsToTxn: __webpack_require__(/*! ./addPartitionsToTxn */ "./node_modules/kafkajs/src/protocol/requests/addPartitionsToTxn/index.js"),
   AddOffsetsToTxn: __webpack_require__(/*! ./addOffsetsToTxn */ "./node_modules/kafkajs/src/protocol/requests/addOffsetsToTxn/index.js"),
   EndTxn: __webpack_require__(/*! ./endTxn */ "./node_modules/kafkajs/src/protocol/requests/endTxn/index.js"),
-  WriteTxnMarkers: {},
+  WriteTxnMarkers: noImplementedRequestDefinitions,
   TxnOffsetCommit: __webpack_require__(/*! ./txnOffsetCommit */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/index.js"),
-  DescribeAcls: {},
-  CreateAcls: {},
-  DeleteAcls: {},
+  DescribeAcls: __webpack_require__(/*! ./describeAcls */ "./node_modules/kafkajs/src/protocol/requests/describeAcls/index.js"),
+  CreateAcls: __webpack_require__(/*! ./createAcls */ "./node_modules/kafkajs/src/protocol/requests/createAcls/index.js"),
+  DeleteAcls: __webpack_require__(/*! ./deleteAcls */ "./node_modules/kafkajs/src/protocol/requests/deleteAcls/index.js"),
   DescribeConfigs: __webpack_require__(/*! ./describeConfigs */ "./node_modules/kafkajs/src/protocol/requests/describeConfigs/index.js"),
   AlterConfigs: __webpack_require__(/*! ./alterConfigs */ "./node_modules/kafkajs/src/protocol/requests/alterConfigs/index.js"),
-  AlterReplicaLogDirs: {},
-  DescribeLogDirs: {},
+  AlterReplicaLogDirs: noImplementedRequestDefinitions,
+  DescribeLogDirs: noImplementedRequestDefinitions,
   SaslAuthenticate: __webpack_require__(/*! ./saslAuthenticate */ "./node_modules/kafkajs/src/protocol/requests/saslAuthenticate/index.js"),
   CreatePartitions: __webpack_require__(/*! ./createPartitions */ "./node_modules/kafkajs/src/protocol/requests/createPartitions/index.js"),
-  CreateDelegationToken: {},
-  RenewDelegationToken: {},
-  ExpireDelegationToken: {},
-  DescribeDelegationToken: {},
+  CreateDelegationToken: noImplementedRequestDefinitions,
+  RenewDelegationToken: noImplementedRequestDefinitions,
+  ExpireDelegationToken: noImplementedRequestDefinitions,
+  DescribeDelegationToken: noImplementedRequestDefinitions,
   DeleteGroups: __webpack_require__(/*! ./deleteGroups */ "./node_modules/kafkajs/src/protocol/requests/deleteGroups/index.js"),
 }
 
@@ -22839,10 +24337,14 @@ const names = Object.keys(apiKeys)
 const keys = Object.values(apiKeys)
 const findApiName = apiKey => names[keys.indexOf(apiKey)]
 
+/**
+ * @param {import("../../../types").ApiVersions} versions
+ * @returns {Lookup}
+ */
 const lookup = versions => (apiKey, definition) => {
   const version = versions[apiKey]
   const availableVersions = definition.versions.map(Number)
-  const bestImplementedVersion = Math.max.apply(this, availableVersions)
+  const bestImplementedVersion = Math.max(...availableVersions)
 
   if (!version || version.maxVersion == null) {
     throw new KafkaJSServerDoesNotSupportApiKey(
@@ -22869,13 +24371,18 @@ module.exports = {
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, transactionTimeout = 5000 }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/response.js")
+    return { request: request({ transactionalId, transactionTimeout }), response }
+  },
+  1: ({ transactionalId, transactionTimeout = 5000 }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/response.js")
     return { request: request({ transactionalId, transactionTimeout }), response }
   },
 }
@@ -22968,13 +24475,76 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/request.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/request.js ***!
+  \*********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/request.js")
+
+/**
+ * InitProducerId Request (Version: 1) => transactional_id transaction_timeout_ms
+ *   transactional_id => NULLABLE_STRING
+ *   transaction_timeout_ms => INT32
+ */
+
+module.exports = ({ transactionalId, transactionTimeout }) =>
+  Object.assign(requestV0({ transactionalId, transactionTimeout }), { apiVersion: 1 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/response.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/initProducerId/v1/response.js ***!
+  \**********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/initProducerId/v0/response.js")
+
+/**
+ * Starting in version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * InitProducerId Response (Version: 0) => throttle_time_ms error_code producer_id producer_epoch
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   producer_id => INT64
+ *   producer_epoch => INT16
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV0(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/joinGroup/index.js":
 /*!***********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/joinGroup/index.js ***!
   \***********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 105:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 132:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const NETWORK_DELAY = 5000
@@ -23071,6 +24641,33 @@ const versions = {
         sessionTimeout,
         rebalanceTimeout,
         memberId,
+        protocolType,
+        groupProtocols,
+      }),
+      response,
+      requestTimeout: requestTimeout({ rebalanceTimeout, sessionTimeout }),
+      logResponseError: logResponseError(memberId),
+    }
+  },
+  5: ({
+    groupId,
+    sessionTimeout,
+    rebalanceTimeout,
+    memberId,
+    groupInstanceId,
+    protocolType,
+    groupProtocols,
+  }) => {
+    const request = __webpack_require__(/*! ./v5/request */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/request.js")
+    const response = __webpack_require__(/*! ./v5/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/response.js")
+
+    return {
+      request: request({
+        groupId,
+        sessionTimeout,
+        rebalanceTimeout,
+        memberId,
+        groupInstanceId,
         protocolType,
         groupProtocols,
       }),
@@ -23429,13 +25026,16 @@ module.exports = ({
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { parse: parseV0 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v0/response.js")
-const { decode } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v2/response.js")
+const { parse, decode: decodeV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v2/response.js")
 
 /**
+ * Starting in version 3, on quota violation, brokers send out responses
+ * before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
  * JoinGroup Response (Version: 3) => throttle_time_ms error_code generation_id group_protocol leader_id member_id [members]
  *   throttle_time_ms => INT32
  *   error_code => INT16
@@ -23447,10 +25047,19 @@ const { decode } = __webpack_require__(/*! ../v2/response */ "./node_modules/kaf
  *     member_id => STRING
  *     member_metadata => BYTES
  */
+const decode = async rawData => {
+  const decoded = await decodeV2(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
 
 module.exports = {
   decode,
-  parse: parseV0,
+  parse,
 }
 
 
@@ -23462,12 +25071,15 @@ module.exports = {
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const requestV3 = __webpack_require__(/*! ../v3/request */ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v3/request.js")
 
 /**
+ * Starting in version 4, the client needs to issue a second request to join group
+ * with assigned id.
+ *
  * JoinGroup Request (Version: 4) => group_id session_timeout rebalance_timeout member_id protocol_type [group_protocols]
  *   group_id => STRING
  *   session_timeout => INT32
@@ -23554,13 +25166,152 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/request.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/request.js ***!
+  \****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { JoinGroup: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * Version 5 adds group_instance_id to identify members across restarts.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
+ *
+ * JoinGroup Request (Version: 5) => group_id session_timeout rebalance_timeout member_id group_instance_id protocol_type [group_protocols]
+ *   group_id => STRING
+ *   session_timeout => INT32
+ *   rebalance_timeout => INT32
+ *   member_id => STRING
+ *   group_instance_id => NULLABLE_STRING
+ *   protocol_type => STRING
+ *   group_protocols => protocol_name protocol_metadata
+ *     protocol_name => STRING
+ *     protocol_metadata => BYTES
+ */
+
+module.exports = ({
+  groupId,
+  sessionTimeout,
+  rebalanceTimeout,
+  memberId,
+  groupInstanceId = null,
+  protocolType,
+  groupProtocols,
+}) => ({
+  apiKey,
+  apiVersion: 5,
+  apiName: 'JoinGroup',
+  encode: async () => {
+    return new Encoder()
+      .writeString(groupId)
+      .writeInt32(sessionTimeout)
+      .writeInt32(rebalanceTimeout)
+      .writeString(memberId)
+      .writeString(groupInstanceId)
+      .writeString(protocolType)
+      .writeArray(groupProtocols.map(encodeGroupProtocols))
+  },
+})
+
+const encodeGroupProtocols = ({ name, metadata = Buffer.alloc(0) }) => {
+  return new Encoder().writeString(name).writeBytes(metadata)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/response.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/joinGroup/v5/response.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 64:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { KafkaJSMemberIdRequired } = __webpack_require__(/*! ../../../../errors */ "./node_modules/kafkajs/src/errors.js")
+const {
+  failure,
+  createErrorFromCode,
+  errorCodes,
+  failIfVersionNotSupported,
+} = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+
+/**
+ * JoinGroup Response (Version: 5) => throttle_time_ms error_code generation_id group_protocol leader_id member_id [members]
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   generation_id => INT32
+ *   group_protocol => STRING
+ *   leader_id => STRING
+ *   member_id => STRING
+ *   members => member_id group_instance_id metadata
+ *     member_id => STRING
+ *     group_instance_id => NULLABLE_STRING
+ *     member_metadata => BYTES
+ */
+const { code: MEMBER_ID_REQUIRED_ERROR_CODE } = errorCodes.find(
+  e => e.type === 'MEMBER_ID_REQUIRED'
+)
+
+const parse = async data => {
+  if (failure(data.errorCode)) {
+    if (data.errorCode === MEMBER_ID_REQUIRED_ERROR_CODE) {
+      throw new KafkaJSMemberIdRequired(createErrorFromCode(data.errorCode), {
+        memberId: data.memberId,
+      })
+    }
+
+    throw createErrorFromCode(data.errorCode)
+  }
+
+  return data
+}
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+  const errorCode = decoder.readInt16()
+
+  failIfVersionNotSupported(errorCode)
+
+  return {
+    throttleTime: 0,
+    clientSideThrottleTime: throttleTime,
+    errorCode,
+    generationId: decoder.readInt32(),
+    groupProtocol: decoder.readString(),
+    leaderId: decoder.readString(),
+    memberId: decoder.readString(),
+    members: decoder.readArray(decoder => ({
+      memberId: decoder.readString(),
+      groupInstanceId: decoder.readString(),
+      memberMetadata: decoder.readBytes(),
+    })),
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/index.js":
 /*!************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/index.js ***!
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -23577,6 +25328,22 @@ const versions = {
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v1/response.js")
     return {
       request: request({ groupId, memberId }),
+      response,
+    }
+  },
+  2: ({ groupId, memberId }) => {
+    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/request.js")
+    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js")
+    return {
+      request: request({ groupId, memberId }),
+      response,
+    }
+  },
+  3: ({ groupId, memberId, groupInstanceId }) => {
+    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/request.js")
+    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/response.js")
+    return {
+      request: request({ groupId, members: [{ memberId, groupInstanceId }] }),
       response,
     }
   },
@@ -23717,6 +25484,167 @@ const decode = async rawData => {
 module.exports = {
   decode,
   parse: parseV0,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/request.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/request.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v1/request.js")
+
+/**
+ * LeaveGroup Request (Version: 2) => group_id member_id
+ *   group_id => STRING
+ *   member_id => STRING
+ */
+
+module.exports = ({ groupId, memberId }) =>
+  Object.assign(requestV1({ groupId, memberId }), { apiVersion: 2 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 21:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v1/response.js")
+
+/**
+ * In version 2 on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * LeaveGroup Response (Version: 2) => throttle_time_ms error_code
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ */
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/request.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/request.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { LeaveGroup: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * Version 3 changes leavegroup to operate on a batch of members
+ * and adds group_instance_id to identify members across restarts.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
+ *
+ * LeaveGroup Request (Version: 3) => group_id [members]
+ *   group_id => STRING
+ *   members => member_id group_instance_id
+ *     member_id => STRING
+ *     group_instance_id => NULLABLE_STRING
+ */
+
+module.exports = ({ groupId, members }) => ({
+  apiKey,
+  apiVersion: 3,
+  apiName: 'LeaveGroup',
+  encode: async () => {
+    return new Encoder()
+      .writeString(groupId)
+      .writeArray(members.map(member => encodeMember(member)))
+  },
+})
+
+const encodeMember = ({ memberId, groupInstanceId = null }) => {
+  return new Encoder().writeString(memberId).writeString(groupInstanceId)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/response.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/response.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 43:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
+const { failIfVersionNotSupported, failure, createErrorFromCode } = __webpack_require__(/*! ../../../error */ "./node_modules/kafkajs/src/protocol/error.js")
+const { parse: parseV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/leaveGroup/v2/response.js")
+
+/**
+ * LeaveGroup Response (Version: 3) => throttle_time_ms error_code [members]
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   members => member_id group_instance_id error_code
+ *     member_id => STRING
+ *     group_instance_id => NULLABLE_STRING
+ *     error_code => INT16
+ */
+
+const decode = async rawData => {
+  const decoder = new Decoder(rawData)
+  const throttleTime = decoder.readInt32()
+  const errorCode = decoder.readInt16()
+  const members = decoder.readArray(decodeMembers)
+
+  failIfVersionNotSupported(errorCode)
+
+  return { throttleTime: 0, clientSideThrottleTime: throttleTime, errorCode, members }
+}
+
+const decodeMembers = decoder => ({
+  memberId: decoder.readString(),
+  groupInstanceId: decoder.readString(),
+  errorCode: decoder.readInt16(),
+})
+
+const parse = async data => {
+  const parsed = parseV2(data)
+
+  const memberWithError = data.members.find(member => failure(member.errorCode))
+  if (memberWithError) {
+    throw createErrorFromCode(memberWithError.errorCode)
+  }
+
+  return parsed
+}
+
+module.exports = {
+  decode,
+  parse,
 }
 
 
@@ -23929,12 +25857,15 @@ module.exports = () => Object.assign(requestV1(), { apiVersion: 2 })
   \******************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const responseV1 = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/listGroups/v1/response.js")
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/listGroups/v1/response.js")
 
 /**
+ * In version 2 on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
  * ListGroups Response (Version: 2) => error_code [groups]
  *   throttle_time_ms => INT32
  *   error_code => INT16
@@ -23942,8 +25873,20 @@ const responseV1 = __webpack_require__(/*! ../v1/response */ "./node_modules/kaf
  *     group_id => STRING
  *     protocol_type => STRING
  */
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
 
-module.exports = responseV1
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
 
 
 /***/ }),
@@ -23954,7 +25897,7 @@ module.exports = responseV1
   \*************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const ISOLATION_LEVEL = __webpack_require__(/*! ../../isolationLevel */ "./node_modules/kafkajs/src/protocol/isolationLevel.js")
@@ -23976,6 +25919,11 @@ const versions = {
   2: ({ replicaId = REPLICA_ID, isolationLevel = ISOLATION_LEVEL.READ_COMMITTED, topics }) => {
     const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/request.js")
     const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/response.js")
+    return { request: request({ replicaId, isolationLevel, topics }), response }
+  },
+  3: ({ replicaId = REPLICA_ID, isolationLevel = ISOLATION_LEVEL.READ_COMMITTED, topics }) => {
+    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/request.js")
+    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/response.js")
     return { request: request({ replicaId, isolationLevel, topics }), response }
   },
 }
@@ -24324,13 +26272,83 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/request.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/request.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV2 = __webpack_require__(/*! ../v2/request */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/request.js")
+
+/**
+ * ListOffsets Request (Version: 3) => replica_id isolation_level [topics]
+ *   replica_id => INT32
+ *   isolation_level => INT8
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition timestamp
+ *       partition => INT32
+ *       timestamp => INT64
+ */
+module.exports = ({ replicaId, isolationLevel, topics }) =>
+  Object.assign(requestV2({ replicaId, isolationLevel, topics }), { apiVersion: 3 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/response.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/listOffsets/v3/response.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV2 } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/listOffsets/v2/response.js")
+
+/**
+ * In version 3 on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * ListOffsets Response (Version: 3) => throttle_time_ms [responses]
+ *   throttle_time_ms => INT32
+ *   responses => topic [partition_responses]
+ *     topic => STRING
+ *     partition_responses => partition error_code timestamp offset
+ *       partition => INT32
+ *       error_code => INT16
+ *       timestamp => INT64
+ *       offset => INT64
+ */
+const decode = async rawData => {
+  const decoded = await decodeV2(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/metadata/index.js":
 /*!**********************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/metadata/index.js ***!
   \**********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 34:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 39:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -24362,6 +26380,11 @@ const versions = {
   5: ({ topics, allowAutoTopicCreation }) => {
     const request = __webpack_require__(/*! ./v5/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/request.js")
     const response = __webpack_require__(/*! ./v5/response */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/response.js")
+    return { request: request({ topics, allowAutoTopicCreation }), response }
+  },
+  6: ({ topics, allowAutoTopicCreation }) => {
+    const request = __webpack_require__(/*! ./v6/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/request.js")
+    const response = __webpack_require__(/*! ./v6/response */ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/response.js")
     return { request: request({ topics, allowAutoTopicCreation }), response }
   },
 }
@@ -24497,17 +26520,25 @@ module.exports = {
   \***************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 8:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v0/request.js")
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { Metadata: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
 
 /**
  * Metadata Request (Version: 1) => [topics]
  *   topics => STRING
  */
 
-module.exports = ({ topics }) => Object.assign(requestV0({ topics }), { apiVersion: 1 })
+module.exports = ({ topics }) => ({
+  apiKey,
+  apiVersion: 1,
+  apiName: 'Metadata',
+  encode: async () => {
+    return new Encoder().writeNullableArray(topics)
+  },
+})
 
 
 /***/ }),
@@ -24592,14 +26623,14 @@ module.exports = {
 /*! CommonJS bailout: module.exports is used directly at 8:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v0/request.js")
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v1/request.js")
 
 /**
  * Metadata Request (Version: 2) => [topics]
  *   topics => STRING
  */
 
-module.exports = ({ topics }) => Object.assign(requestV0({ topics }), { apiVersion: 2 })
+module.exports = ({ topics }) => Object.assign(requestV1({ topics }), { apiVersion: 2 })
 
 
 /***/ }),
@@ -24686,14 +26717,14 @@ module.exports = {
 /*! CommonJS bailout: module.exports is used directly at 8:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v0/request.js")
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v1/request.js")
 
 /**
  * Metadata Request (Version: 3) => [topics]
  *   topics => STRING
  */
 
-module.exports = ({ topics }) => Object.assign(requestV0({ topics }), { apiVersion: 3 })
+module.exports = ({ topics }) => Object.assign(requestV1({ topics }), { apiVersion: 3 })
 
 
 /***/ }),
@@ -24944,13 +26975,90 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/request.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/metadata/v6/request.js ***!
+  \***************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV5 = __webpack_require__(/*! ../v5/request */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/request.js")
+
+/**
+ * Metadata Request (Version: 6) => [topics] allow_auto_topic_creation
+ *   topics => STRING
+ *   allow_auto_topic_creation => BOOLEAN
+ */
+
+module.exports = ({ topics, allowAutoTopicCreation = true }) =>
+  Object.assign(requestV5({ topics, allowAutoTopicCreation }), { apiVersion: 6 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/metadata/v6/response.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/metadata/v6/response.js ***!
+  \****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 38:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v5/response */ "./node_modules/kafkajs/src/protocol/requests/metadata/v5/response.js")
+
+/**
+ * In version 6 on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * Metadata Response (Version: 6) => throttle_time_ms [brokers] cluster_id controller_id [topic_metadata]
+ *   throttle_time_ms => INT32
+ *   brokers => node_id host port rack
+ *     node_id => INT32
+ *     host => STRING
+ *     port => INT32
+ *     rack => NULLABLE_STRING
+ *   cluster_id => NULLABLE_STRING
+ *   controller_id => INT32
+ *   topic_metadata => error_code topic is_internal [partition_metadata]
+ *     error_code => INT16
+ *     topic => STRING
+ *     is_internal => BOOLEAN
+ *     partition_metadata => error_code partition leader [replicas] [isr] [offline_replicas]
+ *       error_code => INT16
+ *       partition => INT32
+ *       leader => INT32
+ *       replicas => INT32
+ *       isr => INT32
+ *       offline_replicas => INT32
+ */
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/index.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/index.js ***!
   \**************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 45:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 72:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 // This value signals to the broker that its default configuration should be used.
@@ -24990,6 +27098,33 @@ const versions = {
         groupGenerationId,
         memberId,
         retentionTime,
+        topics,
+      }),
+      response,
+    }
+  },
+  4: ({ groupId, groupGenerationId, memberId, retentionTime = RETENTION_TIME, topics }) => {
+    const request = __webpack_require__(/*! ./v4/request */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/request.js")
+    const response = __webpack_require__(/*! ./v4/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js")
+    return {
+      request: request({
+        groupId,
+        groupGenerationId,
+        memberId,
+        retentionTime,
+        topics,
+      }),
+      response,
+    }
+  },
+  5: ({ groupId, groupGenerationId, memberId, topics }) => {
+    const request = __webpack_require__(/*! ./v5/request */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/request.js")
+    const response = __webpack_require__(/*! ./v5/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/response.js")
+    return {
+      request: request({
+        groupId,
+        groupGenerationId,
+        memberId,
         topics,
       }),
       response,
@@ -25355,13 +27490,170 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/request.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/request.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV3 = __webpack_require__(/*! ../v3/request */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v3/request.js")
+
+/**
+ * OffsetCommit Request (Version: 4) => group_id generation_id member_id retention_time [topics]
+ *   group_id => STRING
+ *   generation_id => INT32
+ *   member_id => STRING
+ *   retention_time => INT64
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition offset metadata
+ *       partition => INT32
+ *       offset => INT64
+ *       metadata => NULLABLE_STRING
+ */
+
+module.exports = ({ groupId, groupGenerationId, memberId, retentionTime, topics }) =>
+  Object.assign(requestV3({ groupId, groupGenerationId, memberId, retentionTime, topics }), {
+    apiVersion: 4,
+  })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV3 } = __webpack_require__(/*! ../v3/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v3/response.js")
+
+/**
+ * Starting in version 4, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * OffsetCommit Response (Version: 4) => throttle_time_ms [responses]
+ *   throttle_time_ms => INT32
+ *   responses => topic [partition_responses]
+ *     topic => STRING
+ *     partition_responses => partition error_code
+ *       partition => INT32
+ *       error_code => INT16
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV3(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/request.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/request.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { OffsetCommit: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * Version 5 removes retention_time, as this is controlled by a broker setting
+ *
+ * OffsetCommit Request (Version: 4) => group_id generation_id member_id [topics]
+ *   group_id => STRING
+ *   generation_id => INT32
+ *   member_id => STRING
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition offset metadata
+ *       partition => INT32
+ *       offset => INT64
+ *       metadata => NULLABLE_STRING
+ */
+
+module.exports = ({ groupId, groupGenerationId, memberId, topics }) => ({
+  apiKey,
+  apiVersion: 5,
+  apiName: 'OffsetCommit',
+  encode: async () => {
+    return new Encoder()
+      .writeString(groupId)
+      .writeInt32(groupGenerationId)
+      .writeString(memberId)
+      .writeArray(topics.map(encodeTopic))
+  },
+})
+
+const encodeTopic = ({ topic, partitions }) => {
+  return new Encoder().writeString(topic).writeArray(partitions.map(encodePartition))
+}
+
+const encodePartition = ({ partition, offset, metadata = null }) => {
+  return new Encoder()
+    .writeInt32(partition)
+    .writeInt64(offset)
+    .writeString(metadata)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/response.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/offsetCommit/v5/response.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode } = __webpack_require__(/*! ../v4/response */ "./node_modules/kafkajs/src/protocol/requests/offsetCommit/v4/response.js")
+
+/**
+ * OffsetCommit Response (Version: 5) => throttle_time_ms [responses]
+ *   throttle_time_ms => INT32
+ *   responses => topic [partition_responses]
+ *     topic => STRING
+ *     partition_responses => partition error_code
+ *       partition => INT32
+ *       error_code => INT16
+ */
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/index.js":
 /*!*************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/offsetFetch/index.js ***!
   \*************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 24:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -25378,6 +27670,11 @@ const versions = {
   3: ({ groupId, topics }) => {
     const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/request.js")
     const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/response.js")
+    return { request: request({ groupId, topics }), response }
+  },
+  4: ({ groupId, topics }) => {
+    const request = __webpack_require__(/*! ./v4/request */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/request.js")
+    const response = __webpack_require__(/*! ./v4/response */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/response.js")
     return { request: request({ groupId, topics }), response }
   },
 }
@@ -25679,6 +27976,77 @@ const decodePartitions = decoder => ({
 module.exports = {
   decode,
   parse: parseV2,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/request.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/request.js ***!
+  \******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV3 = __webpack_require__(/*! ../v3/request */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/request.js")
+
+/**
+ * OffsetFetch Request (Version: 4) => group_id [topics]
+ *   group_id => STRING
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition
+ *       partition => INT32
+ */
+
+module.exports = ({ groupId, topics }) =>
+  Object.assign(requestV3({ groupId, topics }), { apiVersion: 4 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/response.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/offsetFetch/v4/response.js ***!
+  \*******************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV3 } = __webpack_require__(/*! ../v3/response */ "./node_modules/kafkajs/src/protocol/requests/offsetFetch/v3/response.js")
+
+/**
+ * Starting in version 4, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * OffsetFetch Response (Version: 4) => throttle_time_ms [responses] error_code
+ *   throttle_time_ms => INT32
+ *   responses => topic [partition_responses]
+ *     topic => STRING
+ *     partition_responses => partition offset metadata error_code
+ *       partition => INT32
+ *       offset => INT64
+ *       metadata => NULLABLE_STRING
+ *       error_code => INT16
+ *   error_code => INT16
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV3(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
 }
 
 
@@ -26605,11 +28973,10 @@ module.exports = ({
   \***************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 48:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const Decoder = __webpack_require__(/*! ../../../decoder */ "./node_modules/kafkajs/src/protocol/decoder.js")
-const { parse: parseV5 } = __webpack_require__(/*! ../v5/response */ "./node_modules/kafkajs/src/protocol/requests/produce/v5/response.js")
+const { parse, decode: decodeV5 } = __webpack_require__(/*! ../v5/response */ "./node_modules/kafkajs/src/protocol/requests/produce/v5/response.js")
 
 /**
  * The version number is bumped to indicate that on quota violation brokers send out responses before throttling.
@@ -26627,37 +28994,19 @@ const { parse: parseV5 } = __webpack_require__(/*! ../v5/response */ "./node_mod
  *   throttle_time_ms => INT32
  */
 
-const partition = decoder => ({
-  partition: decoder.readInt32(),
-  errorCode: decoder.readInt16(),
-  baseOffset: decoder.readInt64().toString(),
-  logAppendTime: decoder.readInt64().toString(),
-  logStartOffset: decoder.readInt64().toString(),
-})
-
 const decode = async rawData => {
-  const decoder = new Decoder(rawData)
-  const topics = decoder.readArray(decoder => ({
-    topicName: decoder.readString(),
-    partitions: decoder.readArray(partition),
-  }))
-
-  const throttleTime = decoder.readInt32()
-
-  // Report a `throttleTime` of 0: The broker will not have throttled
-  // this request, but if the `clientSideThrottleTime` is >0 then it
-  // expects us to do that -- and it will ignore requests.
+  const decoded = await decodeV5(rawData)
 
   return {
-    topics,
+    ...decoded,
     throttleTime: 0,
-    clientSideThrottleTime: throttleTime,
+    clientSideThrottleTime: decoded.throttleTime,
   }
 }
 
 module.exports = {
   decode,
-  parse: parseV5,
+  parse,
 }
 
 
@@ -27101,7 +29450,7 @@ module.exports = {
   \***********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 36:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
@@ -27118,6 +29467,22 @@ const versions = {
     const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v1/response.js")
     return {
       request: request({ groupId, generationId, memberId, groupAssignment }),
+      response,
+    }
+  },
+  2: ({ groupId, generationId, memberId, groupAssignment }) => {
+    const request = __webpack_require__(/*! ./v2/request */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/request.js")
+    const response = __webpack_require__(/*! ./v2/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js")
+    return {
+      request: request({ groupId, generationId, memberId, groupAssignment }),
+      response,
+    }
+  },
+  3: ({ groupId, generationId, memberId, groupInstanceId, groupAssignment }) => {
+    const request = __webpack_require__(/*! ./v3/request */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/request.js")
+    const response = __webpack_require__(/*! ./v3/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/response.js")
+    return {
+      request: request({ groupId, generationId, memberId, groupInstanceId, groupAssignment }),
       response,
     }
   },
@@ -27288,19 +29653,171 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/request.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/request.js ***!
+  \****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV1 = __webpack_require__(/*! ../v1/request */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v1/request.js")
+
+/**
+ * SyncGroup Request (Version: 2) => group_id generation_id member_id [group_assignment]
+ *   group_id => STRING
+ *   generation_id => INT32
+ *   member_id => STRING
+ *   group_assignment => member_id member_assignment
+ *     member_id => STRING
+ *     member_assignment => BYTES
+ */
+
+module.exports = ({ groupId, generationId, memberId, groupAssignment }) =>
+  Object.assign(requestV1({ groupId, generationId, memberId, groupAssignment }), { apiVersion: 2 })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v1/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v1/response.js")
+
+/**
+ * In version 2, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * SyncGroup Response (Version: 2) => throttle_time_ms error_code member_assignment
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   member_assignment => BYTES
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/request.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/request.js ***!
+  \****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Encoder = __webpack_require__(/*! ../../../encoder */ "./node_modules/kafkajs/src/protocol/encoder.js")
+const { SyncGroup: apiKey } = __webpack_require__(/*! ../../apiKeys */ "./node_modules/kafkajs/src/protocol/requests/apiKeys.js")
+
+/**
+ * Version 3 adds group_instance_id to indicate member identity across restarts.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-345%3A+Introduce+static+membership+protocol+to+reduce+consumer+rebalances
+ *
+ * SyncGroup Request (Version: 3) => group_id generation_id member_id group_instance_id [group_assignment]
+ *   group_id => STRING
+ *   generation_id => INT32
+ *   member_id => STRING
+ *   group_instance_id => NULLABLE_STRING
+ *   group_assignment => member_id member_assignment
+ *     member_id => STRING
+ *     member_assignment => BYTES
+ */
+
+module.exports = ({
+  groupId,
+  generationId,
+  memberId,
+  groupInstanceId = null,
+  groupAssignment,
+}) => ({
+  apiKey,
+  apiVersion: 3,
+  apiName: 'SyncGroup',
+  encode: async () => {
+    return new Encoder()
+      .writeString(groupId)
+      .writeInt32(generationId)
+      .writeString(memberId)
+      .writeString(groupInstanceId)
+      .writeArray(groupAssignment.map(encodeGroupAssignment))
+  },
+})
+
+const encodeGroupAssignment = ({ memberId, memberAssignment }) => {
+  return new Encoder().writeString(memberId).writeBytes(memberAssignment)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/response.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/syncGroup/v3/response.js ***!
+  \*****************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { decode, parse } = __webpack_require__(/*! ../v2/response */ "./node_modules/kafkajs/src/protocol/requests/syncGroup/v2/response.js")
+
+/**
+ * SyncGroup Response (Version: 2) => throttle_time_ms error_code member_assignment
+ *   throttle_time_ms => INT32
+ *   error_code => INT16
+ *   member_assignment => BYTES
+ */
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/index.js":
 /*!*****************************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/index.js ***!
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const versions = {
   0: ({ transactionalId, groupId, producerId, producerEpoch, topics }) => {
     const request = __webpack_require__(/*! ./v0/request */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/request.js")
     const response = __webpack_require__(/*! ./v0/response */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/response.js")
+    return {
+      request: request({ transactionalId, groupId, producerId, producerEpoch, topics }),
+      response,
+    }
+  },
+  1: ({ transactionalId, groupId, producerId, producerEpoch, topics }) => {
+    const request = __webpack_require__(/*! ./v1/request */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/request.js")
+    const response = __webpack_require__(/*! ./v1/response */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/response.js")
     return {
       request: request({ transactionalId, groupId, producerId, producerEpoch, topics }),
       response,
@@ -27434,51 +29951,158 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/request.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/request.js ***!
+  \**********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const requestV0 = __webpack_require__(/*! ../v0/request */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/request.js")
+
+/**
+ * TxnOffsetCommit Request (Version: 1) => transactional_id group_id producer_id producer_epoch [topics]
+ *   transactional_id => STRING
+ *   group_id => STRING
+ *   producer_id => INT64
+ *   producer_epoch => INT16
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition offset metadata
+ *       partition => INT32
+ *       offset => INT64
+ *       metadata => NULLABLE_STRING
+ */
+
+module.exports = ({ transactionalId, groupId, producerId, producerEpoch, topics }) =>
+  Object.assign(requestV0({ transactionalId, groupId, producerId, producerEpoch, topics }), {
+    apiVersion: 1,
+  })
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/response.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v1/response.js ***!
+  \***********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { parse, decode: decodeV1 } = __webpack_require__(/*! ../v0/response */ "./node_modules/kafkajs/src/protocol/requests/txnOffsetCommit/v0/response.js")
+
+/**
+ * In version 1, on quota violation, brokers send out responses before throttling.
+ * @see https://cwiki.apache.org/confluence/display/KAFKA/KIP-219+-+Improve+quota+communication
+ *
+ * TxnOffsetCommit Response (Version: 1) => throttle_time_ms [topics]
+ *   throttle_time_ms => INT32
+ *   topics => topic [partitions]
+ *     topic => STRING
+ *     partitions => partition error_code
+ *       partition => INT32
+ *       error_code => INT16
+ */
+
+const decode = async rawData => {
+  const decoded = await decodeV1(rawData)
+
+  return {
+    ...decoded,
+    throttleTime: 0,
+    clientSideThrottleTime: decoded.throttleTime,
+  }
+}
+
+module.exports = {
+  decode,
+  parse,
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/kafkajs/src/protocol/resourcePatternTypes.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/kafkajs/src/protocol/resourcePatternTypes.js ***!
+  \*******************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/***/ ((module) => {
+
+// From:
+// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/resource/PatternType.java#L32
+
+/**
+ * @typedef {number} ACLResourcePatternTypes
+ *
+ * Enum for ACL Resource Pattern Type
+ * @readonly
+ * @enum {ACLResourcePatternTypes}
+ */
+module.exports = {
+  /**
+   * Represents any PatternType which this client cannot understand, perhaps because this client is too old.
+   */
+  UNKNOWN: 0,
+  /**
+   * In a filter, matches any resource pattern type.
+   */
+  ANY: 1,
+  /**
+   * In a filter, will perform pattern matching.
+   *
+   * e.g. Given a filter of {@code ResourcePatternFilter(TOPIC, "payments.received", MATCH)`}, the filter match
+   * any {@link ResourcePattern} that matches topic 'payments.received'. This might include:
+   * <ul>
+   *     <li>A Literal pattern with the same type and name, e.g. {@code ResourcePattern(TOPIC, "payments.received", LITERAL)}</li>
+   *     <li>A Wildcard pattern with the same type, e.g. {@code ResourcePattern(TOPIC, "*", LITERAL)}</li>
+   *     <li>A Prefixed pattern with the same type and where the name is a matching prefix, e.g. {@code ResourcePattern(TOPIC, "payments.", PREFIXED)}</li>
+   * </ul>
+   */
+  MATCH: 2,
+  /**
+   * A literal resource name.
+   *
+   * A literal name defines the full name of a resource, e.g. topic with name 'foo', or group with name 'bob'.
+   *
+   * The special wildcard character {@code *} can be used to represent a resource with any name.
+   */
+  LITERAL: 3,
+  /**
+   * A prefixed resource name.
+   *
+   * A prefixed name defines a prefix for a resource, e.g. topics with names that start with 'foo'.
+   */
+  PREFIXED: 4,
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/protocol/resourceTypes.js":
 /*!************************************************************!*\
   !*** ./node_modules/kafkajs/src/protocol/resourceTypes.js ***!
   \************************************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 4:0-14 */
-/***/ ((module) => {
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-// From:
-// https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/resource/ResourceType.java#L31
+const ACLResourceTypes = __webpack_require__(/*! ./aclResourceTypes */ "./node_modules/kafkajs/src/protocol/aclResourceTypes.js")
 
-module.exports = {
-  /**
-   * Represents any ResourceType which this client cannot understand,
-   * perhaps because this client is too old.
-   */
-  UNKNOWN: 0,
-  /**
-   * In a filter, matches any ResourceType.
-   */
-  ANY: 1,
-  /**
-   * A Kafka topic.
-   * @see http://kafka.apache.org/documentation/#topicconfigs
-   */
-  TOPIC: 2,
-  /**
-   * A consumer group.
-   * @see http://kafka.apache.org/documentation/#consumerconfigs
-   */
-  GROUP: 3,
-  /**
-   * The cluster as a whole.
-   */
-  CLUSTER: 4,
-  /**
-   * A transactional ID.
-   */
-  TRANSACTIONAL_ID: 5,
-  /**
-   * A token ID.
-   */
-  DELEGATION_TOKEN: 6,
-}
+/**
+ * @deprecated
+ * @see https://github.com/tulios/kafkajs/issues/649
+ *
+ * Use ConfigResourceTypes or AclResourceTypes instead.
+ */
+module.exports = ACLResourceTypes
 
 
 /***/ }),
@@ -27925,10 +30549,10 @@ module.exports = {
   \*************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 69:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { KafkaJSNumberOfRetriesExceeded } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
+const { KafkaJSNumberOfRetriesExceeded, KafkaJSNonRetriableError } = __webpack_require__(/*! ../errors */ "./node_modules/kafkajs/src/errors.js")
 
 const isTestMode = "development" === 'test'
 const RETRY_DEFAULT = isTestMode ? __webpack_require__(/*! ./defaults.test */ "./node_modules/kafkajs/src/retry/defaults.test.js") : __webpack_require__(/*! ./defaults */ "./node_modules/kafkajs/src/retry/defaults.js")
@@ -27973,10 +30597,14 @@ const createRetriable = (configs, resolve, reject, fn) => {
     fn(bail, retryCount, retryTime)
       .then(resolve)
       .catch(e => {
-        if (shouldRetry && isErrorRetriable(e)) {
-          scheduleRetry()
+        if (isErrorRetriable(e)) {
+          if (shouldRetry) {
+            scheduleRetry()
+          } else {
+            reject(new KafkaJSNumberOfRetriesExceeded(e, { retryCount, retryTime }))
+          }
         } else {
-          reject(new KafkaJSNumberOfRetriesExceeded(e, { retryCount, retryTime }))
+          reject(new KafkaJSNonRetriableError(e))
         }
       })
   }
@@ -27984,6 +30612,14 @@ const createRetriable = (configs, resolve, reject, fn) => {
   return retry
 }
 
+/**
+ * @typedef {(fn: (bail: (err: Error) => void, retryCount: number, retryTime: number) => any) => Promise<ReturnType<fn>>} Retrier
+ */
+
+/**
+ * @param {import("../../types").RetryOptions} [opts]
+ * @returns {Retrier}
+ */
 module.exports = (opts = {}) => fn => {
   return new Promise((resolve, reject) => {
     const configs = Object.assign({}, RETRY_DEFAULT, opts)
@@ -28195,6 +30831,29 @@ module.exports = flatten
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/utils/groupBy.js":
+/*!***************************************************!*\
+  !*** ./node_modules/kafkajs/src/utils/groupBy.js ***!
+  \***************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 1:0-14 */
+/***/ ((module) => {
+
+module.exports = async (array, groupFn) => {
+  const result = new Map()
+
+  for (const item of array) {
+    const group = await Promise.resolve(groupFn(item))
+    result.set(group, result.has(group) ? [...result.get(group), item] : [item])
+  }
+
+  return result
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/utils/lock.js":
 /*!************************************************!*\
   !*** ./node_modules/kafkajs/src/utils/lock.js ***!
@@ -28277,7 +30936,7 @@ module.exports = class Lock {
   \************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 334:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 343:0-14 */
 /***/ ((module) => {
 
 /**
@@ -28376,7 +31035,7 @@ class Long {
   }
 
   /**
-   * Converts the Long to a string written in the specified radix.
+   * Converts the Long to a string.
    * @returns {string}
    * @override
    */
@@ -28399,6 +31058,15 @@ class Long {
    */
   toInt() {
     return Number(BigInt.asIntN(32, this.value))
+  }
+
+  /**
+   * Converts the Long to JSON
+   * @returns {string}
+   * @override
+   */
+  toJSON() {
+    return this.toString()
   }
 
   /**
@@ -28618,15 +31286,51 @@ module.exports = Long
 
 /***/ }),
 
+/***/ "./node_modules/kafkajs/src/utils/sharedPromiseTo.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/kafkajs/src/utils/sharedPromiseTo.js ***!
+  \***********************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module) => {
+
+/**
+ * @template T
+ * @param { (...args: any) => Promise<T> } [asyncFunction]
+ * Promise returning function that will only ever be invoked sequentially.
+ * @returns { (...args: any) => Promise<T> }
+ * Function that may invoke asyncFunction if there is not a currently executing invocation.
+ * Returns promise from the currently executing invocation.
+ */
+module.exports = asyncFunction => {
+  let promise = null
+
+  return (...args) => {
+    if (promise == null) {
+      promise = asyncFunction(...args).finally(() => (promise = null))
+    }
+    return promise
+  }
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/kafkajs/src/utils/shuffle.js":
 /*!***************************************************!*\
   !*** ./node_modules/kafkajs/src/utils/shuffle.js ***!
   \***************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 1:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 6:0-14 */
 /***/ ((module) => {
 
+/**
+ * @param {T[]} array
+ * @returns T[]
+ * @template T
+ */
 module.exports = array => {
   if (!Array.isArray(array)) {
     throw new TypeError("'array' is not an array")
@@ -28786,76 +31490,48 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./url-alphabet/index.js */ "./node_modules/nanoid/url-alphabet/index.js");
 
 
-
-
-// We reuse buffers with the same size to avoid memory fragmentations
-// for better performance.
-let buffers = {}
-let random = bytes => {
-  let buffer = buffers[bytes]
-  if (!buffer) {
-    // `Buffer.allocUnsafe()` is faster because it doesn’t flush the memory.
-    // Memory flushing is unnecessary since the buffer allocation itself resets
-    // the memory with the new bytes.
-    buffer = Buffer.allocUnsafe(bytes)
-    if (bytes <= 255) buffers[bytes] = buffer
+const POOL_SIZE_MULTIPLIER = 128
+let pool, poolOffset
+let fillPool = bytes => {
+  if (!pool || pool.length < bytes) {
+    pool = Buffer.allocUnsafe(bytes * POOL_SIZE_MULTIPLIER)
+    crypto__WEBPACK_IMPORTED_MODULE_0___default().randomFillSync(pool)
+    poolOffset = 0
+  } else if (poolOffset + bytes > pool.length) {
+    crypto__WEBPACK_IMPORTED_MODULE_0___default().randomFillSync(pool)
+    poolOffset = 0
   }
-  return crypto__WEBPACK_IMPORTED_MODULE_0___default().randomFillSync(buffer)
+  poolOffset += bytes
 }
-
-let customRandom = (alphabet, size, getRandom) => {
-  // First, a bitmask is necessary to generate the ID. The bitmask makes bytes
-  // values closer to the alphabet size. The bitmask calculates the closest
-  // `2^31 - 1` number, which exceeds the alphabet size.
-  // For example, the bitmask for the alphabet size 30 is 31 (00011111).
+let random = bytes => {
+  fillPool((bytes -= 0))
+  return pool.subarray(poolOffset - bytes, poolOffset)
+}
+let customRandom = (alphabet, defaultSize, getRandom) => {
   let mask = (2 << (31 - Math.clz32((alphabet.length - 1) | 1))) - 1
-  // Though, the bitmask solution is not perfect since the bytes exceeding
-  // the alphabet size are refused. Therefore, to reliably generate the ID,
-  // the random bytes redundancy has to be satisfied.
-
-  // Note: every hardware random generator call is performance expensive,
-  // because the system call for entropy collection takes a lot of time.
-  // So, to avoid additional system calls, extra bytes are requested in advance.
-
-  // Next, a step determines how many random bytes to generate.
-  // The number of random bytes gets decided upon the ID size, mask,
-  // alphabet size, and magic number 1.6 (using 1.6 peaks at performance
-  // according to benchmarks).
-  let step = Math.ceil((1.6 * mask * size) / alphabet.length)
-
-  return () => {
+  let step = Math.ceil((1.6 * mask * defaultSize) / alphabet.length)
+  return (size = defaultSize) => {
     let id = ''
     while (true) {
       let bytes = getRandom(step)
-      // A compact alternative for `for (var i = 0; i < step; i++)`.
       let i = step
       while (i--) {
-        // Adding `|| ''` refuses a random byte that exceeds the alphabet size.
         id += alphabet[bytes[i] & mask] || ''
-        // `id.length + 1 === size` is a more compact option.
-        if (id.length === +size) return id
+        if (id.length === size) return id
       }
     }
   }
 }
-
-let customAlphabet = (alphabet, size) => customRandom(alphabet, size, random)
-
+let customAlphabet = (alphabet, size = 21) =>
+  customRandom(alphabet, size, random)
 let nanoid = (size = 21) => {
-  let bytes = random(size)
+  fillPool((size -= 0))
   let id = ''
-  // A compact alternative for `for (var i = 0; i < step; i++)`.
-  while (size--) {
-    // It is incorrect to use bytes exceeding the alphabet size.
-    // The following mask reduces the random byte in the 0-255 value
-    // range to the 0-63 value range. Therefore, adding hacks, such
-    // as empty string fallback or magic numbers, is unneccessary because
-    // the bitmask trims bytes down to the alphabet size.
-    id += _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__.urlAlphabet[bytes[size] & 63]
+  for (let i = poolOffset - size; i < poolOffset; i++) {
+    id += _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__.urlAlphabet[pool[i] & 63]
   }
   return id
 }
-
 
 
 
@@ -28876,689 +31552,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "urlAlphabet": () => /* binding */ urlAlphabet
 /* harmony export */ });
-// This alphabet uses `A-Za-z0-9_-` symbols. The genetic algorithm helped
-// optimize the gzip compression for this alphabet.
 let urlAlphabet =
-  'ModuleSymbhasOwnPr-0123456789ABCDEFGHNRVfgctiUvz_KqYTJkLxpZXIjQW'
+  'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict'
 
-
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/index.js":
-/*!***************************************!*\
-  !*** ./node_modules/promise/index.js ***!
-  \***************************************/
-/*! dynamic exports */
-/*! exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/promise/lib/index.js */
-/*! runtime requirements: module, __webpack_require__ */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-module.exports = __webpack_require__(/*! ./lib */ "./node_modules/promise/lib/index.js")
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/lib/core.js":
-/*!******************************************!*\
-  !*** ./node_modules/promise/lib/core.js ***!
-  \******************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 52:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var asap = __webpack_require__(/*! asap/raw */ "./node_modules/asap/raw.js");
-
-function noop() {}
-
-// States:
-//
-// 0 - pending
-// 1 - fulfilled with _value
-// 2 - rejected with _value
-// 3 - adopted the state of another promise, _value
-//
-// once the state is no longer pending (0) it is immutable
-
-// All `_` prefixed properties will be reduced to `_{random number}`
-// at build time to obfuscate them and discourage their use.
-// We don't use symbols or Object.defineProperty to fully hide them
-// because the performance isn't good enough.
-
-
-// to avoid using try/catch inside critical functions, we
-// extract them to here.
-var LAST_ERROR = null;
-var IS_ERROR = {};
-function getThen(obj) {
-  try {
-    return obj.then;
-  } catch (ex) {
-    LAST_ERROR = ex;
-    return IS_ERROR;
-  }
-}
-
-function tryCallOne(fn, a) {
-  try {
-    return fn(a);
-  } catch (ex) {
-    LAST_ERROR = ex;
-    return IS_ERROR;
-  }
-}
-function tryCallTwo(fn, a, b) {
-  try {
-    fn(a, b);
-  } catch (ex) {
-    LAST_ERROR = ex;
-    return IS_ERROR;
-  }
-}
-
-module.exports = Promise;
-
-function Promise(fn) {
-  if (typeof this !== 'object') {
-    throw new TypeError('Promises must be constructed via new');
-  }
-  if (typeof fn !== 'function') {
-    throw new TypeError('Promise constructor\'s argument is not a function');
-  }
-  this._U = 0;
-  this._V = 0;
-  this._W = null;
-  this._X = null;
-  if (fn === noop) return;
-  doResolve(fn, this);
-}
-Promise._Y = null;
-Promise._Z = null;
-Promise._0 = noop;
-
-Promise.prototype.then = function(onFulfilled, onRejected) {
-  if (this.constructor !== Promise) {
-    return safeThen(this, onFulfilled, onRejected);
-  }
-  var res = new Promise(noop);
-  handle(this, new Handler(onFulfilled, onRejected, res));
-  return res;
-};
-
-function safeThen(self, onFulfilled, onRejected) {
-  return new self.constructor(function (resolve, reject) {
-    var res = new Promise(noop);
-    res.then(resolve, reject);
-    handle(self, new Handler(onFulfilled, onRejected, res));
-  });
-}
-function handle(self, deferred) {
-  while (self._V === 3) {
-    self = self._W;
-  }
-  if (Promise._Y) {
-    Promise._Y(self);
-  }
-  if (self._V === 0) {
-    if (self._U === 0) {
-      self._U = 1;
-      self._X = deferred;
-      return;
-    }
-    if (self._U === 1) {
-      self._U = 2;
-      self._X = [self._X, deferred];
-      return;
-    }
-    self._X.push(deferred);
-    return;
-  }
-  handleResolved(self, deferred);
-}
-
-function handleResolved(self, deferred) {
-  asap(function() {
-    var cb = self._V === 1 ? deferred.onFulfilled : deferred.onRejected;
-    if (cb === null) {
-      if (self._V === 1) {
-        resolve(deferred.promise, self._W);
-      } else {
-        reject(deferred.promise, self._W);
-      }
-      return;
-    }
-    var ret = tryCallOne(cb, self._W);
-    if (ret === IS_ERROR) {
-      reject(deferred.promise, LAST_ERROR);
-    } else {
-      resolve(deferred.promise, ret);
-    }
-  });
-}
-function resolve(self, newValue) {
-  // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-  if (newValue === self) {
-    return reject(
-      self,
-      new TypeError('A promise cannot be resolved with itself.')
-    );
-  }
-  if (
-    newValue &&
-    (typeof newValue === 'object' || typeof newValue === 'function')
-  ) {
-    var then = getThen(newValue);
-    if (then === IS_ERROR) {
-      return reject(self, LAST_ERROR);
-    }
-    if (
-      then === self.then &&
-      newValue instanceof Promise
-    ) {
-      self._V = 3;
-      self._W = newValue;
-      finale(self);
-      return;
-    } else if (typeof then === 'function') {
-      doResolve(then.bind(newValue), self);
-      return;
-    }
-  }
-  self._V = 1;
-  self._W = newValue;
-  finale(self);
-}
-
-function reject(self, newValue) {
-  self._V = 2;
-  self._W = newValue;
-  if (Promise._Z) {
-    Promise._Z(self, newValue);
-  }
-  finale(self);
-}
-function finale(self) {
-  if (self._U === 1) {
-    handle(self, self._X);
-    self._X = null;
-  }
-  if (self._U === 2) {
-    for (var i = 0; i < self._X.length; i++) {
-      handle(self, self._X[i]);
-    }
-    self._X = null;
-  }
-}
-
-function Handler(onFulfilled, onRejected, promise){
-  this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
-  this.onRejected = typeof onRejected === 'function' ? onRejected : null;
-  this.promise = promise;
-}
-
-/**
- * Take a potentially misbehaving resolver function and make sure
- * onFulfilled and onRejected are only called once.
- *
- * Makes no guarantees about asynchrony.
- */
-function doResolve(fn, promise) {
-  var done = false;
-  var res = tryCallTwo(fn, function (value) {
-    if (done) return;
-    done = true;
-    resolve(promise, value);
-  }, function (reason) {
-    if (done) return;
-    done = true;
-    reject(promise, reason);
-  });
-  if (!done && res === IS_ERROR) {
-    done = true;
-    reject(promise, LAST_ERROR);
-  }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/lib/done.js":
-/*!******************************************!*\
-  !*** ./node_modules/promise/lib/done.js ***!
-  \******************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var Promise = __webpack_require__(/*! ./core.js */ "./node_modules/promise/lib/core.js");
-
-module.exports = Promise;
-Promise.prototype.done = function (onFulfilled, onRejected) {
-  var self = arguments.length ? this.then.apply(this, arguments) : this;
-  self.then(null, function (err) {
-    setTimeout(function () {
-      throw err;
-    }, 0);
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/lib/es6-extensions.js":
-/*!****************************************************!*\
-  !*** ./node_modules/promise/lib/es6-extensions.js ***!
-  \****************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 7:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-//This file contains the ES6 extensions to the core Promises/A+ API
-
-var Promise = __webpack_require__(/*! ./core.js */ "./node_modules/promise/lib/core.js");
-
-module.exports = Promise;
-
-/* Static Functions */
-
-var TRUE = valuePromise(true);
-var FALSE = valuePromise(false);
-var NULL = valuePromise(null);
-var UNDEFINED = valuePromise(undefined);
-var ZERO = valuePromise(0);
-var EMPTYSTRING = valuePromise('');
-
-function valuePromise(value) {
-  var p = new Promise(Promise._0);
-  p._V = 1;
-  p._W = value;
-  return p;
-}
-Promise.resolve = function (value) {
-  if (value instanceof Promise) return value;
-
-  if (value === null) return NULL;
-  if (value === undefined) return UNDEFINED;
-  if (value === true) return TRUE;
-  if (value === false) return FALSE;
-  if (value === 0) return ZERO;
-  if (value === '') return EMPTYSTRING;
-
-  if (typeof value === 'object' || typeof value === 'function') {
-    try {
-      var then = value.then;
-      if (typeof then === 'function') {
-        return new Promise(then.bind(value));
-      }
-    } catch (ex) {
-      return new Promise(function (resolve, reject) {
-        reject(ex);
-      });
-    }
-  }
-  return valuePromise(value);
-};
-
-var iterableToArray = function (iterable) {
-  if (typeof Array.from === 'function') {
-    // ES2015+, iterables exist
-    iterableToArray = Array.from;
-    return Array.from(iterable);
-  }
-
-  // ES5, only arrays and array-likes exist
-  iterableToArray = function (x) { return Array.prototype.slice.call(x); };
-  return Array.prototype.slice.call(iterable);
-}
-
-Promise.all = function (arr) {
-  var args = iterableToArray(arr);
-
-  return new Promise(function (resolve, reject) {
-    if (args.length === 0) return resolve([]);
-    var remaining = args.length;
-    function res(i, val) {
-      if (val && (typeof val === 'object' || typeof val === 'function')) {
-        if (val instanceof Promise && val.then === Promise.prototype.then) {
-          while (val._V === 3) {
-            val = val._W;
-          }
-          if (val._V === 1) return res(i, val._W);
-          if (val._V === 2) reject(val._W);
-          val.then(function (val) {
-            res(i, val);
-          }, reject);
-          return;
-        } else {
-          var then = val.then;
-          if (typeof then === 'function') {
-            var p = new Promise(then.bind(val));
-            p.then(function (val) {
-              res(i, val);
-            }, reject);
-            return;
-          }
-        }
-      }
-      args[i] = val;
-      if (--remaining === 0) {
-        resolve(args);
-      }
-    }
-    for (var i = 0; i < args.length; i++) {
-      res(i, args[i]);
-    }
-  });
-};
-
-Promise.reject = function (value) {
-  return new Promise(function (resolve, reject) {
-    reject(value);
-  });
-};
-
-Promise.race = function (values) {
-  return new Promise(function (resolve, reject) {
-    iterableToArray(values).forEach(function(value){
-      Promise.resolve(value).then(resolve, reject);
-    });
-  });
-};
-
-/* Prototype Methods */
-
-Promise.prototype['catch'] = function (onRejected) {
-  return this.then(null, onRejected);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/lib/finally.js":
-/*!*********************************************!*\
-  !*** ./node_modules/promise/lib/finally.js ***!
-  \*********************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var Promise = __webpack_require__(/*! ./core.js */ "./node_modules/promise/lib/core.js");
-
-module.exports = Promise;
-Promise.prototype.finally = function (f) {
-  return this.then(function (value) {
-    return Promise.resolve(f()).then(function () {
-      return value;
-    });
-  }, function (err) {
-    return Promise.resolve(f()).then(function () {
-      throw err;
-    });
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/lib/index.js":
-/*!*******************************************!*\
-  !*** ./node_modules/promise/lib/index.js ***!
-  \*******************************************/
-/*! dynamic exports */
-/*! export __esModule [maybe provided (runtime-defined)] [no usage info] [provision prevents renaming (no use info)] -> ./node_modules/promise/lib/core.js .__esModule */
-/*! other exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/promise/lib/core.js */
-/*! runtime requirements: module, __webpack_require__ */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-module.exports = __webpack_require__(/*! ./core.js */ "./node_modules/promise/lib/core.js");
-__webpack_require__(/*! ./done.js */ "./node_modules/promise/lib/done.js");
-__webpack_require__(/*! ./finally.js */ "./node_modules/promise/lib/finally.js");
-__webpack_require__(/*! ./es6-extensions.js */ "./node_modules/promise/lib/es6-extensions.js");
-__webpack_require__(/*! ./node-extensions.js */ "./node_modules/promise/lib/node-extensions.js");
-__webpack_require__(/*! ./synchronous.js */ "./node_modules/promise/lib/synchronous.js");
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/lib/node-extensions.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/promise/lib/node-extensions.js ***!
-  \*****************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-// This file contains then/promise specific extensions that are only useful
-// for node.js interop
-
-var Promise = __webpack_require__(/*! ./core.js */ "./node_modules/promise/lib/core.js");
-var asap = __webpack_require__(/*! asap */ "./node_modules/asap/asap.js");
-
-module.exports = Promise;
-
-/* Static Functions */
-
-Promise.denodeify = function (fn, argumentCount) {
-  if (
-    typeof argumentCount === 'number' && argumentCount !== Infinity
-  ) {
-    return denodeifyWithCount(fn, argumentCount);
-  } else {
-    return denodeifyWithoutCount(fn);
-  }
-};
-
-var callbackFn = (
-  'function (err, res) {' +
-  'if (err) { rj(err); } else { rs(res); }' +
-  '}'
-);
-function denodeifyWithCount(fn, argumentCount) {
-  var args = [];
-  for (var i = 0; i < argumentCount; i++) {
-    args.push('a' + i);
-  }
-  var body = [
-    'return function (' + args.join(',') + ') {',
-    'var self = this;',
-    'return new Promise(function (rs, rj) {',
-    'var res = fn.call(',
-    ['self'].concat(args).concat([callbackFn]).join(','),
-    ');',
-    'if (res &&',
-    '(typeof res === "object" || typeof res === "function") &&',
-    'typeof res.then === "function"',
-    ') {rs(res);}',
-    '});',
-    '};'
-  ].join('');
-  return Function(['Promise', 'fn'], body)(Promise, fn);
-}
-function denodeifyWithoutCount(fn) {
-  var fnLength = Math.max(fn.length - 1, 3);
-  var args = [];
-  for (var i = 0; i < fnLength; i++) {
-    args.push('a' + i);
-  }
-  var body = [
-    'return function (' + args.join(',') + ') {',
-    'var self = this;',
-    'var args;',
-    'var argLength = arguments.length;',
-    'if (arguments.length > ' + fnLength + ') {',
-    'args = new Array(arguments.length + 1);',
-    'for (var i = 0; i < arguments.length; i++) {',
-    'args[i] = arguments[i];',
-    '}',
-    '}',
-    'return new Promise(function (rs, rj) {',
-    'var cb = ' + callbackFn + ';',
-    'var res;',
-    'switch (argLength) {',
-    args.concat(['extra']).map(function (_, index) {
-      return (
-        'case ' + (index) + ':' +
-        'res = fn.call(' + ['self'].concat(args.slice(0, index)).concat('cb').join(',') + ');' +
-        'break;'
-      );
-    }).join(''),
-    'default:',
-    'args[argLength] = cb;',
-    'res = fn.apply(self, args);',
-    '}',
-    
-    'if (res &&',
-    '(typeof res === "object" || typeof res === "function") &&',
-    'typeof res.then === "function"',
-    ') {rs(res);}',
-    '});',
-    '};'
-  ].join('');
-
-  return Function(
-    ['Promise', 'fn'],
-    body
-  )(Promise, fn);
-}
-
-Promise.nodeify = function (fn) {
-  return function () {
-    var args = Array.prototype.slice.call(arguments);
-    var callback =
-      typeof args[args.length - 1] === 'function' ? args.pop() : null;
-    var ctx = this;
-    try {
-      return fn.apply(this, arguments).nodeify(callback, ctx);
-    } catch (ex) {
-      if (callback === null || typeof callback == 'undefined') {
-        return new Promise(function (resolve, reject) {
-          reject(ex);
-        });
-      } else {
-        asap(function () {
-          callback.call(ctx, ex);
-        })
-      }
-    }
-  }
-};
-
-Promise.prototype.nodeify = function (callback, ctx) {
-  if (typeof callback != 'function') return this;
-
-  this.then(function (value) {
-    asap(function () {
-      callback.call(ctx, null, value);
-    });
-  }, function (err) {
-    asap(function () {
-      callback.call(ctx, err);
-    });
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/promise/lib/synchronous.js":
-/*!*************************************************!*\
-  !*** ./node_modules/promise/lib/synchronous.js ***!
-  \*************************************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var Promise = __webpack_require__(/*! ./core.js */ "./node_modules/promise/lib/core.js");
-
-module.exports = Promise;
-Promise.enableSynchronous = function () {
-  Promise.prototype.isPending = function() {
-    return this.getState() == 0;
-  };
-
-  Promise.prototype.isFulfilled = function() {
-    return this.getState() == 1;
-  };
-
-  Promise.prototype.isRejected = function() {
-    return this.getState() == 2;
-  };
-
-  Promise.prototype.getValue = function () {
-    if (this._V === 3) {
-      return this._W.getValue();
-    }
-
-    if (!this.isFulfilled()) {
-      throw new Error('Cannot get a value of an unfulfilled promise.');
-    }
-
-    return this._W;
-  };
-
-  Promise.prototype.getReason = function () {
-    if (this._V === 3) {
-      return this._W.getReason();
-    }
-
-    if (!this.isRejected()) {
-      throw new Error('Cannot get a rejection reason of a non-rejected promise.');
-    }
-
-    return this._W;
-  };
-
-  Promise.prototype.getState = function () {
-    if (this._V === 3) {
-      return this._W.getState();
-    }
-    if (this._V === -1 || this._V === -2) {
-      return 0;
-    }
-
-    return this._V;
-  };
-};
-
-Promise.disableSynchronous = function() {
-  Promise.prototype.isPending = undefined;
-  Promise.prototype.isFulfilled = undefined;
-  Promise.prototype.isRejected = undefined;
-  Promise.prototype.getValue = undefined;
-  Promise.prototype.getReason = undefined;
-  Promise.prototype.getState = undefined;
-};
 
 
 /***/ }),
@@ -29583,29 +31579,2707 @@ module.exports = {
 	},
 	usStreet: {
 		Lookup: __webpack_require__(/*! ./src/us_street/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/us_street/Lookup.js"),
-		Candidate: __webpack_require__(/*! ./src/us_street/Candidate */ "./node_modules/smartystreets-javascript-sdk/src/us_street/Candidate.js")
+		Candidate: __webpack_require__(/*! ./src/us_street/Candidate */ "./node_modules/smartystreets-javascript-sdk/src/us_street/Candidate.js"),
 	},
 	usZipcode: {
 		Lookup: __webpack_require__(/*! ./src/us_zipcode/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/us_zipcode/Lookup.js"),
-		Result: __webpack_require__(/*! ./src/us_zipcode/Result */ "./node_modules/smartystreets-javascript-sdk/src/us_zipcode/Result.js")
+		Result: __webpack_require__(/*! ./src/us_zipcode/Result */ "./node_modules/smartystreets-javascript-sdk/src/us_zipcode/Result.js"),
 	},
 	usAutocomplete: {
 		Lookup: __webpack_require__(/*! ./src/us_autocomplete/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete/Lookup.js"),
-		Suggestion: __webpack_require__(/*! ./src/us_autocomplete/Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete/Suggestion.js")
+		Suggestion: __webpack_require__(/*! ./src/us_autocomplete/Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete/Suggestion.js"),
 	},
 	usAutocompletePro: {
 		Lookup: __webpack_require__(/*! ./src/us_autocomplete_pro/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete_pro/Lookup.js"),
-		Suggestion: __webpack_require__(/*! ./src/us_autocomplete_pro/Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete_pro/Suggestion.js")
+		Suggestion: __webpack_require__(/*! ./src/us_autocomplete_pro/Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete_pro/Suggestion.js"),
 	},
 	usExtract: {
 		Lookup: __webpack_require__(/*! ./src/us_extract/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/us_extract/Lookup.js"),
-		Result: __webpack_require__(/*! ./src/us_extract/Result */ "./node_modules/smartystreets-javascript-sdk/src/us_extract/Result.js")
+		Result: __webpack_require__(/*! ./src/us_extract/Result */ "./node_modules/smartystreets-javascript-sdk/src/us_extract/Result.js"),
 	},
 	internationalStreet: {
 		Lookup: __webpack_require__(/*! ./src/international_street/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/international_street/Lookup.js"),
-		Candidate: __webpack_require__(/*! ./src/international_street/Candidate */ "./node_modules/smartystreets-javascript-sdk/src/international_street/Candidate.js")
+		Candidate: __webpack_require__(/*! ./src/international_street/Candidate */ "./node_modules/smartystreets-javascript-sdk/src/international_street/Candidate.js"),
+	},
+	usReverseGeo: {
+		Lookup: __webpack_require__(/*! ./src/us_reverse_geo/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Lookup.js"),
+	},
+	internationalAddressAutocomplete: {
+		Lookup: __webpack_require__(/*! ./src/international_address_autocomplete/Lookup */ "./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Lookup.js"),
+		Suggestion: __webpack_require__(/*! ./src/international_address_autocomplete/Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Suggestion.js"),
 	},
 };
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js ***!
+  \*******************************************************************************/
+/*! dynamic exports */
+/*! exports [maybe provided (runtime-defined)] [no usage info] -> ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/axios.js */
+/*! runtime requirements: module, __webpack_require__ */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__(/*! ./lib/axios */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/axios.js");
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/adapters/http.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/adapters/http.js ***!
+  \*******************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_require__, module */
+/*! CommonJS bailout: module.exports is used directly at 47:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+var settle = __webpack_require__(/*! ./../core/settle */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/settle.js");
+var buildFullPath = __webpack_require__(/*! ../core/buildFullPath */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/buildFullPath.js");
+var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/buildURL.js");
+var http = __webpack_require__(/*! http */ "http");
+var https = __webpack_require__(/*! https */ "https");
+var httpFollow = __webpack_require__(/*! follow-redirects */ "./node_modules/follow-redirects/index.js").http;
+var httpsFollow = __webpack_require__(/*! follow-redirects */ "./node_modules/follow-redirects/index.js").https;
+var url = __webpack_require__(/*! url */ "url");
+var zlib = __webpack_require__(/*! zlib */ "zlib");
+var VERSION = __webpack_require__(/*! ./../env/data */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/env/data.js").version;
+var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/createError.js");
+var enhanceError = __webpack_require__(/*! ../core/enhanceError */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/enhanceError.js");
+var transitionalDefaults = __webpack_require__(/*! ../defaults/transitional */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/transitional.js");
+var Cancel = __webpack_require__(/*! ../cancel/Cancel */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/Cancel.js");
+
+var isHttps = /https:?/;
+
+/**
+ *
+ * @param {http.ClientRequestArgs} options
+ * @param {AxiosProxyConfig} proxy
+ * @param {string} location
+ */
+function setProxy(options, proxy, location) {
+  options.hostname = proxy.host;
+  options.host = proxy.host;
+  options.port = proxy.port;
+  options.path = location;
+
+  // Basic proxy authorization
+  if (proxy.auth) {
+    var base64 = Buffer.from(proxy.auth.username + ':' + proxy.auth.password, 'utf8').toString('base64');
+    options.headers['Proxy-Authorization'] = 'Basic ' + base64;
+  }
+
+  // If a proxy is used, any redirects must also pass through the proxy
+  options.beforeRedirect = function beforeRedirect(redirection) {
+    redirection.headers.host = redirection.host;
+    setProxy(redirection, proxy, redirection.href);
+  };
+}
+
+/*eslint consistent-return:0*/
+module.exports = function httpAdapter(config) {
+  return new Promise(function dispatchHttpRequest(resolvePromise, rejectPromise) {
+    var onCanceled;
+    function done() {
+      if (config.cancelToken) {
+        config.cancelToken.unsubscribe(onCanceled);
+      }
+
+      if (config.signal) {
+        config.signal.removeEventListener('abort', onCanceled);
+      }
+    }
+    var resolve = function resolve(value) {
+      done();
+      resolvePromise(value);
+    };
+    var rejected = false;
+    var reject = function reject(value) {
+      done();
+      rejected = true;
+      rejectPromise(value);
+    };
+    var data = config.data;
+    var headers = config.headers;
+    var headerNames = {};
+
+    Object.keys(headers).forEach(function storeLowerName(name) {
+      headerNames[name.toLowerCase()] = name;
+    });
+
+    // Set User-Agent (required by some servers)
+    // See https://github.com/axios/axios/issues/69
+    if ('user-agent' in headerNames) {
+      // User-Agent is specified; handle case where no UA header is desired
+      if (!headers[headerNames['user-agent']]) {
+        delete headers[headerNames['user-agent']];
+      }
+      // Otherwise, use specified value
+    } else {
+      // Only set header if it hasn't been set in config
+      headers['User-Agent'] = 'axios/' + VERSION;
+    }
+
+    if (data && !utils.isStream(data)) {
+      if (Buffer.isBuffer(data)) {
+        // Nothing to do...
+      } else if (utils.isArrayBuffer(data)) {
+        data = Buffer.from(new Uint8Array(data));
+      } else if (utils.isString(data)) {
+        data = Buffer.from(data, 'utf-8');
+      } else {
+        return reject(createError(
+          'Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream',
+          config
+        ));
+      }
+
+      if (config.maxBodyLength > -1 && data.length > config.maxBodyLength) {
+        return reject(createError('Request body larger than maxBodyLength limit', config));
+      }
+
+      // Add Content-Length header if data exists
+      if (!headerNames['content-length']) {
+        headers['Content-Length'] = data.length;
+      }
+    }
+
+    // HTTP basic authentication
+    var auth = undefined;
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      auth = username + ':' + password;
+    }
+
+    // Parse url
+    var fullPath = buildFullPath(config.baseURL, config.url);
+    var parsed = url.parse(fullPath);
+    var protocol = parsed.protocol || 'http:';
+
+    if (!auth && parsed.auth) {
+      var urlAuth = parsed.auth.split(':');
+      var urlUsername = urlAuth[0] || '';
+      var urlPassword = urlAuth[1] || '';
+      auth = urlUsername + ':' + urlPassword;
+    }
+
+    if (auth && headerNames.authorization) {
+      delete headers[headerNames.authorization];
+    }
+
+    var isHttpsRequest = isHttps.test(protocol);
+    var agent = isHttpsRequest ? config.httpsAgent : config.httpAgent;
+
+    try {
+      buildURL(parsed.path, config.params, config.paramsSerializer).replace(/^\?/, '');
+    } catch (err) {
+      var customErr = new Error(err.message);
+      customErr.config = config;
+      customErr.url = config.url;
+      customErr.exists = true;
+      reject(customErr);
+    }
+
+    var options = {
+      path: buildURL(parsed.path, config.params, config.paramsSerializer).replace(/^\?/, ''),
+      method: config.method.toUpperCase(),
+      headers: headers,
+      agent: agent,
+      agents: { http: config.httpAgent, https: config.httpsAgent },
+      auth: auth
+    };
+
+    if (config.socketPath) {
+      options.socketPath = config.socketPath;
+    } else {
+      options.hostname = parsed.hostname;
+      options.port = parsed.port;
+    }
+
+    var proxy = config.proxy;
+    if (!proxy && proxy !== false) {
+      var proxyEnv = protocol.slice(0, -1) + '_proxy';
+      var proxyUrl = process.env[proxyEnv] || process.env[proxyEnv.toUpperCase()];
+      if (proxyUrl) {
+        var parsedProxyUrl = url.parse(proxyUrl);
+        var noProxyEnv = process.env.no_proxy || process.env.NO_PROXY;
+        var shouldProxy = true;
+
+        if (noProxyEnv) {
+          var noProxy = noProxyEnv.split(',').map(function trim(s) {
+            return s.trim();
+          });
+
+          shouldProxy = !noProxy.some(function proxyMatch(proxyElement) {
+            if (!proxyElement) {
+              return false;
+            }
+            if (proxyElement === '*') {
+              return true;
+            }
+            if (proxyElement[0] === '.' &&
+                parsed.hostname.substr(parsed.hostname.length - proxyElement.length) === proxyElement) {
+              return true;
+            }
+
+            return parsed.hostname === proxyElement;
+          });
+        }
+
+        if (shouldProxy) {
+          proxy = {
+            host: parsedProxyUrl.hostname,
+            port: parsedProxyUrl.port,
+            protocol: parsedProxyUrl.protocol
+          };
+
+          if (parsedProxyUrl.auth) {
+            var proxyUrlAuth = parsedProxyUrl.auth.split(':');
+            proxy.auth = {
+              username: proxyUrlAuth[0],
+              password: proxyUrlAuth[1]
+            };
+          }
+        }
+      }
+    }
+
+    if (proxy) {
+      options.headers.host = parsed.hostname + (parsed.port ? ':' + parsed.port : '');
+      setProxy(options, proxy, protocol + '//' + parsed.hostname + (parsed.port ? ':' + parsed.port : '') + options.path);
+    }
+
+    var transport;
+    var isHttpsProxy = isHttpsRequest && (proxy ? isHttps.test(proxy.protocol) : true);
+    if (config.transport) {
+      transport = config.transport;
+    } else if (config.maxRedirects === 0) {
+      transport = isHttpsProxy ? https : http;
+    } else {
+      if (config.maxRedirects) {
+        options.maxRedirects = config.maxRedirects;
+      }
+      transport = isHttpsProxy ? httpsFollow : httpFollow;
+    }
+
+    if (config.maxBodyLength > -1) {
+      options.maxBodyLength = config.maxBodyLength;
+    }
+
+    if (config.insecureHTTPParser) {
+      options.insecureHTTPParser = config.insecureHTTPParser;
+    }
+
+    // Create the request
+    var req = transport.request(options, function handleResponse(res) {
+      if (req.aborted) return;
+
+      // uncompress the response body transparently if required
+      var stream = res;
+
+      // return the last request in case of redirects
+      var lastRequest = res.req || req;
+
+
+      // if no content, is HEAD request or decompress disabled we should not decompress
+      if (res.statusCode !== 204 && lastRequest.method !== 'HEAD' && config.decompress !== false) {
+        switch (res.headers['content-encoding']) {
+        /*eslint default-case:0*/
+        case 'gzip':
+        case 'compress':
+        case 'deflate':
+        // add the unzipper to the body stream processing pipeline
+          stream = stream.pipe(zlib.createUnzip());
+
+          // remove the content-encoding in order to not confuse downstream operations
+          delete res.headers['content-encoding'];
+          break;
+        }
+      }
+
+      var response = {
+        status: res.statusCode,
+        statusText: res.statusMessage,
+        headers: res.headers,
+        config: config,
+        request: lastRequest
+      };
+
+      if (config.responseType === 'stream') {
+        response.data = stream;
+        settle(resolve, reject, response);
+      } else {
+        var responseBuffer = [];
+        var totalResponseBytes = 0;
+        stream.on('data', function handleStreamData(chunk) {
+          responseBuffer.push(chunk);
+          totalResponseBytes += chunk.length;
+
+          // make sure the content length is not over the maxContentLength if specified
+          if (config.maxContentLength > -1 && totalResponseBytes > config.maxContentLength) {
+            // stream.destoy() emit aborted event before calling reject() on Node.js v16
+            rejected = true;
+            stream.destroy();
+            reject(createError('maxContentLength size of ' + config.maxContentLength + ' exceeded',
+              config, null, lastRequest));
+          }
+        });
+
+        stream.on('aborted', function handlerStreamAborted() {
+          if (rejected) {
+            return;
+          }
+          stream.destroy();
+          reject(createError('error request aborted', config, 'ERR_REQUEST_ABORTED', lastRequest));
+        });
+
+        stream.on('error', function handleStreamError(err) {
+          if (req.aborted) return;
+          reject(enhanceError(err, config, null, lastRequest));
+        });
+
+        stream.on('end', function handleStreamEnd() {
+          try {
+            var responseData = responseBuffer.length === 1 ? responseBuffer[0] : Buffer.concat(responseBuffer);
+            if (config.responseType !== 'arraybuffer') {
+              responseData = responseData.toString(config.responseEncoding);
+              if (!config.responseEncoding || config.responseEncoding === 'utf8') {
+                responseData = utils.stripBOM(responseData);
+              }
+            }
+            response.data = responseData;
+          } catch (err) {
+            reject(enhanceError(err, config, err.code, response.request, response));
+          }
+          settle(resolve, reject, response);
+        });
+      }
+    });
+
+    // Handle errors
+    req.on('error', function handleRequestError(err) {
+      if (req.aborted && err.code !== 'ERR_FR_TOO_MANY_REDIRECTS') return;
+      reject(enhanceError(err, config, null, req));
+    });
+
+    // set tcp keep alive to prevent drop connection by peer
+    req.on('socket', function handleRequestSocket(socket) {
+      // default interval of sending ack packet is 1 minute
+      socket.setKeepAlive(true, 1000 * 60);
+    });
+
+    // Handle request timeout
+    if (config.timeout) {
+      // This is forcing a int timeout to avoid problems if the `req` interface doesn't handle other types.
+      var timeout = parseInt(config.timeout, 10);
+
+      if (isNaN(timeout)) {
+        reject(createError(
+          'error trying to parse `config.timeout` to int',
+          config,
+          'ERR_PARSE_TIMEOUT',
+          req
+        ));
+
+        return;
+      }
+
+      // Sometime, the response will be very slow, and does not respond, the connect event will be block by event loop system.
+      // And timer callback will be fired, and abort() will be invoked before connection, then get "socket hang up" and code ECONNRESET.
+      // At this time, if we have a large number of request, nodejs will hang up some socket on background. and the number will up and up.
+      // And then these socket which be hang up will devoring CPU little by little.
+      // ClientRequest.setTimeout will be fired on the specify milliseconds, and can make sure that abort() will be fired after connect.
+      req.setTimeout(timeout, function handleRequestTimeout() {
+        req.abort();
+        var timeoutErrorMessage = '';
+        if (config.timeoutErrorMessage) {
+          timeoutErrorMessage = config.timeoutErrorMessage;
+        } else {
+          timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
+        }
+        var transitional = config.transitional || transitionalDefaults;
+        reject(createError(
+          timeoutErrorMessage,
+          config,
+          transitional.clarifyTimeoutError ? 'ETIMEDOUT' : 'ECONNABORTED',
+          req
+        ));
+      });
+    }
+
+    if (config.cancelToken || config.signal) {
+      // Handle cancellation
+      // eslint-disable-next-line func-names
+      onCanceled = function(cancel) {
+        if (req.aborted) return;
+
+        req.abort();
+        reject(!cancel || (cancel && cancel.type) ? new Cancel('canceled') : cancel);
+      };
+
+      config.cancelToken && config.cancelToken.subscribe(onCanceled);
+      if (config.signal) {
+        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
+      }
+    }
+
+
+    // Send the request
+    if (utils.isStream(data)) {
+      data.on('error', function handleStreamError(err) {
+        reject(enhanceError(err, config, null, req));
+      }).pipe(req);
+    } else {
+      req.end(data);
+    }
+  });
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/adapters/xhr.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/adapters/xhr.js ***!
+  \******************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+var settle = __webpack_require__(/*! ./../core/settle */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/settle.js");
+var cookies = __webpack_require__(/*! ./../helpers/cookies */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/cookies.js");
+var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/buildURL.js");
+var buildFullPath = __webpack_require__(/*! ../core/buildFullPath */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/buildFullPath.js");
+var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/parseHeaders.js");
+var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isURLSameOrigin.js");
+var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/createError.js");
+var transitionalDefaults = __webpack_require__(/*! ../defaults/transitional */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/transitional.js");
+var Cancel = __webpack_require__(/*! ../cancel/Cancel */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/Cancel.js");
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+    var responseType = config.responseType;
+    var onCanceled;
+    function done() {
+      if (config.cancelToken) {
+        config.cancelToken.unsubscribe(onCanceled);
+      }
+
+      if (config.signal) {
+        config.signal.removeEventListener('abort', onCanceled);
+      }
+    }
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    var fullPath = buildFullPath(config.baseURL, config.url);
+    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    function onloadend() {
+      if (!request) {
+        return;
+      }
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !responseType || responseType === 'text' ||  responseType === 'json' ?
+        request.responseText : request.response;
+      var response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(function _resolve(value) {
+        resolve(value);
+        done();
+      }, function _reject(err) {
+        reject(err);
+        done();
+      }, response);
+
+      // Clean up request
+      request = null;
+    }
+
+    if ('onloadend' in request) {
+      // Use onloadend if available
+      request.onloadend = onloadend;
+    } else {
+      // Listen for ready state to emulate onloadend
+      request.onreadystatechange = function handleLoad() {
+        if (!request || request.readyState !== 4) {
+          return;
+        }
+
+        // The request errored out and we didn't get a response, this will be
+        // handled by onerror instead
+        // With one exception: request that using file: protocol, most browsers
+        // will return status as 0 even though it's a successful request
+        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+          return;
+        }
+        // readystate handler is calling before onerror or ontimeout handlers,
+        // so we should call onloadend on the next 'tick'
+        setTimeout(onloadend);
+      };
+    }
+
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(createError('Request aborted', config, 'ECONNABORTED', request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      var timeoutErrorMessage = config.timeout ? 'timeout of ' + config.timeout + 'ms exceeded' : 'timeout exceeded';
+      var transitional = config.transitional || transitionalDefaults;
+      if (config.timeoutErrorMessage) {
+        timeoutErrorMessage = config.timeoutErrorMessage;
+      }
+      reject(createError(
+        timeoutErrorMessage,
+        config,
+        transitional.clarifyTimeoutError ? 'ETIMEDOUT' : 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
+        cookies.read(config.xsrfCookieName) :
+        undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
+    }
+
+    // Add responseType to request if needed
+    if (responseType && responseType !== 'json') {
+      request.responseType = config.responseType;
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken || config.signal) {
+      // Handle cancellation
+      // eslint-disable-next-line func-names
+      onCanceled = function(cancel) {
+        if (!request) {
+          return;
+        }
+        reject(!cancel || (cancel && cancel.type) ? new Cancel('canceled') : cancel);
+        request.abort();
+        request = null;
+      };
+
+      config.cancelToken && config.cancelToken.subscribe(onCanceled);
+      if (config.signal) {
+        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
+      }
+    }
+
+    if (!requestData) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/axios.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/axios.js ***!
+  \***********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_require__, module */
+/*! CommonJS bailout: module.exports is used directly at 54:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/bind.js");
+var Axios = __webpack_require__(/*! ./core/Axios */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/Axios.js");
+var mergeConfig = __webpack_require__(/*! ./core/mergeConfig */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/mergeConfig.js");
+var defaults = __webpack_require__(/*! ./defaults */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/index.js");
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  // Factory for creating new instances
+  instance.create = function create(instanceConfig) {
+    return createInstance(mergeConfig(defaultConfig, instanceConfig));
+  };
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Expose Cancel & CancelToken
+axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/Cancel.js");
+axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/CancelToken.js");
+axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/isCancel.js");
+axios.VERSION = __webpack_require__(/*! ./env/data */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/env/data.js").version;
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = __webpack_require__(/*! ./helpers/spread */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/spread.js");
+
+// Expose isAxiosError
+axios.isAxiosError = __webpack_require__(/*! ./helpers/isAxiosError */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isAxiosError.js");
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/Cancel.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/Cancel.js ***!
+  \*******************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 19:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/CancelToken.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/CancelToken.js ***!
+  \************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 119:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var Cancel = __webpack_require__(/*! ./Cancel */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/Cancel.js");
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+
+  // eslint-disable-next-line func-names
+  this.promise.then(function(cancel) {
+    if (!token._listeners) return;
+
+    var i;
+    var l = token._listeners.length;
+
+    for (i = 0; i < l; i++) {
+      token._listeners[i](cancel);
+    }
+    token._listeners = null;
+  });
+
+  // eslint-disable-next-line func-names
+  this.promise.then = function(onfulfilled) {
+    var _resolve;
+    // eslint-disable-next-line func-names
+    var promise = new Promise(function(resolve) {
+      token.subscribe(resolve);
+      _resolve = resolve;
+    }).then(onfulfilled);
+
+    promise.cancel = function reject() {
+      token.unsubscribe(_resolve);
+    };
+
+    return promise;
+  };
+
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Subscribe to the cancel signal
+ */
+
+CancelToken.prototype.subscribe = function subscribe(listener) {
+  if (this.reason) {
+    listener(this.reason);
+    return;
+  }
+
+  if (this._listeners) {
+    this._listeners.push(listener);
+  } else {
+    this._listeners = [listener];
+  }
+};
+
+/**
+ * Unsubscribe from the cancel signal
+ */
+
+CancelToken.prototype.unsubscribe = function unsubscribe(listener) {
+  if (!this._listeners) {
+    return;
+  }
+  var index = this._listeners.indexOf(listener);
+  if (index !== -1) {
+    this._listeners.splice(index, 1);
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+module.exports = CancelToken;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/isCancel.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/isCancel.js ***!
+  \*********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/Axios.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/Axios.js ***!
+  \****************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 148:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+var buildURL = __webpack_require__(/*! ../helpers/buildURL */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/buildURL.js");
+var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/InterceptorManager.js");
+var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/dispatchRequest.js");
+var mergeConfig = __webpack_require__(/*! ./mergeConfig */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/mergeConfig.js");
+var validator = __webpack_require__(/*! ../helpers/validator */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/validator.js");
+
+var validators = validator.validators;
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager(),
+    response: new InterceptorManager()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(configOrUrl, config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof configOrUrl === 'string') {
+    config = config || {};
+    config.url = configOrUrl;
+  } else {
+    config = configOrUrl || {};
+  }
+
+  config = mergeConfig(this.defaults, config);
+
+  // Set config.method
+  if (config.method) {
+    config.method = config.method.toLowerCase();
+  } else if (this.defaults.method) {
+    config.method = this.defaults.method.toLowerCase();
+  } else {
+    config.method = 'get';
+  }
+
+  var transitional = config.transitional;
+
+  if (transitional !== undefined) {
+    validator.assertOptions(transitional, {
+      silentJSONParsing: validators.transitional(validators.boolean),
+      forcedJSONParsing: validators.transitional(validators.boolean),
+      clarifyTimeoutError: validators.transitional(validators.boolean)
+    }, false);
+  }
+
+  // filter out skipped interceptors
+  var requestInterceptorChain = [];
+  var synchronousRequestInterceptors = true;
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
+      return;
+    }
+
+    synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
+
+    requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  var responseInterceptorChain = [];
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  var promise;
+
+  if (!synchronousRequestInterceptors) {
+    var chain = [dispatchRequest, undefined];
+
+    Array.prototype.unshift.apply(chain, requestInterceptorChain);
+    chain = chain.concat(responseInterceptorChain);
+
+    promise = Promise.resolve(config);
+    while (chain.length) {
+      promise = promise.then(chain.shift(), chain.shift());
+    }
+
+    return promise;
+  }
+
+
+  var newConfig = config;
+  while (requestInterceptorChain.length) {
+    var onFulfilled = requestInterceptorChain.shift();
+    var onRejected = requestInterceptorChain.shift();
+    try {
+      newConfig = onFulfilled(newConfig);
+    } catch (error) {
+      onRejected(error);
+      break;
+    }
+  }
+
+  try {
+    promise = dispatchRequest(newConfig);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+
+  while (responseInterceptorChain.length) {
+    promise = promise.then(responseInterceptorChain.shift(), responseInterceptorChain.shift());
+  }
+
+  return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(mergeConfig(config || {}, {
+      method: method,
+      url: url,
+      data: (config || {}).data
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, data, config) {
+    return this.request(mergeConfig(config || {}, {
+      method: method,
+      url: url,
+      data: data
+    }));
+  };
+});
+
+module.exports = Axios;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/InterceptorManager.js":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/InterceptorManager.js ***!
+  \*****************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 54:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected, options) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected,
+    synchronous: options ? options.synchronous : false,
+    runWhen: options ? options.runWhen : null
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/buildFullPath.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/buildFullPath.js ***!
+  \************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var isAbsoluteURL = __webpack_require__(/*! ../helpers/isAbsoluteURL */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isAbsoluteURL.js");
+var combineURLs = __webpack_require__(/*! ../helpers/combineURLs */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/combineURLs.js");
+
+/**
+ * Creates a new URL by combining the baseURL with the requestedURL,
+ * only when the requestedURL is not already an absolute URL.
+ * If the requestURL is absolute, this function returns the requestedURL untouched.
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} requestedURL Absolute or relative URL to combine
+ * @returns {string} The combined full path
+ */
+module.exports = function buildFullPath(baseURL, requestedURL) {
+  if (baseURL && !isAbsoluteURL(requestedURL)) {
+    return combineURLs(baseURL, requestedURL);
+  }
+  return requestedURL;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/createError.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/createError.js ***!
+  \**********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 15:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var enhanceError = __webpack_require__(/*! ./enhanceError */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/enhanceError.js");
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/dispatchRequest.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/dispatchRequest.js ***!
+  \**************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 28:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+var transformData = __webpack_require__(/*! ./transformData */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/transformData.js");
+var isCancel = __webpack_require__(/*! ../cancel/isCancel */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/isCancel.js");
+var defaults = __webpack_require__(/*! ../defaults */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/index.js");
+var Cancel = __webpack_require__(/*! ../cancel/Cancel */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/cancel/Cancel.js");
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+
+  if (config.signal && config.signal.aborted) {
+    throw new Cancel('canceled');
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData.call(
+    config,
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData.call(
+      config,
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData.call(
+          config,
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/enhanceError.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/enhanceError.js ***!
+  \***********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+module.exports = function enhanceError(error, config, code, request, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+
+  error.request = request;
+  error.response = response;
+  error.isAxiosError = true;
+
+  error.toJSON = function toJSON() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code,
+      status: this.response && this.response.status ? this.response.status : null
+    };
+  };
+  return error;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/mergeConfig.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/mergeConfig.js ***!
+  \**********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 13:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+/**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+module.exports = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  function getMergedValue(target, source) {
+    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
+      return utils.merge(target, source);
+    } else if (utils.isPlainObject(source)) {
+      return utils.merge({}, source);
+    } else if (utils.isArray(source)) {
+      return source.slice();
+    }
+    return source;
+  }
+
+  // eslint-disable-next-line consistent-return
+  function mergeDeepProperties(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      return getMergedValue(config1[prop], config2[prop]);
+    } else if (!utils.isUndefined(config1[prop])) {
+      return getMergedValue(undefined, config1[prop]);
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  function valueFromConfig2(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      return getMergedValue(undefined, config2[prop]);
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  function defaultToConfig2(prop) {
+    if (!utils.isUndefined(config2[prop])) {
+      return getMergedValue(undefined, config2[prop]);
+    } else if (!utils.isUndefined(config1[prop])) {
+      return getMergedValue(undefined, config1[prop]);
+    }
+  }
+
+  // eslint-disable-next-line consistent-return
+  function mergeDirectKeys(prop) {
+    if (prop in config2) {
+      return getMergedValue(config1[prop], config2[prop]);
+    } else if (prop in config1) {
+      return getMergedValue(undefined, config1[prop]);
+    }
+  }
+
+  var mergeMap = {
+    'url': valueFromConfig2,
+    'method': valueFromConfig2,
+    'data': valueFromConfig2,
+    'baseURL': defaultToConfig2,
+    'transformRequest': defaultToConfig2,
+    'transformResponse': defaultToConfig2,
+    'paramsSerializer': defaultToConfig2,
+    'timeout': defaultToConfig2,
+    'timeoutMessage': defaultToConfig2,
+    'withCredentials': defaultToConfig2,
+    'adapter': defaultToConfig2,
+    'responseType': defaultToConfig2,
+    'xsrfCookieName': defaultToConfig2,
+    'xsrfHeaderName': defaultToConfig2,
+    'onUploadProgress': defaultToConfig2,
+    'onDownloadProgress': defaultToConfig2,
+    'decompress': defaultToConfig2,
+    'maxContentLength': defaultToConfig2,
+    'maxBodyLength': defaultToConfig2,
+    'transport': defaultToConfig2,
+    'httpAgent': defaultToConfig2,
+    'httpsAgent': defaultToConfig2,
+    'cancelToken': defaultToConfig2,
+    'socketPath': defaultToConfig2,
+    'responseEncoding': defaultToConfig2,
+    'validateStatus': mergeDirectKeys
+  };
+
+  utils.forEach(Object.keys(config1).concat(Object.keys(config2)), function computeConfigValue(prop) {
+    var merge = mergeMap[prop] || mergeDeepProperties;
+    var configValue = merge(prop);
+    (utils.isUndefined(configValue) && merge !== mergeDirectKeys) || (config[prop] = configValue);
+  });
+
+  return config;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/settle.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/settle.js ***!
+  \*****************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 12:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var createError = __webpack_require__(/*! ./createError */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/createError.js");
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+module.exports = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  if (!response.status || !validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response.request,
+      response
+    ));
+  }
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/transformData.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/transformData.js ***!
+  \************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+var defaults = __webpack_require__(/*! ../defaults */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/index.js");
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  var context = this || defaults;
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn.call(context, data, headers);
+  });
+
+  return data;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/index.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/index.js ***!
+  \********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 131:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+var normalizeHeaderName = __webpack_require__(/*! ../helpers/normalizeHeaderName */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/normalizeHeaderName.js");
+var enhanceError = __webpack_require__(/*! ../core/enhanceError */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/core/enhanceError.js");
+var transitionalDefaults = __webpack_require__(/*! ./transitional */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/transitional.js");
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(/*! ../adapters/xhr */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/adapters/xhr.js");
+  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(/*! ../adapters/http */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/adapters/http.js");
+  }
+  return adapter;
+}
+
+function stringifySafely(rawValue, parser, encoder) {
+  if (utils.isString(rawValue)) {
+    try {
+      (parser || JSON.parse)(rawValue);
+      return utils.trim(rawValue);
+    } catch (e) {
+      if (e.name !== 'SyntaxError') {
+        throw e;
+      }
+    }
+  }
+
+  return (encoder || JSON.stringify)(rawValue);
+}
+
+var defaults = {
+
+  transitional: transitionalDefaults,
+
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
+    normalizeHeaderName(headers, 'Content-Type');
+
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data) || (headers && headers['Content-Type'] === 'application/json')) {
+      setContentTypeIfUnset(headers, 'application/json');
+      return stringifySafely(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    var transitional = this.transitional || defaults.transitional;
+    var silentJSONParsing = transitional && transitional.silentJSONParsing;
+    var forcedJSONParsing = transitional && transitional.forcedJSONParsing;
+    var strictJSONParsing = !silentJSONParsing && this.responseType === 'json';
+
+    if (strictJSONParsing || (forcedJSONParsing && utils.isString(data) && data.length)) {
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        if (strictJSONParsing) {
+          if (e.name === 'SyntaxError') {
+            throw enhanceError(e, this, 'E_JSON_PARSE');
+          }
+          throw e;
+        }
+      }
+    }
+
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+  maxBodyLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  },
+
+  headers: {
+    common: {
+      'Accept': 'application/json, text/plain, */*'
+    }
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/transitional.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/defaults/transitional.js ***!
+  \***************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = {
+  silentJSONParsing: true,
+  forcedJSONParsing: true,
+  clarifyTimeoutError: false
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/env/data.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/env/data.js ***!
+  \**************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 1:0-14 */
+/***/ ((module) => {
+
+module.exports = {
+  "version": "0.26.1"
+};
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/bind.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/bind.js ***!
+  \******************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 3:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/buildURL.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/buildURL.js ***!
+  \**********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 22:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/combineURLs.js":
+/*!*************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/combineURLs.js ***!
+  \*************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 10:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/cookies.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/cookies.js ***!
+  \*********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
+
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
+        }
+      };
+    })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
+);
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isAbsoluteURL.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isAbsoluteURL.js ***!
+  \***************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isAxiosError.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isAxiosError.js ***!
+  \**************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+/**
+ * Determines whether the payload is an error thrown by Axios
+ *
+ * @param {*} payload The value to test
+ * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
+ */
+module.exports = function isAxiosError(payload) {
+  return utils.isObject(payload) && (payload.isAxiosError === true);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isURLSameOrigin.js":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/isURLSameOrigin.js ***!
+  \*****************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
+
+      /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+      function resolveURL(url) {
+        var href = url;
+
+        if (msie) {
+        // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
+        urlParsingNode.setAttribute('href', href);
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
+      }
+
+      originURL = resolveURL(window.location.href);
+
+      /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+      };
+    })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
+);
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/normalizeHeaderName.js":
+/*!*********************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/normalizeHeaderName.js ***!
+  \*********************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+module.exports = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/parseHeaders.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/parseHeaders.js ***!
+  \**************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js");
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+module.exports = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/spread.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/spread.js ***!
+  \********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 23:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+module.exports = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/validator.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/validator.js ***!
+  \***********************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_require__, module */
+/*! CommonJS bailout: module.exports is used directly at 79:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var VERSION = __webpack_require__(/*! ../env/data */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/env/data.js").version;
+
+var validators = {};
+
+// eslint-disable-next-line func-names
+['object', 'boolean', 'number', 'function', 'string', 'symbol'].forEach(function(type, i) {
+  validators[type] = function validator(thing) {
+    return typeof thing === type || 'a' + (i < 1 ? 'n ' : ' ') + type;
+  };
+});
+
+var deprecatedWarnings = {};
+
+/**
+ * Transitional option validator
+ * @param {function|boolean?} validator - set to false if the transitional option has been removed
+ * @param {string?} version - deprecated version / removed since version
+ * @param {string?} message - some message with additional info
+ * @returns {function}
+ */
+validators.transitional = function transitional(validator, version, message) {
+  function formatMessage(opt, desc) {
+    return '[Axios v' + VERSION + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
+  }
+
+  // eslint-disable-next-line func-names
+  return function(value, opt, opts) {
+    if (validator === false) {
+      throw new Error(formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')));
+    }
+
+    if (version && !deprecatedWarnings[opt]) {
+      deprecatedWarnings[opt] = true;
+      // eslint-disable-next-line no-console
+      console.warn(
+        formatMessage(
+          opt,
+          ' has been deprecated since v' + version + ' and will be removed in the near future'
+        )
+      );
+    }
+
+    return validator ? validator(value, opt, opts) : true;
+  };
+};
+
+/**
+ * Assert object's properties type
+ * @param {object} options
+ * @param {object} schema
+ * @param {boolean?} allowUnknown
+ */
+
+function assertOptions(options, schema, allowUnknown) {
+  if (typeof options !== 'object') {
+    throw new TypeError('options must be an object');
+  }
+  var keys = Object.keys(options);
+  var i = keys.length;
+  while (i-- > 0) {
+    var opt = keys[i];
+    var validator = schema[opt];
+    if (validator) {
+      var value = options[opt];
+      var result = value === undefined || validator(value, opt, options);
+      if (result !== true) {
+        throw new TypeError('option ' + opt + ' must be ' + result);
+      }
+      continue;
+    }
+    if (allowUnknown !== true) {
+      throw Error('Unknown option ' + opt);
+    }
+  }
+}
+
+module.exports = {
+  assertOptions: assertOptions,
+  validators: validators
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/utils.js ***!
+  \***********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 326:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/lib/helpers/bind.js");
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return Array.isArray(val);
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is a Buffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Buffer, otherwise false
+ */
+function isBuffer(val) {
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return toString.call(val) === '[object FormData]';
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (isArrayBuffer(val.buffer));
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a plain Object
+ *
+ * @param {Object} val The value to test
+ * @return {boolean} True if value is a plain Object, otherwise false
+ */
+function isPlainObject(val) {
+  if (toString.call(val) !== '[object Object]') {
+    return false;
+  }
+
+  var prototype = Object.getPrototypeOf(val);
+  return prototype === null || prototype === Object.prototype;
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return toString.call(val) === '[object URLSearchParams]';
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (isPlainObject(result[key]) && isPlainObject(val)) {
+      result[key] = merge(result[key], val);
+    } else if (isPlainObject(val)) {
+      result[key] = merge({}, val);
+    } else if (isArray(val)) {
+      result[key] = val.slice();
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+/**
+ * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+ *
+ * @param {string} content with BOM
+ * @return {string} content value without BOM
+ */
+function stripBOM(content) {
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
+  return content;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isPlainObject: isPlainObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  extend: extend,
+  trim: trim,
+  stripBOM: stripBOM
+};
+
 
 /***/ }),
 
@@ -29616,23 +34290,13 @@ module.exports = {
 /*! default exports */
 /*! export author [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export dependencies [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export axios-proxy-fix [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export axios [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export axios-retry [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export promise [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
 /*! export description [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export devDependencies [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export aws-sdk [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export babel-core [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export babel-preset-env [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export babelify [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export browserify [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export chai [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export chai-as-promised [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export mocha [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export s3-upload-stream [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export tinyify [provided] [no usage info] [missing usage info prevents renaming] */
-/*!   export zlib [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   other exports [not provided] [no usage info] */
 /*! export keywords [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 0 [provided] [no usage info] [missing usage info prevents renaming] */
@@ -29643,6 +34307,7 @@ module.exports = {
 /*!   export 13 [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 14 [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 15 [provided] [no usage info] [missing usage info prevents renaming] */
+/*!   export 16 [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 2 [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 3 [provided] [no usage info] [missing usage info prevents renaming] */
 /*!   export 4 [provided] [no usage info] [missing usage info prevents renaming] */
@@ -29668,7 +34333,7 @@ module.exports = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"version\":\"1.6.0\",\"description\":\"Quick and easy SmartyStreets address validation.\",\"keywords\":[\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"main\":\"index.js\",\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"author\":\"SmartyStreets SDK Team <support@smartystreets.com> (https://www.smartystreets.com)\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"github:smartystreets/smartystreets-javascript-sdk\"},\"devDependencies\":{\"aws-sdk\":\"^2.412.0\",\"babel-core\":\"^6.26.0\",\"babel-preset-env\":\"^1.6.1\",\"babelify\":\"^8.0.0\",\"browserify\":\"^16.2.3\",\"chai\":\"^4.1.2\",\"chai-as-promised\":\"^7.1.1\",\"mocha\":\"^8.0.1\",\"s3-upload-stream\":\"^1.0.7\",\"tinyify\":\"^2.5.2\",\"zlib\":\"^1.0.5\"},\"dependencies\":{\"axios-proxy-fix\":\"^0.16.3\",\"axios-retry\":\"^3.0.1\",\"promise\":\"^8.0.1\"}}");
+module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"version\":\"1.13.6\",\"description\":\"Quick and easy Smarty address validation.\",\"keywords\":[\"smarty\",\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"main\":\"index.js\",\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"author\":\"Smarty SDK Team <support@smarty.com> (https://www.smarty.com)\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"github:smartystreets/smartystreets-javascript-sdk\"},\"devDependencies\":{\"chai\":\"^4.2.0\",\"mocha\":\"^9.2.1\"},\"dependencies\":{\"axios\":\"^0.26.1\",\"axios-retry\":\"3.2.0\"}}");
 
 /***/ }),
 
@@ -29678,10 +34343,8 @@ module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"versio
   \**********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 
 class AgentSender {
 	constructor(innerSender) {
@@ -29689,7 +34352,7 @@ class AgentSender {
 	}
 
 	send(request) {
-		request.parameters.agent = "smartystreets (sdk:javascript@" + __webpack_require__(/*! ../package.json */ "./node_modules/smartystreets-javascript-sdk/package.json").version + ")";
+		request.parameters.agent = "smarty (sdk:javascript@" + __webpack_require__(/*! ../package.json */ "./node_modules/smartystreets-javascript-sdk/package.json").version + ")";
 		return new Promise((resolve, reject) => {
 			this.sender.send(request)
 				.then(resolve)
@@ -29707,11 +34370,9 @@ module.exports = AgentSender;
   !*** ./node_modules/smartystreets-javascript-sdk/src/BaseUrlSender.js ***!
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 18:0-14 */
+/***/ ((module) => {
 
 class BaseUrlSender {
 	constructor(innerSender, urlOverride) {
@@ -29746,7 +34407,7 @@ module.exports = BaseUrlSender;
 const BatchFullError = __webpack_require__(/*! ./Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js").BatchFullError;
 
 /**
- * This class contains a collection of up to 100 lookups to be sent to one of the SmartyStreets APIs<br>
+ * This class contains a collection of up to 100 lookups to be sent to one of the Smarty APIs<br>
  *     all at once. This is more efficient than sending them one at a time.
  */
 class Batch {
@@ -29801,7 +34462,7 @@ module.exports = Batch;
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 201:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 206:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const HttpSender = __webpack_require__(/*! ./HttpSender */ "./node_modules/smartystreets-javascript-sdk/src/HttpSender.js");
@@ -29823,6 +34484,7 @@ const UsAutocompleteProClient = __webpack_require__(/*! ./us_autocomplete_pro/Cl
 const UsExtractClient = __webpack_require__(/*! ./us_extract/Client */ "./node_modules/smartystreets-javascript-sdk/src/us_extract/Client.js");
 const InternationalStreetClient = __webpack_require__(/*! ./international_street/Client */ "./node_modules/smartystreets-javascript-sdk/src/international_street/Client.js");
 const UsReverseGeoClient = __webpack_require__(/*! ./us_reverse_geo/Client */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Client.js");
+const InternationalAddressAutocompleteClient = __webpack_require__(/*! ./international_address_autocomplete/Client */ "./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Client.js");
 
 const INTERNATIONAL_STREET_API_URI = "https://international-street.api.smartystreets.com/verify";
 const US_AUTOCOMPLETE_API_URL = "https://us-autocomplete.api.smartystreets.com/suggest";
@@ -29831,9 +34493,10 @@ const US_EXTRACT_API_URL = "https://us-extract.api.smartystreets.com/";
 const US_STREET_API_URL = "https://us-street.api.smartystreets.com/street-address";
 const US_ZIP_CODE_API_URL = "https://us-zipcode.api.smartystreets.com/lookup";
 const US_REVERSE_GEO_API_URL = "https://us-reverse-geo.api.smartystreets.com/lookup";
+const INTERNATIONAL_ADDRESS_AUTOCOMPLETE_API_URL = "https://international-autocomplete.api.smartystreets.com/lookup";
 
 /**
- * The ClientBuilder class helps you build a client object for one of the supported SmartyStreets APIs.<br>
+ * The ClientBuilder class helps you build a client object for one of the supported Smarty APIs.<br>
  * You can use ClientBuilder's methods to customize settings like maximum retries or timeout duration. These methods<br>
  * are chainable, so you can usually get set up with one line of code.
  */
@@ -29885,7 +34548,7 @@ class ClientBuilder {
 	}
 
 	/**
-	 * This may be useful when using a local installation of the SmartyStreets APIs.
+	 * This may be useful when using a local installation of the Smarty APIs.
 	 * @param url Defaults to the URL for the API corresponding to the <b>Client</b> object being built.
 	 * @return Returns <b>this</b> to accommodate method chaining.
 	 */
@@ -29898,20 +34561,22 @@ class ClientBuilder {
 	 * Use this to specify a proxy through which to send all lookups.
 	 * @param host The host of the proxy server (do not include the port).
 	 * @param port The port on the proxy server to which you wish to connect.
+	 * @param protocol The protocol on the proxy server to which you wish to connect. If the proxy server uses HTTPS, then you must set the protocol to 'https'.
 	 * @param username The username to login to the proxy.
 	 * @param password The password to login to the proxy.
 	 * @return Returns <b>this</b> to accommodate method chaining.
 	 */
-	withProxy(host, port, username, password) {
+	withProxy(host, port, protocol, username, password) {
 		this.proxy = {
 			host: host,
-			port: port
+			port: port,
+			protocol: protocol,
 		};
 
 		if (username && password) {
 			this.proxy.auth = {
 				username: username,
-				password: password
+				password: password,
 			};
 		}
 
@@ -29945,13 +34610,10 @@ class ClientBuilder {
 	 * @returns Returns <b>this</b> to accommodate method chaining.
 	 */
 	withLicenses(licenses) {
-		for (const license in licenses) {
-			this.licenses.push(license);
-		}
+		this.licenses = licenses;
 
 		return this;
 	}
-
 
 	buildSender() {
 		if (this.httpSender) return this.httpSender;
@@ -29983,7 +34645,7 @@ class ClientBuilder {
 		return this.buildClient(US_ZIP_CODE_API_URL, UsZipcodeClient);
 	}
 
-	buildUsAutocompleteClient() {
+	buildUsAutocompleteClient() { // Deprecated
 		return this.buildClient(US_AUTOCOMPLETE_API_URL, UsAutocompleteClient);
 	}
 
@@ -30002,6 +34664,10 @@ class ClientBuilder {
 	buildUsReverseGeoClient() {
 		return this.buildClient(US_REVERSE_GEO_API_URL, UsReverseGeoClient);
 	}
+
+	buildInternationalAddressAutocompleteClient() {
+		return this.buildClient(INTERNATIONAL_ADDRESS_AUTOCOMPLETE_API_URL, InternationalAddressAutocompleteClient);
+	}
 }
 
 module.exports = ClientBuilder;
@@ -30013,11 +34679,9 @@ module.exports = ClientBuilder;
   !*** ./node_modules/smartystreets-javascript-sdk/src/CustomHeaderSender.js ***!
   \*****************************************************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 22:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/***/ ((module) => {
 
 class CustomHeaderSender {
 	constructor(innerSender, customHeaders) {
@@ -30152,13 +34816,12 @@ module.exports = {
   \*********************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 75:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 74:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Response = __webpack_require__(/*! ./Response */ "./node_modules/smartystreets-javascript-sdk/src/Response.js");
-const Axios = __webpack_require__(/*! axios-proxy-fix */ "./node_modules/axios-proxy-fix/index.js");
+const Axios = __webpack_require__(/*! axios */ "webpack/sharing/consume/default/axios/axios?5c0e");
 const axiosRetry = __webpack_require__(/*! axios-retry */ "./node_modules/axios-retry/index.js");
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 
 class HttpSender {
 	constructor(timeout = 10000, retries = 5, proxyConfig, debug = false) {
@@ -30266,11 +34929,9 @@ module.exports = InputData;
   !*** ./node_modules/smartystreets-javascript-sdk/src/LicenseSender.js ***!
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 22:0-14 */
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 20:0-14 */
+/***/ ((module) => {
 
 class LicenseSender {
 	constructor(innerSender, licenses) {
@@ -30357,8 +35018,8 @@ class SharedCredentials {
 	}
 
 	sign(request) {
-		request.parameters["auth-id"] = this.authId;
-		if (this.hostName) request.headers["Referer"] = this.hostName;
+		request.parameters["key"] = this.authId;
+		if (this.hostName) request.headers["Referer"] = "https://" + this.hostName;
 	}
 }
 
@@ -30372,10 +35033,9 @@ module.exports = SharedCredentials;
   \************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 27:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 const UnprocessableEntityError = __webpack_require__(/*! ./Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js").UnprocessableEntityError;
 const SharedCredentials = __webpack_require__(/*! ./SharedCredentials */ "./node_modules/smartystreets-javascript-sdk/src/SharedCredentials.js");
 
@@ -30436,10 +35096,9 @@ module.exports = StaticCredentials;
   \***************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 58:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 const Errors = __webpack_require__(/*! ./Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
 
 class StatusCodeSender {
@@ -30500,6 +35159,109 @@ module.exports = StatusCodeSender;
 
 /***/ }),
 
+/***/ "./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Client.js":
+/*!****************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Client.js ***!
+  \****************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 42:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Errors = __webpack_require__(/*! ../Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
+const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
+const Suggestion = __webpack_require__(/*! ./Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Suggestion.js");
+
+class Client {
+	constructor(sender) {
+		this.sender = sender;
+	}
+
+	send(lookup) {
+		if (typeof lookup === "undefined") throw new Errors.UndefinedLookupError();
+
+		let request = new Request();
+		request.parameters = {
+			search: lookup.search,
+			country: lookup.country,
+			max_results: lookup.max_results,
+			include_only_administrative_area: lookup.include_only_administrative_area,
+			include_only_locality: lookup.include_only_locality,
+			include_only_postal_code: lookup.include_only_postal_code,
+		};
+
+		return new Promise((resolve, reject) => {
+			this.sender.send(request)
+				.then(response => {
+					if (response.error) reject(response.error);
+
+					lookup.result = buildSuggestionsFromResponse(response.payload);
+					resolve(lookup);
+				})
+				.catch(reject);
+		});
+
+		function buildSuggestionsFromResponse(payload) {
+			if (payload && payload.candidates === null) return [];
+
+			return payload.candidates.map(suggestion => new Suggestion(suggestion));
+		}
+	}
+}
+
+module.exports = Client;
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Lookup.js":
+/*!****************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Lookup.js ***!
+  \****************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 14:0-14 */
+/***/ ((module) => {
+
+class Lookup {
+	constructor(search = "", country = "United States", max_results = undefined, include_only_administrative_area = "", include_only_locality = "", include_only_postal_code = "") {
+		this.result = [];
+
+		this.search = search;
+		this.country = country;
+		this.max_results = max_results;
+		this.include_only_administrative_area = include_only_administrative_area;
+		this.include_only_locality = include_only_locality;
+		this.include_only_postal_code = include_only_postal_code;
+	}
+}
+
+module.exports = Lookup;
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Suggestion.js":
+/*!********************************************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/src/international_address_autocomplete/Suggestion.js ***!
+  \********************************************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 11:0-14 */
+/***/ ((module) => {
+
+class Suggestion {
+	constructor(responseData) {
+		this.street = responseData.street;
+		this.locality = responseData.locality;
+		this.administrativeArea = responseData.administrative_area;
+		this.postalCode = responseData.postal_code;
+		this.countryIso3 = responseData.country_iso3;
+	}
+}
+
+module.exports = Suggestion;
+
+/***/ }),
+
 /***/ "./node_modules/smartystreets-javascript-sdk/src/international_street/Candidate.js":
 /*!*****************************************************************************************!*\
   !*** ./node_modules/smartystreets-javascript-sdk/src/international_street/Candidate.js ***!
@@ -30513,7 +35275,7 @@ module.exports = StatusCodeSender;
  * A candidate is a possible match for an address that was submitted.<br>
  *     A lookup can have multiple candidates if the address was ambiguous.
  *
- * @see "https://smartystreets.com/docs/cloud/international-street-api#root"
+ * @see "https://www.smarty.com/docs/cloud/international-street-api#root"
  */
 class Candidate {
 	constructor(responseData) {
@@ -30663,18 +35425,17 @@ module.exports = Candidate;
   \**************************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 43:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 42:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
 const Errors = __webpack_require__(/*! ../Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
 const Candidate = __webpack_require__(/*! ./Candidate */ "./node_modules/smartystreets-javascript-sdk/src/international_street/Candidate.js");
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 const buildInputData = __webpack_require__(/*! ../util/buildInputData */ "./node_modules/smartystreets-javascript-sdk/src/util/buildInputData.js");
 const keyTranslationFormat = __webpack_require__(/*! ../util/apiToSDKKeyMap */ "./node_modules/smartystreets-javascript-sdk/src/util/apiToSDKKeyMap.js").internationalStreet;
 
 /**
- * This client sends lookups to the SmartyStreets International Street API, <br>
+ * This client sends lookups to the Smarty International Street API, <br>
  *     and attaches the results to the appropriate Lookup objects.
  */
 class Client {
@@ -30736,7 +35497,7 @@ const messages = {
  *     will contain the result of the lookup after it comes back from the API.
  *     <p><b>Note: </b><i>Lookups must have certain required fields set with non-blank values. <br>
  *         These can be found at the URL below.</i></p>
- *     @see "https://smartystreets.com/docs/cloud/international-street-api#http-input-fields"
+ *     @see "https://www.smarty.com/docs/cloud/international-street-api#http-input-fields"
  */
 class Lookup {
 	constructor(country, freeform) {
@@ -30815,16 +35576,15 @@ module.exports = Lookup;
   \*********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 57:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 56:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Errors = __webpack_require__(/*! ../Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
 const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
 const Suggestion = __webpack_require__(/*! ./Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete/Suggestion.js");
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 
 /**
- * This client sends lookups to the SmartyStreets US Autocomplete API, <br>
+ * This client sends lookups to the Smarty US Autocomplete API, <br>
  *     and attaches the results to the appropriate Lookup objects.
  */
 class Client {
@@ -30890,7 +35650,7 @@ module.exports = Client;
 /**
  * In addition to holding all of the input data for this lookup, this class also<br>
  *     will contain the result of the lookup after it comes back from the API.
- *     @see "https://smartystreets.com/docs/cloud/us-autocomplete-api#http-request-input-fields"
+ *     @see "https://www.smarty.com/docs/cloud/us-autocomplete-api#http-request-input-fields"
  */
 class Lookup {
 	/**
@@ -30924,7 +35684,7 @@ module.exports = Lookup;
 /***/ ((module) => {
 
 /**
- * @see "https://smartystreets.com/docs/cloud/us-autocomplete-api#http-response"
+ * @see "https://www.smarty.com/docs/cloud/us-autocomplete-api#http-response"
  */
 class Suggestion {
 	constructor(responseData) {
@@ -30951,10 +35711,9 @@ module.exports = Suggestion;
 const Errors = __webpack_require__(/*! ../Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
 const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
 const Suggestion = __webpack_require__(/*! ./Suggestion */ "./node_modules/smartystreets-javascript-sdk/src/us_autocomplete_pro/Suggestion.js");
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 
 /**
- * This client sends lookups to the SmartyStreets US Autocomplete Pro API, <br>
+ * This client sends lookups to the Smarty US Autocomplete Pro API, <br>
  *     and attaches the suggestions to the appropriate Lookup objects.
  */
 class Client {
@@ -30993,6 +35752,7 @@ class Client {
 				prefer_zip_codes: joinFieldWith(lookup.preferZIPCodes, ";"),
 				prefer_ratio: lookup.preferRatio,
 				prefer_geolocation: lookup.preferGeolocation,
+				source: lookup.source,
 			};
 
 			function joinFieldWith(field, delimiter) {
@@ -31018,13 +35778,13 @@ module.exports = Client;
   \*************************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 28:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 29:0-14 */
 /***/ ((module) => {
 
 /**
  * In addition to holding all of the input data for this lookup, this class also<br>
  *     will contain the result of the lookup after it comes back from the API.
- *     @see "https://smartystreets.com/docs/cloud/us-autocomplete-api#pro-http-request-input-fields"
+ *     @see "https://www.smarty.com/docs/cloud/us-autocomplete-api#pro-http-request-input-fields"
  */
 class Lookup {
 	/**
@@ -31045,6 +35805,7 @@ class Lookup {
 		this.preferZIPCodes = [];
 		this.preferRatio = undefined;
 		this.preferGeolocation = undefined;
+		this.source = undefined
 	}
 }
 
@@ -31062,7 +35823,7 @@ module.exports = Lookup;
 /***/ ((module) => {
 
 /**
- * @see "https://smartystreets.com/docs/cloud/us-autocomplete-api#pro-http-response"
+ * @see "https://www.smarty.com/docs/cloud/us-autocomplete-api#pro-http-response"
  */
 class Suggestion {
 	constructor(responseData) {
@@ -31091,7 +35852,7 @@ module.exports = Suggestion;
 const Candidate = __webpack_require__(/*! ../us_street/Candidate */ "./node_modules/smartystreets-javascript-sdk/src/us_street/Candidate.js");
 
 /**
- * @see <a href="https://smartystreets.com/docs/cloud/us-extract-api#http-response-status">SmartyStreets US Extract API docs</a>
+ * @see <a href="https://www.smarty.com/docs/cloud/us-extract-api#http-response-status">Smarty US Extract API docs</a>
  */
 class Address {
 	constructor (responseData) {
@@ -31114,16 +35875,15 @@ module.exports = Address;
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 43:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 42:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Errors = __webpack_require__(/*! ../Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
 const Result = __webpack_require__(/*! ./Result */ "./node_modules/smartystreets-javascript-sdk/src/us_extract/Result.js");
 
 /**
- * This client sends lookups to the SmartyStreets US Extract API, <br>
+ * This client sends lookups to the Smarty US Extract API, <br>
  *     and attaches the results to the Lookup objects.
  */
 class Client {
@@ -31175,7 +35935,7 @@ module.exports = Client;
 /**
  * In addition to holding all of the input data for this lookup, this class also<br>
  *     will contain the result of the lookup after it comes back from the API.
- *     @see "https://smartystreets.com/docs/cloud/us-extract-api#http-request-input-fields"
+ *     @see "https://www.smarty.com/docs/cloud/us-extract-api#http-request-input-fields"
  */
 class Lookup {
 	/**
@@ -31211,7 +35971,7 @@ module.exports = Lookup;
 const Address = __webpack_require__(/*! ./Address */ "./node_modules/smartystreets-javascript-sdk/src/us_extract/Address.js");
 
 /**
- * @see <a href="https://smartystreets.com/docs/cloud/us-extract-api#http-response-status">SmartyStreets US Extract API docs</a>
+ * @see <a href="https://www.smarty.com/docs/cloud/us-extract-api#http-response-status">Smarty US Extract API docs</a>
  */
 class Result {
 	constructor({meta, addresses}) {
@@ -31238,16 +35998,17 @@ module.exports = Result;
   \********************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 39:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 40:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
+const Response = __webpack_require__(/*! ./Response */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js");
 const buildInputData = __webpack_require__(/*! ../util/buildInputData */ "./node_modules/smartystreets-javascript-sdk/src/util/buildInputData.js");
 const keyTranslationFormat = __webpack_require__(/*! ../util/apiToSDKKeyMap */ "./node_modules/smartystreets-javascript-sdk/src/util/apiToSDKKeyMap.js").usReverseGeo;
 const {UndefinedLookupError} = __webpack_require__(/*! ../Errors.js */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
 
 /**
- * This client sends lookups to the SmartyStreets US Reverse Geo API, <br>
+ * This client sends lookups to the Smarty US Reverse Geo API, <br>
  *     and attaches the results to the appropriate Lookup objects.
  */
 class Client {
@@ -31272,7 +36033,7 @@ class Client {
 		});
 
 		function attachLookupResults(response, lookup) {
-			lookup.response = response.payload;
+			lookup.response = new Response(response.payload);
 
 			return lookup;
 		}
@@ -31284,13 +36045,119 @@ module.exports = Client;
 
 /***/ }),
 
+/***/ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Lookup.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Lookup.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 16:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Response = __webpack_require__(/*! ./Response */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js");
+
+/**
+ * In addition to holding all of the input data for this lookup, this class also<br>
+ *     will contain the result of the lookup after it comes back from the API.
+ *     @see "https://www.smarty.com/docs/cloud/us-street-api#input-fields"
+ */
+class Lookup {
+	constructor(latitude, longitude) {
+		this.latitude = latitude.toFixed(8);
+		this.longitude = longitude.toFixed(8);
+		this.response = new Response();
+	}
+}
+
+module.exports = Lookup;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Response.js ***!
+  \**********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 17:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const Result = __webpack_require__(/*! ./Result */ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Result.js");
+
+/**
+ * The SmartyResponse contains the response from a call to the US Reverse Geo API.
+ */
+class Response {
+	constructor(responseData) {
+		this.results = [];
+
+		if (responseData)
+			responseData.results.map(rawResult => {
+				this.results.push(new Result(rawResult));
+			});
+	}
+}
+
+module.exports = Response;
+
+
+/***/ }),
+
+/***/ "./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Result.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/smartystreets-javascript-sdk/src/us_reverse_geo/Result.js ***!
+  \********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
+/***/ ((module) => {
+
+/**
+ * A candidate is a possible match for an address that was submitted.<br>
+ *     A lookup can have multiple candidates if the address was ambiguous.
+ *
+ * @see "https://www.smarty.com/docs/cloud/us-reverse-geo-api#result"
+ */
+class Result {
+	constructor(responseData) {
+		this.distance = responseData.distance;
+
+		this.address = {};
+		if (responseData.address) {
+			this.address.street = responseData.address.street;
+			this.address.city = responseData.address.city;
+			this.address.state_abbreviation = responseData.address.state_abbreviation;
+			this.address.zipcode = responseData.address.zipcode;
+		}
+
+		this.coordinate = {};
+		if (responseData.coordinate) {
+			this.coordinate.latitude = responseData.coordinate.latitude;
+			this.coordinate.longitude = responseData.coordinate.longitude;
+			this.coordinate.accuracy = responseData.coordinate.accuracy;
+			switch (responseData.coordinate.license) {
+				case 1:
+					this.coordinate.license = "SmartyStreets Proprietary";
+					break;
+				default:
+					this.coordinate.license = "SmartyStreets";
+			}
+		}
+	}
+}
+
+module.exports = Result;
+
+/***/ }),
+
 /***/ "./node_modules/smartystreets-javascript-sdk/src/us_street/Candidate.js":
 /*!******************************************************************************!*\
   !*** ./node_modules/smartystreets-javascript-sdk/src/us_street/Candidate.js ***!
   \******************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 78:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 88:0-14 */
 /***/ ((module) => {
 
 /**
@@ -31298,7 +36165,7 @@ module.exports = Client;
  *     A lookup can have multiple candidates if the address was ambiguous, and<br>
  *     the maxCandidates field is set higher than 1.
  *
- * @see "https://smartystreets.com/docs/cloud/us-street-api#root"
+ * @see "https://www.smarty.com/docs/cloud/us-street-api#root"
  */
 class Candidate {
 	constructor(responseData) {
@@ -31347,6 +36214,14 @@ class Candidate {
 			this.metadata.elotSort = responseData.metadata.elot_sort;
 			this.metadata.latitude = responseData.metadata.latitude;
 			this.metadata.longitude = responseData.metadata.longitude;
+			switch (responseData.metadata.coordinate_license)
+			{
+				case 1:
+					this.metadata.coordinateLicense = "SmartyStreets Proprietary";
+					break;
+				default:
+					this.metadata.coordinateLicense = "SmartyStreets";
+			}
 			this.metadata.precision = responseData.metadata.precision;
 			this.metadata.timeZone = responseData.metadata.time_zone;
 			this.metadata.utcOffset = responseData.metadata.utc_offset;
@@ -31360,12 +36235,14 @@ class Candidate {
 			this.analysis.dpvFootnotes = responseData.analysis.dpv_footnotes;
 			this.analysis.cmra = responseData.analysis.dpv_cmra;
 			this.analysis.vacant = responseData.analysis.dpv_vacant;
+			this.analysis.noStat = responseData.analysis.dpv_no_stat;
 			this.analysis.active = responseData.analysis.active;
 			this.analysis.isEwsMatch = responseData.analysis.ews_match; // Deprecated, refer to metadata.ews_match
 			this.analysis.footnotes = responseData.analysis.footnotes;
 			this.analysis.lacsLinkCode = responseData.analysis.lacslink_code;
 			this.analysis.lacsLinkIndicator = responseData.analysis.lacslink_indicator;
 			this.analysis.isSuiteLinkMatch = responseData.analysis.suitelink_match;
+			this.analysis.enhancedMatch = responseData.analysis.enhanced_match;
 		}
 	}
 }
@@ -31380,7 +36257,7 @@ module.exports = Candidate;
   \***************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 41:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 43:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Candidate = __webpack_require__(/*! ./Candidate */ "./node_modules/smartystreets-javascript-sdk/src/us_street/Candidate.js");
@@ -31391,7 +36268,7 @@ const sendBatch = __webpack_require__(/*! ../util/sendBatch */ "./node_modules/s
 const keyTranslationFormat = __webpack_require__(/*! ../util/apiToSDKKeyMap */ "./node_modules/smartystreets-javascript-sdk/src/util/apiToSDKKeyMap.js").usStreet;
 
 /**
- * This client sends lookups to the SmartyStreets US Street API, <br>
+ * This client sends lookups to the Smarty US Street API, <br>
  *     and attaches the results to the appropriate Lookup objects.
  */
 class Client {
@@ -31413,6 +36290,8 @@ class Client {
 		let batch;
 
 		if (dataIsLookup) {
+			if (data.maxCandidates == null && data.match == "enhanced")
+				data.maxCandidates = 5;
 			batch = new Batch();
 			batch.add(data);
 		} else {
@@ -31439,7 +36318,7 @@ module.exports = Client;
 /**
  * In addition to holding all of the input data for this lookup, this class also<br>
  *     will contain the result of the lookup after it comes back from the API.
- *     @see "https://smartystreets.com/docs/cloud/us-street-api#input-fields"
+ *     @see "https://www.smarty.com/docs/cloud/us-street-api#input-fields"
  */
 class Lookup {
 	constructor(street, street2, secondary, city, state, zipCode, lastLine, addressee, urbanization, match, maxCandidates, inputId) {
@@ -31481,7 +36360,7 @@ const sendBatch = __webpack_require__(/*! ../util/sendBatch */ "./node_modules/s
 const keyTranslationFormat = __webpack_require__(/*! ../util/apiToSDKKeyMap */ "./node_modules/smartystreets-javascript-sdk/src/util/apiToSDKKeyMap.js").usZipcode;
 
 /**
- * This client sends lookups to the SmartyStreets US ZIP Code API, <br>
+ * This client sends lookups to the Smarty US ZIP Code API, <br>
  *     and attaches the results to the appropriate Lookup objects.
  */
 class Client {
@@ -31527,7 +36406,7 @@ module.exports = Client;
 /**
  * In addition to holding all of the input data for this lookup, this class also<br>
  *     will contain the result of the lookup after it comes back from the API.
- *     @see "https://smartystreets.com/docs/cloud/us-zipcode-api#http-request-input-fields"
+ *     @see "https://www.smarty.com/docs/cloud/us-zipcode-api#http-request-input-fields"
  */
 class Lookup {
 	constructor(city, state, zipCode, inputId) {
@@ -31553,7 +36432,7 @@ module.exports = Lookup;
 /***/ ((module) => {
 
 /**
- * @see "https://smartystreets.com/docs/cloud/us-zipcode-api#root"
+ * @see "https://www.smarty.com/docs/cloud/us-zipcode-api#root"
  */
 class Result {
 	constructor(responseData) {
@@ -31656,7 +36535,7 @@ module.exports = {
   \****************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 35:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 39:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const ClientBuilder = __webpack_require__(/*! ../ClientBuilder */ "./node_modules/smartystreets-javascript-sdk/src/ClientBuilder.js");
@@ -31693,6 +36572,10 @@ function buildUsReverseGeoApiClient(credentials) {
 	return instantiateClientBuilder(credentials).buildUsReverseGeoClient();
 }
 
+function buildInternationalAddressAutocompleteApiClient(credentials) {
+	return instantiateClientBuilder(credentials).buildInternationalAddressAutocompleteClient();
+}
+
 module.exports = {
 	usStreet: buildUsStreetApiClient,
 	usAutocomplete: buildUsAutocompleteApiClient,
@@ -31701,6 +36584,7 @@ module.exports = {
 	usZipcode: buildUsZipcodeApiClient,
 	internationalStreet: buildInternationalStreetApiClient,
 	usReverseGeo: buildUsReverseGeoApiClient,
+	internationalAddressAutocomplete: buildInternationalAddressAutocompleteApiClient,
 };
 
 /***/ }),
@@ -31735,11 +36619,10 @@ module.exports = (lookup, keyTranslationFormat) => {
   \*************************************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 6:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const Request = __webpack_require__(/*! ../Request */ "./node_modules/smartystreets-javascript-sdk/src/Request.js");
-const Promise = __webpack_require__(/*! promise */ "./node_modules/promise/index.js");
 const Errors = __webpack_require__(/*! ../Errors */ "./node_modules/smartystreets-javascript-sdk/src/Errors.js");
 const buildInputData = __webpack_require__(/*! ../util/buildInputData */ "./node_modules/smartystreets-javascript-sdk/src/util/buildInputData.js");
 
@@ -31853,19 +36736,6 @@ module.exports = require("assert");
 
 "use strict";
 module.exports = require("crypto");
-
-/***/ }),
-
-/***/ "domain":
-/*!*************************!*\
-  !*** external "domain" ***!
-  \*************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("domain");
 
 /***/ }),
 
@@ -32031,7 +36901,7 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -32142,10 +37012,11 @@ module.exports = require("zlib");
 /******/ 			var promises = [];
 /******/ 			switch(name) {
 /******/ 				case "default": {
-/******/ 					register("axios", "0.21.1", () => () => __webpack_require__(/*! ./node_modules/axios/index.js */ "./node_modules/axios/index.js"));
-/******/ 					register("kafkajs", "1.14.0", () => () => __webpack_require__(/*! ./node_modules/kafkajs/index.js */ "./node_modules/kafkajs/index.js"));
-/******/ 					register("nanoid", "3.1.12", () => () => __webpack_require__(/*! ./node_modules/nanoid/index.js */ "./node_modules/nanoid/index.js"));
-/******/ 					register("smartystreets-javascript-sdk", "1.6.0", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
+/******/ 					register("axios", "0.21.4", () => () => __webpack_require__(/*! ./node_modules/axios/index.js */ "./node_modules/axios/index.js"));
+/******/ 					register("axios", "0.26.1", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js"));
+/******/ 					register("kafkajs", "1.16.0", () => () => __webpack_require__(/*! ./node_modules/kafkajs/index.js */ "./node_modules/kafkajs/index.js"));
+/******/ 					register("nanoid", "3.3.4", () => () => __webpack_require__(/*! ./node_modules/nanoid/index.js */ "./node_modules/nanoid/index.js"));
+/******/ 					register("smartystreets-javascript-sdk", "1.13.6", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
 /******/ 				}
 /******/ 				break;
 /******/ 			}
@@ -32278,9 +37149,20 @@ module.exports = require("zlib");
 /******/ 		var moduleToHandlerMapping = {
 /******/ 			"webpack/sharing/consume/default/kafkajs/kafkajs": () => loadStrictVersionCheckFallback("default", "kafkajs", [1,1,14,0], () => () => __webpack_require__(/*! kafkajs */ "./node_modules/kafkajs/index.js")),
 /******/ 			"webpack/sharing/consume/default/nanoid/nanoid": () => loadStrictVersionCheckFallback("default", "nanoid", [1,3,1,12], () => () => __webpack_require__(/*! nanoid */ "./node_modules/nanoid/index.js")),
-/******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js"))
+/******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js")),
+/******/ 			"webpack/sharing/consume/default/axios/axios?5c0e": () => loadStrictVersionCheckFallback("default", "axios", [2,0,26,1], () => () => __webpack_require__(/*! axios */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js"))
 /******/ 		};
-/******/ 		// no consumes in initial chunks
+/******/ 		var initialConsumes = ["webpack/sharing/consume/default/axios/axios?5c0e"];
+/******/ 		initialConsumes.forEach((id) => {
+/******/ 			__webpack_modules__[id] = (module) => {
+/******/ 				// Handle case when module is used sync
+/******/ 				installedModules[id] = 0;
+/******/ 				delete __webpack_module_cache__[id];
+/******/ 				var factory = moduleToHandlerMapping[id]();
+/******/ 				if(typeof factory !== "function") throw new Error("Shared module is not available for eager consumption: " + id);
+/******/ 				module.exports = factory();
+/******/ 			}
+/******/ 		});
 /******/ 		var chunkMapping = {
 /******/ 			"732": [
 /******/ 				"webpack/sharing/consume/default/nanoid/nanoid",
