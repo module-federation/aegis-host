@@ -1,61 +1,50 @@
 
-const passport = require('passport');
-const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
-const config = require('../../public/aegis.config.json').services.auth.passport || process.env.AUTH; // ensure this is set at all times
-const { tokenTypes } = require('./tokens');
-const httpStatus = require('http-status');
+const 
+  passport = require('passport'),
+  httpStatus = require('http-status'),
+  authStrategies = require('./strategy'),
+  protectedRoutes = [ // TODO: should rather get it later as a list from aegis-app
+    '^(\/aegis\/api\/)(?!.*login)(?!.*config)' // all routes under api except login and config are protected
+  ];
 
-const jwtOptions = {
-    secretOrKey: config.secret,
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    issuer: config.issuer,
-    audience: config.audience
-};
-
-const jwtVerify = async (payload, done) => {
-    try {
-      if (payload.type !== tokenTypes.ACCESS) {
-        throw new Error('Invalid token type');
-      }
-
-      if(!payload.sub) return done(null, false); // Early exit with unauthenticated return - HIGHLY INSECURE
-
-      // CURRENTLY INSECURE AS WE DO NOT HAVE ACCESS TO USER DB MODEL / PORT OVER HERE
-
-      // const user = await User.findById(payload.sub);
-      // if (!user) {
-      //   return done(null, false);
-      // }
-      
-      done(null, user);
-    } catch (error) {
-      done(error, false);
-    }
-};
-
-const aegisStrategy = new JwtStrategy(jwtOptions, jwtVerify);
-
+/**
+ *  used to initialize passport js and the associated auth strategies into an express app
+ * @param {ExpressApp} app 
+ * @returns null
+ */
 const passportAuth = function(app){
-  // aegisStrategy authentication
   app.use(passport.initialize());
-  passport.use('jwt', aegisStrategy);
+  (Object.keys(authStrategies)).forEach( key => passport.use(key, authStrategies[key]));
 }
 
-
-const verifyAuth = (req, resolve, reject, requiredRights) => async (err, user, info) => {
-  if (err || info || !user) {
-    return reject(new Error(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+/**
+ * 
+ * @param {Object} req 
+ * @param {Function} resolve 
+ * @param {Function} reject 
+ * @returns 
+ */
+const verifyAuth = (req, resolve, reject) => async (err, user, info) => {
+  // all protected routes must have a passport strategy authentication
+  if(protectedRoutes.findIndex(route => (new RegExp(route,'ig').test(req.path))) > -1){
+    console.log('protected route', req.path);
+    if (err || info || !user) {
+      return reject({
+        statusCode: httpStatus.UNAUTHORIZED, 
+        error: new Error(httpStatus.UNAUTHORIZED,'Please authenticate')
+      });
+    }
   }
-  req.user = user;
+  req.user = user || {}; // user can be a null object on non-protected routes
   resolve();
 };
 
-const protectAuthRoutes = (...requiredRights) => async (req, res, next) => {
+const protectAuthRoutes = async (req, res, next) => {
   return new Promise((resolve, reject) => {
-    passport.authenticate('jwt', { session: false }, verifyAuth(req, resolve, reject, requiredRights))(req, res, next);
+    passport.authenticate('jwt', { session: false }, verifyAuth(req, resolve, reject))(req, res, next);
   })
-  .then(() => next())
-  .catch((err) => next(err));
+  .then( () => next() )
+  .catch( ({statusCode, error}) => res.status(statusCode).send(error.message) );
 };
 
 
