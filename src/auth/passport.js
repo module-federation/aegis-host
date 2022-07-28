@@ -27,7 +27,6 @@ const passportAuth = function(app){
 const verifyAuth = (req, resolve, reject) => async (err, user, info) => {
   // all protected routes must have a passport strategy authentication
   if(protectedRoutes.findIndex(route => (new RegExp(route,'ig').test(req.path))) > -1){
-    console.log('protected route', req.path);
     if (err || info || !user) {
       return reject({
         statusCode: httpStatus.UNAUTHORIZED, 
