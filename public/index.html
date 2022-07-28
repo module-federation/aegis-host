@@ -28,51 +28,96 @@
         </span>
       </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
-        aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarsExample01">
-        <ul class="navbar-nav me-auto mb-2">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="wsapp.html">Service Mesh</a>
-          </li>
-          <li class="nav-item">
-            <a cccc class="nav-link active" aria-current="page" href="aegis/api/config?details=threads&html=true">Thread
-              Pools</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis/api/config?html=true">Models</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis.config.json">Config</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=data&html=true">Data</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="aegis/api/config?details=events&html=true">Events</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="hot-reload.html">Reload</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="aegis.log">
-              <span class="navbar-link text-light mb-0">Log</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/module-federation/aegis" target="_blank" rel="noopener">
-              <span class="navbar-link text-light mb-0">Source</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="arch.html">
-              <span class="navbar-link text-light mb-0">Architecture</span>
-            </a>
-          </li>
-        </ul>
+        <div class="collapse navbar-collapse" id="navbarsExample01">
+          <ul class="navbar-nav me-auto mb-2">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="wsapp.html"
+                >Service Mesh</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="aegis/api/config?details=threads&html=true"
+                >Thread Pools</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="aegis/api/config?html=true"
+                >Models</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="aegis/api/config?details=data&html=true"
+                >Data</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="aegis/api/config?details=relations&html=true"
+                >Relations</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="aegis/api/config?details=events&html=true"
+                >Events</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="aegis/api/config?details=ports&html=true"
+                >Ports</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="aegis.config.json"
+                >Config</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="hot-reload.html">
+                <span class="navbar-link text-light mb-0">Reload</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="aegis.log">
+                <span class="navbar-link text-light mb-0">Log</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="https://github.com/module-federation/aegis"
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="navbar-link text-light mb-0">Source</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="arch.html">
+                <span class="navbar-link text-light mb-0">Architecture</span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
@@ -154,7 +199,9 @@
             {
               "firstName":"Alan",
               "lastName":"Turing",
-              "email":"al@snail.mail",
+              "userName":"enigma",
+              "password":"s3cr3t",
+              "email":"al@snail-mail.co",
               "creditCardNumber":"378282246310005",
               "shippingAddress":"Bletchley, Milton Keynes MK3 6EB, UK",
               "billingAddress":"Bletchley, Milton Keynes MK3 6EB, UK",
@@ -193,10 +240,19 @@
         </div>
       </div>
 
-      <div class="col-md-7">
-        <pre id="url" class="text-warning text-decoration-underline mb-3"></pre>
-        <pre id="messages" class="text-light mb-3 overflow-scroll" style="height: 80vh"
-          hover="postion: relative; width: 700px; z-index: 99">
+        <div class="col-md-7">
+          <input 
+            type="text" 
+            class="bg-dark text-warning text-decoration-underline mb-3 border-0" 
+            style="width:80vw"
+            id="url"
+          ></>
+          <pre
+            id="messages"
+            class="text-light mb-3 overflow-scroll"
+            style="height: 80vh"
+            hover="postion: relative; width: 700px; z-index: 99"
+          >
           <code id="jsonCode"></code>
         </pre>
       </div>

@@ -1,4 +1,4 @@
-; (function () {
+;(function () {
   const apiRoot = 'aegis/api'
   const modelApiPath = apiRoot + '/models'
   const messages = document.querySelector('#messages')
@@ -19,7 +19,7 @@
   const reloadModelButton = document.querySelector('#reloadModelButton')
 
   class ProgressBar {
-    constructor(events) {
+    constructor (events) {
       this.progresscntrl = document.getElementById('progresscntrl')
       this.progressbar = document.getElementById('progressbar')
       this.collapse = new bootstrap.Collapse(this.progresscntrl, {
@@ -38,21 +38,21 @@
       })
     }
 
-    show() {
+    show () {
       this.collapse.show()
     }
 
-    hide() {
+    hide () {
       this.collapse.hide()
     }
 
-    makeProgress(progress) {
+    makeProgress (progress) {
       this.progressbar.style.width = progress + '%'
       this.progressbar.setAttribute('aria-valuenow', progress)
     }
   }
 
-  async function instrumentedFetch(url, options) {
+  async function instrumentedFetch (url, options) {
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 35 } })
     )
@@ -112,7 +112,7 @@
    * "Authorization": "bearer <token>"
    * }}
    */
-  function getHeaders() {
+  function getHeaders () {
     const content = { 'Content-Type': 'application/json' }
     return {
       ...content,
@@ -125,7 +125,7 @@
    * JSON Web Token and set `authHeader` accordingly.
    * Need CORS for this.
    */
-  async function refreshAccessToken() {
+  async function refreshAccessToken () {
     const file = await fetch('aegis.config.json')
     const text = await file.text()
     const config = JSON.parse(text).services.token
@@ -147,7 +147,7 @@
     }
   }
 
-  function prettifyJson(json) {
+  function prettifyJson (json) {
     if (typeof json !== 'string') {
       json = JSON.stringify(json, null, 2)
     }
@@ -171,15 +171,18 @@
     )
   }
 
-  function displayUrl(url) {
+  function displayUrl (url) {
     document.getElementById(
       'url'
-    ).textContent = `${location.protocol}//${location.host}/${url}`
+    ).value = `${location.protocol}//${location.host}/${url}`
   }
 
-  function getUrl() {
-    const model = document.getElementById('model').value
+  function getUrl () {
+    if (customUrl) {
+      return document.getElementById('url').value
+    }
     const id = document.getElementById('modelId').value
+    const model = document.getElementById('model').value
     const param = document.getElementById('parameter').value
     const query = document.getElementById('query').value
     let url = `${modelApiPath}/${model}`
@@ -190,38 +193,55 @@
     return url
   }
 
+  let customUrl = false
+
+  function makeCustomUrl () {
+    customUrl = true
+  }
+
+  function makeAutoUrl () {
+    customUrl = false
+  }
+
+  const urlInput = document.getElementById('url')
+  urlInput.onfocus = makeCustomUrl
+  modelInput.onfocus = makeAutoUrl
+  modelIdInput.onfocus = makeAutoUrl
+  queryInput.onfocus = makeAutoUrl
+  paramInput.onfocus = makeAutoUrl
+
   modelInput.onchange = getUrl
   modelIdInput.onchange = getUrl
   queryInput.onchange = getUrl
   paramInput.onchange = getUrl
 
-  function showMessage(message) {
+  function showMessage (message) {
     document.getElementById('jsonCode').innerHTML += `\n${prettifyJson(
       message
     )}`
     messages.scrollTop = messages.scrollHeight
   }
 
-  function updateModelId(id) {
+  function updateModelId (id) {
     if (id) modelIdInput.value = id
   }
 
-  function handleResponse(response) {
+  function handleResponse (response) {
     try {
       return [200, 201, 400].includes(response.status)
         ? response.json().then(function (data) {
-          updateModelId(data.modelId)
-          return JSON.stringify(data, null, 2)
-        })
+            updateModelId(data.modelId)
+            return JSON.stringify(data, null, 2)
+          })
         : Promise.reject(
-          new Error([response.status, response.statusText].join(': '))
-        )
+            new Error([response.status, response.statusText].join(': '))
+          )
     } catch (error) {
       return error.message
     }
   }
 
-  function endpointModelName() {
+  function endpointModelName () {
     const endpoint = document.getElementById('model').value
     const len = endpoint.length
     if (endpoint.charAt(len - 1) === 's') return endpoint.slice(0, len - 1)
@@ -254,10 +274,10 @@
       }
     )
     showMessage(response)
-    setTimeout(() => bar.hide(), 2000)
+    setTimeout(() => bar.hide(), 1000)
   }
 
-  async function deployConditions(poolName) {
+  async function deployConditions (poolName) {
     try {
       const response = await fetch(`${apiRoot}/config?details=threads`)
       const pools = await response.json()

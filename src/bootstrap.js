@@ -16,7 +16,7 @@ function clearRoutes() {
 
 async function load(aegis = null) {
   if (aegis) {
-    aegis.dispose()
+    await aegis.dispose()
     clearRoutes()
   }
 

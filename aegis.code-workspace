@@ -6,5 +6,11 @@
     {
       "path": "../aegis-app"
     }
-  ]
+  ],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "aegis",
+    "githubPullRequests.ignoredPullRequestBranches": [
+      "master"
+    ]
+  }
 }
