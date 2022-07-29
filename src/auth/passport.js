@@ -34,7 +34,7 @@ const verifyAuth = (req, resolve, reject) => async (err, user, info) => {
       });
     }
   }
-  req.user = user || {}; // user can be a null object on non-protected routes
+  req.user = user; // user can be a false object on non-protected routes
   resolve();
 };
 

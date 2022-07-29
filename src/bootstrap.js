@@ -6,7 +6,7 @@ const importFresh = require('import-fresh')
 const express = require('express')
 const server = require('./server')
 const app = express()
-const { passportAuth, protectAuthRoutes } = require('./auth/passport') // untested - hold commit
+const { passportAuth, protectAuthRoutes } = require('./auth/passport'); // review and impement a dynamic middleware / config import later
 
 function clearRoutes() {
   app._router.stack = app._router.stack.filter(
@@ -29,7 +29,7 @@ async function load(aegis = null) {
     app.use(express.json())
     app.use(express.static('public'))
 
-    passportAuth(app); // initialize passport auth - untested hold commit
+    passportAuth(app); // initialize passport auth - object is pass by reference
 
     app.use('/reload', async (req, res) => {
       await load(aegis)
@@ -37,7 +37,8 @@ async function load(aegis = null) {
     })
 
     // protectAuthRoutes is configured to open routes that it deems ok - all others are protected
-    app.all('*', protectAuthRoutes, (req, res) => handle(req.path, req.method, req, res)) //  - untested hold commit
+    // supposed to get the routes from config / dynamic location - currently hardcoded - needs review
+    app.all('*', protectAuthRoutes, (req, res) => handle(req.path, req.method, req, res))
   })
 }
 

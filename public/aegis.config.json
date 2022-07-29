@@ -106,9 +106,10 @@
         "algorithms": ["RS256"]
       },
       "passport":{
+        "algorithm": "HS256",
         "secret":"v2e%TY(*&sri*4^js%*oj35j*^^&p25o",
-        "issuer":"https://lthscreate.com",
-        "audience":"https://lthscreate.com"
+        "issuer":"login validator",
+        "audience":"lthscreate.com"
       }
     },
     "token": {
