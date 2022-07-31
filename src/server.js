@@ -12,15 +12,17 @@
 'use strict'
 
 // aegis library
-const { adapters, services } = require('@module-federation/aegis')
-const { AuthorizationService, CertificateService, ClusterService } = services
-const { ServiceMeshAdapter } = adapters
+const {
+  AuthorizationService,
+  CertificateService,
+  ClusterService,
+  ServiceMeshPlugin
+} = require('@module-federation/aegis').services
 
 const fs = require('fs')
 const tls = require('tls')
 const http = require('http')
 const https = require('https')
-const websocket = require('ws')
 
 const port = process.argv[2] ? process.argv[2] : process.env.PORT || 80
 const sslPort = process.argv[2] ? process.argv[2] : process.env.SSL_PORT || 443
@@ -195,7 +197,7 @@ exports.start = async function (app) {
     } else {
       // https disabled, so attach to http
       /** @type {ServiceMeshAdapter}  */
-      ServiceMeshAdapter.attachServer(httpServer)
+      ServiceMeshPlugin.attachServer(httpServer)
     }
     httpServer.listen(port, checkPublicIpAddress)
   }
@@ -232,7 +234,7 @@ exports.start = async function (app) {
       // graceful shutdown prevents new clients from connecting
       app.use(shutdown(httpsServer))
       // service mesh uses same port
-      ServiceMeshAdapter.attachServer(httpsServer, secureCtx)
+      ServiceMeshPlugin.attachServer(httpsServer, secureCtx)
 
       // listen on ssl port
       httpsServer.listen(sslPort, () =>
