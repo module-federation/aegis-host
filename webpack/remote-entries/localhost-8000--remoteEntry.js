@@ -34333,7 +34333,7 @@ module.exports = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"version\":\"1.13.6\",\"description\":\"Quick and easy Smarty address validation.\",\"keywords\":[\"smarty\",\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"main\":\"index.js\",\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"author\":\"Smarty SDK Team <support@smarty.com> (https://www.smarty.com)\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"github:smartystreets/smartystreets-javascript-sdk\"},\"devDependencies\":{\"chai\":\"^4.2.0\",\"mocha\":\"^9.2.1\"},\"dependencies\":{\"axios\":\"^0.26.1\",\"axios-retry\":\"3.2.0\"}}");
+module.exports = JSON.parse("{\"name\":\"smartystreets-javascript-sdk\",\"version\":\"1.13.7\",\"description\":\"Quick and easy Smarty address validation.\",\"keywords\":[\"smarty\",\"smartystreets\",\"address\",\"validation\",\"verification\",\"verify\",\"validate\",\"street-address\",\"geocoding\",\"addresses\",\"zipcode\",\"autocomplete\",\"autosuggest\",\"suggestions\",\"international\",\"http\",\"sdk\"],\"main\":\"index.js\",\"scripts\":{\"test\":\"mocha 'tests/**/*.js'\"},\"author\":\"Smarty SDK Team <support@smarty.com> (https://www.smarty.com)\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"github:smartystreets/smartystreets-javascript-sdk\"},\"devDependencies\":{\"chai\":\"^4.2.0\",\"mocha\":\"^9.2.1\"},\"dependencies\":{\"axios\":\"^0.26.1\",\"axios-retry\":\"3.2.0\"}}");
 
 /***/ }),
 
@@ -34771,7 +34771,7 @@ class UnprocessableEntityError extends SmartyError {
 
 class TooManyRequestsError extends SmartyError {
 	constructor() {
-		super("When using the public 'website key' authentication, we restrict the number of requests coming from a given source over too short of a time.");
+		super("When using the public 'embedded key' authentication, we restrict the number of requests coming from a given source over too short of a time.");
 	}
 }
 
@@ -36807,6 +36807,19 @@ module.exports = require("net");
 
 /***/ }),
 
+/***/ "os":
+/*!*********************!*\
+  !*** external "os" ***!
+  \*********************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("os");
+
+/***/ }),
+
 /***/ "stream":
 /*!*************************!*\
   !*** external "stream" ***!
@@ -37019,7 +37032,7 @@ module.exports = require("zlib");
 /******/ 					register("axios", "0.26.1", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js"));
 /******/ 					register("kafkajs", "1.16.0", () => () => __webpack_require__(/*! ./node_modules/kafkajs/index.js */ "./node_modules/kafkajs/index.js"));
 /******/ 					register("nanoid", "3.3.4", () => () => __webpack_require__(/*! ./node_modules/nanoid/index.js */ "./node_modules/nanoid/index.js"));
-/******/ 					register("smartystreets-javascript-sdk", "1.13.6", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
+/******/ 					register("smartystreets-javascript-sdk", "1.13.7", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
 /******/ 				}
 /******/ 				break;
 /******/ 			}
