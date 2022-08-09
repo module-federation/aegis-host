@@ -39276,19 +39276,19 @@ function nextTickArgs (fn, a, b) {
 "use strict";
 var moduleMap = {
 	"./models": () => {
-		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(419), __webpack_require__.e(935), __webpack_require__.e(829)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(935), __webpack_require__.e(829)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	},
 	"./adapters": () => {
 		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867)]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./services": () => {
-		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(419), __webpack_require__.e(732)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(732)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./ports": () => {
 		return Promise.all([__webpack_require__.e(935), __webpack_require__.e(334)]).then(() => () => (__webpack_require__(/*! ./src/domain/ports.js */ "./src/domain/ports.js")));
 	},
 	"./event-bus": () => {
-		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(419), __webpack_require__.e(857)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(857)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
 	}
 };
 var get = (module) => {
@@ -39816,8 +39816,9 @@ module.exports = require("zlib");
 /******/ 		});
 /******/ 		var installedModules = {};
 /******/ 		var moduleToHandlerMapping = {
-/******/ 			"webpack/sharing/consume/default/multicast-dns/multicast-dns": () => loadStrictVersionCheckFallback("default", "multicast-dns", [1,7,2,5], () => () => __webpack_require__(/*! multicast-dns */ "./node_modules/multicast-dns/index.js")),
+/******/ 			"webpack/sharing/consume/default/axios/axios?5326": () => loadStrictVersionCheckFallback("default", "axios", [2,0,21,1], () => () => __webpack_require__(/*! axios */ "./node_modules/axios/index.js")),
 /******/ 			"webpack/sharing/consume/default/kafkajs/kafkajs": () => loadStrictVersionCheckFallback("default", "kafkajs", [1,1,14,0], () => () => __webpack_require__(/*! kafkajs */ "./node_modules/kafkajs/index.js")),
+/******/ 			"webpack/sharing/consume/default/multicast-dns/multicast-dns": () => loadStrictVersionCheckFallback("default", "multicast-dns", [1,7,2,5], () => () => __webpack_require__(/*! multicast-dns */ "./node_modules/multicast-dns/index.js")),
 /******/ 			"webpack/sharing/consume/default/nanoid/nanoid": () => loadStrictVersionCheckFallback("default", "nanoid", [1,3,1,12], () => () => __webpack_require__(/*! nanoid */ "./node_modules/nanoid/index.js")),
 /******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js")),
 /******/ 			"webpack/sharing/consume/default/axios/axios?5c0e": () => loadStrictVersionCheckFallback("default", "axios", [2,0,26,1], () => () => __webpack_require__(/*! axios */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js"))
@@ -39834,14 +39835,13 @@ module.exports = require("zlib");
 /******/ 			}
 /******/ 		});
 /******/ 		var chunkMapping = {
-/******/ 			"419": [
-/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
-/******/ 			],
 /******/ 			"732": [
 /******/ 				"webpack/sharing/consume/default/nanoid/nanoid",
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			],
 /******/ 			"867": [
+/******/ 				"webpack/sharing/consume/default/axios/axios?5326",
+/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs",
 /******/ 				"webpack/sharing/consume/default/multicast-dns/multicast-dns"
 /******/ 			],
 /******/ 			"935": [

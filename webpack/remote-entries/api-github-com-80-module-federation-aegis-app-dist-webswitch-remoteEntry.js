@@ -37223,8 +37223,10 @@ module.exports = require("zlib");
 /******/ 		});
 /******/ 		var chunkMapping = {
 /******/ 			"829": [
-/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs",
 /******/ 				"webpack/sharing/consume/default/nanoid/nanoid"
+/******/ 			],
+/******/ 			"867": [
+/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs"
 /******/ 			]
 /******/ 		};
 /******/ 		__webpack_require__.f.consumes = (chunkId, promises) => {
