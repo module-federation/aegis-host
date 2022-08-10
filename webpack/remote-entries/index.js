@@ -5,4 +5,3 @@
 
 exports.local = require('./local')
 exports.cache = require('./cache')
-exports.webswitch = require('./webswitch')

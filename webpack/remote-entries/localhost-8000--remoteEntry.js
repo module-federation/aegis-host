@@ -13,10 +13,13 @@ module.exports =
 
 var moduleMap = {
 	"./models": () => {
-		return Promise.all([__webpack_require__.e(96), __webpack_require__.e(251), __webpack_require__.e(867), __webpack_require__.e(829)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
+		return Promise.all([__webpack_require__.e(360), __webpack_require__.e(867), __webpack_require__.e(829)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	},
 	"./adapters": () => {
-		return Promise.all([__webpack_require__.e(96), __webpack_require__.e(867)]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+		return Promise.all([__webpack_require__.e(360), __webpack_require__.e(867)]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+	},
+	"./services": () => {
+		return Promise.all([__webpack_require__.e(360), __webpack_require__.e(68), __webpack_require__.e(867), __webpack_require__.e(732)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	}
 };
 var get = (module) => {
@@ -212,6 +215,18 @@ module.exports = require("tls");
 
 /***/ }),
 
+/***/ "tty":
+/*!**********************!*\
+  !*** external "tty" ***!
+  \**********************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/***/ ((module) => {
+
+module.exports = require("tty");
+
+/***/ }),
+
 /***/ "url":
 /*!**********************!*\
   !*** external "url" ***!
@@ -341,7 +356,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=aegis-app&filedir=dist&branch=webswitch";
+/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=aegis-app&filedir=dist&branch=master";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/readFile chunk loading */
