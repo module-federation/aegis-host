@@ -91,14 +91,10 @@ remoteEntries.then(remotes => {
       parentPort.on('message', async message => {
         // Look for a use case function called `message.name`
         if (typeof domainPorts[message.name] === 'function') {
-          try {
-            // invoke an inbound port (a.k.a use case function)
-            const result = await domainPorts[message.name](message.data)
-            // serialize `result` to get rid of any functions
-            parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
-          } catch (error) {
-            console.error('worker:', error)
-          }
+          // invoke an inbound port (a.k.a use case function)
+          const result = await domainPorts[message.name](message.data)
+          // serialize `result` to get rid of any functions
+          parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
           // The "event port" is transfered
         } else if (message.eventPort instanceof MessagePort) {
           // send/recv events to/from main thread
