@@ -85,7 +85,7 @@ remoteEntries.then(remotes => {
       // load distributed cache and register its events
       await initCache().load()
       // notify main we are up
-      parentPort.postMessage({ metaEvent: 'aegis-up' })
+      //parentPort.postMessage({ metaEvent: 'aegis-up' })
 
       // handle API requests from main
       parentPort.on('message', async message => {
