@@ -11,13 +11,16 @@
   const modelIdInput = document.querySelector('#modelId')
   const queryInput = document.querySelector('#query')
   const paramInput = document.querySelector('#parameter')
+  const portInput = document.querySelector('#port')
   const copyButton = document.querySelector('#copyButton')
   const clearIdButton = document.querySelector('#clearIdButton')
   const clearQueryButton = document.querySelector('#clearQueryButton')
   const clearModelButton = document.querySelector('#clearModelButton')
   const clearParamButton = document.querySelector('#clearParamButton')
+  const clearPortsButton = document.querySelector('#clearPortsButton')
   const reloadModelButton = document.querySelector('#reloadModelButton')
 
+  let models
   class ProgressBar {
     constructor (events) {
       this.progresscntrl = document.getElementById('progresscntrl')
@@ -185,9 +188,12 @@
     const model = document.getElementById('model').value
     const param = document.getElementById('parameter').value
     const query = document.getElementById('query').value
+    const port = document.getElementById('port').value
+
     let url = `${modelApiPath}/${model}`
     if (id) url += `/${id}`
     if (param) url += `/${param}`
+    if (port) url += `/ports/${port}`
     if (query) url += `?${query}`
     displayUrl(url)
     return url
@@ -210,10 +216,29 @@
   queryInput.onfocus = makeAutoUrl
   paramInput.onfocus = makeAutoUrl
 
-  modelInput.onchange = getUrl
+  modelInput.onchange = getUrl_updatePorts
   modelIdInput.onchange = getUrl
   queryInput.onchange = getUrl
   paramInput.onchange = getUrl
+  portInput.onchange = getUrl
+
+  function removeAllChildNodes (parent) {
+    while (parent.firstChild) {
+      parent.removeChild(parent.firstChild)
+    }
+  }
+
+  function getUrl_updatePorts () {
+    document.getElementById('port').value = ''
+    getUrl()
+    removeAllChildNodes(document.querySelector('#portList'))
+    const model = models.find(
+      model => model.endpoint === document.getElementById('model').value
+    )
+    Object.keys(model.ports).forEach(port =>
+      portList.appendChild(new Option(port))
+    )
+  }
 
   function showMessage (message) {
     document.getElementById('jsonCode').innerHTML += `\n${prettifyJson(
@@ -277,23 +302,7 @@
     setTimeout(() => bar.hide(), 1000)
   }
 
-  async function deployConditions (poolName) {
-    try {
-      const response = await fetch(`${apiRoot}/config?details=threads`)
-      const pools = await response.json()
-      const pool = pools.find(pool => pool.name === poolName)
-      return (
-        !pool ||
-        pool.total === 0 ||
-        (pool.total < pool.max && pool.queueRate > pool.queueTolerance)
-      )
-    } catch (error) {
-      return false
-    }
-  }
-
   postButton.onclick = async function () {
-    document.getElementById('modelId').value = ''
     const model = document.getElementById('model').value
     if (!model || model === '') {
       showMessage({ error: 'no model selected' })
@@ -364,6 +373,7 @@
     document.getElementById('modelId').value = ''
     document.getElementById('query').value = ''
     document.getElementById('parameter').value = ''
+    document.getElementById('port').value = ''
     getUrl()
   })
 
@@ -383,14 +393,21 @@
     getUrl()
   })
 
+  clearPortsButton.addEventListener('click', function () {
+    document.getElementById('port').value = ''
+    getUrl()
+  })
+
   window.addEventListener('load', async function () {
     // if enabled, request fresh access token and store in auth header
     await refreshAccessToken()
     // get list of all models and add to datalist for model input control
-    const data = await fetch('aegis/api/config?isCached=false', {
+    const modelJson = await fetch('aegis/api/config?isCached=false', {
       headers: getHeaders()
     })
-    const models = await data.json()
-    models.forEach(m => modelList.appendChild(new Option(m.endpoint)))
+    models = await modelJson.json()
+    models.forEach(m => {
+      modelList.appendChild(new Option(m.endpoint))
+    })
   })
 })()
