@@ -54,7 +54,7 @@ async function init (remotes) {
  * If a response is needed, call `ThreadPool.run` as shown below.
  *
  * ```js
- * ThreadPool.run(jobName, jobData, { channel: EVENTCHANNEL })
+ * ThreadPool.runJob(jobName, jobData, { channel: EVENTCHANNEL })
  * ```
  *
  * @param {MessagePort} eventPort
