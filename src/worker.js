@@ -62,17 +62,13 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire events from main
-    eventPort.onmessage = async msgEvent => {
-      // don't `await` the task
-      console.debug({ fn: 'worker: eventPort.onmessage', data: msgEvent.data })
+    eventPort.onmessage = async msgEvent =>
       broker.notify(msgEvent.data.eventName, msgEvent.data)
-    }
 
     // forward events to main
-    broker.on('to_main', event => {
-      console.debug({ fn: 'worker:on:to_main', event })
+    broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
-    })
+    )
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
@@ -84,8 +80,6 @@ remoteEntries.then(remotes => {
       console.info('aegis worker thread running')
       // load distributed cache and register its events
       await initCache().load()
-      // notify main we are up
-      //parentPort.postMessage({ metaEvent: 'aegis-up' })
 
       // handle API requests from main
       parentPort.on('message', async message => {
