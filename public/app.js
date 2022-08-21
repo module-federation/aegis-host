@@ -59,9 +59,7 @@
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 35 } })
     )
-
     let response = await fetch(url, options)
-
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 50 } })
     )
@@ -74,13 +72,10 @@
 
     while (true) {
       const { done, value } = await reader.read()
-
       if (done) {
         break
       }
-
       chunks.push(value)
-
       receivedLength += value.length
       ratio = (contentLength / receivedLength) * 100
       window.dispatchEvent(
@@ -89,7 +84,6 @@
     }
 
     let chunksAll = new Uint8Array(receivedLength)
-
     let position = 0
     for (let chunk of chunks) {
       chunksAll.set(chunk, position)
@@ -97,11 +91,9 @@
     }
 
     let result = new TextDecoder('utf-8').decode(chunksAll)
-
     window.dispatchEvent(
       new CustomEvent('fetch-done', { detail: { progress: 100 } })
     )
-
     return JSON.parse(result)
   }
 
@@ -310,15 +302,19 @@
     }
     const bar = new ProgressBar(fetchEvents)
     const timerId = setTimeout(() => bar.show(), 1000)
-    const response = await instrumentedFetch(getUrl(), {
-      method: 'POST',
-      body: document.getElementById('payload').value,
-      headers: getHeaders()
-    })
-    clearTimeout(timerId)
-    setTimeout(() => bar.hide(), 1000)
-    updateModelId(response.modelId)
-    showMessage(response)
+    try {
+      const response = await instrumentedFetch(getUrl(), {
+        method: 'POST',
+        body: document.getElementById('payload').value,
+        headers: getHeaders()
+      })
+      clearTimeout(timerId)
+      setTimeout(() => bar.hide(), 1000)
+      updateModelId(response.modelId)
+      showMessage(response)
+    } catch (error) {
+      showMessage(error.message)
+    }
   }
 
   patchButton.onclick = function () {
