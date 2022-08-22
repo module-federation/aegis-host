@@ -71,7 +71,7 @@ ports:
     description: http api
     visibility: public
     onOpen: open-preview
-  - port: 8081
+  - port: 8888
     description: webswitch
     visibility: public
     onOpen: open-preview
