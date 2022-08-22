@@ -9,9 +9,9 @@ github:
     addBadge: true
 
 # multi-repo
-# additionalRepositories:
-#   - url: https://github.com/module-federation/aegis
-#   - url: https://github.com/module-federation/aegis-app
+additionalRepositories:
+  - url: https://github.com/module-federation/aegis
+  - url: https://github.com/module-federation/aegis-app
 
 tasks:
   - name: mongodb
