@@ -1,6 +1,6 @@
 {
   "name": "aegis-host",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "description": "Federated Application Host",
   "installConfig": {
     "pnp": false
@@ -20,11 +20,10 @@
     "transpile": "babel src --out-dir dist",
     "start": "node --title aegis src/bootstrap.js",
     "demo": "",
-    "demo:8080": "open http://localhost:8080",
-    "reload": "open http://localhost/reload",
+    "reload": "open http://localhost/reload.html",
     "stop": "PID=$(lsof -P -i | grep aegis | grep LISTEN | awk '{print $2}'); kill $PID",
     "restart": "yarn build && yarn start",
-    "webswitch": "cd ../aegis ; export SWITCH=true ; export PORT=8085 ; ./start.sh ",
+    "webswitch": "cd ../aegis ; export SWITCH=true ; export PORT=8888 ; ./start.sh ",
     "gen-keys": "node cert/mesh/keys.js",
     "login-status": "echo \"/workspace/aegis-host/status.sh\" >> ~/.aegis && echo \". ~/.aegis\"",
     "cmd-log": "echo \"alias log='view ~/aegis-host/public/aegis.log'\" >> ~/.aegis",
@@ -63,7 +62,7 @@
   "author": "Tyson Midboe",
   "license": "Apache-2.0",
   "dependencies": {
-    "@module-federation/aegis": "^1.2.0-beta",
+    "@module-federation/aegis": "^1.2.3-beta",
     "express": "^4.18.1",
     "path-to-regexp": "^6.2.1",
     "regenerator-runtime": "^0.13.9",

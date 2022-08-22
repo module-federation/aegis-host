@@ -26,5 +26,12 @@ exports.local = [
     path: __dirname,
     type: 'service',
     importRemote: async () => import('local/services')
+  },
+  {
+    name: 'ports',
+    url: 'http://localhost:8000/remoteEntry.js',
+    path: __dirname,
+    type: 'port',
+    importRemote: async () => import('local/ports')
   }
 ]

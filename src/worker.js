@@ -54,7 +54,7 @@ async function init (remotes) {
  * If a response is needed, call `ThreadPool.run` as shown below.
  *
  * ```js
- * ThreadPool.run(jobName, jobData, { channel: EVENTCHANNEL })
+ * ThreadPool.runJob(jobName, jobData, { channel: EVENTCHANNEL })
  * ```
  *
  * @param {MessagePort} eventPort
@@ -62,17 +62,13 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire events from main
-    eventPort.onmessage = async msgEvent => {
-      // don't `await` the task
-      console.debug({ fn: 'worker: eventPort.onmessage', data: msgEvent.data })
+    eventPort.onmessage = async msgEvent =>
       broker.notify(msgEvent.data.eventName, msgEvent.data)
-    }
 
     // forward events to main
-    broker.on('to_main', event => {
-      console.debug({ fn: 'worker:on:to_main', event })
+    broker.on('to_main', event =>
       eventPort.postMessage(JSON.parse(JSON.stringify(event)))
-    })
+    )
   } catch (error) {
     console.error({ fn: connectEventChannel.name, error })
   }
@@ -84,21 +80,15 @@ remoteEntries.then(remotes => {
       console.info('aegis worker thread running')
       // load distributed cache and register its events
       await initCache().load()
-      // notify main we are up
-      //parentPort.postMessage({ metaEvent: 'aegis-up' })
 
       // handle API requests from main
       parentPort.on('message', async message => {
         // Look for a use case function called `message.name`
         if (typeof domainPorts[message.name] === 'function') {
-          try {
-            // invoke an inbound port (a.k.a use case function)
-            const result = await domainPorts[message.name](message.data)
-            // serialize `result` to get rid of any functions
-            parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
-          } catch (error) {
-            console.error('worker:', error)
-          }
+          // invoke an inbound port (a.k.a use case function)
+          const result = await domainPorts[message.name](message.data)
+          // serialize `result` to get rid of any functions
+          parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
           // The "event port" is transfered
         } else if (message.eventPort instanceof MessagePort) {
           // send/recv events to/from main thread
