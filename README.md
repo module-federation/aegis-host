@@ -10,7 +10,7 @@ This repo contains the host code. The library can be found [here](https://github
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) 
 
 #### Open Branch:
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/module-federation/aegis-app) 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/briteliteimmersive/aegis-app) 
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
