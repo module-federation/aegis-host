@@ -5,33 +5,33 @@
  */
 
 /** @type {entry[]} */
-exports.local = [
+exports.bli = [
   {
-    name: 'local',
+    name: 'bli',
     url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'model',
-    importRemote: async () => import('local/models')
+    importRemote: async () => import('bli/models')
   },
   {
     name: 'adapters',
     url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'adapter',
-    importRemote: async () => import('local/adapters')
+    importRemote: async () => import('bli/adapters')
   },
   {
     name: 'services',
     url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'service',
-    importRemote: async () => import('local/services')
+    importRemote: async () => import('bli/services')
   },
   {
     name: 'ports',
     url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'port',
-    importRemote: async () => import('local/ports')
+    importRemote: async () => import('bli/ports')
   }
 ]

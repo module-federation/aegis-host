@@ -3,5 +3,5 @@
 // exports.customerLocal = require('./customer-local')
 // exports.order = require('./order')
 
-exports.local = require('./local')
+exports.bli = require('./bli')
 exports.cache = require('./cache')
