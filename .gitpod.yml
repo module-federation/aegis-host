@@ -34,7 +34,7 @@ tasks:
       yarn
       gp sync-done installHost
     command: |
-      gp sync-await-build
+      gp sync-await build
       cd ../aegis-app
       yarn buildLocalRepo
       gp sync-done buildHost
@@ -49,17 +49,16 @@ tasks:
       gp sync-await buildHost
       cd ../aegis-host
       yarn build
-      gp sync-done startHost
       export PORT=8080
-      yarn start
       gp sync-done startSwitch
+      yarn start
 
   - name: webswitch
     command: |
-      gp sync-await startSwitch
       cd ../aegis-host
       export PORT=8888
       export SWITCH=true
+      gp sync-await startSwitch
       yarn start
 
 workspaceLocation: aegis-host/aegis.code-workspace
