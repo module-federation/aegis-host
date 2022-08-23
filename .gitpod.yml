@@ -52,10 +52,11 @@ tasks:
       gp sync-done startHost
       export PORT=8080
       yarn start
+      gp sync-done startSwitch
 
   - name: webswitch
     command: |
-      gp sync-await startHost
+      gp sync-await startSwitch
       cd ../aegis-host
       export PORT=8888
       export SWITCH=true
