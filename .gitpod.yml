@@ -50,6 +50,7 @@ tasks:
       cd ../aegis-host
       yarn build
       gp sync-done startHost
+      export PORT=8080
       yarn start
 
   - name: webswitch
