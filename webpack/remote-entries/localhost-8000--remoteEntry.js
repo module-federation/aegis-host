@@ -39265,7 +39265,11 @@ function nextTickArgs (fn, a, b) {
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "webpack/container/entry/webswitch":
+=======
+/***/ "webpack/container/entry/local":
+>>>>>>> 7020cf323e2587b869073340f12bc8e761d2be88
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -39276,16 +39280,24 @@ function nextTickArgs (fn, a, b) {
 "use strict";
 var moduleMap = {
 	"./models": () => {
+<<<<<<< HEAD
 		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(353), __webpack_require__.e(829)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
+=======
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(334), __webpack_require__.e(732), __webpack_require__.e(829)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
+>>>>>>> 7020cf323e2587b869073340f12bc8e761d2be88
 	},
 	"./adapters": () => {
 		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867)]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./services": () => {
+<<<<<<< HEAD
 		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(732)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+=======
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(732), __webpack_require__.e(589)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+>>>>>>> 7020cf323e2587b869073340f12bc8e761d2be88
 	},
 	"./ports": () => {
-		return Promise.all([__webpack_require__.e(353), __webpack_require__.e(334)]).then(() => () => (__webpack_require__(/*! ./src/domain/ports.js */ "./src/domain/ports.js")));
+		return __webpack_require__.e(334).then(() => () => (__webpack_require__(/*! ./src/domain/ports.js */ "./src/domain/ports.js")));
 	},
 	"./event-bus": () => {
 		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(857)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
@@ -39835,11 +39847,13 @@ module.exports = require("zlib");
 /******/ 			}
 /******/ 		});
 /******/ 		var chunkMapping = {
-/******/ 			"353": [
+/******/ 			"334": [
+/******/ 				"webpack/sharing/consume/default/nanoid/nanoid"
+/******/ 			],
+/******/ 			"589": [
 /******/ 				"webpack/sharing/consume/default/nanoid/nanoid"
 /******/ 			],
 /******/ 			"732": [
-/******/ 				"webpack/sharing/consume/default/nanoid/nanoid",
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
 /******/ 			],
 /******/ 			"867": [
@@ -39960,7 +39974,11 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
+<<<<<<< HEAD
 /******/ 			534: 0
+=======
+/******/ 			446: 0
+>>>>>>> 7020cf323e2587b869073340f12bc8e761d2be88
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -40023,7 +40041,11 @@ module.exports = require("zlib");
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
+<<<<<<< HEAD
 /******/ 	return __webpack_require__("webpack/container/entry/webswitch");
+=======
+/******/ 	return __webpack_require__("webpack/container/entry/local");
+>>>>>>> 7020cf323e2587b869073340f12bc8e761d2be88
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map
