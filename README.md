@@ -17,7 +17,7 @@ This repo contains the host code. The library can be found [here](https://github
 
 - loaded from multiple network locations and repositories at runtime;
 - developed by multiple teams;
-- run together in a single process;
+- can run together in a single process;
 - can be reloaded at any time without restarting the process or interrupting other components running in the process;
 - are _not_ _installed_ on the server but _streamed_ over the network as needed.
 
