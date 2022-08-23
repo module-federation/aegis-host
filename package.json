@@ -63,7 +63,7 @@
   "author": "Tyson Midboe",
   "license": "Apache-2.0",
   "dependencies": {
-    "@module-federation/aegis": "^1.2.0-beta",
+    "@module-federation/aegis": "^1.2.3-beta",
     "express": "^4.18.1",
     "path-to-regexp": "^6.2.1",
     "regenerator-runtime": "^0.13.9",
@@ -71,8 +71,8 @@
     "ws": "^8.8.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.5",
     "@babel/cli": "^7.18.6",
+    "@babel/core": "^7.15.5",
     "babel-loader": "^8.2.2",
     "chalk": "^2.4.2",
     "cross-var": "^1.1.0",
