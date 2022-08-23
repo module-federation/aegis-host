@@ -29,12 +29,12 @@ tasks:
 
   - name: aegis-app
     init: |
-      gp sync-wait install
+      gp sync-await install
       cd ../aegis-app
       yarn
       gp sync-done installHost
     command: |
-      gp sync-wait-build
+      gp sync-await-build
       cd ../aegis-app
       yarn buildLocalRepo
       gp sync-done buildHost
