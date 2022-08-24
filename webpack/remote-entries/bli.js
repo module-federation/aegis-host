@@ -1,5 +1,4 @@
 'use strict'
-const ctx = JSON.parse(process.env.GITPOD_WORKSPACE_CONTEXT)
 
 /**
  * @typedef {import("../remote-entries-type").remoteEntry} entry
@@ -9,35 +8,30 @@ const ctx = JSON.parse(process.env.GITPOD_WORKSPACE_CONTEXT)
 exports.bli = [
   {
     name: 'bli',
-    url: 'https://api.github.com',
-    repo: 'aegis-app',
-    owner: 'briteliteimmersive',
-    filedir: 'dist',
-    branch: ctx.ref,
+    url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'model',
     importRemote: async () => import('bli/models')
   },
   {
     name: 'adapters',
-    url: 'https://api.github.com',
-    repo: 'aegis-app',
-    owner: 'briteliteimmersive',
-    filedir: 'dist',
-    branch: ctx.ref,
+    url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'adapter',
     importRemote: async () => import('bli/adapters')
   },
   {
     name: 'services',
-    url: 'https://api.github.com',
-    repo: 'aegis-app',
-    owner: 'briteliteimmersive',
-    filedir: 'dist',
-    branch: ctx.ref,
+    url: 'http://localhost:8000/remoteEntry.js',
     path: __dirname,
     type: 'service',
     importRemote: async () => import('bli/services')
+  },
+  {
+    name: 'ports',
+    url: 'http://localhost:8000/remoteEntry.js',
+    path: __dirname,
+    type: 'port',
+    importRemote: async () => import('bli/ports')
   }
 ]

@@ -10,14 +10,26 @@ github:
 
 # multi-repo
 additionalRepositories:
-  - url: https://github.com/module-federation/aegis-app
+  - url: https://github.com/module-federation/aegis
+  - url: https://github.com/briteliteimmersive/aegis-app
 
 tasks:
   - name: mongodb
     command: ../aegis-host/mongo.sh
 
+  - name: aegis-lib
+    init: |
+      cd ../aegis
+      yarn
+      gp sync-done install
+    command: |
+      cd ../aegis
+      yarn build
+      gp sync-done build
+
   - name: aegis-app
     init: |
+      gp sync-await install
       cd ../aegis-app
       yarn
       gp sync-done installHost
@@ -27,7 +39,7 @@ tasks:
       yarn buildLocalRepo
       gp sync-done buildHost
       yarn startLocalRepo
-      
+
   - name: aegis-host
     init: |
       gp sync-await installHost
@@ -37,17 +49,17 @@ tasks:
       gp sync-await buildHost
       cd ../aegis-host
       yarn build
-      gp sync-done startHost
-      cd ../aegis
-      ./start.sh
+      export PORT=8080
+      gp sync-done startSwitch
+      yarn start
 
   - name: webswitch
     command: |
-      gp sync-await startHost
-      cd ../aegis
-      export PORT=8081
+      cd ../aegis-host
+      export PORT=8888
       export SWITCH=true
-      ./start.sh
+      gp sync-await startSwitch
+      yarn start
 
 workspaceLocation: aegis-host/aegis.code-workspace
 
@@ -60,7 +72,7 @@ ports:
     description: http api
     visibility: public
     onOpen: open-preview
-  - port: 8081
+  - port: 8888
     description: webswitch
     visibility: public
     onOpen: open-preview

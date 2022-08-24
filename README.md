@@ -3,38 +3,21 @@
 
 # ÆGIS <sub><sup>formerly _microlib_</sup></sub>
 
-The ÆGIS federation host deploys, runs, integrates and persists federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run together on the same host instance while remaining independently deployable. This allows organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect from a microservices architecture. Conversely, services can just as easily be distributed across the ÆGIS fabric or service mesh, which is designed to subsume the entire IT landscape, from microprocessor to microcontroller, datacenter to embedded, phone to drone. In either case, the development experience is the same. Component deployment, integration and persistence is automated and transparent, freeing developers to concentrate on what pays the bills, the business logic. And paying the bills gets easier when you eliminated the need for bespoke deployment automation. Because federated deployment always works the same way, regardless of vendor or compute primitive, there's no vendor lock-in and no need to devote the kind of time and resources we do today. In fact, the eventual goal is for no one to be involved on a daily basis with normal operations.         
+The ÆGIS federation host deploys, runs, integrates and persists federated application components (or federated microservice libraries) in a distributed middleware fabric. Multiple, polyglot services can run together on 
+the same host instance while remaining independently deployable. This allows organizations to reduce their footprint and simplify their operations without loosing any of autonomy and loose coupling they've come to expect from a microservices architecture. Conversely, services can just as easily be distributed across the ÆGIS fabric or service mesh, which is designed to subsume the entire IT landscape, from microprocessor to microcontroller, datacenter to embedded, phone to drone. In either case, the development experience is the same. Component deployment, integration and persistence is automated and transparent, freeing developers to concentrate on what pays the bills, the business logic. And paying the bills gets easier when you eliminated the need for bespoke deployment automation. Because federated deployment always works the same way, regardless of vendor or compute primitive, there's no vendor lock-in and no need to devote the kind of time and resources we do today.
 
 This repo contains the host code. The library can be found [here](https://github.com/module-federation/aegis).
 
-# Developing a federated application with ÆGIS
-
-## Development Environment
-#### Open the Develop branch:
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/briteliteimmersive/aegis-app/tree/develop) 
---------
-#### Open other branches:
-[![Open a branch Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/bli-dev/aegis-app) 
-
-## Tutorials
-### Getting Started
-[![branchingvid](https://user-images.githubusercontent.com/38910830/176278835-1159996f-6383-45ac-a9fd-e6de608f8746.png)](https://drive.google.com/file/d/1CMWy25zT7sKWTbIUw6ftbk2DYcCcFdx_/view?usp=sharing)
-
-### Branching
-[![branchingvid](https://user-images.githubusercontent.com/38910830/176278420-442131c8-993d-4669-83a8-d0110f6be40f.png)](https://drive.google.com/file/d/1jrwqctZ95uVjhlNE8q2gUmebO6m_wvO5/view?usp=sharing)
-
-### Relations
-[![branchingvid](https://user-images.githubusercontent.com/38910830/176278420-442131c8-993d-4669-83a8-d0110f6be40f.png)](https://drive.google.com/file/d/1cIKDawGKDdbYwrA_mMukE6rJhvISR8_s/view?usp=sharing)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/briteliteimmersive/aegis-app) 
 
 #### Open Branch:
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/module-federation/aegis-app) 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/briteliteimmersive/aegis-app) 
 
 ## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
 - loaded from multiple network locations and repositories at runtime;
 - developed by multiple teams;
-- run together in a single process;
+- can run together in a single process;
 - can be reloaded at any time without restarting the process or interrupting other components running in the process;
 - are _not_ _installed_ on the server but _streamed_ over the network as needed.
 
