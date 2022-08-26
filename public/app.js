@@ -185,7 +185,7 @@
     let url = `${modelApiPath}/${model}`
     if (id) url += `/${id}`
     if (param) url += `/${param}`
-    if (port) url += `/ports/${port}`
+    if (port) url += `/service/ports/${port}`
     if (query) url += `?${query}`
     displayUrl(url)
     return url

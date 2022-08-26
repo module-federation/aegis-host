@@ -1421,10 +1421,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@module-federation/aegis@^1.2.0-beta":
-  version "1.2.0-beta"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.2.0-beta.tgz#0b3a98cee982dfff0ee63dd011b601effe34f917"
-  integrity sha512-KtELe59c5ZjquUGrWk3jgc5bjyj2lNpPGnYvgFRmBbgcfOQARqZHJpNfmT0OiOSprXNzXcix1o69kknJz62Jsg==
+"@module-federation/aegis@^1.2.3-beta":
+  version "1.2.3-beta"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.2.3-beta.tgz#29bb8c89630c8c3699e07ad34228204195aa7378"
+  integrity sha512-md0cMQUFaJZ5ay3N/rWdj3ETJU1r0vJpskVmHjj2g3O2yE9PyfdpR7ARuAL33c6TyOKP6G+raopu2Ruj3hkZMg==
   dependencies:
     "@assemblyscript/loader" "0.20.13"
     "@octokit/core" "3.6.0"
@@ -1441,7 +1441,7 @@
     mesh-link "0.13.6"
     mongodb "4.7.0"
     multicast-dns "7.2.5"
-    nanoid "4.0.0"
+    nanoid "3.3.2"
     nats "2.7.1"
     path-to-regexp "^6.2.1"
     python-shell "^3.0.1"
@@ -1449,6 +1449,7 @@
     sharedmap "^1.2.0"
     webpack "^5.66.0"
     whois "2.13.9"
+    ws "^8.8.0"
 
 "@multiformats/mafmt@^11.0.2":
   version "11.0.2"
@@ -7861,15 +7862,20 @@ nanoid@3.1.20:
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.20.tgz#badc263c6b1dcf14b71efaa85f6ab4c1d6cfc788"
   integrity sha512-a1cQNyczgKbLX9jwbS/+d7W8fX/RfgYR7lVWwWOGIPNgK2m0MWvrGF6/m4kk6U3QcFMnZf3RIhL0v2Jgh/0Uxw==
 
-nanoid@4.0.0, nanoid@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-4.0.0.tgz#6e144dee117609232c3f415c34b0e550e64999a5"
-  integrity sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==
+nanoid@3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.2.tgz#c89622fafb4381cd221421c69ec58547a1eec557"
+  integrity sha512-CuHBogktKwpm5g2sRgv83jEy2ijFzBwMoYA60orPDR7ynsLijJDqgsi4RDGj3OJpy3Ieb+LYwiRmIOGyytgITA==
 
 nanoid@^3.0.2, nanoid@^3.1.20, nanoid@^3.1.23:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
   integrity sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==
+
+nanoid@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-4.0.0.tgz#6e144dee117609232c3f415c34b0e550e64999a5"
+  integrity sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==
 
 napi-macros@~2.0.0:
   version "2.0.0"
