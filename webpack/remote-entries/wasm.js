@@ -14,13 +14,13 @@ exports.wasm = [
     name: 'wasm',
     url: 'https://api.github.com',
     repo: 'aegis',
-    owner: 'module-federation',
+    owner: 'briteliteimmersive',
     filedir: 'wasm/build',
     branch: 'main',
     wasm: true,
     path: __dirname,
     type: 'model',
-    importRemote () {
+    importRemote() {
       return importWebAssembly(this)
     }
   }

@@ -1,1 +1,0 @@
-## This directory contains remote-entry.js files
