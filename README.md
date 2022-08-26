@@ -22,6 +22,7 @@ This repo contains the host code. The library can be found [here](https://github
 
 ![mono-micro-fed 001](https://user-images.githubusercontent.com/38910830/126571702-0cd570fd-2a94-4560-86b0-18d514d7cb65.jpeg)
 
+
 ## TL;DR
 
 ```shell
@@ -130,7 +131,7 @@ In addtion to zero-install, hot deployment and local eventing, aegis promotes st
 
 ## Components
 
-Aegis uses a modified version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. Aegis modules fall into three categories: `model`, `adapter` and `service`.
+Aegis uses a modified     version of [Webpack Module Federation](https://webpack.js.org/concepts/module-federation/) to import remote modules over the network into the host framework at runtime. Aegis modules fall into three categories: `model`, `adapter` and `service`.
 
 A [model](https://github.com/module-federation/aegis-application/blob/master/src/config/order.js) is a domain entity/service - or in [polylith](https://polylith.gitbook.io/) architecture, a component - that implements all or part of the service’s core logic. Each model has a corresponding ModelSpecification object which is used to define and configure core properties of the model and their values or bindings, such as URL endpoint of the service or external dependencies to be injected. The object implements an interface the has many options but only a few simple requirements, so developers can use as much, or as little, of the framework's capabilities as they choose.
 
