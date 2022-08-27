@@ -67,6 +67,7 @@
     "path-to-regexp": "^6.2.1",
     "regenerator-runtime": "^0.13.9",
     "require-fresh": "^1.1.0",
+    "rimraf": "^3.0.2",
     "ws": "^8.8.0"
   },
   "devDependencies": {
@@ -79,7 +80,6 @@
     "express-cli": "0.0.1",
     "jest": "^27.0.6",
     "mocha": "^8.2.0",
-    "rimraf": "^3.0.2",
     "split": "^1.0.1",
     "webpack": "5.47.1",
     "webpack-cli": "^4.10.0",
