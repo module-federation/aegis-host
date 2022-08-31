@@ -4,7 +4,7 @@ github:
     branches: true
     pullRequests: true
     pullRequestsFromForks: true
-    addCheck: false
+    addCheck: prevent-merge-on-error
     addComment: false
     addBadge: true
 
