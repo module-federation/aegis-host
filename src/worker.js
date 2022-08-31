@@ -1,17 +1,13 @@
 'use strict'
 
 require('regenerator-runtime')
-const { domain, adapters, services } = require('@module-federation/aegis')
+const { domain, adapters } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
 const { importRemotes, EventBrokerFactory } = domain
-const { StorageAdapter } = adapters
-const { StorageService } = services
-const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const DomainPorts = domain.UseCaseService
-const overrides = { find, save, ...StorageService }
 const modelName = workerData.poolName.toUpperCase()
 
 if (!modelName) {
@@ -33,7 +29,7 @@ const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
 async function init (remotes) {
   try {
     // import federated modules; override as needed
-    await importRemotes(remotes, overrides)
+    await importRemotes(remotes)
     // get the inbound ports for this domain model
     return DomainPorts(modelName)
   } catch (error) {
