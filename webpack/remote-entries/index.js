@@ -5,4 +5,4 @@
 
 exports.local = require('./local')
 exports.cache = require('./cache')
-exports.wasm = require('./wasm')
+//exports.wasm = require('./wasm')

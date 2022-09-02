@@ -1,13 +1,17 @@
 'use strict'
 
 require('regenerator-runtime')
-const { domain, adapters } = require('@module-federation/aegis')
+const { domain, adapters, services } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
-const { importRemotes, EventBrokerFactory } = domain
+const { importRemotes, EventBrokerFactory, AppError } = domain
+const { StorageAdapter } = adapters
+const { StorageService } = services
+const { find, save } = StorageAdapter
 const { initCache } = adapters.controllers
 const DomainPorts = domain.UseCaseService
+const overrides = { find, save, ...StorageService }
 const modelName = workerData.poolName.toUpperCase()
 
 if (!modelName) {
@@ -29,7 +33,7 @@ const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
 async function init (remotes) {
   try {
     // import federated modules; override as needed
-    await importRemotes(remotes)
+    await importRemotes(remotes, overrides)
     // get the inbound ports for this domain model
     return DomainPorts(modelName)
   } catch (error) {
@@ -81,10 +85,14 @@ remoteEntries.then(remotes => {
       parentPort.on('message', async message => {
         // Look for a use case function called `message.name`
         if (typeof domainPorts[message.name] === 'function') {
-          // invoke an inbound port (a.k.a use case function)
-          const result = await domainPorts[message.name](message.data)
-          // serialize `result` to get rid of any functions
-          parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
+          try {
+            // invoke an inbound port (a.k.a use case function)
+            const result = await domainPorts[message.name](message.data)
+            // serialize `result` to get rid of any functions
+            parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
+          } catch (error) {
+            parentPort.postMessage(new AppError(error))
+          }
           // The "event port" is transfered
         } else if (message.eventPort instanceof MessagePort) {
           // send/recv events to/from main thread
