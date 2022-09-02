@@ -25,6 +25,14 @@ const broker = EventBrokerFactory.getInstance()
 /** @type {Promise<import('../webpack/remote-entries-type').remoteEntry[]>} */
 const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
 
+
+class AppError { 
+  constructor(err) { 
+    const errProps = Object.getOwnPropertyNames(err)
+    for (var k in errProps) this[errProps[k]] = err[errProps[k]].toString();
+  }
+}
+
 /**
  * Import and bind remote modules: i.e. models, adapters and services
  * @param {import('../webpack/remote-entries-type.js').remoteEntry[]} remotes
@@ -85,10 +93,14 @@ remoteEntries.then(remotes => {
       parentPort.on('message', async message => {
         // Look for a use case function called `message.name`
         if (typeof domainPorts[message.name] === 'function') {
-          // invoke an inbound port (a.k.a use case function)
-          const result = await domainPorts[message.name](message.data)
-          // serialize `result` to get rid of any functions
-          parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
+          try{
+            // invoke an inbound port (a.k.a use case function)
+            const result = await domainPorts[message.name](message.data)
+            // serialize `result` to get rid of any functions
+            parentPort.postMessage(result instanceof Error ? new AppError(result) : JSON.parse(JSON.stringify(result || {})))
+          }catch(e){
+            parentPort.postMessage(new AppError(e));
+          }
           // The "event port" is transfered
         } else if (message.eventPort instanceof MessagePort) {
           // send/recv events to/from main thread
@@ -102,5 +114,6 @@ remoteEntries.then(remotes => {
     })
   } catch (error) {
     console.error({ remoteEntries, error })
+    throw new Error(error)
   }
 })
