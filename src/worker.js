@@ -1,17 +1,13 @@
 'use strict'
 
 require('regenerator-runtime')
-const { domain, adapters, services } = require('@module-federation/aegis')
+const { domain, adapters } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
-const { importRemotes, EventBrokerFactory, AppError } = domain
-const { StorageAdapter } = adapters
-const { StorageService } = services
-const { find, save } = StorageAdapter
+const { importRemotes, EventBrokerFactory } = domain
 const { initCache } = adapters.controllers
 const DomainPorts = domain.UseCaseService
-const overrides = { find, save, ...StorageService }
 const modelName = workerData.poolName.toUpperCase()
 
 if (!modelName) {
@@ -25,6 +21,13 @@ const broker = EventBrokerFactory.getInstance()
 /** @type {Promise<import('../webpack/remote-entries-type').remoteEntry[]>} */
 const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
 
+const AppError = err => ({
+  name: err.name,
+  message: err.message,
+  stack: err.stack,
+  hasError: true
+})
+
 /**
  * Import and bind remote modules: i.e. models, adapters and services
  * @param {import('../webpack/remote-entries-type.js').remoteEntry[]} remotes
@@ -33,7 +36,7 @@ const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
 async function init (remotes) {
   try {
     // import federated modules; override as needed
-    await importRemotes(remotes, overrides)
+    await importRemotes(remotes)
     // get the inbound ports for this domain model
     return DomainPorts(modelName)
   } catch (error) {
@@ -75,36 +78,38 @@ function connectEventChannel (eventPort) {
 }
 
 remoteEntries.then(remotes => {
-  try {
-    init(remotes).then(async domainPorts => {
-      console.info('aegis worker thread running')
-      // load distributed cache and register its events
-      await initCache().load()
+  init(remotes).then(async domainPorts => {
+    console.info('aegis worker thread running')
+    // load distributed cache and register its events
+    await initCache().load()
 
-      // handle API requests from main
-      parentPort.on('message', async message => {
-        // Look for a use case function called `message.name`
-        if (typeof domainPorts[message.name] === 'function') {
-          try {
-            // invoke an inbound port (a.k.a use case function)
-            const result = await domainPorts[message.name](message.data)
-            // serialize `result` to get rid of any functions
-            parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
-          } catch (error) {
-            parentPort.postMessage(new AppError(error))
-          }
-          // The "event port" is transfered
-        } else if (message.eventPort instanceof MessagePort) {
-          // send/recv events to/from main thread
-          connectEventChannel(message.eventPort)
-        } else {
-          console.warn('not a domain port', message)
-          // main is expecting a response
-          parentPort.postMessage({ error: 'not a function', message })
+    // handle API requests from main
+    parentPort.on('message', async message => {
+      // Look for a use case function called `message.name`
+      if (typeof domainPorts[message.name] === 'function') {
+        try {
+          // invoke an inbound port method on this domain model
+          const result = await domainPorts[message.name](message.data)
+          // serialize `result` to get rid of any functions
+          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+        } catch (error) {
+          // catch and return (dont kill the thread)
+          parentPort.postMessage(AppError(error))
         }
-      })
+        // The "event port" is transfered
+      } else if (message.eventPort instanceof MessagePort) {
+        // send/recv events to/from main thread
+        connectEventChannel(message.eventPort)
+        // no response expected
+      } else if (message.name === 'ping') {
+        parentPort.postMessage('pong')
+      } else {
+        console.warn('not a domain port', message)
+        // main is expecting a response
+        parentPort.postMessage(
+          AppError(new Error(`not a function: ${message}`))
+        )
+      }
     })
-  } catch (error) {
-    console.error({ remoteEntries, error })
-  }
+  })
 })
