@@ -111,5 +111,8 @@ remoteEntries.then(remotes => {
         )
       }
     })
+    parentPort.on('close', () => console.log('close'))
+
+    parentPort.on('messageerror', err => console.error(err))
   })
 })
