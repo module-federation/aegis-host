@@ -5,7 +5,7 @@ const { domain, adapters } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
-const { importRemotes, EventBrokerFactory } = domain
+const { importRemotes, EventBrokerFactory, AppError } = domain
 const { initCache } = adapters.controllers
 const DomainPorts = domain.UseCaseService
 const modelName = workerData.poolName.toUpperCase()
@@ -20,13 +20,6 @@ const broker = EventBrokerFactory.getInstance()
 
 /** @type {Promise<import('../webpack/remote-entries-type').remoteEntry[]>} */
 const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
-
-const AppError = err => ({
-  name: err.name,
-  message: err.message,
-  stack: err.stack,
-  hasError: true
-})
 
 /**
  * Import and bind remote modules: i.e. models, adapters and services
@@ -102,7 +95,7 @@ remoteEntries.then(remotes => {
         connectEventChannel(message.eventPort)
         // no response expected
       } else if (message.name === 'ping') {
-        parentPort.postMessage('pong')
+        parentPort.postMessage(message.data)
       } else {
         console.warn('not a domain port', message)
         // main is expecting a response
@@ -111,8 +104,5 @@ remoteEntries.then(remotes => {
         )
       }
     })
-    parentPort.on('close', () => console.log('close'))
-
-    parentPort.on('messageerror', err => console.error(err))
   })
 })

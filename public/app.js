@@ -59,7 +59,13 @@
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 35 } })
     )
+
     let response = await fetch(url, options)
+
+    if (![200, 201].includes(response.status)) {
+      return response.status + ': ' + response.statusText
+    }
+
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 50 } })
     )
