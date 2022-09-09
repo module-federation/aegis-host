@@ -73,6 +73,7 @@ One of the main goals of Aegis is to provide an alternative to distributed syste
 In addtion to zero-install, hot deployment and local eventing, aegis promotes strong boundaries between, and prevents coupling of, collocated components through the formalism of the port-adapter paradigm and the use of code generation to automate boilerplate integration tasks. Features include:
 
 ### Highlights
+
 - Deployment independence without distribution
 - Language independence without distribution
 - Self-deployment (_no deployment automation required!_)
