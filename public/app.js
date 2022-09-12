@@ -62,7 +62,7 @@
 
     let response = await fetch(url, options)
 
-    if (![200, 201].includes(response.status)) {
+    if (![200, 201, 400].includes(response.status)) {
       return response.status + ': ' + response.statusText
     }
 
@@ -363,6 +363,10 @@
 
   clearButton.onclick = function () {
     document.getElementById('jsonCode').innerHTML = ''
+    document.getElementById('modelId').value = ''
+    document.getElementById('query').value = ''
+    document.getElementById('parameter').value = ''
+    document.getElementById('port').value = ''
   }
 
   copyButton.addEventListener('click', function () {
