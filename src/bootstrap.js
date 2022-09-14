@@ -5,6 +5,7 @@ require('regenerator-runtime')
 const importFresh = require('import-fresh')
 const express = require('express')
 const server = require('./server')
+const cors = require('cors')
 const app = express()
 
 function clearRoutes () {
@@ -25,6 +26,7 @@ async function load (aegis = null) {
     const remotes = (await remote.get('./remoteEntries'))()
     const handle = await aegis.init(remotes)
 
+    app.use(cors())
     app.use(express.json())
     app.use(express.static('public'))
 
