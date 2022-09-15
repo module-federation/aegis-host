@@ -9,7 +9,7 @@ This repo contains the host code. The library can be found [here](https://github
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/github.com/module-federation/aegis) 
 
-(Note: to avoid rate-limiting, create a [Gitpod](gitpod.com) variable in your profile called GITHUB_TOKEN with the value of a Github personal access [token](github.com/settings/profile).)
+(Note: to avoid rate-limiting, create a [Gitpod](https://gitpod.io) variable in your profile called GITHUB_TOKEN with the value of a Github personal access [token](https://github.com/settings/profile).)
 
 #### Open Branch:
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/module-federation/aegis-app) 
