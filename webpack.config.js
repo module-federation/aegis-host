@@ -77,7 +77,7 @@ function handleEnv (env) {
 }
 
 function exitAfterBuild () {
-  setTimeout(() => process.exit(0), 10000)
+  setTimeout(() => process.exit(0), 4000)
 }
 
 module.exports = [server]
