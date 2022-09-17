@@ -179,10 +179,9 @@
   }
 
   function getUrl () {
-    if (customUrl) {
-      return document.getElementById('url').value
-    }
-    const id = document.getElementById('modelId').value
+    if (customUrl) return document.getElementById('url').value
+
+    const id = modelIdInput.value
     const model = document.getElementById('model').value
     const param = document.getElementById('parameter').value
     const query = document.getElementById('query').value
@@ -193,6 +192,7 @@
     if (param) url += `/${param}`
     if (port) url += `/service/ports/${port}`
     if (query) url += `?${query}`
+
     displayUrl(url)
     return url
   }
@@ -208,11 +208,13 @@
   }
 
   const urlInput = document.getElementById('url')
+
   urlInput.onfocus = makeCustomUrl
   modelInput.onfocus = makeAutoUrl
   modelIdInput.onfocus = makeAutoUrl
   queryInput.onfocus = makeAutoUrl
   paramInput.onfocus = makeAutoUrl
+  portInput.onfocus = makeAutoUrl
 
   modelInput.onchange = updatePorts
   modelIdInput.onchange = getUrl
@@ -227,12 +229,12 @@
   }
 
   function updatePorts () {
-    document.getElementById('port').value = ''
-    getUrl()
+    portInput.value = ''
     removeAllChildNodes(document.querySelector('#portList'))
-    const model = models.find(
-      model => model.endpoint === document.getElementById('model').value
-    )
+    getUrl()
+
+    const model = models.find(model => model.endpoint === modelInput.value)
+
     Object.keys(model.ports).forEach(port => {
       if (model.ports[port].type === 'inbound')
         portList.appendChild(new Option(port))
@@ -273,15 +275,13 @@
   const fetchEvents = ['fetch-connect', 'fetch-read', 'fetch-done']
 
   window.addEventListener('fetch-connect', function (e) {
-    const btn = document.querySelector('#reloadModelButton')
-    btn.disabled = true
-    btn.ariaBusy = true
+    reloadModelButton.disabled = true
+    reloadModelButton.ariaBusy = true
   })
 
   window.addEventListener('fetch-done', function (e) {
-    const btn = document.querySelector('#reloadModelButton')
-    btn.disabled = false
-    btn.ariaBusy = false
+    reloadModelButton.disabled = false
+    reloadModelButton.ariaBusy = false
   })
 
   reloadModelButton.onclick = async function () {
@@ -298,17 +298,6 @@
     showMessage(response)
     setTimeout(() => bar.hide(), 1000)
   }
-
-  // let stressTest = false
-  // postButton.addEventListener('mouseup', function () {
-  //   return (stressTest = false)
-  // })
-  // postButton.addEventListener('mousedown', async function () {
-  //   setTimeout(async () => {
-  //     document.getElementById('modelId').value = ''
-  //     while (stressTest) await post()
-  //   }, 1000)
-  // })
 
   function pressAndHold (item, action) {
     let timerID
@@ -333,9 +322,7 @@
     function pressingDown (e) {
       // Start the timer
       requestAnimationFrame(timer)
-
       e.preventDefault()
-
       console.log('Pressing!')
     }
 
@@ -343,7 +330,6 @@
       // Stop the timer
       cancelAnimationFrame(timerID)
       counter = 0
-
       console.log('Not pressing!')
     }
 
@@ -360,13 +346,9 @@
     }
   }
 
-  pressAndHold(
-    postButton,
-    () => (document.getElementById('modelId').value = '')
-  )
-  postButton.onclick = post
+  pressAndHold(postButton, () => (modelIdInput.value = ''))
 
-  async function post () {
+  postButton.onclick = async function post () {
     const model = document.getElementById('model').value
     if (!model || model === '') {
       showMessage({ error: 'no model selected' })
@@ -437,32 +419,32 @@
   })
 
   clearModelButton.addEventListener('click', function () {
-    document.getElementById('model').value = ''
-    document.getElementById('modelId').value = ''
-    document.getElementById('query').value = ''
-    document.getElementById('parameter').value = ''
-    document.getElementById('port').value = ''
+    modelInput.value = ''
+    modelIdInput.value = ''
+    queryInput.value = ''
+    paramInput.value = ''
+    portInput.value = ''
     getUrl()
   })
 
   clearIdButton.addEventListener('click', function () {
-    document.getElementById('modelId').value = ''
-    document.getElementById('parameter').value = ''
+    modelIdInput.value = ''
+    paramInput.value = ''
     getUrl()
   })
 
   clearParamButton.addEventListener('click', function () {
-    document.getElementById('parameter').value = ''
+    paramInput.value = ''
     getUrl()
   })
 
   clearQueryButton.addEventListener('click', function () {
-    document.getElementById('query').value = ''
+    queryInput.value = ''
     getUrl()
   })
 
   clearPortsButton.addEventListener('click', function () {
-    document.getElementById('port').value = ''
+    portInput.value = ''
     getUrl()
   })
 
