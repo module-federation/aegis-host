@@ -214,7 +214,7 @@
   queryInput.onfocus = makeAutoUrl
   paramInput.onfocus = makeAutoUrl
 
-  modelInput.onchange = getUrl_updatePorts
+  modelInput.onchange = updatePorts
   modelIdInput.onchange = getUrl
   queryInput.onchange = getUrl
   paramInput.onchange = getUrl
@@ -226,16 +226,17 @@
     }
   }
 
-  function getUrl_updatePorts () {
+  function updatePorts () {
     document.getElementById('port').value = ''
     getUrl()
     removeAllChildNodes(document.querySelector('#portList'))
     const model = models.find(
       model => model.endpoint === document.getElementById('model').value
     )
-    Object.keys(model.ports).forEach(port =>
-      portList.appendChild(new Option(port))
-    )
+    Object.keys(model.ports).forEach(port => {
+      if (model.ports[port].type === 'inbound')
+        portList.appendChild(new Option(port))
+    })
   }
 
   function showMessage (message) {
@@ -264,11 +265,9 @@
     }
   }
 
-  function endpointModelName () {
+  function modelNameFromEndpoint () {
     const endpoint = document.getElementById('model').value
-    const len = endpoint.length
-    if (endpoint.charAt(len - 1) === 's') return endpoint.slice(0, len - 1)
-    return endpoint
+    return models.find(model => model.endpoint === endpoint).modelName
   }
 
   const fetchEvents = ['fetch-connect', 'fetch-read', 'fetch-done']
@@ -288,7 +287,7 @@
   reloadModelButton.onclick = async function () {
     const bar = new ProgressBar(fetchEvents)
     bar.show()
-    const modelName = endpointModelName()
+    const modelName = modelNameFromEndpoint()
     const response = await instrumentedFetch(
       `${modelApiPath}/reload?modelName=${modelName}`,
       {
@@ -300,7 +299,74 @@
     setTimeout(() => bar.hide(), 1000)
   }
 
-  postButton.onclick = async function () {
+  // let stressTest = false
+  // postButton.addEventListener('mouseup', function () {
+  //   return (stressTest = false)
+  // })
+  // postButton.addEventListener('mousedown', async function () {
+  //   setTimeout(async () => {
+  //     document.getElementById('modelId').value = ''
+  //     while (stressTest) await post()
+  //   }, 1000)
+  // })
+
+  function pressAndHold (item, action) {
+    let timerID
+    let counter = 0
+
+    let pressHoldEvent = new CustomEvent('pressHold')
+
+    // Increase or decreae value to adjust how long
+    // one should keep pressing down before the pressHold
+    // event fires
+    let pressHoldDuration = 10
+
+    // Listening for the mouse and touch events
+    item.addEventListener('mousedown', pressingDown, false)
+    item.addEventListener('mouseup', notPressingDown, false)
+    item.addEventListener('mouseleave', notPressingDown, false)
+    item.addEventListener('touchstart', pressingDown, false)
+    item.addEventListener('touchend', notPressingDown, false)
+    // Listening for our custom pressHold event
+    item.addEventListener('pressHold', action, false)
+
+    function pressingDown (e) {
+      // Start the timer
+      requestAnimationFrame(timer)
+
+      e.preventDefault()
+
+      console.log('Pressing!')
+    }
+
+    function notPressingDown (e) {
+      // Stop the timer
+      cancelAnimationFrame(timerID)
+      counter = 0
+
+      console.log('Not pressing!')
+    }
+
+    function timer () {
+      console.log('Timer tick!')
+
+      if (counter < pressHoldDuration) {
+        timerID = requestAnimationFrame(timer)
+        counter++
+      } else {
+        console.log('Press threshold reached!')
+        item.dispatchEvent(pressHoldEvent)
+      }
+    }
+  }
+
+  pressAndHold(
+    postButton,
+    () => (document.getElementById('modelId').value = '')
+  )
+  postButton.onclick = post
+
+  async function post () {
     const model = document.getElementById('model').value
     if (!model || model === '') {
       showMessage({ error: 'no model selected' })
@@ -363,10 +429,6 @@
 
   clearButton.onclick = function () {
     document.getElementById('jsonCode').innerHTML = ''
-    document.getElementById('modelId').value = ''
-    document.getElementById('query').value = ''
-    document.getElementById('parameter').value = ''
-    document.getElementById('port').value = ''
   }
 
   copyButton.addEventListener('click', function () {
