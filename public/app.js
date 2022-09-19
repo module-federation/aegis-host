@@ -299,16 +299,20 @@
     setTimeout(() => bar.hide(), 1000)
   }
 
-  function pressAndHold (item, action) {
+  /**
+   * Increase or decreae value to adjust how long
+   * one should keep pressing down before the pressHold
+   * event fires
+   *
+   * @param {*} item
+   * @param {*} action
+   * @param {*} pressHoldDuration
+   */
+  function pressAndHold (item, action, pressHoldDuration = 20) {
     let timerID
     let counter = 0
 
     let pressHoldEvent = new CustomEvent('pressHold')
-
-    // Increase or decreae value to adjust how long
-    // one should keep pressing down before the pressHold
-    // event fires
-    let pressHoldDuration = 10
 
     // Listening for the mouse and touch events
     item.addEventListener('mousedown', pressingDown, false)
@@ -372,7 +376,7 @@
   }
 
   patchButton.onclick = function () {
-    document.getElementById('query').value = ''
+    queryInput.value = ''
     fetch(getUrl(), {
       method: 'PATCH',
       body: document.getElementById('payload').value,
@@ -386,8 +390,7 @@
   }
 
   getButton.onclick = function () {
-    const query = document.getElementById('query').value
-    if (/html=true/i.test(query)) {
+    if (/html=true/i.test(queryInput.value)) {
       window.open(getUrl())
       return
     }
