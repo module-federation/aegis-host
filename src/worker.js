@@ -87,7 +87,7 @@ remoteEntries.then(remotes => {
           parentPort.postMessage(JSON.parse(JSON.stringify(result)))
         } catch (error) {
           // catch and return (dont kill the thread)
-          parentPort.postMessage(AppError(error))
+          parentPort.postMessage(AppError(error, error.code))
         }
         // The "event port" is transfered
       } else if (message.eventPort instanceof MessagePort) {
