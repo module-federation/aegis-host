@@ -55,8 +55,8 @@ tasks:
   - name: wasmedge
     init: |
       echo "Y\n" | sudo apt-get update
-      ec\n" | sudo apt install build-essential curl wget git vim libboost-all-dev llvm-dev liblld-10-dev
-      echo "1ho "Y\n" | sudo apt-get -y upgrade
+      echo "Y\n" | sudo apt install build-essential curl wget git vim libboost-all-dev llvm-dev liblld-10-dev
+      echo "Y\n" | sudo apt-get -y upgrade
       echo "Y/n" | curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
       curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash
       curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
@@ -64,7 +64,8 @@ tasks:
       echo "1/n" | curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
       echo "1/n" | curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
       source $HOME/.cargo/env
-      echo "1/n" | rustup override set 1.50.0
+      echo "1
+      " | rustup override set 1.50.0
       gp sync-await buildHost
       yarn add wasmedge-core
       yarn add wasmedge-extensions
