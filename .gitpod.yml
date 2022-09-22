@@ -57,12 +57,12 @@ tasks:
       printf 'Y\n' | sudo apt-get update
       printf 'Y\n' | sudo apt install build-essential curl wget git vim libboost-all-dev llvm-dev liblld-10-dev
       printf 'Y\n' | sudo apt-get -y upgrade
-      yes 1 | curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-      yes 1 | curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash
-      yes 1 | curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
+      curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -y
+      curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -y -s -- -e all
       source $HOME/.wasmedge/env
-      yes 1 | curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-      yes 1 | curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
+      curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSfy | sh
       source $HOME/.cargo/env
       rustup override set 1.50.0
       gp sync-await buildHost
