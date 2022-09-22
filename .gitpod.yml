@@ -61,8 +61,8 @@ tasks:
       curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -y
       curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -y -s -- -e all
       source $HOME/.wasmedge/env
-      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
-      curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSfy | sh
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
       source $HOME/.cargo/env
       rustup override set 1.50.0
       gp sync-await buildHost
