@@ -58,8 +58,8 @@ tasks:
       printf 'Y\n' | sudo apt install build-essential curl wget git vim libboost-all-dev llvm-dev liblld-10-dev
       printf 'Y\n' | sudo apt-get -y upgrade
       printf '1\n' | curl --proto '=ht  tps' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-      curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash
-      curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
+      printf '1\n' | curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash
+      printf '1\n' | curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
       source $HOME/.wasmedge/env
       printf '1\n' | curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
       printf '1\n' | curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
