@@ -20,6 +20,9 @@ tasks:
   - name: aegis-lib
     init: |
       cd ../aegis
+      printf 'Y\n' | sudo apt-get update
+      printf 'Y\n' | sudo apt install build-essential curl wget git vim libboost-all-dev llvm-dev liblld-10-dev
+      printf 'Y\n' | sudo apt-get upgrade
       yarn
       gp sync-done install
     command: |
@@ -32,40 +35,39 @@ tasks:
       gp sync-await install
       cd ../aegis-app
       yarn
-      gp sync-done installHost
+      gp sync-done installApp
     command: |
       gp sync-await build
       cd ../aegis-app
       yarn buildLocalRepo
-      gp sync-done buildHost
+      gp sync-done buildApp
       yarn startLocalRepo
 
   - name: aegis-host
     init: |
-      gp sync-await installHost
+      gp sync-await installApp
       cd ../aegis-host
       yarn
+      gp sync-done installHost
     command: |
-      gp sync-await buildHost
+      gp sync-await buildApp
       cd ../aegis-host
       yarn build
-      gp sync-done                                                                                                   
+      gp sync-done startHost
       yarn start
 
   - name: wasmedge
     init: |
-      printf 'Y\n' | sudo apt-get update
-      printf 'Y\n' | sudo apt install build-essential curl wget git vim libboost-all-dev llvm-dev liblld-10-dev
-      printf 'Y\n' | sudo apt-get upgrade
+      cd ../aegis-host
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh
-      chmod 777 rustup-initsh
-      ./rustup-init.sh -y.
-      curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash
+      chmod 777 rustup-init.sh
+      ./rustup-init.sh -y
       curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
       source $HOME/.wasmedge/env
       curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
       source $HOME/.cargo/env
       rustup override set 1.50.0
+      gp sync-await installHost
       yarn add wasmedge-core
       yarn add wasmedge-extensions
       rustwasmc build --enable-ext --enable-aot
