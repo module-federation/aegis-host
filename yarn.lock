@@ -1421,10 +1421,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@module-federation/aegis@^1.3.3-beta":
-  version "1.3.3-beta"
-  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.3.3-beta.tgz#2cc402843eb121ff74dfd082dc4d761f1daa86d4"
-  integrity sha512-4mY22Xdqd9Qf6VdtPQsKBEep2W9juxS7+2fF9jjWk2Obb80/iBHgZfxueTbeerppS3f8gxbup1yX1fzVq2LTfA==
+"@module-federation/aegis@^1.3.5-beta":
+  version "1.3.5-beta"
+  resolved "https://registry.yarnpkg.com/@module-federation/aegis/-/aegis-1.3.5-beta.tgz#584498b2c4c8810502114e1c0fc7ec5267cea60e"
+  integrity sha512-IDbc98St4E16N8XsDG0uZP1F90Umgboakr8t1k117oGDVjDuC0EeWZpM7GQCPcUzeD7OyyghMLygUQ3IHEmTqg==
   dependencies:
     "@assemblyscript/loader" "0.21.1"
     "@octokit/core" "4.0.5"
@@ -1432,6 +1432,7 @@
     acme-client "^5.0.0"
     as-bind "0.8.2"
     assemblyscript "0.21.1"
+    cors "^2.8.5"
     dotenv "16.0.1"
     express "4.18.1"
     express-jwt "7.7.5"
@@ -1445,6 +1446,7 @@
     nats "2.7.1"
     path-to-regexp "^6.2.1"
     python-shell "^3.0.1"
+    query-params-mongo "^1.1.3"
     regenerator-runtime "0.13.9"
     rimraf "3.0.2"
     sharedmap "^1.2.0"
@@ -8820,6 +8822,11 @@ qs@~6.5.2:
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.3.tgz#3aeeffc91967ef6e35c0e488ef46fb296ab76aad"
   integrity sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==
+
+query-params-mongo@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/query-params-mongo/-/query-params-mongo-1.1.3.tgz#34276e324622bbccc47af60d04edd34b500ba645"
+  integrity sha512-FksHM/v8NVDlCVUxqhxMas2rnXPiyw+yLegM+G9gOUMMTPDtWRCydUy1iHm5NFsobHMsyZBkkpBldhGEJ+7Tsg==
 
 querystringify@^2.1.1:
   version "2.2.0"
