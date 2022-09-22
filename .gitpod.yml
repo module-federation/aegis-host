@@ -70,7 +70,7 @@ tasks:
       gp sync-await installHost
       yarn add wasmedge-core
       yarn add wasmedge-extensions
-      rustwasmc build --enable-ext --enable-aot
+    command: rustwasmc build --enable-ext --enable-aot
 
   - name: webswitch
     command: |
