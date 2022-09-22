@@ -63,6 +63,7 @@ tasks:
       chmod 777 rustup-init.sh
       ./rustup-init.sh -y
       curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
+      chmod 777 $HOME/.cargo/env
       source $HOME/.wasmedge/env
       curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
       source $HOME/.cargo/env
