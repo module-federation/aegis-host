@@ -14,10 +14,10 @@ additionalRepositories:
   - url: https://github.com/module-federation/aegis-app
 
 tasks:
-  - name: mongodb
+  - name: start-mongodb
     command: ../aegis-host/mongo.sh
 
-  - name: rust
+  - name: install-rust
     init: |
       sudo printf 'Y/n' | ACCEPT_EULA=Y apt-get update
       sudo printf 'Y/n' | ACCEPT_EULA=Y apt-get upgrade
@@ -40,6 +40,7 @@ tasks:
       gp sync-done install-aegis
     command: |
       gp sync-await build-wasmedge
+      cd ../aegis-app
       yarn build
       yarn webswitch
       gp sync-done build-aegis
@@ -52,12 +53,18 @@ tasks:
       gp sync-done install-app
     command: |
       gp sync-await build-aegis
+      gp sync-done build-repo
       cd ../aegis-app
       yarn buildLocalRepo
       gp sync-done build-app
+
+  - name: start-repo
+    command: |
+      gp sync-await build-repo
+      cd ../aegis-app
       yarn startLocalRepo
 
-  - name: aegis-host
+  - name: start-host
     init: |
       gp sync-await install-app
       cd ../aegis-host
@@ -80,7 +87,6 @@ tasks:
       gp sync-done install-wasmedge
     command: |
       rustwasmc build --enable-t --enable-aot
-      gp sync-done build-wasmedge
 
   - name: webswitch
     command: |
