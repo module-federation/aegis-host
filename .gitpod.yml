@@ -19,8 +19,8 @@ tasks:
 
   - name: rust
     init: |
-      sudo ACCEPT_EULA=Y apt-get update
-      sudo ACCEPT_EULA=Y apt-get upgrade
+      printf 'Y/n' | sudo ACCEPT_EULA=Y apt-get update
+      printf 'Y/n' |  sudo ACCEPT_EULA=Y apt-get upgrade
       printf 'Y/n' | sudo apt-get install wget git curl software-properties-common \
           build-essential vim libboost-all-dev llvm-dev liblld-10-dev
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh
