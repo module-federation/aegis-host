@@ -17,67 +17,71 @@ tasks:
   - name: mongodb
     command: ../aegis-host/mongo.sh
 
-  - name: aegis-lib
+  - name: rust
+    init: |
+      sudo ACCEPT_EULA=Y apt-get update
+      sudo ACCEPT_EULA=Y apt-get upgrade
+      sudo apt-get install wget git curl software-properties-common \
+          build-essential vim libboost-all-dev llvm-dev liblld-10-dev
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh
+      chmod 754 rustup-init.sh
+      ./rustup-init.sh -y
+      chmod 754 $HOME/.cargo/env
+      source $HOME/.cargo/env
+      gp sync-done install-rust
+
+  - name: aegis
     init: |
       cd ../aegis
-      printf 'Y\n' | sudo apt-get update
-      printf 'Y\n' | sudo apt install build-essential curl wget git vim libboost-all-dev llvm-dev liblld-10-dev
-      printf 'Y\n' | sudo apt-get upgrade
+      gp sync-await install-rust
       yarn
-      gp sync-done install
+      gp sync-done install-aegis
     command: |
-      cd ../aegis
+      gp sync-await build-wasm
       yarn build
-      gp sync-done build
+      yarn webswitch
+      gp sync-done build-aegis
 
   - name: aegis-app
     init: |
-      gp sync-await install
+      gp sync-await install-aegis
       cd ../aegis-app
       yarn
-      gp sync-done installApp
+      gp sync-done install-app
     command: |
-      gp sync-await build
+      gp sync-await build-aegis
       cd ../aegis-app
       yarn buildLocalRepo
-      gp sync-done buildApp
+      gp sync-done build-app
       yarn startLocalRepo
 
   - name: aegis-host
     init: |
-      gp sync-await installApp
+      gp sync-await install-app
       cd ../aegis-host
       yarn
-      gp sync-done installHost
+      gp sync-done install-host
     command: |
-      gp sync-await buildApp
-      cd ../aegis-host
+      gp sync-await build-app
+      gp sync-await build-wasmedge
       yarn build
-      gp sync-done startHost
+      gp sync-done start-host
       yarn start
 
   - name: wasmedge
     init: |
+      gp sync-await install-host
       cd ../aegis-host
-      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh
-      chmod 777 rustup-init.sh
-      ./rustup-init.sh -y
-      chmod 777 $HOME/.cargo/env
-      source $HOME/.cargo/env
-      curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
-      chmod 777 $HOME/.wasmedge/env
-      source $HOME/.wasmedge/env
-      curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
-      source $HOME/.cargo/env
-      rustup override set 1.50.0
-      gp sync-await installHost
+      yarn add -g rustwasmc
       yarn add wasmedge-core
       yarn add wasmedge-extensions
-    command: rustwasmc build --enable-ext --enable-aot
+    command: |
+      rustwasmc build --enable-t --enable-aot
+      gp sync-done build-wasmedge
 
   - name: webswitch
     command: |
-      gp sync-await startHost
+      gp sync-await start-host
       cd ../aegis-host
       export PORT=8888
       export SWITCH=true
@@ -106,3 +110,16 @@ ports:
     description: multicast dns
     visibility: public
     onOpen: ignore
+  #   curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
+  #   chmod 777 $HOME/.wasmedge/env
+  #   source $HOME/.wasmedge/env
+  #   curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
+  #   source $HOME/.cargo/env
+  #   rustup target add wasm32-wasi
+  #   rustup override set 1.50.0
+  #   gp sync-await installHost
+  #   yarn add wasmedge-core
+  #   yarn add wasmedge-extensions
+  # command: |
+  #   gp sync-await buildHost
+  #   rustwasmc build --enable-ext --enable-aot
