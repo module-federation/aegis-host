@@ -87,6 +87,7 @@ tasks:
       gp sync-done install-wasmedge
     command: |
       rustwasmc build --enable-t --enable-aot
+      gp sync-done build-wasmedge
 
   - name: webswitch
     command: |
