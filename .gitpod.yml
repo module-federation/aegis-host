@@ -53,7 +53,6 @@ tasks:
       gp sync-done install-app
     command: |
       gp sync-await build-aegis
-      gp sync-done build-repo
       cd ../aegis-app
       yarn buildLocalRepo
       gp sync-done build-app
@@ -81,6 +80,7 @@ tasks:
     init: |
       gp sync-await install-host
       cd ../aegis-host
+      source $HOME/.wasmedge/env
       yarn add -g rustwasmc
       yarn add wasmedge-core
       yarn add wasmedge-extensions

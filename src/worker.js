@@ -5,7 +5,7 @@ const { domain, adapters } = require('@module-federation/aegis')
 const { workerData, parentPort } = require('worker_threads')
 const remote = require('../dist/remoteEntry')
 
-const { importRemotes, EventBrokerFactory, AppError } = domain
+const { importRemotes, EventBrokerFactory, AppError, requestContext } = domain
 const { initCache } = adapters.controllers
 const DomainPorts = domain.UseCaseService
 const modelName = workerData.poolName.toUpperCase()
@@ -75,19 +75,30 @@ remoteEntries.then(remotes => {
     console.info('aegis worker thread running')
     // load distributed cache and register its events
     await initCache().load()
-
     // handle API requests from main
     parentPort.on('message', async message => {
       // Look for a use case function called `message.name`
       if (typeof domainPorts[message.name] === 'function') {
         try {
+          requestContext.enterWith(new Map(message.data.context))
+          console.log({ message })
           // invoke an inbound port method on this domain model
           const result = await domainPorts[message.name](message.data)
-          // serialize `result` to get rid of any functions
-          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+          // serialize `result` to get rid of any functions,
+          parentPort.postMessage(
+            JSON.parse(
+              JSON.stringify({
+                ...result,
+                context: [...requestContext.getStore()]
+              })
+            )
+          )
         } catch (error) {
           // catch and return (dont kill the thread)
           parentPort.postMessage(AppError(error, error.code))
+        } finally {
+          const msg = `exit context ${requestContext.getStore().get('id')}`
+          requestContext.exit(() => console.log(msg))
         }
         // The "event port" is transfered
       } else if (message.eventPort instanceof MessagePort) {
