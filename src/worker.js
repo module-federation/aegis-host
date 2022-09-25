@@ -89,14 +89,7 @@ remoteEntries.then(remotes => {
           const result = await domainPorts[message.name](message.data)
 
           // serialize `result` to get rid of any functions,
-          parentPort.postMessage(
-            JSON.parse(
-              JSON.stringify({
-                ...result,
-                context: [...requestContext.getStore()]
-              })
-            )
-          )
+          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
         } catch (error) {
           // catch and return (dont kill the thread)
           parentPort.postMessage(AppError(error, error.code))
