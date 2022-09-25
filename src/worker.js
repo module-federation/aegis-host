@@ -73,8 +73,10 @@ function connectEventChannel (eventPort) {
 remoteEntries.then(remotes => {
   init(remotes).then(async domainPorts => {
     console.info('aegis worker thread running')
+
     // load distributed cache and register its events
     await initCache().load()
+
     // handle API requests from main
     parentPort.on('message', async message => {
       // Look for a use case function called `message.name`
@@ -82,8 +84,10 @@ remoteEntries.then(remotes => {
         try {
           requestContext.enterWith(new Map(message.data.context))
           console.log({ message })
+
           // invoke an inbound port method on this domain model
           const result = await domainPorts[message.name](message.data)
+
           // serialize `result` to get rid of any functions,
           parentPort.postMessage(
             JSON.parse(
@@ -104,12 +108,14 @@ remoteEntries.then(remotes => {
       } else if (message.eventPort instanceof MessagePort) {
         // send/recv events to/from main thread
         connectEventChannel(message.eventPort)
-        // no response expected
+
+        // no response expected   dd
       } else if (message.name === 'ping') {
         parentPort.postMessage(message.data)
       } else {
         console.warn('not a domain port', message)
         // main is expecting a response
+
         parentPort.postMessage(
           AppError(new Error(`not a function: ${message}`))
         )
