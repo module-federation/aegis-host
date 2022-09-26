@@ -39,7 +39,6 @@ tasks:
       yarn
       gp sync-done install-aegis
     command: |
-      gp sync-await build-wasmedge
       cd ../aegis-app
       yarn build
       yarn webswitch
@@ -71,7 +70,6 @@ tasks:
       gp sync-done install-host
     command: |
       gp sync-await build-app
-      gp sync-await build-wasmedge
       yarn build
       gp sync-done start-host
       yarn start
@@ -87,7 +85,6 @@ tasks:
       gp sync-done install-wasmedge
     command: |
       rustwasmc build --enable-t --enable-aot
-      gp sync-done build-wasmedge
 
   - name: webswitch
     command: |
