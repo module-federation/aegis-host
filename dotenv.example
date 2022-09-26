@@ -4,6 +4,15 @@
 # Target environment: local, dev, test, prod
 NODE_ENV=local
 
+# is this instance an ægis webswitch?
+SWITCH=false
+
+# override multicast dns and explicitly set switch url 
+# SWITCH_OVERRIDE=true
+# SWITCH_HOST=8888-modulefederat-aegishost-njnlhwopdp4.ws-us65.gitpod.io
+# SWITCH_PORT=443
+# SWITCH_PROTO=wss
+
 # system provisions cert for this domain
 DOMAIN=localhost
 
@@ -22,9 +31,6 @@ AUTH_ENABLED=false
 SSL_ENABLED=false
 SSL_PORT=443
 PORT=80
-
-# is this instance an ægis webswitch?
-SWITCH=false
 
 # URL root level path
 API_ROOT=/aegis/api
