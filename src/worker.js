@@ -82,8 +82,8 @@ remoteEntries.then(remotes => {
       // Look for a use case function called `message.name`
       if (typeof domainPorts[message.name] === 'function') {
         try {
+          // get context and save data lkkkllllklslls  s s
           requestContext.enterWith(new Map(message.data.context))
-          console.log({ message })
 
           // invoke an inbound port method on this domain model
           const result = await domainPorts[message.name](message.data)
@@ -94,7 +94,9 @@ remoteEntries.then(remotes => {
           // catch and return (dont kill the thread)
           parentPort.postMessage(AppError(error, error.code))
         } finally {
-          const msg = `exit context ${requestContext.getStore().get('id')}`
+          const msg = `exit thread context ${requestContext
+            .getStore()
+            .get('id')}`
           requestContext.exit(() => console.log(msg))
         }
         // The "event port" is transfered
