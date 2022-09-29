@@ -61,10 +61,9 @@
     )
 
     let response = await fetch(url, options)
-
-    if (![200, 201, 400].includes(response.status)) {
+    if (response.status === 420) return '420: Enhance Your Calm'
+    if (![200, 201, 202, 400].includes(response.status))
       return response.status + ': ' + response.statusText
-    }
 
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 50 } })
@@ -78,9 +77,7 @@
 
     while (true) {
       const { done, value } = await reader.read()
-      if (done) {
-        break
-      }
+      if (done) break
       chunks.push(value)
       receivedLength += value.length
       ratio = (contentLength / receivedLength) * 100
@@ -252,16 +249,19 @@
     if (id) modelIdInput.value = id
   }
 
-  function handleResponse (response) {
+  function getResponseText (response, msg) {
+    if (response.status === 420) return 'enhance your calm'
+    return msg ? msg : response.statusText
+  }
+
+  async function handleResponse (response) {
     try {
-      return [200, 201, 400].includes(response.status)
-        ? response.json().then(function (data) {
-            updateModelId(data.modelId)
-            return JSON.stringify(data, null, 2)
-          })
-        : Promise.reject(
-            new Error([response.status, response.statusText].join(': '))
-          )
+      const json = await response.json()
+      const msg = JSON.stringify(json, null, 2)
+      if (json?.modelId) updateModelId(json.modelId)
+      if (response.status === 420) return '420: enhance your calm'
+      if ([200, 201, 202, 400].includes(response.status)) return msg
+      return new Error([response.status, response.statusText, msg].join(': '))
     } catch (error) {
       return error.message
     }

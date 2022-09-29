@@ -94,11 +94,9 @@ remoteEntries.then(remotes => {
           // catch and return (dont kill the thread)
           parentPort.postMessage(AppError(error, error.code))
         } finally {
-          const msg = `exit thread context ${requestContext
-            .getStore()
-            .get('id')}`
-          requestContext.exit(() => console.log(msg))
+          requestContext.exit(console.info)
         }
+
         // The "event port" is transfered
       } else if (message.eventPort instanceof MessagePort) {
         // send/recv events to/from main thread
