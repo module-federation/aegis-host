@@ -249,11 +249,6 @@
     if (id) modelIdInput.value = id
   }
 
-  function getResponseText (response, msg) {
-    if (response.status === 420) return 'enhance your calm'
-    return msg ? msg : response.statusText
-  }
-
   async function handleResponse (response) {
     try {
       const json = await response.json()
