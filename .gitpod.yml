@@ -21,7 +21,7 @@ tasks:
     init: |
       sudo printf 'Y/n' | ACCEPT_EULA=Y apt-get update
       sudo printf 'Y/n' | ACCEPT_EULA=Y apt-get upgrade
-      sudo printf 'Y/n' | apt-get install wget git curl software-properties-common \
+      sudo printf 'Y/n' | apt-get install wget git  curl software-properties-common \
           build-essential vim libboost-all-dev llvm-dev liblld-10-dev
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh
       chmod 754 rustup-init.sh
