@@ -51,6 +51,7 @@ tasks:
       gp sync-done install-app
     command: |
       gp sync-await start-repo
+      cd ../aegis-app
       yarn bar
 
   - name: aegis-host
