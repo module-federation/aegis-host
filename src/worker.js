@@ -92,7 +92,7 @@ remoteEntries.then(remotes => {
           parentPort.postMessage(AppError(error, error.code))
         } finally {
           // tear down context
-          requestContext.exit()
+          requestContext.exit(x => x)
         }
       } else if (message.eventPort instanceof MessagePort) {
         // send/recv events to/from main thread
