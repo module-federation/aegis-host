@@ -21,7 +21,7 @@ tasks:
     init: |
       sudo printf 'Y/n' | ACCEPT_EULA=Y apt-get update
       sudo printf 'Y/n' | ACCEPT_EULA=Y apt-get upgrade
-      sudo printf 'Y/n' | apt-get install wget git  curl software-properties-common \
+      sudo printf 'Y/n' | apt-get install wget git curl software-properties-common \
           build-essential vim libboost-all-dev llvm-dev liblld-10-dev
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh
       chmod 754 rustup-init.sh
@@ -52,7 +52,9 @@ tasks:
     command: |
       gp sync-await start-repo
       cd ../aegis-app
-      yarn bar
+      yarn buildAll
+      gp sync-done build-all
+      yarn linkAndStart
 
   - name: aegis-host
     init: |
@@ -67,7 +69,7 @@ tasks:
       cd ../aegis-host
       chmod 754 $HOME/.wasmedge/env
       source $HOME/.wasmedge/env
-      yarn add -g rustwasmc
+      yarn add rustwasmc
       yarn add wasmedge-core
       yarn add wasmedge-extensions
     command: |
@@ -75,7 +77,7 @@ tasks:
 
   - name: webswitch
     command: |
-      sleep 5
+      gp sync-await build-all
       cd ../aegis-host
       export PORT=8888
       export SWITCH=true
