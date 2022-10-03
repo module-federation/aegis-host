@@ -73,6 +73,7 @@ tasks:
       yarn add wasmedge-core
       yarn add wasmedge-extensions
     command: |
+      source $HOME/.wasmedge/env
       rustwasmc build --enable-ext --enable-aot
 
   - name: webswitch
