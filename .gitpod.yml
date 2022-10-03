@@ -34,8 +34,8 @@ tasks:
   - name: start-repo
     command: |
       cd ../aegis-app
-      yarn startLocalRepo
       gp sync-done start-repo
+      yarn startLocalRepo
 
   - name: aegis
     init: |
