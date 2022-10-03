@@ -42,7 +42,6 @@ async function init (remotes) {
  * to events, both inter-thread (raised by one thread and handled by another) and
  * inter-process (remotely generated and locally handled or vice versa). Inter-process
  * events (event from another host instance) are transmitted over the service mesh.
- * Custom user-defined events will also use this channel.
  *
  * Connect both ends of the channel to the thread-local {@link broker} via pub & sub events.
  *
@@ -82,33 +81,29 @@ remoteEntries.then(remotes => {
       // Look for a use case function called `message.name`
       if (typeof domainPorts[message.name] === 'function') {
         try {
-          // get context and save data lkkkllllklslls  s s
+          // set context for this request
           requestContext.enterWith(new Map(message.data.context))
-
           // invoke an inbound port method on this domain model
           const result = await domainPorts[message.name](message.data)
-
           // serialize `result` to get rid of any functions,
-          parentPort.postMessage(JSON.parse(JSON.stringify(result)))
+          parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
         } catch (error) {
           // catch and return (dont kill the thread)
           parentPort.postMessage(AppError(error, error.code))
         } finally {
+          // tear down context
           requestContext.exit(console.info)
         }
-
-        // The "event port" is transfered
       } else if (message.eventPort instanceof MessagePort) {
         // send/recv events to/from main thread
         connectEventChannel(message.eventPort)
-
-        // no response expected   dd
+        // no response expected
       } else if (message.name === 'ping') {
+        // answer ping with received message
         parentPort.postMessage(message.data)
       } else {
         console.warn('not a domain port', message)
         // main is expecting a response
-
         parentPort.postMessage(
           AppError(new Error(`not a function: ${message}`))
         )

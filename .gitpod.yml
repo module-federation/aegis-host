@@ -30,24 +30,18 @@ tasks:
       source $HOME/.cargo/env
       rustup override set 1.50.0
       rustup target add wasm32-wasi
-      gp sync-done install-rust
 
   - name: start-repo
     command: |
       cd ../aegis-app
       yarn startLocalRepo
+      gp sync-done start-repo
 
   - name: aegis
     init: |
-      gp sync-await install-rust
       cd ../aegis
       yarn
       gp sync-done install-aegis
-    command: |
-      cd ../aegis-app
-      yarn build
-      yarn webswitch
-      gp sync-done build-aegis
 
   - name: aegis-app
     init: |
@@ -56,10 +50,8 @@ tasks:
       yarn
       gp sync-done install-app
     command: |
-      gp sync-await build-aegis
-      cd ../aegis-app
-      yarn buildLocalRepo
-      gp sync-done build-app
+      gp sync-await start-repo
+      yarn bar
 
   - name: aegis-host
     init: |
@@ -67,11 +59,6 @@ tasks:
       cd ../aegis-host
       yarn
       gp sync-done install-host
-    command: |
-      gp sync-await build-app
-      yarn build
-      gp sync-done start-host
-      yarn start
 
   - name: wasmedge
     init: |
@@ -82,13 +69,12 @@ tasks:
       yarn add -g rustwasmc
       yarn add wasmedge-core
       yarn add wasmedge-extensions
-      gp sync-done install-wasmedge
     command: |
       rustwasmc build --enable-ext --enable-aot
 
   - name: webswitch
     command: |
-      gp sync-await start-host
+      sleep 5
       cd ../aegis-host
       export PORT=8888
       export SWITCH=true
@@ -117,16 +103,3 @@ ports:
     description: multicast dns
     visibility: public
     onOpen: ignore
-  #   curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -e all
-  #   chmod 777 $HOME/.wasmedge/env
-  #   source $HOME/.wasmedge/env
-  #   curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh
-  #   source $HOME/.cargo/env
-  #   rustup target add wasm32-wasi
-  #   rustup override set 1.50.0
-  #   gp sync-await installHost
-  #   yarn add wasmedge-core
-  #   yarn add wasmedge-extensions
-  # command: |
-  #   gp sync-await buildHost
-  #   rustwasmc build --enable-ext --enable-aot
