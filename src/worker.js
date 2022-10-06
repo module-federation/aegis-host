@@ -57,7 +57,7 @@ async function init (remotes) {
 function connectEventChannel (eventPort) {
   try {
     // fire events from main
-    eventPort.onmessage = async msgEvent =>
+    eventPort.onmessage = msgEvent =>
       broker.notify(msgEvent.data.eventName, msgEvent.data)
 
     // forward events to main
