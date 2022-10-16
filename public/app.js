@@ -1,4 +1,4 @@
-;(function () {
+; (function () {
   const apiRoot = 'aegis/api'
   const modelApiPath = apiRoot + '/models'
   const messages = document.querySelector('#messages')
@@ -22,7 +22,7 @@
 
   let models
   class ProgressBar {
-    constructor (events) {
+    constructor(events) {
       this.progresscntrl = document.getElementById('progresscntrl')
       this.progressbar = document.getElementById('progressbar')
       this.collapse = new bootstrap.Collapse(this.progresscntrl, {
@@ -41,21 +41,21 @@
       })
     }
 
-    show () {
+    show() {
       this.collapse.show()
     }
 
-    hide () {
+    hide() {
       this.collapse.hide()
     }
 
-    makeProgress (progress) {
+    makeProgress(progress) {
       this.progressbar.style.width = progress + '%'
       this.progressbar.setAttribute('aria-valuenow', progress)
     }
   }
 
-  async function instrumentedFetch (url, options) {
+  async function instrumentedFetch(url, options) {
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 35 } })
     )
@@ -102,6 +102,27 @@
 
   // Include JWT access token in header for auth check
   let authHeader = {}
+  let useIdempotencyKey = false
+
+  function generateUUID() { // Public Domain/MIT
+    var d = new Date().getTime()//Timestamp
+    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0//Time in microseconds since page-load or 0 if unsupported
+    return 'yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16//random number between 0 and 16
+      if (d > 0) {//Use timestamp until depleted
+        r = (d + r) % 16 | 0
+        d = Math.floor(d / 16)
+      } else {//Use microseconds since page-load if supported
+        r = (d2 + r) % 16 | 0
+        d2 = Math.floor(d2 / 16)
+      }
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+    })
+  }
+
+  function getIdempotencyKey() {
+    return generateUUID()
+  }
 
   /**
    * Returns headers, including auth header if auth is enabled.
@@ -110,12 +131,15 @@
    * "Authorization": "bearer <token>"
    * }}
    */
-  function getHeaders () {
+  function getHeaders() {
     const content = { 'Content-Type': 'application/json' }
-    return {
+    const headers = {
       ...content,
       ...authHeader
     }
+    return useIdempotencyKey
+      ? { ...headers, 'idempotency-key': getIdempotencyKey() }
+      : headers
   }
 
   /**
@@ -123,29 +147,32 @@
    * JSON Web Token and set `authHeader` accordingly.
    * Need CORS for this.
    */
-  async function refreshAccessToken () {
+  async function refreshAccessToken() {
     const file = await fetch('aegis.config.json')
     const text = await file.text()
-    const config = JSON.parse(text).services.token
-    let token = { access_token: '' }
-    if (config.authEnabled) {
-      const data = await fetch(config.oauthUri, {
+    const conf = JSON.parse(text)
+    const token = conf.services.token
+    const general = conf.general
+    let jwtToken = { access_token: '' }
+    if (token.authEnabled) {
+      const data = await fetch(token.oauthUri, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify({
-          client_id: config.client_id,
-          client_secret: config.client_secret,
-          audience: config.audience,
-          grant_type: config.grant_type
+          client_id: token.client_id,
+          client_secret: token.client_secret,
+          audience: token.audience,
+          grant_type: token.grant_type
         })
       })
-      token = await data.json()
+      jwtToken = await data.json()
       // add json web token to authentication header
-      authHeader = { Authorization: `bearer ${token.access_token}` }
+      authHeader = { Authorization: `bearer ${jwtToken.access_token}` }
     }
+    useIdempotencyKey = general.useIdempotencyKey
   }
 
-  function prettifyJson (json) {
+  function prettifyJson(json) {
     if (typeof json !== 'string') {
       json = JSON.stringify(json, null, 2)
     }
@@ -169,13 +196,13 @@
     )
   }
 
-  function displayUrl (url) {
+  function displayUrl(url) {
     document.getElementById(
       'url'
     ).value = `${location.protocol}//${location.host}/${url}`
   }
 
-  function getUrl () {
+  function getUrl() {
     if (customUrl) return document.getElementById('url').value
 
     const id = modelIdInput.value
@@ -196,11 +223,11 @@
 
   let customUrl = false
 
-  function makeCustomUrl () {
+  function makeCustomUrl() {
     customUrl = true
   }
 
-  function makeAutoUrl () {
+  function makeAutoUrl() {
     customUrl = false
   }
 
@@ -219,13 +246,13 @@
   paramInput.onchange = getUrl
   portInput.onchange = getUrl
 
-  function removeAllChildNodes (parent) {
+  function removeAllChildNodes(parent) {
     while (parent.firstChild) {
       parent.removeChild(parent.firstChild)
     }
   }
 
-  function updatePorts () {
+  function updatePorts() {
     portInput.value = ''
     removeAllChildNodes(document.querySelector('#portList'))
     getUrl()
@@ -238,18 +265,18 @@
     })
   }
 
-  function showMessage (message) {
+  function showMessage(message) {
     document.getElementById('jsonCode').innerHTML += `\n${prettifyJson(
       message
     )}`
     messages.scrollTop = messages.scrollHeight
   }
 
-  function updateModelId (id) {
+  function updateModelId(id) {
     if (id) modelIdInput.value = id
   }
 
-  async function handleResponse (response) {
+  async function handleResponse(response) {
     try {
       const json = await response.json()
       const msg = JSON.stringify(json, null, 2)
@@ -262,7 +289,7 @@
     }
   }
 
-  function modelNameFromEndpoint () {
+  function modelNameFromEndpoint() {
     const endpoint = document.getElementById('model').value
     return models.find(model => model.endpoint === endpoint).modelName
   }
@@ -303,7 +330,7 @@
    * @param {*} action
    * @param {*} pressHoldDuration
    */
-  function pressAndHold (item, action, pressHoldDuration = 20) {
+  function pressAndHold(item, action, pressHoldDuration = 20) {
     let timerID
     let counter = 0
 
@@ -318,21 +345,21 @@
     // Listening for our custom pressHold event
     item.addEventListener('pressHold', action, false)
 
-    function pressingDown (e) {
+    function pressingDown(e) {
       // Start the timer
       requestAnimationFrame(timer)
       e.preventDefault()
       console.log('Pressing!')
     }
 
-    function notPressingDown (e) {
+    function notPressingDown(e) {
       // Stop the timer
       cancelAnimationFrame(timerID)
       counter = 0
       console.log('Not pressing!')
     }
 
-    function timer () {
+    function timer() {
       console.log('Timer tick!')
 
       if (counter < pressHoldDuration) {
@@ -347,7 +374,7 @@
 
   pressAndHold(postButton, () => (modelIdInput.value = ''))
 
-  postButton.onclick = async function post () {
+  postButton.onclick = async function post() {
     const model = document.getElementById('model').value
     if (!model || model === '') {
       showMessage({ error: 'no model selected' })
