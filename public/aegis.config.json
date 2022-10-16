@@ -6,10 +6,7 @@
     "remoteServices": "aegis-services",
     "resumeWorkflow": true,
     "checkIpHost": "https://checkip.amazonaws.com",
-    "eventBroker": {
-      "debug": true,
-      "useEventBus": false
-    },
+    "useIdempotentKey": false,
     "defaultCircuitBreaker": {
       "errorRate": 25,
       "callVolume": 100,
