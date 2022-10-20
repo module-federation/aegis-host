@@ -22,7 +22,7 @@
 
   let models
   class ProgressBar {
-    constructor(events) {
+    constructor (events) {
       this.progresscntrl = document.getElementById('progresscntrl')
       this.progressbar = document.getElementById('progressbar')
       this.collapse = new bootstrap.Collapse(this.progresscntrl, {
@@ -41,21 +41,21 @@
       })
     }
 
-    show() {
+    show () {
       this.collapse.show()
     }
 
-    hide() {
+    hide () {
       this.collapse.hide()
     }
 
-    makeProgress(progress) {
+    makeProgress (progress) {
       this.progressbar.style.width = progress + '%'
       this.progressbar.setAttribute('aria-valuenow', progress)
     }
   }
 
-  async function instrumentedFetch(url, options) {
+  async function instrumentedFetch (url, options) {
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 35 } })
     )
@@ -104,7 +104,7 @@
   let authHeader = {}
   let useIdempotencyKey = false
 
-  function generateUUID() { // Public Domain/MIT
+  function generateUUID () { // Public Domain/MIT
     var d = new Date().getTime()//Timestamp
     var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0//Time in microseconds since page-load or 0 if unsupported
     return 'yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -120,7 +120,7 @@
     })
   }
 
-  function getIdempotencyKey() {
+  function getIdempotencyKey () {
     return generateUUID()
   }
 
@@ -131,7 +131,7 @@
    * "Authorization": "bearer <token>"
    * }}
    */
-  function getHeaders() {
+  function getHeaders () {
     const content = { 'Content-Type': 'application/json' }
     const headers = {
       ...content,
@@ -147,7 +147,7 @@
    * JSON Web Token and set `authHeader` accordingly.
    * Need CORS for this.
    */
-  async function refreshAccessToken() {
+  async function refreshAccessToken () {
     const file = await fetch('aegis.config.json')
     const text = await file.text()
     const conf = JSON.parse(text)
@@ -172,7 +172,7 @@
     useIdempotencyKey = general.useIdempotencyKey
   }
 
-  function prettifyJson(json) {
+  function prettifyJson (json) {
     if (typeof json !== 'string') {
       json = JSON.stringify(json, null, 2)
     }
@@ -196,13 +196,13 @@
     )
   }
 
-  function displayUrl(url) {
+  function displayUrl (url) {
     document.getElementById(
       'url'
     ).value = `${location.protocol}//${location.host}/${url}`
   }
 
-  function getUrl() {
+  function getUrl () {
     if (customUrl) return document.getElementById('url').value
 
     const id = modelIdInput.value
@@ -223,11 +223,11 @@
 
   let customUrl = false
 
-  function makeCustomUrl() {
+  function makeCustomUrl () {
     customUrl = true
   }
 
-  function makeAutoUrl() {
+  function makeAutoUrl () {
     customUrl = false
   }
 
@@ -246,13 +246,13 @@
   paramInput.onchange = getUrl
   portInput.onchange = getUrl
 
-  function removeAllChildNodes(parent) {
+  function removeAllChildNodes (parent) {
     while (parent.firstChild) {
       parent.removeChild(parent.firstChild)
     }
   }
 
-  function updatePorts() {
+  function updatePorts () {
     portInput.value = ''
     removeAllChildNodes(document.querySelector('#portList'))
     getUrl()
@@ -265,18 +265,18 @@
     })
   }
 
-  function showMessage(message) {
+  function showMessage (message) {
     document.getElementById('jsonCode').innerHTML += `\n${prettifyJson(
       message
     )}`
     messages.scrollTop = messages.scrollHeight
   }
 
-  function updateModelId(id) {
+  function updateModelId (id) {
     if (id) modelIdInput.value = id
   }
 
-  async function handleResponse(response) {
+  async function handleResponse (response) {
     try {
       const json = await response.json()
       const msg = JSON.stringify(json, null, 2)
@@ -285,11 +285,11 @@
       if ([200, 201, 202, 400].includes(response.status)) return msg
       return new Error([response.status, response.statusText, msg].join(': '))
     } catch (error) {
-      return error.message
+      
     }
   }
 
-  function modelNameFromEndpoint() {
+  function modelNameFromEndpoint () {
     const endpoint = document.getElementById('model').value
     return models.find(model => model.endpoint === endpoint).modelName
   }
@@ -330,7 +330,7 @@
    * @param {*} action
    * @param {*} pressHoldDuration
    */
-  function pressAndHold(item, action, pressHoldDuration = 20) {
+  function pressAndHold (item, action, pressHoldDuration = 20) {
     let timerID
     let counter = 0
 
@@ -345,21 +345,21 @@
     // Listening for our custom pressHold event
     item.addEventListener('pressHold', action, false)
 
-    function pressingDown(e) {
+    function pressingDown (e) {
       // Start the timer
       requestAnimationFrame(timer)
       e.preventDefault()
       console.log('Pressing!')
     }
 
-    function notPressingDown(e) {
+    function notPressingDown (e) {
       // Stop the timer
       cancelAnimationFrame(timerID)
       counter = 0
       console.log('Not pressing!')
     }
 
-    function timer() {
+    function timer () {
       console.log('Timer tick!')
 
       if (counter < pressHoldDuration) {
@@ -374,7 +374,7 @@
 
   pressAndHold(postButton, () => (modelIdInput.value = ''))
 
-  postButton.onclick = async function post() {
+  postButton.onclick = async function post () {
     const model = document.getElementById('model').value
     if (!model || model === '') {
       showMessage({ error: 'no model selected' })
