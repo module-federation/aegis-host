@@ -68,9 +68,14 @@
     "express": "^4.18.1",
     "path-to-regexp": "^6.2.1",
     "pino": "^8.5.0",
+    "pretty": "^2.0.0",
+    "pretty-cli": "^0.0.14",
     "regenerator-runtime": "^0.13.9",
     "require-fresh": "^1.1.0",
     "rimraf": "^3.0.2",
+    "rustwasmc": "^0.1.29",
+    "wasmedge-core": "^0.9.0",
+    "wasmedge-extensions": "^0.9.0",
     "ws": "^8.8.0"
   },
   "devDependencies": {
