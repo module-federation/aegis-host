@@ -30,7 +30,6 @@ async function init (remotes) {
   try {
     // import federated modules; override as needed
     await importRemotes(remotes)
-    console.log('poolname', workerData.poolName.toUpperCase())
     // get the inbound ports for this domain
     return makeDomain(workerData.poolName.toUpperCase())
   } catch (error) {
@@ -82,14 +81,20 @@ remoteEntries.then(remotes => {
       // Look for a use case function called `message.name`
       try {
         console.log('received msg', { msg, domainPorts })
+
         if (msg.data) {
+          console.log('modelName', msg.data.modelName)
+
           const domainPort = domainPorts[msg.data.modelName][msg.name]
-          if (typeof domainPort === 'function') {
+
+          if (typeof domainPort === 'function')
             try {
               // set context for this request
               requestContext.enterWith(new Map(msg.data.context))
+
               // invoke an inbound port method on this domain model
               const result = await domainPort(msg.data.jobData)
+
               parentPort.postMessage(JSON.parse(JSON.stringify(result || {})))
             } catch (error) {
               throw new Error(error)
@@ -97,23 +102,20 @@ remoteEntries.then(remotes => {
               // tear down context
               requestContext.exit(x => x)
             }
-          }
-        } else if (msg.eventPort instanceof MessagePort) {
+        } else if (msg.eventPort instanceof MessagePort)
           // send/recv events to/from main thread
           connectEventChannel(msg.eventPort)
-          // no response expected
-        } else if (msg.name === 'ping') {
+        // no response expected
+        else if (msg.name === 'ping')
           // answer ping with received message
           parentPort.postMessage(msg.data.jobData)
-        } else {
-          console.warn('not a domain port', msg)
-          // main is expecting a response
-          parentPort.postMessage(
-            AppError(new Error(`not a function: ${msg}`))
-          )
-        }
+        else
+          throw new Error(`not a port function: ${msg}`)
       } catch (error) {
-        // catch and return (dont kill the thread)
+        // catch so we dont kill the thread
+        console.error({ fn: 'worker', error })
+
+        // main is expecting a response
         parentPort.postMessage(AppError(error, error.code))
       }
     })
