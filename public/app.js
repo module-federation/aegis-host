@@ -138,7 +138,7 @@
       ...authHeader
     }
     return useIdempotencyKey
-      ? { ...headers, 'idempotency-key': getIdempotencyKey() }
+      ? { ...headers, 'idempotency-key': '86ba-63082fe20754' }//getIdempotencyKey() }
       : headers
   }
 
@@ -242,9 +242,9 @@
 
   modelInput.onchange = updatePorts
   modelIdInput.onchange = getUrl
-  queryInput.onchange = getUrl
+  //queryInput.onchange = getUrl
   paramInput.onchange = getUrl
-  portInput.onchange = getUrl
+  //portInput.onchange = getUrl
 
   function removeAllChildNodes (parent) {
     while (parent.firstChild) {
@@ -257,12 +257,35 @@
     removeAllChildNodes(document.querySelector('#portList'))
     getUrl()
 
+    if (modelInput.value === '') return
+
     const model = models.find(model => model.endpoint === modelInput.value)
 
     Object.keys(model.ports).forEach(port => {
       if (model.ports[port].type === 'inbound')
         portList.appendChild(new Option(port))
     })
+  }
+
+  function updateQueryList () {
+    queryInput.value = ''
+    removeAllChildNodes(document.querySelector('#queryList'))
+    getUrl()
+    if (modelIdInput.value === '') return
+
+    const model = models.find(model => model.endpoint === modelInput.value)
+
+    if (model.relations) {
+      Object.keys(model.relations).forEach(rel => {
+        queryList.appendChild(new Option(`relation=${rel}`))
+      })
+    }
+    if (model.commands) {
+      Object.keys(model.commands).forEach(cmd => {
+        queryList.appendChild(new Option(`command=${cmd}`))
+      })
+    }
+    queryList.appendChild(new Option('html=true'))
   }
 
   function showMessage (message) {
@@ -285,7 +308,7 @@
       if ([200, 201, 202, 400].includes(response.status)) return msg
       return new Error([response.status, response.statusText, msg].join(': '))
     } catch (error) {
-      
+
     }
   }
 
@@ -391,6 +414,7 @@
       clearTimeout(timerId)
       setTimeout(() => bar.hide(), 1000)
       updateModelId(response.modelId)
+      updateQueryList()
       showMessage(response)
     } catch (error) {
       showMessage(error.message)
@@ -449,12 +473,14 @@
     queryInput.value = ''
     paramInput.value = ''
     portInput.value = ''
+    updatePorts()
     getUrl()
   })
 
   clearIdButton.addEventListener('click', function () {
     modelIdInput.value = ''
     paramInput.value = ''
+    updateQueryList()
     getUrl()
   })
 
