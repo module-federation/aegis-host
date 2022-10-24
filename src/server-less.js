@@ -1,9 +1,15 @@
 'use strict'
 
 const { aegis, adapters } = require('@module-federation/aegis')
+const remote = require('../webpack/remote-entries')
 const { ServerlessAdapter } = adapters
 
-const adapter = ServerlessAdapter(aegis).then(adapter => adapter)
+/** @type {Promise<import('../webpack/remote-entries-type').remoteEntry[]>} */
+const remoteEntries = remote.get('./remoteEntries').then(factory => factory())
+
+const adapter = remoteEntries
+  .then(remotes => aegis.init(remotes))
+  .then(handle => ServerlessAdapter(handle))
 
 /**
  * Serverless entry point. Configure the serverless platform
