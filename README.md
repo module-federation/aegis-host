@@ -11,10 +11,11 @@ This repo contains the host code. The library can be found [here](https://github
 
 Note: to avoid rate-limiting, create a variable in your Gitpod [profile](https://gitpod.io/account) called GITHUB_TOKEN with the value of a Github personal access [token](https://github.com/settings/apps). 
 
-#### Open Branch:
+
+## Open Branch:
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/t/module-federation/aegis-app) 
 
-# [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
+## [Federated Microservices](https://trmidboe.medium.com/federated-applications-ba396d6925b1)
 
 - loaded from multiple network locations and repositories at runtime;
 - developed by multiple teams;
