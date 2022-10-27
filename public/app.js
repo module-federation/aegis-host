@@ -138,7 +138,7 @@
       ...authHeader
     }
     return useIdempotencyKey
-      ? { ...headers, 'idempotency-key': '86ba-63082fe20754' }//getIdempotencyKey() }
+      ? { ...headers, 'idempotency-key': getIdempotencyKey() }
       : headers
   }
 
