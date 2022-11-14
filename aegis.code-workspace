@@ -8,12 +8,16 @@
     },
     {
       "path": "../aegis-app"
+    },
+    {
+      "path": "../litehouse"
     }
   ],
   "settings": {
     "liveServer.settings.multiRootWorkspaceName": "aegis",
-    "githubPullRequests.ignoredPullRequestBranches": [
-      "master"
-    ]
+    "githubPullRequests.ignoredPullRequestBranches": ["master"],
+    "files.associations": {
+      "types.h": "c"
+    }
   }
 }

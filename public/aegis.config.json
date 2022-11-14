@@ -63,9 +63,7 @@
         "heartbeat": 3000,
         "uplink": null,
         "debug": false,
-        "isBackupSwitch": false,
-        "priority": 20,
-        "weight": 40
+        "isBackupSwitch": false
       },
       "MeshLink": {
         "desc": "Fast UDP-based, peer-to-peer mesh with shared Redis cache.",
@@ -100,9 +98,7 @@
         "jwksUri": "https://dev-2fe2iar6.us.auth0.com/.well-known/jwks.json",
         "audience": "https://microlib.io/",
         "issuer": "https://dev-2fe2iar6.us.auth0.com/",
-        "algorithms": [
-          "RS256"
-        ]
+        "algorithms": ["RS256"]
       }
     },
     "token": {

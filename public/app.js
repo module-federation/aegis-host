@@ -1,4 +1,4 @@
-; (function () {
+;(function () {
   const apiRoot = 'aegis/api'
   const modelApiPath = apiRoot + '/models'
   const messages = document.querySelector('#messages')
@@ -104,19 +104,26 @@
   let authHeader = {}
   let useIdempotencyKey = false
 
-  function generateUUID () { // Public Domain/MIT
-    var d = new Date().getTime()//Timestamp
-    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0//Time in microseconds since page-load or 0 if unsupported
+  function generateUUID () {
+    // Public Domain/MIT
+    var d = new Date().getTime() //Timestamp
+    var d2 =
+      (typeof performance !== 'undefined' &&
+        performance.now &&
+        performance.now() * 1000) ||
+      0 //Time in microseconds since page-load or 0 if unsupported
     return 'yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = Math.random() * 16//random number between 0 and 16
-      if (d > 0) {//Use timestamp until depleted
+      var r = Math.random() * 16 //random number between 0 and 16
+      if (d > 0) {
+        //Use timestamp until depleted
         r = (d + r) % 16 | 0
         d = Math.floor(d / 16)
-      } else {//Use microseconds since page-load if supported
+      } else {
+        //Use microseconds since page-load if supported
         r = (d2 + r) % 16 | 0
         d2 = Math.floor(d2 / 16)
       }
-      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+      return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
     })
   }
 
@@ -271,7 +278,10 @@
     queryInput.value = ''
     removeAllChildNodes(document.querySelector('#queryList'))
     getUrl()
-    if (modelIdInput.value === '') return
+    if (modelIdInput.value === '') {
+      queryList.appendChild(new Option('__count=all'))
+      return
+    }
 
     const model = models.find(model => model.endpoint === modelInput.value)
 
@@ -307,9 +317,7 @@
       if (response.status === 420) return '420: enhance your calm'
       if ([200, 201, 202, 400].includes(response.status)) return msg
       return new Error([response.status, response.statusText, msg].join(': '))
-    } catch (error) {
-
-    }
+    } catch (error) {}
   }
 
   function modelNameFromEndpoint () {
@@ -474,6 +482,7 @@
     paramInput.value = ''
     portInput.value = ''
     updatePorts()
+    updateQueryList()
     getUrl()
   })
 

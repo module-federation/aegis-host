@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="1.5" border="0">
     <diagram name="c4" id="8JoluLsr5rRwba4acvXE">
-        <mxGraphModel dx="2274" dy="361" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#E6E6E6" math="0" shadow="0">
+        <mxGraphModel dx="2372" dy="458" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#E6E6E6" math="0" shadow="0">
             <root>
                 <mxCell id="xVd8jDNDeQ8bvFG07IMr-0"/>
                 <mxCell id="xVd8jDNDeQ8bvFG07IMr-1" parent="xVd8jDNDeQ8bvFG07IMr-0"/>
@@ -243,14 +243,14 @@
         </mxGraphModel>
     </diagram>
     <diagram name="AIOT" id="C57_Dr-gr5Sgo95vxOue">
-        <mxGraphModel dx="574" dy="361" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+        <mxGraphModel dx="611" dy="416" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
             <root>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-0"/>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-1" parent="yZtqZgkybrvEYegP9EMW-0"/>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-2" value="" style="whiteSpace=wrap;html=1;fillColor=#E6E6E6;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
                     <mxGeometry x="40" y="210" width="590" height="610" as="geometry"/>
                 </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-3" value="&lt;p&gt;&lt;span style=&quot;font-size: 12px ; font-weight: normal&quot;&gt;Async I/O using QUIC protocol handles real time data streams&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;CPU-intensive workloads, like AI inference, run on dedicated threads as WebAssembly modules that are AoT-compiled to native&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                <mxCell id="yZtqZgkybrvEYegP9EMW-3" value="&lt;p&gt;&lt;span style=&quot;font-size: 12px ; font-weight: normal&quot;&gt;Async I/O using DDS protocol handles real time data streams&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;CPU-intensive workloads, like AI inference, run on dedicated threads as WebAssembly modules that are AoT-compiled to native&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
                     <mxGeometry x="58" y="259" width="212" height="120" as="geometry"/>
                 </mxCell>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-4" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;labelBackgroundColor=#33FFFF;fontSize=12;strokeColor=#FFFFFF;strokeWidth=1;fillColor=default;size=80;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
@@ -325,7 +325,7 @@
                         <mxPoint y="1" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-27" value="LiDAR&lt;br&gt;WebRTC&lt;br&gt;CCTV" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                <mxCell id="yZtqZgkybrvEYegP9EMW-27" value="IoT Sensors&lt;br&gt;(e.g. LiDAR)" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
                     <mxGeometry x="124.5" y="360" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-28" value="" style="group;glass=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1" connectable="0">
@@ -352,8 +352,8 @@
                 <mxCell id="yZtqZgkybrvEYegP9EMW-35" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=10;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
                     <mxGeometry x="226" y="484" width="60" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-36" value="QUIC&lt;br&gt;Server" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
-                    <mxGeometry x="246.5" y="512.5" width="30" height="5" as="geometry"/>
+                <mxCell id="yZtqZgkybrvEYegP9EMW-36" value="ROS2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                    <mxGeometry x="246.5" y="510" width="30" height="7.5" as="geometry"/>
                 </mxCell>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-37" value="&lt;span style=&quot;font-size: 14px&quot;&gt;&lt;b&gt;I/O-bound&lt;/b&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
                     <mxGeometry x="96" y="443.94" width="80" height="30" as="geometry"/>
@@ -363,7 +363,7 @@
                         <mxPoint x="190" y="554" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-39" value="QUIC&amp;nbsp;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yZtqZgkybrvEYegP9EMW-38" vertex="1" connectable="0">
+                <mxCell id="yZtqZgkybrvEYegP9EMW-39" value="DDS" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yZtqZgkybrvEYegP9EMW-38" vertex="1" connectable="0">
                     <mxGeometry x="0.0383" y="3" relative="1" as="geometry">
                         <mxPoint x="4" y="-4" as="offset"/>
                     </mxGeometry>
@@ -386,7 +386,7 @@
                 <mxCell id="yZtqZgkybrvEYegP9EMW-46" value="&lt;h1&gt;Designed for AIoT&lt;/h1&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
                     <mxGeometry x="58" y="224" width="235" height="36" as="geometry"/>
                 </mxCell>
-                <mxCell id="yZtqZgkybrvEYegP9EMW-47" value="seL4 Kernel, Linux, MacOS, Windows, OpenHarmony, iOS, Android, Browser, Serverless (Lambda), Raspberry Pi..." style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
+                <mxCell id="yZtqZgkybrvEYegP9EMW-47" value="seL4 Kernel, Linux, MacOS, Windows, OpenHarmony, iOS, Android, Browser, Serverless, Raspberry Pi..." style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
                     <mxGeometry x="200" y="695" width="390" height="45" as="geometry"/>
                 </mxCell>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-48" value="Cloud, On-Prem, Frontend, Backend, Edge, Mobile, Embedded, IoT" style="whiteSpace=wrap;html=1;" parent="yZtqZgkybrvEYegP9EMW-1" vertex="1">
@@ -438,7 +438,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="9OvleWoG_n5-Iy7mdOHa" name="logo ideas">
-        <mxGraphModel dx="1894" dy="656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1522" dy="458" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="h_ngC8WSSTxwbMSJ3hNI-0"/>
                 <mxCell id="h_ngC8WSSTxwbMSJ3hNI-1" parent="h_ngC8WSSTxwbMSJ3hNI-0"/>

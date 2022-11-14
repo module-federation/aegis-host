@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      progress {
-        margin: 4px;
-      }
-      progress:indeterminate {
-        width: 80vw;
-        height: 20px;
-      }
-    </style>
-    <title>hot reload in progress...</title>
-  </head>
-  <body">
-    <h1>hot reload in progress...</h1>
-    <script>
-      function reload() {
-        fetch("/reload").then(
-          () => (window.location.href = "hot-reload-complete.html")
-        );
-      }
-      window.onload = reload;
-    </script>
-    <progress>reloading...</progress>
+
+<head>
+  <style>
+    progress {
+      margin: 4px;
+    }
+
+    progress:indeterminate {
+      width: 80vw;
+      height: 20px;
+    }
+  </style>
+  <title>hot reload in progress...</title>
+</head>
+<body">
+  <h1>hot reload in progress...</h1>
+  <script>
+    function reload () {
+      fetch("/reload").then(
+        () => (window.location.href = "hot-reload-complete.html")
+      );
+    }
+    window.onload = reload;
+  </script>
+  <progress>reloading...</progress>
   </body>
+
 </html>
