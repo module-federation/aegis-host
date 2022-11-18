@@ -62,8 +62,8 @@
 
     let response = await fetch(url, options)
     if (response.status === 420) return '420: Enhance Your Calm'
-    if (![200, 201, 202, 400].includes(response.status))
-      return response.status + ': ' + response.statusText
+    if (response.status === 404) return '404: Not Found'
+    if (response.status === 400) return response.json()
 
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 50 } })
@@ -180,6 +180,7 @@
   }
 
   function prettifyJson (json) {
+    if (!json) return
     if (typeof json !== 'string') {
       json = JSON.stringify(json, null, 2)
     }
