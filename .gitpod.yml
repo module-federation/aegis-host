@@ -44,7 +44,7 @@ tasks:
       gp sync-done start-repo
       cd ../aegis-app
       yarn buildAll
-      gp sync-done buidAll
+      gp sync-done buildAll
       yarn start-all
       
   - name: host
