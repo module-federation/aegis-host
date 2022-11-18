@@ -23,6 +23,7 @@ tasks:
       yarn add express
   - command: |
       gp sync-await start-repo
+      cd ../aegis-app
       yarn startLocalRepo
 
   - name: aegis
