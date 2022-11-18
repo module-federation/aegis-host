@@ -52,6 +52,7 @@ tasks:
       gp sync-await use-lts-node
       cd ../aegis
       yarn
+      yarn add express
       gp sync-done install-aegis
 
   - name: aegis-app
@@ -59,7 +60,6 @@ tasks:
       gp sync-await install-aegis
       cd ../aegis-app
       yarn
-      yarn add express
       gp sync-done install-app
   - command: |
       cd ../aegis-app
