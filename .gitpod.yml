@@ -52,7 +52,6 @@ tasks:
       gp sync-await use-lts-node
       cd ../aegis
       yarn
-      yarn add express
       gp sync-done install-aegis
 
   - name: aegis-app
@@ -61,9 +60,6 @@ tasks:
       cd ../aegis-app
       yarn
       gp sync-done install-app
-  - command: |
-      cd ../aegis-app
-      yarn startLocalRepo
 
   - name: aegis-host
     init: |
@@ -72,10 +68,15 @@ tasks:
       yarn
       gp sync-done install-host
     command: |
-      sleep 5s
+      gp sync-done install-host
       cd ../aegis-app
       yarn buildAll
       gp sync-done build-all
+
+  - name: start repo
+    command: |
+      cd ../aegis-host
+      yarn startLocalRepo
 
   - name: webswitch
     command: |
