@@ -14,6 +14,12 @@ additionalRepositories:
   - url: https://github.com/module-federation/aegis-app
 
 tasks:
+
+  - name: mongo
+    command: |
+      cd ../aegis
+      ./mongo.sh
+      
   - name: start repo
     before: |
       nvm install --lts
