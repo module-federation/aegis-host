@@ -20,7 +20,7 @@ tasks:
       cd ../aegis
       ./mongo.sh
       
-  - name: start repo
+  - name: repo
     before: |
       nvm install --lts
       nvm use --lts
@@ -32,7 +32,7 @@ tasks:
       cd ../aegis-app
       yarn startLocalRepo
 
-  - name: aegis
+  - name: remote
     init: |
       cd ../aegis
       yarn
@@ -45,6 +45,11 @@ tasks:
       cd ../aegis-app
       yarn buildAll
       gp sync-done buidAll
+      yarn start-all
+      
+  - name: host
+    command: |
+      gp sync-await buildAll
       cd ../aegis
       yarn start
 
