@@ -14,7 +14,12 @@ additionalRepositories:
   - url: https://github.com/module-federation/aegis-app
 
 tasks:
-  - name: start repo
+  - name: mongo
+    command: |
+      cd ../aegis
+      ./mongo.sh
+
+  - name: repo
     before: |
       nvm install --lts
       nvm use --lts
@@ -26,7 +31,7 @@ tasks:
       cd ../aegis-app
       yarn startLocalRepo
 
-  - name: install aegis
+  - name: remote
     init: |
       cd ../aegis
       yarn
@@ -41,7 +46,7 @@ tasks:
       gp sync-done buildAll
       yarn start-all
 
-  - name: start aegis
+  - name: host
     command: |
       gp sync-await buildAll
       cd ../aegis
@@ -61,7 +66,7 @@ tasks:
   #     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
   #     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
-workspaceLocation: aegis-host/aegis.code-workspace
+workspaceLocation: aegis-host/aegis.code-workspaceqqwsqsssqqsssqqqq111ss1sß1111                                                                                                                                       1
 
 ports:
   - port: 8000
