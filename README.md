@@ -1,5 +1,7 @@
+  
   [![aegis](https://user-images.githubusercontent.com/38910830/128654405-93098731-3c31-4f52-bda0-efe95d77c5fe.png)](https://blog.federated-microservices.com)
 
+  <span style="color:blue">
 
 # ÆGIS <sub><sup>formerly _microlib_</sup></sub>
 
@@ -339,3 +341,5 @@ Aegis prevents vendor lock-in by providing a layer of abstraction on top of vend
 [Microservice Library Videos](https://www.youtube.com/channel/UCT-3YJ2Ilgcjebqvs40Qz2A)
 
 <img src="https://ssl.google-analytics.com/collect?v=1&t=event&ec=email&ea=open&t=event&tid=UA-120967034-1&z=1589682154&cid=ae045149-9d17-0367-bbb0-11c41d92b411&dt=aegis&dp=/email/aegis">
+
+</span>.
