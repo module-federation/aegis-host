@@ -61,9 +61,8 @@
     )
 
     let response = await fetch(url, options)
-    if (response.status === 420) return '420: Enhance Your Calm'
-    if (response.status === 404) return '404: Not Found'
-    if (response.status === 400) return response.json()
+    if (response.status > 299 || response.status < 200)
+      throw new Error(`${response.status}: ${response.statusText}`)
 
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 50 } })
@@ -127,10 +126,6 @@
     })
   }
 
-  function getIdempotencyKey () {
-    return generateUUID()
-  }
-
   /**
    * Returns headers, including auth header if auth is enabled.
    * @returns {{
@@ -145,7 +140,7 @@
       ...authHeader
     }
     return useIdempotencyKey
-      ? { ...headers, 'idempotency-key': getIdempotencyKey() }
+      ? { ...headers, 'idempotency-key': generateUUID() }
       : headers
   }
 
@@ -179,17 +174,40 @@
     useIdempotencyKey = general.useIdempotencyKey
   }
 
+  let modelIds = []
+
   function prettifyJson (json) {
     if (!json) return
     if (typeof json !== 'string') {
       json = JSON.stringify(json, null, 2)
     }
+    let next = false
+    modelIds = []
+    let modelIndex = 0
     return json.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
       function (match) {
+        if (next) {
+          modelIds.push(match.replaceAll('"', ''))
+          modelIndex++
+          next = false
+        }
         let cls = '<span>'
+
+        console.log({ match })
+
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
+            if (/"id"|"modelId"/.test(match)) {
+              next = true
+              return (
+                '<span class="text-warning">' +
+                match +
+                '</span><input type="button" style="background-color: skyblue" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail: ' +
+                modelIndex +
+                '}))" value="Get ID"/>'
+              )
+            }
             cls = "<span class='text-warning'>"
           } else {
             cls = '<span>'
@@ -203,6 +221,12 @@
       }
     )
   }
+
+  window.addEventListener('getId', e => {
+    setModelId(modelIds[e.detail])
+    updateModelId()
+    getButton.click()
+  })
 
   function displayUrl (url) {
     document.getElementById(
@@ -231,7 +255,7 @@
 
   let customUrl = false
 
-  function makeCustomUrl () {
+  function makeCustUrl () {
     customUrl = true
   }
 
@@ -241,16 +265,16 @@
 
   const urlInput = document.getElementById('url')
 
-  urlInput.onfocus = makeCustomUrl
+  urlInput.onfocus = makeCustUrl
   modelInput.onfocus = makeAutoUrl
   modelIdInput.onfocus = makeAutoUrl
   queryInput.onfocus = makeAutoUrl
   paramInput.onfocus = makeAutoUrl
   portInput.onfocus = makeAutoUrl
 
-  modelInput.onchange = updatePorts
+  modelInput.onchange = getUrl
   modelIdInput.onchange = getUrl
-  //queryInput.onchange = getUrl
+  queryInput.onchange = getUrl
   paramInput.onchange = getUrl
   //portInput.onchange = getUrl
 
@@ -269,10 +293,11 @@
 
     const model = models.find(model => model.endpoint === modelInput.value)
 
-    Object.keys(model.ports).forEach(port => {
-      if (model.ports[port].type === 'inbound')
-        portList.appendChild(new Option(port))
-    })
+    if (model?.ports)
+      Object.keys(model.ports).forEach(port => {
+        if (model.ports[port].type === 'inbound')
+          portList.appendChild(new Option(port))
+      })
   }
 
   function updateQueryList () {
@@ -286,12 +311,12 @@
 
     const model = models.find(model => model.endpoint === modelInput.value)
 
-    if (model.relations) {
+    if (model?.relations) {
       Object.keys(model.relations).forEach(rel => {
         queryList.appendChild(new Option(`relation=${rel}`))
       })
     }
-    if (model.commands) {
+    if (model?.commands) {
       Object.keys(model.commands).forEach(cmd => {
         queryList.appendChild(new Option(`command=${cmd}`))
       })
@@ -299,26 +324,48 @@
     queryList.appendChild(new Option('html=true'))
   }
 
-  function showMessage (message) {
-    document.getElementById('jsonCode').innerHTML += `\n${prettifyJson(
-      message
-    )}`
+  function showMessage (message, style = 'pretty') {
+    const styles = {
+      pretty: message => `\n${prettifyJson(message)}`,
+      error: message => `\n<span style="color:pink">${message}</span>`,
+      plain: message => `\n${message}`
+    }
+    document.getElementById('jsonCode').innerHTML += styles[style](message)
     messages.scrollTop = messages.scrollHeight
   }
 
-  function updateModelId (id) {
-    if (id) modelIdInput.value = id
+  function updateModelId () {
+    modelIdInput.value = getModelId()
+  }
+
+  let modelId
+
+  function setModelId (id) {
+    modelId = id
+  }
+
+  function getModelId () {
+    return modelId.replaceAll('"', '')
+  }
+
+  function formatError (response, msg) {
+    return `${response.status}: ${
+      msg
+        ? msg
+            .split('{')
+            .join('')
+            .split('}')
+            .join('')
+            .trim()
+        : response.statusText
+    }`
   }
 
   async function handleResponse (response) {
-    try {
-      const json = await response.json()
-      const msg = JSON.stringify(json, null, 2)
-      if (json?.modelId) updateModelId(json.modelId)
-      if (response.status === 420) return '420: enhance your calm'
-      if ([200, 201, 202, 400].includes(response.status)) return msg
-      return new Error([response.status, response.statusText, msg].join(': '))
-    } catch (error) {}
+    const json = response?.json ? await response.json() : response
+    const msg = JSON.stringify(json, null, 2)
+    if (response.status > 199 && response.status < 300) return msg
+    throw new Error(formatError(response, msg))
   }
 
   function modelNameFromEndpoint () {
@@ -339,18 +386,22 @@
   })
 
   reloadModelButton.onclick = async function () {
-    const bar = new ProgressBar(fetchEvents)
-    bar.show()
-    const modelName = modelNameFromEndpoint()
-    const response = await instrumentedFetch(
-      `${modelApiPath}/reload?modelName=${modelName}`,
-      {
-        method: 'GET',
-        headers: getHeaders()
-      }
-    )
-    showMessage(response)
-    setTimeout(() => bar.hide(), 1000)
+    try {
+      const bar = new ProgressBar(fetchEvents)
+      bar.show()
+      const modelName = modelNameFromEndpoint()
+      const response = await instrumentedFetch(
+        `${modelApiPath}/reload?modelName=${modelName}`,
+        {
+          method: 'GET',
+          headers: getHeaders()
+        }
+      )
+      showMessage(response)
+      setTimeout(() => bar.hide(), 1000)
+    } catch (error) {
+      showMessage(error.message, 'error')
+    }
   }
 
   /**
@@ -406,7 +457,7 @@
 
   pressAndHold(postButton, () => (modelIdInput.value = ''))
 
-  postButton.onclick = async function post () {
+  postButton.onclick = function post () {
     const model = document.getElementById('model').value
     if (!model || model === '') {
       showMessage({ error: 'no model selected' })
@@ -414,20 +465,18 @@
     }
     const bar = new ProgressBar(fetchEvents)
     const timerId = setTimeout(() => bar.show(), 1000)
-    try {
-      const response = await instrumentedFetch(getUrl(), {
-        method: 'POST',
-        body: document.getElementById('payload').value,
-        headers: getHeaders()
+
+    instrumentedFetch(getUrl(), {
+      method: 'POST',
+      body: document.getElementById('payload').value,
+      headers: getHeaders()
+    })
+      .then(showMessage)
+      .catch(error => showMessage(error.message, 'error'))
+      .then(() => {
+        clearTimeout(timerId)
+        setTimeout(() => bar.hide(), 500)
       })
-      clearTimeout(timerId)
-      setTimeout(() => bar.hide(), 1000)
-      updateModelId(response.modelId)
-      updateQueryList()
-      showMessage(response)
-    } catch (error) {
-      showMessage(error.message)
-    }
   }
 
   patchButton.onclick = function () {
@@ -439,8 +488,9 @@
     })
       .then(handleResponse)
       .then(showMessage)
+      .then(updatePorts)
       .catch(function (err) {
-        showMessage(err.message)
+        showMessage(err.message, 'error')
       })
   }
 
@@ -454,7 +504,7 @@
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
-        showMessage(err.message)
+        showMessage(err.message, 'error')
       })
   }
 
@@ -463,7 +513,7 @@
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
-        showMessage(err.message)
+        showMessage(err.message, 'error')
       })
   }
 
@@ -477,6 +527,8 @@
   })
 
   clearModelButton.addEventListener('click', function () {
+    setModelId(null)
+    modelIds = []
     modelInput.value = ''
     modelIdInput.value = ''
     queryInput.value = ''
@@ -491,6 +543,7 @@
     modelIdInput.value = ''
     paramInput.value = ''
     updateQueryList()
+    updatePorts()
     getUrl()
   })
 
