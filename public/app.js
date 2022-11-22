@@ -193,9 +193,7 @@
           next = false
         }
         let cls = '<span>'
-
-        console.log({ match })
-
+        // console.log({ match })
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
             if (/"id"|"modelId"/.test(match)) {
@@ -203,7 +201,7 @@
               return (
                 '<span class="text-warning">' +
                 match +
-                '</span><input type="button" style="background-color: skyblue" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail: ' +
+                '</span><input type="button" class="btn-warning" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail: ' +
                 modelIndex +
                 '}))" value="Get ID"/>'
               )
@@ -220,6 +218,17 @@
         return cls + match + '</span>'
       }
     )
+  }
+
+  function showMessage (message, style = 'pretty') {
+    const styles = {
+      pretty: message => `\n${prettifyJson(message)}`,
+      error: message =>
+        `\n<span style="color: #FF00FF"><b>${message}</b></span>`,
+      plain: message => `\n${message}`
+    }
+    document.getElementById('jsonCode').innerHTML += styles[style](message)
+    messages.scrollTop = messages.scrollHeight
   }
 
   window.addEventListener('getId', e => {
@@ -291,7 +300,9 @@
 
     if (modelInput.value === '') return
 
-    const model = models.find(model => model.endpoint === modelInput.value)
+    const model = models.find(
+      model => model.endpoint.toUpperCase() === modelInput.value.toUpperCase()
+    )
 
     if (model?.ports)
       Object.keys(model.ports).forEach(port => {
@@ -304,13 +315,15 @@
     queryInput.value = ''
     removeAllChildNodes(document.querySelector('#queryList'))
     getUrl()
+
     if (modelIdInput.value === '') {
       queryList.appendChild(new Option('__count=all'))
       return
     }
 
-    const model = models.find(model => model.endpoint === modelInput.value)
-
+    const model = models.find(
+      model => model.endpoint.toUpperCase() === modelInput.value.toUpperCase()
+    )
     if (model?.relations) {
       Object.keys(model.relations).forEach(rel => {
         queryList.appendChild(new Option(`relation=${rel}`))
@@ -324,16 +337,6 @@
     queryList.appendChild(new Option('html=true'))
   }
 
-  function showMessage (message, style = 'pretty') {
-    const styles = {
-      pretty: message => `\n${prettifyJson(message)}`,
-      error: message => `\n<span style="color:pink">${message}</span>`,
-      plain: message => `\n${message}`
-    }
-    document.getElementById('jsonCode').innerHTML += styles[style](message)
-    messages.scrollTop = messages.scrollHeight
-  }
-
   function updateModelId () {
     modelIdInput.value = getModelId()
   }
@@ -345,7 +348,7 @@
   }
 
   function getModelId () {
-    return modelId.replaceAll('"', '')
+    if (modelId) return modelId.replaceAll('"', '')
   }
 
   function formatError (response, msg) {
@@ -399,6 +402,8 @@
       )
       showMessage(response)
       setTimeout(() => bar.hide(), 1000)
+      updatePorts()
+      updateQueryList()
     } catch (error) {
       showMessage(error.message, 'error')
     }
@@ -460,7 +465,7 @@
   postButton.onclick = function post () {
     const model = document.getElementById('model').value
     if (!model || model === '') {
-      showMessage({ error: 'no model selected' })
+      showMessage({ error: 'no model selected' }, 'error')
       return
     }
     const bar = new ProgressBar(fetchEvents)
@@ -472,6 +477,8 @@
       headers: getHeaders()
     })
       .then(showMessage)
+      .then(updatePorts)
+      .then(updateQueryList)
       .catch(error => showMessage(error.message, 'error'))
       .then(() => {
         clearTimeout(timerId)
@@ -489,6 +496,7 @@
       .then(handleResponse)
       .then(showMessage)
       .then(updatePorts)
+      .then(updateQueryList)
       .catch(function (err) {
         showMessage(err.message, 'error')
       })
@@ -503,6 +511,8 @@
     fetch(getUrl(), { headers: getHeaders() })
       .then(handleResponse)
       .then(showMessage)
+      .then(updatePorts)
+      .then(updateQueryList)
       .catch(function (err) {
         showMessage(err.message, 'error')
       })

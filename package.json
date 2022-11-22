@@ -76,7 +76,8 @@
     "rustwasmc": "^0.1.29",
     "wasmedge-core": "^0.9.0",
     "wasmedge-extensions": "^0.9.0",
-    "ws": "^8.8.0"
+    "ws": "^8.8.0",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@babel/cli": "^7.18.6",
