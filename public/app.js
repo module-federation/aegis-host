@@ -40,7 +40,6 @@
         })
       })
     }
-
     show () {
       this.collapse.show()
     }
@@ -60,9 +59,8 @@
       new CustomEvent('fetch-connect', { detail: { progress: 35 } })
     )
 
-    let response = await fetch(url, options)
-    if (response.status > 299 || response.status < 200)
-      throw new Error(`${response.status}: ${response.statusText}`)
+    const response = await fetch(url, options)
+    await handleError(response)
 
     window.dispatchEvent(
       new CustomEvent('fetch-connect', { detail: { progress: 50 } })
@@ -174,63 +172,6 @@
     useIdempotencyKey = general.useIdempotencyKey
   }
 
-  let modelIds = []
-
-  function prettifyJson (json) {
-    if (!json) return
-    if (typeof json !== 'string') {
-      json = JSON.stringify(json, null, 2)
-    }
-    let next = false
-    modelIds = []
-    let modelIndex = 0
-    return json.replace(
-      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-      function (match) {
-        if (next) {
-          modelIds.push(match.replaceAll('"', ''))
-          modelIndex++
-          next = false
-        }
-        let cls = '<span>'
-        // console.log({ match })
-        if (/^"/.test(match)) {
-          if (/:$/.test(match)) {
-            if (/"id"|"modelId"/.test(match)) {
-              next = true
-              return (
-                '<span class="text-warning">' +
-                match +
-                '</span><input type="button" class="btn-warning" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail: ' +
-                modelIndex +
-                '}))" value="Get ID"/>'
-              )
-            }
-            cls = "<span class='text-warning'>"
-          } else {
-            cls = '<span>'
-          }
-        } else if (/true|false/.test(match)) {
-          cls = "<span style='color: violet'>"
-        } else if (/null/.test(match)) {
-          cls = "<span class='text-info'>"
-        }
-        return cls + match + '</span>'
-      }
-    )
-  }
-
-  function showMessage (message, style = 'pretty') {
-    const styles = {
-      pretty: message => `\n${prettifyJson(message)}`,
-      error: message =>
-        `\n<span style="color: #FF00FF"><b>${message}</b></span>`,
-      plain: message => `\n${message}`
-    }
-    document.getElementById('jsonCode').innerHTML += styles[style](message)
-    messages.scrollTop = messages.scrollHeight
-  }
-
   window.addEventListener('getId', e => {
     setModelId(modelIds[e.detail])
     updateModelId()
@@ -285,7 +226,11 @@
   modelIdInput.onchange = getUrl
   queryInput.onchange = getUrl
   paramInput.onchange = getUrl
-  //portInput.onchange = getUrl
+  portInput.onchange = getUrl
+
+  modelInput.addEventListener('change', updatePorts)
+  modelInput.addEventListener('change', updateQueryList)
+  modelIdInput.addEventListener('change', updateQueryList)
 
   function removeAllChildNodes (parent) {
     while (parent.firstChild) {
@@ -338,7 +283,7 @@
   }
 
   function updateModelId () {
-    modelIdInput.value = getModelId()
+    if (modelInput.value) modelIdInput.value = getModelId()
   }
 
   let modelId
@@ -349,26 +294,6 @@
 
   function getModelId () {
     if (modelId) return modelId.replaceAll('"', '')
-  }
-
-  function formatError (response, msg) {
-    return `${response.status}: ${
-      msg
-        ? msg
-            .split('{')
-            .join('')
-            .split('}')
-            .join('')
-            .trim()
-        : response.statusText
-    }`
-  }
-
-  async function handleResponse (response) {
-    const json = response?.json ? await response.json() : response
-    const msg = JSON.stringify(json, null, 2)
-    if (response.status > 199 && response.status < 300) return msg
-    throw new Error(formatError(response, msg))
   }
 
   function modelNameFromEndpoint () {
@@ -387,27 +312,6 @@
     reloadModelButton.disabled = false
     reloadModelButton.ariaBusy = false
   })
-
-  reloadModelButton.onclick = async function () {
-    try {
-      const bar = new ProgressBar(fetchEvents)
-      bar.show()
-      const modelName = modelNameFromEndpoint()
-      const response = await instrumentedFetch(
-        `${modelApiPath}/reload?modelName=${modelName}`,
-        {
-          method: 'GET',
-          headers: getHeaders()
-        }
-      )
-      showMessage(response)
-      setTimeout(() => bar.hide(), 1000)
-      updatePorts()
-      updateQueryList()
-    } catch (error) {
-      showMessage(error.message, 'error')
-    }
-  }
 
   /**
    * Increase or decreae value to adjust how long
@@ -460,30 +364,112 @@
     }
   }
 
+  function showMessage (message, style = 'pretty') {
+    const styles = {
+      pretty: message => `\n${prettifyJson(message)}`,
+      error: message => `\n<span style="color:#bdada4">${message}</span>`,
+      plain: message => `\n${message}`
+    }
+    //const msg = message === typeof Object ? JSON.stringify(message) : message
+    document.getElementById('jsonCode').innerHTML += styles[style](message)
+    messages.scrollTop = messages.scrollHeight
+  }
+
+  async function handleError (response) {
+    let msg = null
+    if (response.status > 199 && response.status < 300) {
+      return response
+    }
+    try {
+      msg = JSON.stringify(await response.json(), null, 2)
+    } catch (error) {
+      msg = `${response.status}: ${response.statusText}`
+    }
+    throw new Error(msg)
+  }
+
+  async function handleResponse (response) {
+    return response.json()
+  }
+
+  let modelIds = []
+
+  function prettifyJson (json) {
+    if (!json) return
+    if (typeof json !== 'string') {
+      json = JSON.stringify(json, null, 2)
+    }
+    let next = false
+    modelIds = []
+    let modelIndex = -1
+    return json.replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+      function (match) {
+        if (next) {
+          modelIds.push(match.replaceAll('"', ''))
+          modelIndex++
+          next = false
+          return `<button type="button" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail: ${modelIndex}}))" class="btn-warning" title="Click to GET ID">GET ${match}</button>`
+        }
+        let cls = '<span>'
+        // console.log({ match })
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            if (/"id"|"modelId"/.test(match)) {
+              next = true
+            }
+            cls = "<span class='text-warning'>"
+          } else {
+            cls = '<span>'
+          }
+        } else if (/true|false/.test(match)) {
+          cls = "<span style='color: violet'>"
+        } else if (/null/.test(match)) {
+          cls = "<span class='text-info'>"
+        }
+        return cls + match + '</span>'
+      }
+    )
+  }
+
+  reloadModelButton.onclick = async function () {
+    try {
+      const bar = new ProgressBar(fetchEvents)
+      bar.show()
+      const modelName = modelNameFromEndpoint()
+      const jsonObj = await instrumentedFetch(
+        `${modelApiPath}/reload?modelName=${modelName}`,
+        {
+          method: 'GET',
+          headers: getHeaders()
+        }
+      )
+      showMessage(jsonObj)
+      setTimeout(() => bar.hide(), 1000)
+    } catch (error) {
+      showMessage(error.message, 'error')
+    }
+  }
+
   pressAndHold(postButton, () => (modelIdInput.value = ''))
 
-  postButton.onclick = function post () {
+  postButton.onclick = async function post () {
     const model = document.getElementById('model').value
     if (!model || model === '') {
-      showMessage({ error: 'no model selected' }, 'error')
+      showMessage('no model selected', 'error')
       return
     }
-    const bar = new ProgressBar(fetchEvents)
-    const timerId = setTimeout(() => bar.show(), 1000)
-
-    instrumentedFetch(getUrl(), {
-      method: 'POST',
-      body: document.getElementById('payload').value,
-      headers: getHeaders()
-    })
-      .then(showMessage)
-      .then(updatePorts)
-      .then(updateQueryList)
-      .catch(error => showMessage(error.message, 'error'))
-      .then(() => {
-        clearTimeout(timerId)
-        setTimeout(() => bar.hide(), 500)
+    try {
+      const jsonObj = await instrumentedFetch(getUrl(), {
+        method: 'POST',
+        body: document.getElementById('payload').value,
+        headers: getHeaders()
       })
+      setModelId(jsonObj.id)
+      showMessage(jsonObj)
+    } catch (err) {
+      showMessage(err.message, 'error')
+    }
   }
 
   patchButton.onclick = function () {
@@ -493,10 +479,9 @@
       body: document.getElementById('payload').value,
       headers: getHeaders()
     })
+      .then(handleError)
       .then(handleResponse)
       .then(showMessage)
-      .then(updatePorts)
-      .then(updateQueryList)
       .catch(function (err) {
         showMessage(err.message, 'error')
       })
@@ -509,10 +494,9 @@
     }
     document.getElementById('parameter').value = ''
     fetch(getUrl(), { headers: getHeaders() })
+      .then(handleError)
       .then(handleResponse)
       .then(showMessage)
-      .then(updatePorts)
-      .then(updateQueryList)
       .catch(function (err) {
         showMessage(err.message, 'error')
       })
@@ -520,6 +504,7 @@
 
   deleteButton.onclick = function () {
     fetch(getUrl(), { method: 'DELETE', headers: getHeaders() })
+      .then(handleError)
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {
@@ -564,11 +549,13 @@
 
   clearQueryButton.addEventListener('click', function () {
     queryInput.value = ''
+    updateQueryList()
     getUrl()
   })
 
   clearPortsButton.addEventListener('click', function () {
     portInput.value = ''
+    updatePorts()
     getUrl()
   })
 

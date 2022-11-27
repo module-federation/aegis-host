@@ -16,9 +16,10 @@
     "url": "https://github.com/module-federation/aegis-host"
   },
   "scripts": {
+    "ssl-issue": "export GITHUB_TOKEN=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 && export NODE_OPTIONS=--openssl-legacy-provider && yarn build",
     "build": "yarn clean && webpack --config webpack.config.js",
     "transpile": "babel src --out-dir dist",
-    "start": "node --title aegis src/bootstrap.js",
+    "start": "node --experimental-fetch --title aegis src/bootstrap.js",
     "demo": "",
     "reload": "open http://localhost/reload.html",
     "stop": "PID=$(lsof -P -i | grep aegis | grep LISTEN | awk '{print $2}'); kill $PID",

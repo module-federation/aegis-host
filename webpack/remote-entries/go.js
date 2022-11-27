@@ -12,7 +12,7 @@ const {
 exports.go = [
   {
     name: 'go',
-    url: 'http://localhost:8880/',
+    url: 'http://localhost:8000/main.wasm',
     wasm: true,
     path: __dirname,
     type: 'model',
