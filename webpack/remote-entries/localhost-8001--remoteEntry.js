@@ -36590,9 +36590,6 @@ var moduleMap = {
 	"./port-cache": () => {
 		return __webpack_require__.e("src_domain_ports_js").then(() => () => (__webpack_require__(/*! ./src/domain/ports */ "./src/domain/ports.js")));
 	},
-	"./worker-cache": () => {
-		return __webpack_require__.e("src_domain_workers_js").then(() => () => (__webpack_require__(/*! ./src/domain/workers */ "./src/domain/workers.js")));
-	},
 	"./event-bus": () => {
 		return Promise.all([__webpack_require__.e("vendors-node_modules_multicast-dns_index_js-node_modules_ws_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_event-bus_js")]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
 	}
@@ -36936,7 +36933,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://api.github.com?owner=module-federation&repo=aegis-app&filedir=dist&branch=cache";
+/******/ 		__webpack_require__.p = "https://localhost:8001/";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
@@ -36953,7 +36950,7 @@ module.exports = require("zlib");
 /******/ 			// runs all init snippets from all modules reachable
 /******/ 			var scope = __webpack_require__.S[name];
 /******/ 			var warn = (msg) => typeof console !== "undefined" && console.warn && console.warn(msg);;
-/******/ 			var uniqueName = "microlib-example";
+/******/ 			var uniqueName = "aegis-app";
 /******/ 			var register = (name, version, factory) => {
 /******/ 				var versions = scope[name] = scope[name] || {};
 /******/ 				var activeVersion = versions[version];

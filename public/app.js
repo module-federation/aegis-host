@@ -172,12 +172,6 @@
     useIdempotencyKey = general.useIdempotencyKey
   }
 
-  window.addEventListener('getId', e => {
-    setModelId(modelIds[e.detail])
-    updateModelId()
-    getButton.click()
-  })
-
   function displayUrl (url) {
     document.getElementById(
       'url'
@@ -239,14 +233,13 @@
   }
 
   function updatePorts () {
+    const endpoint = modelInput.value.toUpperCase()
+
     portInput.value = ''
     removeAllChildNodes(document.querySelector('#portList'))
-    getUrl()
-
-    if (modelInput.value === '') return
 
     const model = models.find(
-      model => model.endpoint.toUpperCase() === modelInput.value.toUpperCase()
+      model => model.endpoint.toUpperCase() === endpoint
     )
 
     if (model?.ports)
@@ -254,12 +247,15 @@
         if (model.ports[port].type === 'inbound')
           portList.appendChild(new Option(port))
       })
+
+    getUrl()
   }
 
   function updateQueryList () {
+    const endpoint = modelInput.value.toUpperCase()
+
     queryInput.value = ''
     removeAllChildNodes(document.querySelector('#queryList'))
-    getUrl()
 
     if (modelIdInput.value === '') {
       queryList.appendChild(new Option('__count=all'))
@@ -267,8 +263,9 @@
     }
 
     const model = models.find(
-      model => model.endpoint.toUpperCase() === modelInput.value.toUpperCase()
+      model => model.endpoint.toUpperCase() === endpoint
     )
+
     if (model?.relations) {
       Object.keys(model.relations).forEach(rel => {
         queryList.appendChild(new Option(`relation=${rel}`))
@@ -280,6 +277,8 @@
       })
     }
     queryList.appendChild(new Option('html=true'))
+
+    getUrl()
   }
 
   function updateModelId () {
@@ -367,7 +366,7 @@
   function showMessage (message, style = 'pretty') {
     const styles = {
       pretty: message => `\n${prettifyJson(message)}`,
-      error: message => `\n<span style="color:#bdada4">${message}</span>`,
+      error: message => `\n<span style="color:pink">${message}</span>`,
       plain: message => `\n${message}`
     }
     //const msg = message === typeof Object ? JSON.stringify(message) : message
@@ -392,31 +391,38 @@
     return response.json()
   }
 
-  let modelIds = []
-
   function prettifyJson (json) {
+    let endpoint = modelInput.value
     if (!json) return
     if (typeof json !== 'string') {
+      jsonArr = [json].flat()
       json = JSON.stringify(json, null, 2)
+    } else {
+      jsonArr = [JSON.parse(json)].flat()
     }
-    let next = false
-    modelIds = []
-    let modelIndex = -1
+    let nextId = false
+    const matches = []
     return json.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
       function (match) {
-        if (next) {
-          modelIds.push(match.replaceAll('"', ''))
-          modelIndex++
-          next = false
-          return `<button type="button" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail: ${modelIndex}}))" class="btn-warning" title="Click to GET ID">GET ${match}</button>`
+        matches.push(match)
+        if (nextId) {
+          nextId = false
+          console.log(location.search)
+          const id = match.replaceAll('"', '')
+          const ep = jsonArr.filter(x => x.id === id).map(x => x.endpoint)[0]
+          const rl = location.search.match('relation')
+          const lc = rl?.length ? lc[0] : 0
+          endpoint = lc || ep || endpoint
+          return `<button type="button" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail:{ id:\'${id}\',
+          endpoint: \'${endpoint}\'}}))" class="btn-warning" title="Click to GET ID">GET ${match}</button>`
         }
         let cls = '<span>'
         // console.log({ match })
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
             if (/"id"|"modelId"/.test(match)) {
-              next = true
+              nextId = true
             }
             cls = "<span class='text-warning'>"
           } else {
@@ -431,6 +437,12 @@
       }
     )
   }
+
+  window.addEventListener('getId', e => {
+    modelInput.value = e.detail.endpoint
+    modelIdInput.value = e.detail.id
+    getButton.click()
+  })
 
   reloadModelButton.onclick = async function () {
     try {
@@ -497,6 +509,7 @@
       .then(handleError)
       .then(handleResponse)
       .then(showMessage)
+      .then(updateQueryList)
       .catch(function (err) {
         showMessage(err.message, 'error')
       })
