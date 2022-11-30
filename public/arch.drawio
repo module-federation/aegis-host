@@ -1,6 +1,249 @@
 <mxfile host="65bd71144e" scale="1.5" border="0">
+    <diagram name="c4" id="8JoluLsr5rRwba4acvXE">
+        <mxGraphModel dx="2269" dy="464" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#E6E6E6" math="0" shadow="0">
+            <root>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-0"/>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-1" parent="xVd8jDNDeQ8bvFG07IMr-0"/>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-2" value="" style="rounded=0;whiteSpace=wrap;html=1;glass=0;strokeWidth=1;fillColor=none;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                    <mxGeometry x="-1660" y="20" width="770" height="1050" as="geometry"/>
+                </mxCell>
+                <object placeholders="1" c4Name="ÆGIS appGantry" c4Type="SystemScopeBoundary" c4Application="Software System" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;[%c4Application%]&lt;/div&gt;" Description="" id="xVd8jDNDeQ8bvFG07IMr-3">
+                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];glass=0;strokeWidth=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1600" y="212" width="660" height="638" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Type="ÆGIS Service Mesh" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-4">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1500" y="897.44" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Type="ÆGIS Service Mesh" c4Container="Cmponent " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-5">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1530" y="887.44" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-6" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-7" target="xVd8jDNDeQ8bvFG07IMr-41" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object placeholders="1" c4Type="ÆGIS appFabric" c4Container="Component " c4Technology="ÆGIS webSwitch, NATS, Kafka, etc" c4Description="Service mesh client/server, self-forming network overlay" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-7">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1560" y="876" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-8">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1224" y="897.44" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-9">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1234" y="887.44" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-10">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1234" y="887.44" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-11">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1545" y="60" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-12" value="consumes" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-13" target="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-13">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1555" y="50" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-14">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1551" y="261" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-15">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1561" y="251" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-16">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1561" y="251" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-17">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1220" y="445" width="200" height="170" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-18">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor= #63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1230" y="435" width="200" height="170" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-19">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1240" y="262" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-20">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1250" y="252" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-21" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-22" target="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Component" c4Technology="ÆGIS Domain Model" c4Description="Independently deployable, portable, polyglot, performant, secure units of compute " label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-22">
+                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1240" y="425" width="200" height="170" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-23" value="runs" style="edgeStyle=none;html=1;exitX=0.533;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-17" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-1128" y="678" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-24" value="streams" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" target="xVd8jDNDeQ8bvFG07IMr-30" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-950" y="542" as="targetPoint"/>
+                        <mxPoint x="-1124" y="780" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-25" value="binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-19" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="-1008" y="730"/>
+                            <mxPoint x="-970" y="730"/>
+                            <mxPoint x="-970" y="322"/>
+                        </Array>
+                        <mxPoint x="-1310" y="552" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-26" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-41" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points"/>
+                    </mxGeometry>
+                </mxCell>
+                <object placeholders="1" c4Name="ÆGIS Federation Host" c4Type="Container" c4Technology="HTTP Server, Federation Application Host" c4Description="Provides zero downtime, zero install, rapid independent deployment to any compute primative. Abstracts non-functional concerns for 100% business logic in hosted code." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-27">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#52A2D8;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1248" y="666" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-28" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.416;entryY=1.006;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.439;exitY=0.006;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-14" target="xVd8jDNDeQ8bvFG07IMr-11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-29" value="consumes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-28" vertex="1" connectable="0">
+                    <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, file system, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-30">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1244" y="877.44" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-31" value="consumes" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-1390" y="130" as="sourcePoint"/>
+                        <mxPoint x="-1380" y="240" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <object placeholders="1" c4Name="External System" c4Type="Software or Storage System" c4Description="Software or storage system, e.g. database, blockchain, serverless function, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-32">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1565" y="40" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-33" value="binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-14" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-1250" y="720" as="sourcePoint"/>
+                        <Array as="points">
+                            <mxPoint x="-1280" y="696"/>
+                            <mxPoint x="-1280" y="351"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-34" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-37" target="xVd8jDNDeQ8bvFG07IMr-22" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-35" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-34" vertex="1" connectable="0">
+                    <mxGeometry x="0.0959" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-36" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-37" target="xVd8jDNDeQ8bvFG07IMr-44" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Controllers, Datasources" c4Description="Implements a port interface on one end and a client or service on the other to enable communcation between the application core and the outside world. Calls an optional service interface if configured." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-37">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1260" y="242" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-38" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-1420" y="272" as="sourcePoint"/>
+                        <mxPoint x="-1305" y="150" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="-1200" y="150"/>
+                            <mxPoint x="-1305" y="150"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-39" value="consumes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-38" vertex="1" connectable="0">
+                    <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-40" value="ws, quic, dds" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-41" target="xVd8jDNDeQ8bvFG07IMr-7" edge="1">
+                    <mxGeometry x="0.2" y="-10" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <object placeholders="1" c4Type="ÆGIS appFabric" c4Container="Component" c4Technology="ÆGIS webSwitch, NATS, Kafka, etc" c4Description="Service mesh client/server, self-forming network overlay" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-41">
+                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1560" y="666" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-42" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-44" target="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-43" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-42" vertex="1" connectable="0">
+                    <mxGeometry x="-0.0729" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. NATS, Kafka" c4Description="Provides an additional layer of abstraction for port adapters. If a port adapter implements a general integration pattern (e.g. pub/sub), a service adapter implements a specific instance of that pattern (e.g. NATS)." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-44">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1571" y="241" width="240" height="120" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-45" value="Legend" style="align=right;fontSize=16;fontStyle=1;strokeColor=none;fillColor=none;fontColor=#4D4D4D;spacingTop=-8;resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                    <mxGeometry x="-1090" y="160" width="180" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-46" value="" style="shape=table;html=1;whiteSpace=wrap;startSize=0;container=1;collapsible=0;childLayout=tableLayout;fillColor=none;align=left;spacingLeft=10;strokeColor=none;rounded=1;arcSize=11;fontColor=#FFFFFF;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                    <mxGeometry x="-1090" y="40" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-48" value="Container" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=#52A2D8;top=0;left=0;bottom=0;right=0;overflow=hidden;pointerEvents=1;align=left;spacingLeft=10;fontColor=#FFFFFF;" parent="xVd8jDNDeQ8bvFG07IMr-46" vertex="1">
+                    <mxGeometry width="180" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-49" value="Component" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=#7CBEF1;top=0;left=0;bottom=0;right=0;overflow=hidden;pointerEvents=1;align=left;spacingLeft=10;fontColor=#FFFFFF;" parent="xVd8jDNDeQ8bvFG07IMr-46" vertex="1">
+                    <mxGeometry y="40" width="180" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="xVd8jDNDeQ8bvFG07IMr-50" value="External Software System" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=#8B8496;top=0;left=0;bottom=0;right=0;overflow=hidden;pointerEvents=1;align=left;spacingLeft=10;fontColor=#FFFFFF;" parent="xVd8jDNDeQ8bvFG07IMr-46" vertex="1">
+                    <mxGeometry y="80" width="180" height="40" as="geometry"/>
+                </mxCell>
+                <object placeholders="1" c4Name="[Containers] AEGIS SW ARCH" c4Type="ContainerDiagramTitle" c4Description="ÆGIS C4 container/component diagram" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Description%&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-51">
+                    <mxCell style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;metaEdit=1;allowArrows=0;resizable=1;rotatable=0;connectable=0;recursiveResize=0;expand=0;pointerEvents=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
+                        <mxGeometry x="-1654" y="1026.44" width="260" height="40" as="geometry"/>
+                    </mxCell>
+                </object>
+            </root>
+        </mxGraphModel>
+    </diagram>
     <diagram name="AIOT" id="C57_Dr-gr5Sgo95vxOue">
-        <mxGraphModel dx="640" dy="458" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
+        <mxGraphModel dx="569" dy="464" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF" math="0" shadow="0">
             <root>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-0"/>
                 <mxCell id="yZtqZgkybrvEYegP9EMW-1" parent="yZtqZgkybrvEYegP9EMW-0"/>
@@ -356,249 +599,6 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
-    <diagram name="c4" id="8JoluLsr5rRwba4acvXE">
-        <mxGraphModel dx="2340" dy="458" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#E6E6E6" math="0" shadow="0">
-            <root>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-0"/>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-1" parent="xVd8jDNDeQ8bvFG07IMr-0"/>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-2" value="" style="rounded=0;whiteSpace=wrap;html=1;glass=0;strokeWidth=1;fillColor=none;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                    <mxGeometry x="-1660" y="20" width="770" height="1050" as="geometry"/>
-                </mxCell>
-                <object placeholders="1" c4Name="ÆGIS appGantry" c4Type="SystemScopeBoundary" c4Application="Software System" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;[%c4Application%]&lt;/div&gt;" Description="" id="xVd8jDNDeQ8bvFG07IMr-3">
-                    <mxCell style="rounded=1;fontSize=11;whiteSpace=wrap;html=1;dashed=1;arcSize=20;fillColor=none;strokeColor=#666666;fontColor=#333333;labelBackgroundColor=none;align=left;verticalAlign=bottom;labelBorderColor=none;spacingTop=0;spacing=10;dashPattern=8 4;metaEdit=1;rotatable=0;perimeter=rectanglePerimeter;noLabel=0;labelPadding=0;allowArrows=0;connectable=0;expand=0;recursiveResize=0;editable=1;pointerEvents=0;absoluteArcSize=1;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];glass=0;strokeWidth=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1600" y="212" width="660" height="638" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Type="ÆGIS Service Mesh" c4Container="Container " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-4">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1500" y="897.44" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Type="ÆGIS Service Mesh" c4Container="Cmponent " c4Technology="e.g. Apache Kafka, etc." c4Description="Description of message bus type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-5">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1530" y="887.44" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-6" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-7" target="xVd8jDNDeQ8bvFG07IMr-41" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <object placeholders="1" c4Type="ÆGIS appFabric" c4Container="Component " c4Technology="ÆGIS webSwitch, NATS, Kafka, etc" c4Description="Service mesh client/server, self-forming network overlay" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-7">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1560" y="876" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-8">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1224" y="897.44" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-9">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1234" y="887.44" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-10">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1234" y="887.44" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-11">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1545" y="60" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-12" value="consumes" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-13" target="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <object placeholders="1" c4Name="External system name" c4Type="Software System" c4Description="Description of external software system." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-13">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1555" y="50" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-14">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1551" y="261" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-15">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1561" y="251" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-16">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1561" y="251" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-17">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1220" y="445" width="200" height="170" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Container " c4Technology="ÆGIS Domain Model" c4Description="Independently deployable &#10;federated application &#10;component&#10;" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-18">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor= #63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1230" y="435" width="200" height="170" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-19">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1240" y="262" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Spring Service" c4Description="Description of component role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-20">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1250" y="252" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-21" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-22" target="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <object placeholders="1" c4Type="ÆGIS Federated Microservice" c4Container="Component" c4Technology="ÆGIS Domain Model" c4Description="Independently deployable, portable, polyglot, performant, secure units of compute " label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-22">
-                    <mxCell style="shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1240" y="425" width="200" height="170" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-23" value="runs" style="edgeStyle=none;html=1;exitX=0.533;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-17" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="-1128" y="678" as="sourcePoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-24" value="streams" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" target="xVd8jDNDeQ8bvFG07IMr-30" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="-950" y="542" as="targetPoint"/>
-                        <mxPoint x="-1124" y="780" as="sourcePoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-25" value="binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-19" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="-1008" y="730"/>
-                            <mxPoint x="-970" y="730"/>
-                            <mxPoint x="-970" y="322"/>
-                        </Array>
-                        <mxPoint x="-1310" y="552" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-26" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-41" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points"/>
-                    </mxGeometry>
-                </mxCell>
-                <object placeholders="1" c4Name="ÆGIS Federation Host" c4Type="Container" c4Technology="HTTP Server, Federation Application Host" c4Description="Provides zero downtime, zero install, rapid independent deployment to any compute primative. Abstracts non-functional concerns for 100% business logic in hosted code." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-27">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#52A2D8;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1248" y="666" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-28" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.416;entryY=1.006;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.439;exitY=0.006;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-14" target="xVd8jDNDeQ8bvFG07IMr-11" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-29" value="consumes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-28" vertex="1" connectable="0">
-                    <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <object placeholders="1" c4Name="Source Code Repository" c4Type="Software or Storage System" c4Description="Repository of federated component source or bytecode, e.g. Github, file server, file system, KV Cache, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-30">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1244" y="877.44" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-31" value="consumes" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="-1390" y="130" as="sourcePoint"/>
-                        <mxPoint x="-1380" y="240" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <object placeholders="1" c4Name="External System" c4Type="Software or Storage System" c4Description="Software or storage system, e.g. database, blockchain, serverless function, etc" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#cccccc&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-32">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1565" y="40" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-33" value="binds" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-27" target="xVd8jDNDeQ8bvFG07IMr-14" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="-1250" y="720" as="sourcePoint"/>
-                        <Array as="points">
-                            <mxPoint x="-1280" y="696"/>
-                            <mxPoint x="-1280" y="351"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-34" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-37" target="xVd8jDNDeQ8bvFG07IMr-22" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-35" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-34" vertex="1" connectable="0">
-                    <mxGeometry x="0.0959" y="1" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-36" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-37" target="xVd8jDNDeQ8bvFG07IMr-44" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <object placeholders="1" c4Name="ÆGIS Port Adapter" c4Type="Component" c4Technology="e.g. Controllers, Datasources" c4Description="Implements a port interface on one end and a client or service on the other to enable communcation between the application core and the outside world. Calls an optional service interface if configured." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-37">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1260" y="242" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-38" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="-1420" y="272" as="sourcePoint"/>
-                        <mxPoint x="-1305" y="150" as="targetPoint"/>
-                        <Array as="points">
-                            <mxPoint x="-1200" y="150"/>
-                            <mxPoint x="-1305" y="150"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-39" value="consumes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-38" vertex="1" connectable="0">
-                    <mxGeometry x="0.0544" y="1" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-40" value="ws, udp, quic" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-41" target="xVd8jDNDeQ8bvFG07IMr-7" edge="1">
-                    <mxGeometry x="0.2" y="-10" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <object placeholders="1" c4Type="ÆGIS appFabric" c4Container="Component" c4Technology="ÆGIS webSwitch, NATS, Kafka, etc" c4Description="Service mesh client/server, self-forming network overlay" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Type%&lt;/font&gt;&lt;div&gt;[%c4Container%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-41">
-                    <mxCell style="shape=cylinder3;size=15;direction=south;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#63BEF2;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1560" y="666" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-42" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" parent="xVd8jDNDeQ8bvFG07IMr-1" source="xVd8jDNDeQ8bvFG07IMr-44" target="xVd8jDNDeQ8bvFG07IMr-37" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-43" value="invokes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="xVd8jDNDeQ8bvFG07IMr-42" vertex="1" connectable="0">
-                    <mxGeometry x="-0.0729" y="-1" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <object placeholders="1" c4Name="ÆGIS Service Adapter" c4Type="Component" c4Technology="e.g. NATS, Kafka" c4Description="Provides an additional layer of abstraction for port adapters. If a port adapter implements a general integration pattern (e.g. pub/sub), a service adapter implements a specific instance of that pattern (e.g. NATS)." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-44">
-                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1571" y="241" width="240" height="120" as="geometry"/>
-                    </mxCell>
-                </object>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-45" value="Legend" style="align=right;fontSize=16;fontStyle=1;strokeColor=none;fillColor=none;fontColor=#4D4D4D;spacingTop=-8;resizable=0;" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                    <mxGeometry x="-1090" y="160" width="180" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-46" value="" style="shape=table;html=1;whiteSpace=wrap;startSize=0;container=1;collapsible=0;childLayout=tableLayout;fillColor=none;align=left;spacingLeft=10;strokeColor=none;rounded=1;arcSize=11;fontColor=#FFFFFF;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                    <mxGeometry x="-1090" y="40" width="180" height="120" as="geometry"/>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-48" value="Container" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=#52A2D8;top=0;left=0;bottom=0;right=0;overflow=hidden;pointerEvents=1;align=left;spacingLeft=10;fontColor=#FFFFFF;" parent="xVd8jDNDeQ8bvFG07IMr-46" vertex="1">
-                    <mxGeometry width="180" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-49" value="Component" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=#7CBEF1;top=0;left=0;bottom=0;right=0;overflow=hidden;pointerEvents=1;align=left;spacingLeft=10;fontColor=#FFFFFF;" parent="xVd8jDNDeQ8bvFG07IMr-46" vertex="1">
-                    <mxGeometry y="40" width="180" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="xVd8jDNDeQ8bvFG07IMr-50" value="External Software System" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;fillColor=#8B8496;top=0;left=0;bottom=0;right=0;overflow=hidden;pointerEvents=1;align=left;spacingLeft=10;fontColor=#FFFFFF;" parent="xVd8jDNDeQ8bvFG07IMr-46" vertex="1">
-                    <mxGeometry y="80" width="180" height="40" as="geometry"/>
-                </mxCell>
-                <object placeholders="1" c4Name="[Containers] AEGIS SW ARCH" c4Type="ContainerDiagramTitle" c4Description="ÆGIS C4 container/component diagram" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Name%&lt;/div&gt;&lt;/b&gt;&lt;/font&gt;&lt;div style=&quot;text-align: left&quot;&gt;%c4Description%&lt;/div&gt;" id="xVd8jDNDeQ8bvFG07IMr-51">
-                    <mxCell style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;metaEdit=1;allowArrows=0;resizable=1;rotatable=0;connectable=0;recursiveResize=0;expand=0;pointerEvents=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="xVd8jDNDeQ8bvFG07IMr-1" vertex="1">
-                        <mxGeometry x="-1654" y="1026.44" width="260" height="40" as="geometry"/>
-                    </mxCell>
-                </object>
             </root>
         </mxGraphModel>
     </diagram>

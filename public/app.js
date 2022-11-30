@@ -391,6 +391,10 @@
     return response.json()
   }
 
+  let endpoints = []
+
+  window.addEventListener('change', () => (endpoints = []))
+
   function prettifyJson (json) {
     let endpoint = modelInput.value
     if (!json) return
@@ -401,28 +405,31 @@
       jsonArr = [JSON.parse(json)].flat()
     }
     let nextId = false
-    const matches = []
+    let nextEndpoint = false
     return json.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
       function (match) {
-        matches.push(match)
+        if (nextEndpoint) {
+          nextEndpoint = false
+          endpoints.push(match.replaceAll('"', ''))
+        }
         if (nextId) {
           nextId = false
           console.log(location.search)
           const id = match.replaceAll('"', '')
           const ep = jsonArr.filter(x => x.id === id).map(x => x.endpoint)[0]
-          const rl = location.search.match('relation')
-          const lc = rl?.length ? lc[0] : 0
-          endpoint = lc || ep || endpoint
+          endpoint = ep || endpoint
           return `<button type="button" onclick="window.dispatchEvent(new CustomEvent(\'getId\', {detail:{ id:\'${id}\',
           endpoint: \'${endpoint}\'}}))" class="btn-warning" title="Click to GET ID">GET ${match}</button>`
         }
         let cls = '<span>'
-        // console.log({ match })
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
             if (/"id"|"modelId"/.test(match)) {
               nextId = true
+            }
+            if (/"endpoint"/.test(match)) {
+              nextEndpoint = true
             }
             cls = "<span class='text-warning'>"
           } else {
@@ -439,7 +446,7 @@
   }
 
   window.addEventListener('getId', e => {
-    modelInput.value = e.detail.endpoint
+    modelInput.value = endpoints.pop() || e.detail.endpoint
     modelIdInput.value = e.detail.id
     getButton.click()
   })
