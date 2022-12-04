@@ -20,16 +20,17 @@ tasks:
       ./mongo.sh
 
   - name: repo
-    before: |
+    init: |
       nvm install --lts
       nvm use --lts
       cd ../aegis-app
       yarn
       yarn add express
   - command: |
-      gp sync-await start-repo
       cd ../aegis-app
-      yarn startLocalRepo
+      nohup yarn startLocalRepo &
+      nohup yarn startCacheRepo &
+      gp sync-done repo
 
   - name: remote
     init: |
@@ -40,7 +41,7 @@ tasks:
       cd ../aegis-app
       yarn
     command: |
-      gp sync-done start-repo
+      gp sync-await repo
       cd ../aegis-app
       yarn buildAll
       gp sync-done buildAll

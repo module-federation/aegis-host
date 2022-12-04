@@ -17,7 +17,7 @@
   },
   "scripts": {
     "ssl-issue": "export GITHUB_TOKEN=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 && export NODE_OPTIONS=--openssl-legacy-provider && yarn build",
-    "build": "yarn clean && webpack --config webpack.config.js",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && yarn clean && webpack --config webpack.config.js",
     "transpile": "babel src --out-dir dist",
     "start": "node --experimental-fetch --title aegis src/bootstrap.js",
     "demo": "",
