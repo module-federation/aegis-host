@@ -473,11 +473,6 @@
   pressAndHold(postButton, () => (modelIdInput.value = ''))
 
   postButton.onclick = async function post () {
-    const model = document.getElementById('model').value
-    if (!model || model === '') {
-      showMessage('no model selected', 'error')
-      return
-    }
     try {
       const jsonObj = await instrumentedFetch(getUrl(), {
         method: 'POST',
