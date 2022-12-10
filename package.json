@@ -20,7 +20,7 @@
     "build": "export NODE_OPTIONS=--openssl-legacy-provider && yarn clean && webpack --config webpack.config.js",
     "transpile": "babel src --out-dir dist",
     "start": "node --experimental-fetch --title aegis src/bootstrap.js",
-    "demo": "",
+    "demo": "open http://localhost",
     "reload": "open http://localhost/reload.html",
     "stop": "PID=$(lsof -P -i | grep aegis | grep LISTEN | awk '{print $2}'); kill $PID",
     "restart": "yarn build && yarn start",
