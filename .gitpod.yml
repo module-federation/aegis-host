@@ -1,12 +1,12 @@
-# github:
-#   prebuilds:
-#     master: true
-#     branches: true
-#     pullRequests: true
-#     pullRequestsFromForks: true
-#     addCheck: prevent-merge-on-error
-#     addComment: false
-#     addBadge: true
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: prevent-merge-on-error
+    addComment: false
+    addBadge: true
 
 # # multi-repo
 # additionalRepositories:
