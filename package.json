@@ -63,7 +63,7 @@
   "author": "Tyson Midboe",
   "license": "Apache-2.0",
   "dependencies": {
-    "@module-federation/aegis": "^1.3.5-beta",
+    "@module-federation/aegis": "git://github.com/module-federation/aegis.git#main",
     "bufferutil": "^4.0.6",
     "cors": "^2.8.5",
     "express": "^4.18.1",
