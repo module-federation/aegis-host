@@ -1,92 +1,92 @@
-github:
-  prebuilds:
-    master: true
-    branches: true
-    pullRequests: true
-    pullRequestsFromForks: true
-    addCheck: prevent-merge-on-error
-    addComment: false
-    addBadge: true
+# github:
+#   prebuilds:
+#     master: true
+#     branches: true
+#     pullRequests: true
+#     pullRequestsFromForks: true
+#     addCheck: prevent-merge-on-error
+#     addComment: false
+#     addBadge: true
 
-# multi-repo
-additionalRepositories:
-  - url: https://github.com/module-federation/aegis
-  - url: https://github.com/module-federation/aegis-host
+# # multi-repo
+# additionalRepositories:
+#   - url: https://github.com/module-federation/aegis
+#   - url: https://github.com/module-federation/aegis-host
 
-tasks:
-  - name: mongo
-    command: |
-      cd ../aegis
-      ./mongo.sh
+# tasks:
+#   - name: mongo
+#     command: |
+#       cd ../aegis
+#       ./mongo.sh
 
-  - name: repo
-    init: |
-      nvm install --lts
-      nvm use --lts
-      cd ../aegis-app
-      yarn
-      yarn add express
-  - command: |
-      cd ../aegis-app
-      nohup yarn startLocalRepo &
-      nohup yarn startCacheRepo &
-      gp sync-done repo
+#   - name: repo
+#     init: |
+#       nvm install --lts
+#       nvm use --lts
+#       cd ../aegis-app
+#       yarn
+#       yarn add express
+#   - command: |
+#       cd ../aegis-app
+#       nohup yarn startLocalRepo &
+#       nohup yarn startCacheRepo &
+#       gp sync-done repo
 
-  - name: remote
-    init: |
-      cd ../aegis
-      yarn
-      cd ../aegis-host
-      yarn
-      cd ../aegis-app
-      yarn
-    command: |
-      gp sync-await repo
-      cd ../aegis-app
-      yarn buildAll
-      gp sync-done buildAll
-      yarn start-all
+#   - name: remote
+#     init: |
+#       cd ../aegis
+#       yarn
+#       cd ../aegis-host
+#       yarn
+#       cd ../aegis-app
+#       yarn
+#     command: |
+#       gp sync-await repo
+#       cd ../aegis-app
+#       yarn buildAll
+#       gp sync-done buildAll
+#       yarn start-all
 
-  - name: host
-    command: |
-      gp sync-await buildAll
-      cd ../aegis
-      yarn start
+#   - name: host
+#     command: |
+#       gp sync-await buildAll
+#       cd ../aegis
+#       yarn start
 
-  - name: webswitch
-    command: |
-      gp sync-await buildAll
-      cd ../aegis-host
-      export PORT=8888
-      export SWITCH=true
-      yarn start
+#   - name: webswitch
+#     command: |
+#       gp sync-await buildAll
+#       cd ../aegis-host
+#       export PORT=8888
+#       export SWITCH=true
+#       yarn start
 
-  # - name: ros2
-  #   init: |
-  #     sudo apt update && sudo apt install curl gnupg lsb-release
-  #     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-  #     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+#   # - name: ros2
+#   #   init: |
+#   #     sudo apt update && sudo apt install curl gnupg lsb-release
+#   #     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+#   #     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
-workspaceLocation: aegis-host/aegis.code-workspace                                                                                                                                    1
+# workspaceLocation: aegis-host/aegis.code-workspace                                                                                                                                    1
 
-ports:
-  - port: 8000
-    description: local repo
-    visibility: public
-    onOpen: ignore
-  - port: 8080
-    description: http api
-    visibility: public
-    onOpen: open-preview
-  - port: 8888
-    description: webswitch
-    visibility: public
-    onOpen: open-preview
-  - port: 27017
-    description: mongodb
-    visibility: public
-    onOpen: ignore
-  - port: 5353
-    description: multicast dns
-    visibility: public
-    onOpen: ignore
+# ports:
+#   - port: 8000
+#     description: local repo
+#     visibility: public
+#     onOpen: ignore
+#   - port: 8080
+#     description: http api
+#     visibility: public
+#     onOpen: open-preview
+#   - port: 8888
+#     description: webswitch
+#     visibility: public
+#     onOpen: open-preview
+#   - port: 27017
+#     description: mongodb
+#     visibility: public
+#     onOpen: ignore
+#   - port: 5353
+#     description: multicast dns
+#     visibility: public
+#     onOpen: ignore
