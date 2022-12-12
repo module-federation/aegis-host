@@ -21,7 +21,7 @@
     "transpile": "babel src --out-dir dist",
     "start": "node --experimental-fetch --title aegis src/bootstrap.js",
     "demo": "open http://localhost",
-    "reload": "open http://localhost/reload.html",
+    "reload": "curl -s http://localhost/reload",
     "stop": "PID=$(lsof -P -i | grep aegis | grep LISTEN | awk '{print $2}'); kill $PID",
     "restart": "yarn build && yarn start",
     "webswitch": "cd ../aegis ; export SWITCH=true ; export PORT=8888 ; ./start.sh ",

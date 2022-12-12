@@ -6,7 +6,7 @@
     "remoteServices": "aegis-services",
     "resumeWorkflow": true,
     "checkIpHost": "https://checkip.amazonaws.com",
-    "useIdempotencyKey": true,
+    "useIdempotencyKey": false,
     "defaultCircuitBreaker": {
       "errorRate": 25,
       "callVolume": 100,
