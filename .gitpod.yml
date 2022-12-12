@@ -1,13 +1,4 @@
-github:
-  prebuilds:
-    master: true
-    branches: true
-    pullRequests: true
-    pullRequestsFromForks: true
-    addCheck: prevent-merge-on-error
-    addComment: false
-    addBadge: true
-
+mainConfiguration: https://github.com/brightliteimmersive/fdp
 # # multi-repo
 # additionalRepositories:
 #   - url: https://github.com/module-federation/aegis
