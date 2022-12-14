@@ -1,4 +1,4 @@
-mainConfiguration: https://github.com/briteliteimmersive/fdp
+mainConfiguration: https://github.com/module-federation/aegis
 # # multi-repo
 # additionalRepositories:
 #   - url: https://github.com/module-federation/aegis
