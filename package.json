@@ -66,6 +66,7 @@
     "@module-federation/aegis": "git://github.com/module-federation/aegis.git#main",
     "bufferutil": "^4.0.6",
     "cors": "^2.8.5",
+    "dotenv": "16.0.3",
     "express": "^4.18.1",
     "path-to-regexp": "^6.2.1",
     "pino": "^8.5.0",
