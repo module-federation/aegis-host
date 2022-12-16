@@ -259,6 +259,8 @@
 
     if (modelIdInput.value === '') {
       queryList.appendChild(new Option('__count=all'))
+      queryList.appendChild(new Option('__cached=true'))
+
       return
     }
 
