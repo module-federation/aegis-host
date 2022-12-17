@@ -260,7 +260,6 @@
     if (modelIdInput.value === '') {
       queryList.appendChild(new Option('__count=all'))
       queryList.appendChild(new Option('__cached=true'))
-
       return
     }
 
@@ -279,6 +278,7 @@
       })
     }
     queryList.appendChild(new Option('html=true'))
+    queryList.appendChild(new Option('__cached=true'))
 
     getUrl()
   }
