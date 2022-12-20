@@ -1,42 +1,51 @@
-"use strict"
+'use strict'
 
-var assert = require("assert")
+const {
+  AppError,
+  ThreadPoolFactory,
+  EventBrokerFactory,
+  DataSourceFactory,
+  DomainEvents,
+  default: ModelFactory
+} = require('@module-federation/aegis/lib/domain')
 
-import addModelFactory from "@module-federation/aegis/lib/use-cases/add-model"
-import postModelFactory from "@module-federation/aegis/lib/adapters/controllers/post-model"
+var assert = require('assert')
 
-import DataSourceFactory from "@module-federation/aegis/lib/domain/datasource-factory"
-import ModelFactory from "@module-federation/aegis/lib/domain"
-import ObserverFactory from "@module-federation/aegis/lib/domain/observer"
-import hash from "@module-federation/aegis/lib/domain/util/hash"
+const makeCreateModel = require('@module-federation/aegis/lib/domain/use-cases/create-model')
+  .default
+const postModelFactory = require('@module-federation/aegis/lib/adapters/controllers/post-model')
+  .default
 
-describe("Controllers", function () {
-  describe("postModel()", function () {
-    it("should add new model", async function () {
+describe('Controllers', function () {
+  describe('postModel()', function () {
+    it('should add new model', async function () {
       ModelFactory.registerModel({
-        modelName: "ABC",
-        factory: ({ a }) => ({ a, b: "c" }),
-        endpoint: "abcs",
-        dependencies: {},
+        modelName: 'ABC',
+        factory: ({ a }) => ({ a, b: 'c' }),
+        endpoint: 'abcs',
+        dependencies: {}
       })
       ModelFactory.registerEvent(
         ModelFactory.EventTypes.CREATE,
-        "ABC",
+        'ABC',
         model => ({ model })
       )
-      const createModel = await addModelFactory({
-        modelName: "ABC",
+      const createModel = makeCreateModel({
+        modelName: 'ABC',
         models: ModelFactory,
-        repository: DataSourceFactory.getDataSource("ABC"),
-        observer: ObserverFactory.getInstance(),
+        repository: DataSourceFactory.getDataSource('ABC'),
+        //broker: EventBrokerFactory.getInstance(),
+        domainEvents: DomainEvents,
+        AppError: AppError,
+        threadpool: ThreadPoolFactory.getThreadPool('ABC')
       })
       const resp = await postModelFactory(createModel)({
-        body: { a: "a" },
-        headers: { "User-Agent": "test" },
-        ip: "127.0.0.1",
-        log: () => 1,
+        body: { a: 'a' },
+        headers: { 'User-Agent': 'test' },
+        ip: '127.0.0.1',
+        log: () => 1
       })
-      console.log("resp.status", resp.statusCode)
+      console.log('resp.status', resp.statusCode)
       assert.strictEqual(resp.statusCode, 201)
     })
   })

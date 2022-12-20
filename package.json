@@ -17,6 +17,7 @@
   },
   "scripts": {
     "build": "yarn clean && webpack --config webpack.config.js",
+    "test": "jest",
     "transpile": "babel src --out-dir dist",
     "start": "node --title aegis src/bootstrap.js",
     "demo": "open http://localhost",
@@ -42,7 +43,6 @@
     "deploy-lambda": "yarn clean npm run transpile && webpack --config webpack.config.js --env serverless && serverless package && serverless deploy",
     "clean": "rimraf dist",
     "test-mocha": "mocha --recursive -r esm",
-    "test": "jest",
     "demo-ssl": "open https://localhost:443",
     "demo-aws": "open https://aegis.module-federation.org",
     "refresh-token": "./accessToken.sh",

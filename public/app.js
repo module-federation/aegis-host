@@ -142,17 +142,8 @@
       : headers
   }
 
-  /**
-   * Get config file. If auth is enabled, request new
-   * JSON Web Token and set `authHeader` accordingly.
-   * Need CORS for this.
-   */
-  async function refreshAccessToken () {
-    const file = await fetch('aegis.config.json')
-    const text = await file.text()
-    const conf = JSON.parse(text)
+  async function refreshAccessTocken (conf) {
     const token = conf.services.token
-    const general = conf.general
     let jwtToken = { access_token: '' }
     if (token.authEnabled) {
       const data = await fetch(token.oauthUri, {
@@ -169,7 +160,23 @@
       // add json web token to authentication header
       authHeader = { Authorization: `bearer ${jwtToken.access_token}` }
     }
-    useIdempotencyKey = general.useIdempotencyKey
+  }
+
+  function setIdempotency (conf) {
+    useIdempotencyKey = conf.general.useIdempotencyKey
+  }
+
+  /**
+   * Get config file. If auth is enabled, request new
+   * JSON Web Token and set `authHeader` accordingly.
+   * Need CORS for this.
+   */
+  async function updateConfigSettings () {
+    const file = await fetch('aegis.config.json')
+    const text = await file.text()
+    const conf = JSON.parse(text)
+    refreshAccessTocken(conf)
+    setIdempotency(conf)
   }
 
   function displayUrl (url) {
@@ -283,18 +290,10 @@
     getUrl()
   }
 
-  function updateModelId () {
-    if (modelInput.value) modelIdInput.value = getModelId()
-  }
-
   let modelId
 
   function setModelId (id) {
     modelId = id
-  }
-
-  function getModelId () {
-    if (modelId) return modelId.replaceAll('"', '')
   }
 
   function modelNameFromEndpoint () {
@@ -368,7 +367,8 @@
   function showMessage (message, style = 'pretty') {
     const styles = {
       pretty: message => `\n${prettifyJson(message)}`,
-      error: message => `\n<span style="color:pink">${message}</span>`,
+      error: message =>
+        `\n<span style="color:#FF7F50"><b>${message}</b></span>`,
       plain: message => `\n${message}`
     }
     //const msg = message === typeof Object ? JSON.stringify(message) : message
@@ -535,12 +535,11 @@
 
   copyButton.addEventListener('click', function () {
     modelIdInput.select()
-    document.execCommand('copy')
+    navigator.clipboard.writeText(modelIdInput.value)
   })
 
   clearModelButton.addEventListener('click', function () {
     setModelId(null)
-    modelIds = []
     modelInput.value = ''
     modelIdInput.value = ''
     queryInput.value = ''
@@ -578,7 +577,7 @@
 
   window.addEventListener('load', async function () {
     // if enabled, request fresh access token and store in auth header
-    await refreshAccessToken()
+    await updateConfigSettings()
     // get list of all models and add to datalist for model input control
     const modelJson = await fetch('aegis/api/config?isCached=false', {
       headers: getHeaders()
