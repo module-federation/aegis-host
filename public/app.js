@@ -101,7 +101,7 @@
   let authHeader = {}
   let useIdempotencyKey = false
 
-  function generateUUID () {
+  function generateUuid () {
     // Public Domain/MIT
     var d = new Date().getTime() //Timestamp
     var d2 =
@@ -138,11 +138,11 @@
       ...authHeader
     }
     return useIdempotencyKey
-      ? { ...headers, 'idempotency-key': generateUUID() }
+      ? { ...headers, 'idempotency-key': generateUuid() }
       : headers
   }
 
-  async function refreshAccessTocken (conf) {
+  async function refreshAccessToken (conf) {
     const token = conf.services.token
     let jwtToken = { access_token: '' }
     if (token.authEnabled) {
@@ -175,7 +175,7 @@
     const file = await fetch('aegis.config.json')
     const text = await file.text()
     const conf = JSON.parse(text)
-    refreshAccessTocken(conf)
+    await refreshAccessToken(conf)
     setIdempotency(conf)
   }
 
@@ -513,7 +513,6 @@
       .then(handleError)
       .then(handleResponse)
       .then(showMessage)
-      .then(updateQueryList)
       .catch(function (err) {
         showMessage(err.message, 'error')
       })
@@ -575,10 +574,7 @@
     getUrl()
   })
 
-  window.addEventListener('load', async function () {
-    // if enabled, request fresh access token and store in auth header
-    await updateConfigSettings()
-    // get list of all models and add to datalist for model input control
+  async function loadModels () {
     const modelJson = await fetch('aegis/api/config?isCached=false', {
       headers: getHeaders()
     })
@@ -586,5 +582,13 @@
     models.forEach(m => {
       modelList.appendChild(new Option(m.endpoint))
     })
+    return models
+  }
+
+  window.addEventListener('load', async function () {
+    // if enabled, request fresh access token and store in auth header
+    await updateConfigSettings()
+    // get list of all models and add to datalist for model input control
+    await loadModels()
   })
 })()

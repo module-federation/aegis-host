@@ -19,7 +19,7 @@ const {
   ServiceMeshPlugin
 } = require('@module-federation/aegis').services
 
-const fs = require('fs')
+const fs = require('node:fs/promises')
 const tls = require('tls')
 const http = require('http')
 const https = require('https')
@@ -135,12 +135,13 @@ exports.start = async function (app) {
    * @returns
    */
   async function requestTrustedCert (domain, renewal = false) {
-    if (!renewal && fs.existsSync(certFile) && fs.existsSync(keyFile)) {
+    try {
       return {
-        key: fs.readFileSync(keyFile, 'utf8'),
-        cert: fs.readFileSync(certFile, 'utf-8')
+        key: await fs.readFile(keyFile, 'utf8'),
+        cert: await fs.readFile(certFile, 'utf-8')
       }
-    }
+    } catch (error) {}
+
     // call service to acquire or renew x509 certificate from PKI
     const { key, cert } = await CertificateService.provisionCert(domain)
 
