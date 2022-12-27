@@ -145,8 +145,8 @@ exports.start = async function (app) {
     // call service to acquire or renew x509 certificate from PKI
     const { key, cert } = await CertificateService.provisionCert(domain)
 
-    fs.writeFileSync(certFile, cert, 'utf-8')
-    fs.writeFileSync(keyFile, key, 'utf-8')
+    await fs.writeFile(certFile, cert, 'utf-8')
+    await fs.writeFile(keyFile, key, 'utf-8')
 
     return { key, cert }
   }
