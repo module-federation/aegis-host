@@ -132,7 +132,8 @@ exports.start = async function (app) {
    *
    * @param {string} domain domain for which cert will be  created
    * @param {boolean} [renewal] false by default, set true to renew
-   * @returns
+   * @returns {{ key:string, cert:string }} the CA cert and private 
+   * key used to sign it
    */
   async function requestTrustedCert (domain, renewal = false) {
     try {
