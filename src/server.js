@@ -142,7 +142,7 @@ exports.start = async function (app) {
           fs.readFile(certFile, 'utf-8')
         ])
       }
-    } catch (error) {}
+    } catch {}
 
     // call service to acquire or renew x509 certificate from PKI
     const { key, cert } = await CertificateService.provisionCert(domain)
