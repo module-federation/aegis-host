@@ -147,8 +147,8 @@ exports.start = async function (app) {
     const { key, cert } = await CertificateService.provisionCert(domain)
 
     await Promise.all([
-      fs.writeFile(certFile, cert, 'utf-8'),
-      fs.writeFile(keyFile, key, 'utf-8')
+      fs.writeFile(keyFile, key, 'utf-8'),
+      fs.writeFile(certFile, cert, 'utf-8')
     ])
     return { key, cert }
   }
