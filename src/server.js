@@ -136,12 +136,11 @@ exports.start = async function (app) {
    */
   async function requestTrustedCert (domain, renewal = false) {
     try {
-      return {
-        const [key, cert] = await Promise.all([
-          fs.readFile(keyFile, 'utf8'),
-          fs.readFile(certFile, 'utf-8')
-        ])
-      }
+      const [key, cert] = await Promise.all([
+        fs.readFile(keyFile, 'utf8'),
+        fs.readFile(certFile, 'utf-8')
+      ])
+      return { key, cert }
     } catch {}
 
     // call service to acquire or renew x509 certificate from PKI
