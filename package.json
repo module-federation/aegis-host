@@ -24,7 +24,7 @@
     "reload": "curl -s http://localhost/reload",
     "stop": "PID=$(lsof -P -i | grep aegis | grep LISTEN | awk '{print $2}'); kill $PID",
     "restart": "yarn build && yarn start",
-    "webswitch": "cd ../aegis ; export SWITCH=true ; export PORT=8888 ; ./start.sh ",
+    "webswitch": "cd ../aegis && export SWITCH=true && export PORT=8888 && ./start.sh ",
     "gen-keys": "node cert/mesh/keys.js",
     "login-status": "echo \"/workspace/aegis-host/status.sh\" >> ~/.aegis && echo \". ~/.aegis\"",
     "cmd-log": "echo \"alias log='view ~/aegis-host/public/aegis.log'\" >> ~/.aegis",
