@@ -19,7 +19,7 @@
     "build": "yarn clean && webpack --config webpack.config.js",
     "test": "jest",
     "transpile": "babel src --out-dir dist",
-    "start": "node --title aegis src/bootstrap.js",
+    "start": "node --title aegis --trace-warnings src/bootstrap.js",
     "demo": "open http://localhost",
     "reload": "curl -s http://localhost/reload",
     "stop": "PID=$(lsof -P -i | grep aegis | grep LISTEN | awk '{print $2}'); kill $PID",
