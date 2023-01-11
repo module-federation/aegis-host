@@ -2,6 +2,7 @@
 
 require('dotenv').config()
 require('regenerator-runtime')
+const { loadMiddleware } = require('./middleware')
 const importFresh = require('import-fresh')
 const express = require('express')
 const server = require('./server')
@@ -29,6 +30,7 @@ async function load (aegis = null) {
     app.use(cors())
     app.use(express.json())
     app.use(express.static('public'))
+    loadMiddleware(app)
 
     app.use('/reload', async (req, res) => {
       await load(aegis)

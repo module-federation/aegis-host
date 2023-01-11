@@ -2,6 +2,269 @@ module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./node_modules/@leichtgewicht/ip-codec/index.cjs":
+/*!********************************************************!*\
+  !*** ./node_modules/@leichtgewicht/ip-codec/index.cjs ***!
+  \********************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_exports__, module */
+/***/ ((module, exports) => {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// GENERATED FILE. DO NOT EDIT.
+var ipCodec = (function(exports) {
+  "use strict";
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.decode = decode;
+  exports.encode = encode;
+  exports.familyOf = familyOf;
+  exports.name = void 0;
+  exports.sizeOf = sizeOf;
+  exports.v6 = exports.v4 = void 0;
+  const v4Regex = /^(\d{1,3}\.){3,3}\d{1,3}$/;
+  const v4Size = 4;
+  const v6Regex = /^(::)?(((\d{1,3}\.){3}(\d{1,3}){1})?([0-9a-f]){0,4}:{0,2}){1,8}(::)?$/i;
+  const v6Size = 16;
+  const v4 = {
+    name: 'v4',
+    size: v4Size,
+    isFormat: ip => v4Regex.test(ip),
+  
+    encode(ip, buff, offset) {
+      offset = ~~offset;
+      buff = buff || new Uint8Array(offset + v4Size);
+      const max = ip.length;
+      let n = 0;
+  
+      for (let i = 0; i < max;) {
+        const c = ip.charCodeAt(i++);
+  
+        if (c === 46) {
+          // "."
+          buff[offset++] = n;
+          n = 0;
+        } else {
+          n = n * 10 + (c - 48);
+        }
+      }
+  
+      buff[offset] = n;
+      return buff;
+    },
+  
+    decode(buff, offset) {
+      offset = ~~offset;
+      return `${buff[offset++]}.${buff[offset++]}.${buff[offset++]}.${buff[offset]}`;
+    }
+  
+  };
+  exports.v4 = v4;
+  const v6 = {
+    name: 'v6',
+    size: v6Size,
+    isFormat: ip => ip.length > 0 && v6Regex.test(ip),
+  
+    encode(ip, buff, offset) {
+      offset = ~~offset;
+      let end = offset + v6Size;
+      let fill = -1;
+      let hexN = 0;
+      let decN = 0;
+      let prevColon = true;
+      let useDec = false;
+      buff = buff || new Uint8Array(offset + v6Size); // Note: This algorithm needs to check if the offset
+      // could exceed the buffer boundaries as it supports
+      // non-standard compliant encodings that may go beyond
+      // the boundary limits. if (offset < end) checks should
+      // not be necessary...
+  
+      for (let i = 0; i < ip.length; i++) {
+        let c = ip.charCodeAt(i);
+  
+        if (c === 58) {
+          // :
+          if (prevColon) {
+            if (fill !== -1) {
+              // Not Standard! (standard doesn't allow multiple ::)
+              // We need to treat
+              if (offset < end) buff[offset] = 0;
+              if (offset < end - 1) buff[offset + 1] = 0;
+              offset += 2;
+            } else if (offset < end) {
+              // :: in the middle
+              fill = offset;
+            }
+          } else {
+            // : ends the previous number
+            if (useDec === true) {
+              // Non-standard! (ipv4 should be at end only)
+              // A ipv4 address should not be found anywhere else but at
+              // the end. This codec also support putting characters
+              // after the ipv4 address..
+              if (offset < end) buff[offset] = decN;
+              offset++;
+            } else {
+              if (offset < end) buff[offset] = hexN >> 8;
+              if (offset < end - 1) buff[offset + 1] = hexN & 0xff;
+              offset += 2;
+            }
+  
+            hexN = 0;
+            decN = 0;
+          }
+  
+          prevColon = true;
+          useDec = false;
+        } else if (c === 46) {
+          // . indicates IPV4 notation
+          if (offset < end) buff[offset] = decN;
+          offset++;
+          decN = 0;
+          hexN = 0;
+          prevColon = false;
+          useDec = true;
+        } else {
+          prevColon = false;
+  
+          if (c >= 97) {
+            c -= 87; // a-f ... 97~102 -87 => 10~15
+          } else if (c >= 65) {
+            c -= 55; // A-F ... 65~70 -55 => 10~15
+          } else {
+            c -= 48; // 0-9 ... starting from charCode 48
+  
+            decN = decN * 10 + c;
+          } // We don't know yet if its a dec or hex number
+  
+  
+          hexN = (hexN << 4) + c;
+        }
+      }
+  
+      if (prevColon === false) {
+        // Commiting last number
+        if (useDec === true) {
+          if (offset < end) buff[offset] = decN;
+          offset++;
+        } else {
+          if (offset < end) buff[offset] = hexN >> 8;
+          if (offset < end - 1) buff[offset + 1] = hexN & 0xff;
+          offset += 2;
+        }
+      } else if (fill === 0) {
+        // Not Standard! (standard doesn't allow multiple ::)
+        // This means that a : was found at the start AND end which means the
+        // end needs to be treated as 0 entry...
+        if (offset < end) buff[offset] = 0;
+        if (offset < end - 1) buff[offset + 1] = 0;
+        offset += 2;
+      } else if (fill !== -1) {
+        // Non-standard! (standard doens't allow multiple ::)
+        // Here we find that there has been a :: somewhere in the middle
+        // and the end. To treat the end with priority we need to move all
+        // written data two bytes to the right.
+        offset += 2;
+  
+        for (let i = Math.min(offset - 1, end - 1); i >= fill + 2; i--) {
+          buff[i] = buff[i - 2];
+        }
+  
+        buff[fill] = 0;
+        buff[fill + 1] = 0;
+        fill = offset;
+      }
+  
+      if (fill !== offset && fill !== -1) {
+        // Move the written numbers to the end while filling the everything
+        // "fill" to the bytes with zeros.
+        if (offset > end - 2) {
+          // Non Standard support, when the cursor exceeds bounds.
+          offset = end - 2;
+        }
+  
+        while (end > fill) {
+          buff[--end] = offset < end && offset > fill ? buff[--offset] : 0;
+        }
+      } else {
+        // Fill the rest with zeros
+        while (offset < end) {
+          buff[offset++] = 0;
+        }
+      }
+  
+      return buff;
+    },
+  
+    decode(buff, offset) {
+      offset = ~~offset;
+      let result = '';
+  
+      for (let i = 0; i < v6Size; i += 2) {
+        if (i !== 0) {
+          result += ':';
+        }
+  
+        result += (buff[offset + i] << 8 | buff[offset + i + 1]).toString(16);
+      }
+  
+      return result.replace(/(^|:)0(:0)*:0(:|$)/, '$1::$3').replace(/:{3,4}/, '::');
+    }
+  
+  };
+  exports.v6 = v6;
+  const name = 'ip';
+  exports.name = name;
+  
+  function sizeOf(ip) {
+    if (v4.isFormat(ip)) return v4.size;
+    if (v6.isFormat(ip)) return v6.size;
+    throw Error(`Invalid ip address: ${ip}`);
+  }
+  
+  function familyOf(string) {
+    return sizeOf(string) === v4.size ? 1 : 2;
+  }
+  
+  function encode(ip, buff, offset) {
+    offset = ~~offset;
+    const size = sizeOf(ip);
+  
+    if (typeof buff === 'function') {
+      buff = buff(offset + size);
+    }
+  
+    if (size === v4.size) {
+      return v4.encode(ip, buff, offset);
+    }
+  
+    return v6.encode(ip, buff, offset);
+  }
+  
+  function decode(buff, offset, length) {
+    offset = ~~offset;
+    length = length || buff.length - offset;
+  
+    if (length === v4.size) {
+      return v4.decode(buff, offset, length);
+    }
+  
+    if (length === v6.size) {
+      return v6.decode(buff, offset, length);
+    }
+  
+    throw Error(`Invalid buffer size needs to be ${v4.size} for v4 or ${v6.size} for v6.`);
+  }
+  return "default" in exports ? exports.default : exports;
+})({});
+if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() { return ipCodec; }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+else {}
+
+
+/***/ }),
+
 /***/ "./node_modules/axios-retry/index.js":
 /*!*******************************************!*\
   !*** ./node_modules/axios-retry/index.js ***!
@@ -2894,7 +3157,7 @@ module.exports = JSON.parse("{\"name\":\"axios\",\"version\":\"0.21.4\",\"descri
   \*****************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: module */
-/*! CommonJS bailout: module.exports is used directly at 25:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 26:0-14 */
 /***/ ((module) => {
 
 /**
@@ -2905,6 +3168,7 @@ var s = 1000;
 var m = s * 60;
 var h = m * 60;
 var d = h * 24;
+var w = d * 7;
 var y = d * 365.25;
 
 /**
@@ -2926,7 +3190,7 @@ module.exports = function(val, options) {
   var type = typeof val;
   if (type === 'string' && val.length > 0) {
     return parse(val);
-  } else if (type === 'number' && isNaN(val) === false) {
+  } else if (type === 'number' && isFinite(val)) {
     return options.long ? fmtLong(val) : fmtShort(val);
   }
   throw new Error(
@@ -2948,7 +3212,7 @@ function parse(str) {
   if (str.length > 100) {
     return;
   }
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
+  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
     str
   );
   if (!match) {
@@ -2963,6 +3227,10 @@ function parse(str) {
     case 'yr':
     case 'y':
       return n * y;
+    case 'weeks':
+    case 'week':
+    case 'w':
+      return n * w;
     case 'days':
     case 'day':
     case 'd':
@@ -3005,16 +3273,17 @@ function parse(str) {
  */
 
 function fmtShort(ms) {
-  if (ms >= d) {
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
     return Math.round(ms / d) + 'd';
   }
-  if (ms >= h) {
+  if (msAbs >= h) {
     return Math.round(ms / h) + 'h';
   }
-  if (ms >= m) {
+  if (msAbs >= m) {
     return Math.round(ms / m) + 'm';
   }
-  if (ms >= s) {
+  if (msAbs >= s) {
     return Math.round(ms / s) + 's';
   }
   return ms + 'ms';
@@ -3029,25 +3298,29 @@ function fmtShort(ms) {
  */
 
 function fmtLong(ms) {
-  return plural(ms, d, 'day') ||
-    plural(ms, h, 'hour') ||
-    plural(ms, m, 'minute') ||
-    plural(ms, s, 'second') ||
-    ms + ' ms';
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
+    return plural(ms, msAbs, d, 'day');
+  }
+  if (msAbs >= h) {
+    return plural(ms, msAbs, h, 'hour');
+  }
+  if (msAbs >= m) {
+    return plural(ms, msAbs, m, 'minute');
+  }
+  if (msAbs >= s) {
+    return plural(ms, msAbs, s, 'second');
+  }
+  return ms + ' ms';
 }
 
 /**
  * Pluralization helper.
  */
 
-function plural(ms, n, name) {
-  if (ms < n) {
-    return;
-  }
-  if (ms < n * 1.5) {
-    return Math.floor(ms / n) + ' ' + name;
-  }
-  return Math.ceil(ms / n) + ' ' + name + 's';
+function plural(ms, msAbs, n, name) {
+  var isPlural = msAbs >= n * 1.5;
+  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
 }
 
 
@@ -3059,39 +3332,115 @@ function plural(ms, n, name) {
   \*******************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_exports__, module, __webpack_require__ */
-/*! CommonJS bailout: exports is used directly at 7:0-7 */
-/*! CommonJS bailout: exports.humanize(...) prevents optimization as exports is passed as call context as 86:12-28 */
-/*! CommonJS bailout: exports.enable(...) prevents optimization as exports is passed as call context as 168:0-14 */
+/*! CommonJS bailout: module.exports.humanize(...) prevents optimization as module.exports is passed as call context as 152:8-31 */
+/*! CommonJS bailout: exports is used directly at 255:37-44 */
+/*! CommonJS bailout: module.exports is used directly at 255:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 257:21-35 */
 /***/ ((module, exports, __webpack_require__) => {
+
+/* eslint-env browser */
 
 /**
  * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(/*! ./debug */ "./node_modules/debug/src/debug.js");
-exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
+exports.storage = localstorage();
+exports.destroy = (() => {
+	let warned = false;
+
+	return () => {
+		if (!warned) {
+			warned = true;
+			console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+		}
+	};
+})();
 
 /**
  * Colors.
  */
 
 exports.colors = [
-  'lightseagreen',
-  'forestgreen',
-  'goldenrod',
-  'dodgerblue',
-  'darkorchid',
-  'crimson'
+	'#0000CC',
+	'#0000FF',
+	'#0033CC',
+	'#0033FF',
+	'#0066CC',
+	'#0066FF',
+	'#0099CC',
+	'#0099FF',
+	'#00CC00',
+	'#00CC33',
+	'#00CC66',
+	'#00CC99',
+	'#00CCCC',
+	'#00CCFF',
+	'#3300CC',
+	'#3300FF',
+	'#3333CC',
+	'#3333FF',
+	'#3366CC',
+	'#3366FF',
+	'#3399CC',
+	'#3399FF',
+	'#33CC00',
+	'#33CC33',
+	'#33CC66',
+	'#33CC99',
+	'#33CCCC',
+	'#33CCFF',
+	'#6600CC',
+	'#6600FF',
+	'#6633CC',
+	'#6633FF',
+	'#66CC00',
+	'#66CC33',
+	'#9900CC',
+	'#9900FF',
+	'#9933CC',
+	'#9933FF',
+	'#99CC00',
+	'#99CC33',
+	'#CC0000',
+	'#CC0033',
+	'#CC0066',
+	'#CC0099',
+	'#CC00CC',
+	'#CC00FF',
+	'#CC3300',
+	'#CC3333',
+	'#CC3366',
+	'#CC3399',
+	'#CC33CC',
+	'#CC33FF',
+	'#CC6600',
+	'#CC6633',
+	'#CC9900',
+	'#CC9933',
+	'#CCCC00',
+	'#CCCC33',
+	'#FF0000',
+	'#FF0033',
+	'#FF0066',
+	'#FF0099',
+	'#FF00CC',
+	'#FF00FF',
+	'#FF3300',
+	'#FF3333',
+	'#FF3366',
+	'#FF3399',
+	'#FF33CC',
+	'#FF33FF',
+	'#FF6600',
+	'#FF6633',
+	'#FF9900',
+	'#FF9933',
+	'#FFCC00',
+	'#FFCC33'
 ];
 
 /**
@@ -3102,38 +3451,31 @@ exports.colors = [
  * TODO: add a `localStorage` variable to explicitly enable/disable colors
  */
 
+// eslint-disable-next-line complexity
 function useColors() {
-  // NB: In an Electron preload script, document will be defined but not fully
-  // initialized. Since we know we're in Chrome, we'll just detect this case
-  // explicitly
-  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
-    return true;
-  }
+	// NB: In an Electron preload script, document will be defined but not fully
+	// initialized. Since we know we're in Chrome, we'll just detect this case
+	// explicitly
+	if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
+		return true;
+	}
 
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-  return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
-    // double check webkit in userAgent just in case we are in a worker
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
+	// Internet Explorer and Edge do not support colors.
+	if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+		return false;
+	}
+
+	// Is webkit? http://stackoverflow.com/a/16459606/376773
+	// document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+	return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
+		// Is firebug? http://stackoverflow.com/a/398120/376773
+		(typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
+		// Is firefox >= v31?
+		// https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+		(typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
+		// Double check webkit in userAgent just in case we are in a worker
+		(typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
 }
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  try {
-    return JSON.stringify(v);
-  } catch (err) {
-    return '[UnexpectedJSONParseError]: ' + err.message;
-  }
-};
-
 
 /**
  * Colorize log arguments if enabled.
@@ -3142,52 +3484,49 @@ exports.formatters.j = function(v) {
  */
 
 function formatArgs(args) {
-  var useColors = this.useColors;
+	args[0] = (this.useColors ? '%c' : '') +
+		this.namespace +
+		(this.useColors ? ' %c' : ' ') +
+		args[0] +
+		(this.useColors ? '%c ' : ' ') +
+		'+' + module.exports.humanize(this.diff);
 
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
+	if (!this.useColors) {
+		return;
+	}
 
-  if (!useColors) return;
+	const c = 'color: ' + this.color;
+	args.splice(1, 0, c, 'color: inherit');
 
-  var c = 'color: ' + this.color;
-  args.splice(1, 0, c, 'color: inherit')
+	// The final "%c" is somewhat tricky, because there could be other
+	// arguments passed either before or after the %c, so we need to
+	// figure out the correct index to insert the CSS into
+	let index = 0;
+	let lastC = 0;
+	args[0].replace(/%[a-zA-Z%]/g, match => {
+		if (match === '%%') {
+			return;
+		}
+		index++;
+		if (match === '%c') {
+			// We only are interested in the *last* %c
+			// (the user may have provided their own)
+			lastC = index;
+		}
+	});
 
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
+	args.splice(lastC, 0, c);
 }
 
 /**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
+ * Invokes `console.debug()` when available.
+ * No-op when `console.debug` is not a "function".
+ * If `console.debug` is not available, falls back
+ * to `console.log`.
  *
  * @api public
  */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
+exports.log = console.debug || console.log || (() => {});
 
 /**
  * Save `namespaces`.
@@ -3195,15 +3534,17 @@ function log() {
  * @param {String} namespaces
  * @api private
  */
-
 function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
+	try {
+		if (namespaces) {
+			exports.storage.setItem('debug', namespaces);
+		} else {
+			exports.storage.removeItem('debug');
+		}
+	} catch (error) {
+		// Swallow
+		// XXX (@Qix-) should we be logging these?
+	}
 }
 
 /**
@@ -3212,26 +3553,22 @@ function save(namespaces) {
  * @return {String} returns the previously persisted debug modes
  * @api private
  */
-
 function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
+	let r;
+	try {
+		r = exports.storage.getItem('debug');
+	} catch (error) {
+		// Swallow
+		// XXX (@Qix-) should we be logging these?
+	}
 
-  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-  if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = process.env.DEBUG;
-  }
+	// If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+	if (!r && typeof process !== 'undefined' && 'env' in process) {
+		r = process.env.DEBUG;
+	}
 
-  return r;
+	return r;
 }
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
 
 /**
  * Localstorage attempts to return the localstorage.
@@ -3245,232 +3582,318 @@ exports.enable(load());
  */
 
 function localstorage() {
-  try {
-    return window.localStorage;
-  } catch (e) {}
+	try {
+		// TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
+		// The Browser also has localStorage in the global context.
+		return localStorage;
+	} catch (error) {
+		// Swallow
+		// XXX (@Qix-) should we be logging these?
+	}
 }
+
+module.exports = __webpack_require__(/*! ./common */ "./node_modules/debug/src/common.js")(exports);
+
+const {formatters} = module.exports;
+
+/**
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+ */
+
+formatters.j = function (v) {
+	try {
+		return JSON.stringify(v);
+	} catch (error) {
+		return '[UnexpectedJSONParseError]: ' + error.message;
+	}
+};
 
 
 /***/ }),
 
-/***/ "./node_modules/debug/src/debug.js":
-/*!*****************************************!*\
-  !*** ./node_modules/debug/src/debug.js ***!
-  \*****************************************/
+/***/ "./node_modules/debug/src/common.js":
+/*!******************************************!*\
+  !*** ./node_modules/debug/src/common.js ***!
+  \******************************************/
 /*! unknown exports (runtime-defined) */
-/*! runtime requirements: __webpack_exports__, module, __webpack_require__ */
-/*! CommonJS bailout: module.exports is used directly at 9:10-24 */
-/*! CommonJS bailout: exports is used directly at 9:0-7 */
-/*! CommonJS bailout: exports.coerce(...) prevents optimization as exports is passed as call context as 85:14-28 */
-/*! CommonJS bailout: exports.enabled(...) prevents optimization as exports is passed as call context as 118:18-33 */
-/*! CommonJS bailout: exports.useColors(...) prevents optimization as exports is passed as call context as 119:20-37 */
-/*! CommonJS bailout: exports.init(...) prevents optimization as exports is passed as call context as 124:4-16 */
-/*! CommonJS bailout: exports.save(...) prevents optimization as exports is passed as call context as 139:2-14 */
-/*! CommonJS bailout: exports.enable(...) prevents optimization as exports is passed as call context as 165:2-16 */
-/***/ ((module, exports, __webpack_require__) => {
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 274:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 
 /**
  * This is the common logic for both the Node.js and web browser
  * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
  */
 
-exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = __webpack_require__(/*! ms */ "./node_modules/debug/node_modules/ms/index.js");
+function setup(env) {
+	createDebug.debug = createDebug;
+	createDebug.default = createDebug;
+	createDebug.coerce = coerce;
+	createDebug.disable = disable;
+	createDebug.enable = enable;
+	createDebug.enabled = enabled;
+	createDebug.humanize = __webpack_require__(/*! ms */ "./node_modules/debug/node_modules/ms/index.js");
+	createDebug.destroy = destroy;
 
-/**
- * The currently active debug mode names, and names to skip.
- */
+	Object.keys(env).forEach(key => {
+		createDebug[key] = env[key];
+	});
 
-exports.names = [];
-exports.skips = [];
+	/**
+	* The currently active debug mode names, and names to skip.
+	*/
 
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
- */
+	createDebug.names = [];
+	createDebug.skips = [];
 
-exports.formatters = {};
+	/**
+	* Map of special "%n" handling functions, for the debug "format" argument.
+	*
+	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+	*/
+	createDebug.formatters = {};
 
-/**
- * Previous log timestamp.
- */
+	/**
+	* Selects a color for a debug namespace
+	* @param {String} namespace The namespace string for the debug instance to be colored
+	* @return {Number|String} An ANSI color code for the given namespace
+	* @api private
+	*/
+	function selectColor(namespace) {
+		let hash = 0;
 
-var prevTime;
+		for (let i = 0; i < namespace.length; i++) {
+			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
+			hash |= 0; // Convert to 32bit integer
+		}
 
-/**
- * Select a color.
- * @param {String} namespace
- * @return {Number}
- * @api private
- */
+		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+	}
+	createDebug.selectColor = selectColor;
 
-function selectColor(namespace) {
-  var hash = 0, i;
+	/**
+	* Create a debugger with the given `namespace`.
+	*
+	* @param {String} namespace
+	* @return {Function}
+	* @api public
+	*/
+	function createDebug(namespace) {
+		let prevTime;
+		let enableOverride = null;
+		let namespacesCache;
+		let enabledCache;
 
-  for (i in namespace) {
-    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
+		function debug(...args) {
+			// Disabled?
+			if (!debug.enabled) {
+				return;
+			}
 
-  return exports.colors[Math.abs(hash) % exports.colors.length];
+			const self = debug;
+
+			// Set `diff` timestamp
+			const curr = Number(new Date());
+			const ms = curr - (prevTime || curr);
+			self.diff = ms;
+			self.prev = prevTime;
+			self.curr = curr;
+			prevTime = curr;
+
+			args[0] = createDebug.coerce(args[0]);
+
+			if (typeof args[0] !== 'string') {
+				// Anything else let's inspect with %O
+				args.unshift('%O');
+			}
+
+			// Apply any `formatters` transformations
+			let index = 0;
+			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
+				// If we encounter an escaped % then don't increase the array index
+				if (match === '%%') {
+					return '%';
+				}
+				index++;
+				const formatter = createDebug.formatters[format];
+				if (typeof formatter === 'function') {
+					const val = args[index];
+					match = formatter.call(self, val);
+
+					// Now we need to remove `args[index]` since it's inlined in the `format`
+					args.splice(index, 1);
+					index--;
+				}
+				return match;
+			});
+
+			// Apply env-specific formatting (colors, etc.)
+			createDebug.formatArgs.call(self, args);
+
+			const logFn = self.log || createDebug.log;
+			logFn.apply(self, args);
+		}
+
+		debug.namespace = namespace;
+		debug.useColors = createDebug.useColors();
+		debug.color = createDebug.selectColor(namespace);
+		debug.extend = extend;
+		debug.destroy = createDebug.destroy; // XXX Temporary. Will be removed in the next major release.
+
+		Object.defineProperty(debug, 'enabled', {
+			enumerable: true,
+			configurable: false,
+			get: () => {
+				if (enableOverride !== null) {
+					return enableOverride;
+				}
+				if (namespacesCache !== createDebug.namespaces) {
+					namespacesCache = createDebug.namespaces;
+					enabledCache = createDebug.enabled(namespace);
+				}
+
+				return enabledCache;
+			},
+			set: v => {
+				enableOverride = v;
+			}
+		});
+
+		// Env-specific initialization logic for debug instances
+		if (typeof createDebug.init === 'function') {
+			createDebug.init(debug);
+		}
+
+		return debug;
+	}
+
+	function extend(namespace, delimiter) {
+		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+		newDebug.log = this.log;
+		return newDebug;
+	}
+
+	/**
+	* Enables a debug mode by namespaces. This can include modes
+	* separated by a colon and wildcards.
+	*
+	* @param {String} namespaces
+	* @api public
+	*/
+	function enable(namespaces) {
+		createDebug.save(namespaces);
+		createDebug.namespaces = namespaces;
+
+		createDebug.names = [];
+		createDebug.skips = [];
+
+		let i;
+		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+		const len = split.length;
+
+		for (i = 0; i < len; i++) {
+			if (!split[i]) {
+				// ignore empty strings
+				continue;
+			}
+
+			namespaces = split[i].replace(/\*/g, '.*?');
+
+			if (namespaces[0] === '-') {
+				createDebug.skips.push(new RegExp('^' + namespaces.slice(1) + '$'));
+			} else {
+				createDebug.names.push(new RegExp('^' + namespaces + '$'));
+			}
+		}
+	}
+
+	/**
+	* Disable debug output.
+	*
+	* @return {String} namespaces
+	* @api public
+	*/
+	function disable() {
+		const namespaces = [
+			...createDebug.names.map(toNamespace),
+			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
+		].join(',');
+		createDebug.enable('');
+		return namespaces;
+	}
+
+	/**
+	* Returns true if the given mode name is enabled, false otherwise.
+	*
+	* @param {String} name
+	* @return {Boolean}
+	* @api public
+	*/
+	function enabled(name) {
+		if (name[name.length - 1] === '*') {
+			return true;
+		}
+
+		let i;
+		let len;
+
+		for (i = 0, len = createDebug.skips.length; i < len; i++) {
+			if (createDebug.skips[i].test(name)) {
+				return false;
+			}
+		}
+
+		for (i = 0, len = createDebug.names.length; i < len; i++) {
+			if (createDebug.names[i].test(name)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	* Convert regexp to namespace
+	*
+	* @param {RegExp} regxep
+	* @return {String} namespace
+	* @api private
+	*/
+	function toNamespace(regexp) {
+		return regexp.toString()
+			.substring(2, regexp.toString().length - 2)
+			.replace(/\.\*\?$/, '*');
+	}
+
+	/**
+	* Coerce `val`.
+	*
+	* @param {Mixed} val
+	* @return {Mixed}
+	* @api private
+	*/
+	function coerce(val) {
+		if (val instanceof Error) {
+			return val.stack || val.message;
+		}
+		return val;
+	}
+
+	/**
+	* XXX DO NOT USE. This is a temporary stub function.
+	* XXX It WILL be removed in the next major release.
+	*/
+	function destroy() {
+		console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+	}
+
+	createDebug.enable(createDebug.load());
+
+	return createDebug;
 }
 
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function createDebug(namespace) {
-
-  function debug() {
-    // disabled?
-    if (!debug.enabled) return;
-
-    var self = debug;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // turn the `arguments` into a proper Array
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %O
-      args.unshift('%O');
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    // apply env-specific formatting (colors, etc.)
-    exports.formatArgs.call(self, args);
-
-    var logFn = debug.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-
-  debug.namespace = namespace;
-  debug.enabled = exports.enabled(namespace);
-  debug.useColors = exports.useColors();
-  debug.color = selectColor(namespace);
-
-  // env-specific initialization logic for debug instances
-  if ('function' === typeof exports.init) {
-    exports.init(debug);
-  }
-
-  return debug;
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  exports.names = [];
-  exports.skips = [];
-
-  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (var i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
+module.exports = setup;
 
 
 /***/ }),
@@ -3485,14 +3908,14 @@ function coerce(val) {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 /**
- * Detect Electron renderer process, which is node, but we should
+ * Detect Electron renderer / nwjs process, which is node, but we should
  * treat as a browser.
  */
 
-if (typeof process !== 'undefined' && process.type === 'renderer') {
-  module.exports = __webpack_require__(/*! ./browser.js */ "./node_modules/debug/src/browser.js");
+if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
+	module.exports = __webpack_require__(/*! ./browser.js */ "./node_modules/debug/src/browser.js");
 } else {
-  module.exports = __webpack_require__(/*! ./node.js */ "./node_modules/debug/src/node.js");
+	module.exports = __webpack_require__(/*! ./node.js */ "./node_modules/debug/src/node.js");
 }
 
 
@@ -3504,31 +3927,33 @@ if (typeof process !== 'undefined' && process.type === 'renderer') {
   \****************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_exports__, module, __webpack_require__ */
-/*! CommonJS bailout: exports is used directly at 14:0-7 */
-/*! CommonJS bailout: exports.humanize(...) prevents optimization as exports is passed as call context as 117:38-54 */
-/*! CommonJS bailout: exports.enable(...) prevents optimization as exports is passed as call context as 248:0-14 */
+/*! CommonJS bailout: module.exports.humanize(...) prevents optimization as module.exports is passed as call context as 176:31-54 */
+/*! CommonJS bailout: exports is used directly at 240:37-44 */
+/*! CommonJS bailout: module.exports is used directly at 240:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 242:21-35 */
 /***/ ((module, exports, __webpack_require__) => {
 
 /**
  * Module dependencies.
  */
 
-var tty = __webpack_require__(/*! tty */ "tty");
-var util = __webpack_require__(/*! util */ "util");
+const tty = __webpack_require__(/*! tty */ "tty");
+const util = __webpack_require__(/*! util */ "util");
 
 /**
  * This is the Node.js implementation of `debug()`.
- *
- * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(/*! ./debug */ "./node_modules/debug/src/debug.js");
 exports.init = init;
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
+exports.destroy = util.deprecate(
+	() => {},
+	'Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.'
+);
 
 /**
  * Colors.
@@ -3536,79 +3961,137 @@ exports.useColors = useColors;
 
 exports.colors = [6, 2, 3, 4, 5, 1];
 
+try {
+	// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
+	// eslint-disable-next-line import/no-extraneous-dependencies
+	const supportsColor = __webpack_require__(/*! supports-color */ "./node_modules/supports-color/index.js");
+
+	if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
+		exports.colors = [
+			20,
+			21,
+			26,
+			27,
+			32,
+			33,
+			38,
+			39,
+			40,
+			41,
+			42,
+			43,
+			44,
+			45,
+			56,
+			57,
+			62,
+			63,
+			68,
+			69,
+			74,
+			75,
+			76,
+			77,
+			78,
+			79,
+			80,
+			81,
+			92,
+			93,
+			98,
+			99,
+			112,
+			113,
+			128,
+			129,
+			134,
+			135,
+			148,
+			149,
+			160,
+			161,
+			162,
+			163,
+			164,
+			165,
+			166,
+			167,
+			168,
+			169,
+			170,
+			171,
+			172,
+			173,
+			178,
+			179,
+			184,
+			185,
+			196,
+			197,
+			198,
+			199,
+			200,
+			201,
+			202,
+			203,
+			204,
+			205,
+			206,
+			207,
+			208,
+			209,
+			214,
+			215,
+			220,
+			221
+		];
+	}
+} catch (error) {
+	// Swallow - we only care if `supports-color` is available; it doesn't have to be.
+}
+
 /**
  * Build up the default `inspectOpts` object from the environment variables.
  *
  *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
  */
 
-exports.inspectOpts = Object.keys(process.env).filter(function (key) {
-  return /^debug_/i.test(key);
-}).reduce(function (obj, key) {
-  // camel-case
-  var prop = key
-    .substring(6)
-    .toLowerCase()
-    .replace(/_([a-z])/g, function (_, k) { return k.toUpperCase() });
+exports.inspectOpts = Object.keys(process.env).filter(key => {
+	return /^debug_/i.test(key);
+}).reduce((obj, key) => {
+	// Camel-case
+	const prop = key
+		.substring(6)
+		.toLowerCase()
+		.replace(/_([a-z])/g, (_, k) => {
+			return k.toUpperCase();
+		});
 
-  // coerce string value into JS value
-  var val = process.env[key];
-  if (/^(yes|on|true|enabled)$/i.test(val)) val = true;
-  else if (/^(no|off|false|disabled)$/i.test(val)) val = false;
-  else if (val === 'null') val = null;
-  else val = Number(val);
+	// Coerce string value into JS value
+	let val = process.env[key];
+	if (/^(yes|on|true|enabled)$/i.test(val)) {
+		val = true;
+	} else if (/^(no|off|false|disabled)$/i.test(val)) {
+		val = false;
+	} else if (val === 'null') {
+		val = null;
+	} else {
+		val = Number(val);
+	}
 
-  obj[prop] = val;
-  return obj;
+	obj[prop] = val;
+	return obj;
 }, {});
-
-/**
- * The file descriptor to write the `debug()` calls to.
- * Set the `DEBUG_FD` env variable to override with another value. i.e.:
- *
- *   $ DEBUG_FD=3 node script.js 3>debug.log
- */
-
-var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
-
-if (1 !== fd && 2 !== fd) {
-  util.deprecate(function(){}, 'except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)')()
-}
-
-var stream = 1 === fd ? process.stdout :
-             2 === fd ? process.stderr :
-             createWritableStdioStream(fd);
 
 /**
  * Is stdout a TTY? Colored output is enabled when `true`.
  */
 
 function useColors() {
-  return 'colors' in exports.inspectOpts
-    ? Boolean(exports.inspectOpts.colors)
-    : tty.isatty(fd);
+	return 'colors' in exports.inspectOpts ?
+		Boolean(exports.inspectOpts.colors) :
+		tty.isatty(process.stderr.fd);
 }
-
-/**
- * Map %o to `util.inspect()`, all on a single line.
- */
-
-exports.formatters.o = function(v) {
-  this.inspectOpts.colors = this.useColors;
-  return util.inspect(v, this.inspectOpts)
-    .split('\n').map(function(str) {
-      return str.trim()
-    }).join(' ');
-};
-
-/**
- * Map %o to `util.inspect()`, allowing multiple lines if needed.
- */
-
-exports.formatters.O = function(v) {
-  this.inspectOpts.colors = this.useColors;
-  return util.inspect(v, this.inspectOpts);
-};
 
 /**
  * Adds ANSI color escape codes if enabled.
@@ -3617,27 +4100,33 @@ exports.formatters.O = function(v) {
  */
 
 function formatArgs(args) {
-  var name = this.namespace;
-  var useColors = this.useColors;
+	const {namespace: name, useColors} = this;
 
-  if (useColors) {
-    var c = this.color;
-    var prefix = '  \u001b[3' + c + ';1m' + name + ' ' + '\u001b[0m';
+	if (useColors) {
+		const c = this.color;
+		const colorCode = '\u001B[3' + (c < 8 ? c : '8;5;' + c);
+		const prefix = `  ${colorCode};1m${name} \u001B[0m`;
 
-    args[0] = prefix + args[0].split('\n').join('\n' + prefix);
-    args.push('\u001b[3' + c + 'm+' + exports.humanize(this.diff) + '\u001b[0m');
-  } else {
-    args[0] = new Date().toUTCString()
-      + ' ' + name + ' ' + args[0];
-  }
+		args[0] = prefix + args[0].split('\n').join('\n' + prefix);
+		args.push(colorCode + 'm+' + module.exports.humanize(this.diff) + '\u001B[0m');
+	} else {
+		args[0] = getDate() + name + ' ' + args[0];
+	}
+}
+
+function getDate() {
+	if (exports.inspectOpts.hideDate) {
+		return '';
+	}
+	return new Date().toISOString() + ' ';
 }
 
 /**
- * Invokes `util.format()` with the specified arguments and writes to `stream`.
+ * Invokes `util.format()` with the specified arguments and writes to stderr.
  */
 
-function log() {
-  return stream.write(util.format.apply(util, arguments) + '\n');
+function log(...args) {
+	return process.stderr.write(util.format(...args) + '\n');
 }
 
 /**
@@ -3646,15 +4135,14 @@ function log() {
  * @param {String} namespaces
  * @api private
  */
-
 function save(namespaces) {
-  if (null == namespaces) {
-    // If you set a process.env field to null or undefined, it gets cast to the
-    // string 'null' or 'undefined'. Just delete instead.
-    delete process.env.DEBUG;
-  } else {
-    process.env.DEBUG = namespaces;
-  }
+	if (namespaces) {
+		process.env.DEBUG = namespaces;
+	} else {
+		// If you set a process.env field to null or undefined, it gets cast to the
+		// string 'null' or 'undefined'. Just delete instead.
+		delete process.env.DEBUG;
+	}
 }
 
 /**
@@ -3665,75 +4153,7 @@ function save(namespaces) {
  */
 
 function load() {
-  return process.env.DEBUG;
-}
-
-/**
- * Copied from `node/src/node.js`.
- *
- * XXX: It's lame that node doesn't expose this API out-of-the-box. It also
- * relies on the undocumented `tty_wrap.guessHandleType()` which is also lame.
- */
-
-function createWritableStdioStream (fd) {
-  var stream;
-  var tty_wrap = process.binding('tty_wrap');
-
-  // Note stream._type is used for test-module-load-list.js
-
-  switch (tty_wrap.guessHandleType(fd)) {
-    case 'TTY':
-      stream = new tty.WriteStream(fd);
-      stream._type = 'tty';
-
-      // Hack to have stream not keep the event loop alive.
-      // See https://github.com/joyent/node/issues/1726
-      if (stream._handle && stream._handle.unref) {
-        stream._handle.unref();
-      }
-      break;
-
-    case 'FILE':
-      var fs = __webpack_require__(/*! fs */ "fs");
-      stream = new fs.SyncWriteStream(fd, { autoClose: false });
-      stream._type = 'fs';
-      break;
-
-    case 'PIPE':
-    case 'TCP':
-      var net = __webpack_require__(/*! net */ "net");
-      stream = new net.Socket({
-        fd: fd,
-        readable: false,
-        writable: true
-      });
-
-      // FIXME Should probably have an option in net.Socket to create a
-      // stream from an existing fd which is writable only. But for now
-      // we'll just add this hack and set the `readable` member to false.
-      // Test: ./node test/fixtures/echo.js < /etc/passwd
-      stream.readable = false;
-      stream.read = null;
-      stream._type = 'pipe';
-
-      // FIXME Hack to have stream not keep the event loop alive.
-      // See https://github.com/joyent/node/issues/1726
-      if (stream._handle && stream._handle.unref) {
-        stream._handle.unref();
-      }
-      break;
-
-    default:
-      // Probably an error on in uv_guess_handle()
-      throw new Error('Implement me. Unknown stream file type!');
-  }
-
-  // For supporting legacy API we put the FD here.
-  stream.fd = fd;
-
-  stream._isStdio = true;
-
-  return stream;
+	return process.env.DEBUG;
 }
 
 /**
@@ -3743,20 +4163,2089 @@ function createWritableStdioStream (fd) {
  * differently for a particular `debug` instance.
  */
 
-function init (debug) {
-  debug.inspectOpts = {};
+function init(debug) {
+	debug.inspectOpts = {};
 
-  var keys = Object.keys(exports.inspectOpts);
-  for (var i = 0; i < keys.length; i++) {
-    debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
+	const keys = Object.keys(exports.inspectOpts);
+	for (let i = 0; i < keys.length; i++) {
+		debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
+	}
+}
+
+module.exports = __webpack_require__(/*! ./common */ "./node_modules/debug/src/common.js")(exports);
+
+const {formatters} = module.exports;
+
+/**
+ * Map %o to `util.inspect()`, all on a single line.
+ */
+
+formatters.o = function (v) {
+	this.inspectOpts.colors = this.useColors;
+	return util.inspect(v, this.inspectOpts)
+		.split('\n')
+		.map(str => str.trim())
+		.join(' ');
+};
+
+/**
+ * Map %O to `util.inspect()`, allowing multiple lines if needed.
+ */
+
+formatters.O = function (v) {
+	this.inspectOpts.colors = this.useColors;
+	return util.inspect(v, this.inspectOpts);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/dns-packet/classes.js":
+/*!********************************************!*\
+  !*** ./node_modules/dns-packet/classes.js ***!
+  \********************************************/
+/*! default exports */
+/*! export toClass [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export toString [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+exports.toString = function (klass) {
+  switch (klass) {
+    case 1: return 'IN'
+    case 2: return 'CS'
+    case 3: return 'CH'
+    case 4: return 'HS'
+    case 255: return 'ANY'
+  }
+  return 'UNKNOWN_' + klass
+}
+
+exports.toClass = function (name) {
+  switch (name.toUpperCase()) {
+    case 'IN': return 1
+    case 'CS': return 2
+    case 'CH': return 3
+    case 'HS': return 4
+    case 'ANY': return 255
+  }
+  return 0
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/dns-packet/index.js":
+/*!******************************************!*\
+  !*** ./node_modules/dns-packet/index.js ***!
+  \******************************************/
+/*! default exports */
+/*! export AUTHENTIC_DATA [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export AUTHORITATIVE_ANSWER [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export CHECKING_DISABLED [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export DNSSEC_OK [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export RECURSION_AVAILABLE [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export RECURSION_DESIRED [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export TRUNCATED_RESPONSE [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export a [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export aaaa [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export answer [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export caa [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export cname [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export decode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export dname [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export dnskey [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export ds [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export encode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export encodingLength [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export hinfo [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export mx [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export name [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export ns [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export nsec [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export nsec3 [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export null [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export opt [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export option [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export ptr [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export question [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export record [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export rp [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export rrsig [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export soa [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export srv [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export sshfp [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export streamDecode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export streamEncode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export txt [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export unknown [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_exports__ */
+/*! CommonJS bailout: exports.encodingLength(...) prevents optimization as exports is passed as call context as 1528:35-57 */
+/*! CommonJS bailout: exports.encode(...) prevents optimization as exports is passed as call context as 1586:14-28 */
+/*! CommonJS bailout: exports.decode(...) prevents optimization as exports is passed as call context as 1602:17-31 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+const Buffer = __webpack_require__(/*! buffer */ "buffer").Buffer
+const types = __webpack_require__(/*! ./types */ "./node_modules/dns-packet/types.js")
+const rcodes = __webpack_require__(/*! ./rcodes */ "./node_modules/dns-packet/rcodes.js")
+const opcodes = __webpack_require__(/*! ./opcodes */ "./node_modules/dns-packet/opcodes.js")
+const classes = __webpack_require__(/*! ./classes */ "./node_modules/dns-packet/classes.js")
+const optioncodes = __webpack_require__(/*! ./optioncodes */ "./node_modules/dns-packet/optioncodes.js")
+const ip = __webpack_require__(/*! @leichtgewicht/ip-codec */ "./node_modules/@leichtgewicht/ip-codec/index.cjs")
+
+const QUERY_FLAG = 0
+const RESPONSE_FLAG = 1 << 15
+const FLUSH_MASK = 1 << 15
+const NOT_FLUSH_MASK = ~FLUSH_MASK
+const QU_MASK = 1 << 15
+const NOT_QU_MASK = ~QU_MASK
+
+const name = exports.name = {}
+
+name.encode = function (str, buf, offset) {
+  if (!buf) buf = Buffer.alloc(name.encodingLength(str))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  // strip leading and trailing .
+  const n = str.replace(/^\.|\.$/gm, '')
+  if (n.length) {
+    const list = n.split('.')
+
+    for (let i = 0; i < list.length; i++) {
+      const len = buf.write(list[i], offset + 1)
+      buf[offset] = len
+      offset += len + 1
+    }
+  }
+
+  buf[offset++] = 0
+
+  name.encode.bytes = offset - oldOffset
+  return buf
+}
+
+name.encode.bytes = 0
+
+name.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const list = []
+  let oldOffset = offset
+  let totalLength = 0
+  let consumedBytes = 0
+  let jumped = false
+
+  while (true) {
+    if (offset >= buf.length) {
+      throw new Error('Cannot decode name (buffer overflow)')
+    }
+    const len = buf[offset++]
+    consumedBytes += jumped ? 0 : 1
+
+    if (len === 0) {
+      break
+    } else if ((len & 0xc0) === 0) {
+      if (offset + len > buf.length) {
+        throw new Error('Cannot decode name (buffer overflow)')
+      }
+      totalLength += len + 1
+      if (totalLength > 254) {
+        throw new Error('Cannot decode name (name too long)')
+      }
+      list.push(buf.toString('utf-8', offset, offset + len))
+      offset += len
+      consumedBytes += jumped ? 0 : len
+    } else if ((len & 0xc0) === 0xc0) {
+      if (offset + 1 > buf.length) {
+        throw new Error('Cannot decode name (buffer overflow)')
+      }
+      const jumpOffset = buf.readUInt16BE(offset - 1) - 0xc000
+      if (jumpOffset >= oldOffset) {
+        // Allow only pointers to prior data. RFC 1035, section 4.1.4 states:
+        // "[...] an entire domain name or a list of labels at the end of a domain name
+        // is replaced with a pointer to a prior occurance (sic) of the same name."
+        throw new Error('Cannot decode name (bad pointer)')
+      }
+      offset = jumpOffset
+      oldOffset = jumpOffset
+      consumedBytes += jumped ? 0 : 1
+      jumped = true
+    } else {
+      throw new Error('Cannot decode name (bad label)')
+    }
+  }
+
+  name.decode.bytes = consumedBytes
+  return list.length === 0 ? '.' : list.join('.')
+}
+
+name.decode.bytes = 0
+
+name.encodingLength = function (n) {
+  if (n === '.' || n === '..') return 1
+  return Buffer.byteLength(n.replace(/^\.|\.$/gm, '')) + 2
+}
+
+const string = {}
+
+string.encode = function (s, buf, offset) {
+  if (!buf) buf = Buffer.alloc(string.encodingLength(s))
+  if (!offset) offset = 0
+
+  const len = buf.write(s, offset + 1)
+  buf[offset] = len
+  string.encode.bytes = len + 1
+  return buf
+}
+
+string.encode.bytes = 0
+
+string.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const len = buf[offset]
+  const s = buf.toString('utf-8', offset + 1, offset + 1 + len)
+  string.decode.bytes = len + 1
+  return s
+}
+
+string.decode.bytes = 0
+
+string.encodingLength = function (s) {
+  return Buffer.byteLength(s) + 1
+}
+
+const header = {}
+
+header.encode = function (h, buf, offset) {
+  if (!buf) buf = header.encodingLength(h)
+  if (!offset) offset = 0
+
+  const flags = (h.flags || 0) & 32767
+  const type = h.type === 'response' ? RESPONSE_FLAG : QUERY_FLAG
+
+  buf.writeUInt16BE(h.id || 0, offset)
+  buf.writeUInt16BE(flags | type, offset + 2)
+  buf.writeUInt16BE(h.questions.length, offset + 4)
+  buf.writeUInt16BE(h.answers.length, offset + 6)
+  buf.writeUInt16BE(h.authorities.length, offset + 8)
+  buf.writeUInt16BE(h.additionals.length, offset + 10)
+
+  return buf
+}
+
+header.encode.bytes = 12
+
+header.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  if (buf.length < 12) throw new Error('Header must be 12 bytes')
+  const flags = buf.readUInt16BE(offset + 2)
+
+  return {
+    id: buf.readUInt16BE(offset),
+    type: flags & RESPONSE_FLAG ? 'response' : 'query',
+    flags: flags & 32767,
+    flag_qr: ((flags >> 15) & 0x1) === 1,
+    opcode: opcodes.toString((flags >> 11) & 0xf),
+    flag_aa: ((flags >> 10) & 0x1) === 1,
+    flag_tc: ((flags >> 9) & 0x1) === 1,
+    flag_rd: ((flags >> 8) & 0x1) === 1,
+    flag_ra: ((flags >> 7) & 0x1) === 1,
+    flag_z: ((flags >> 6) & 0x1) === 1,
+    flag_ad: ((flags >> 5) & 0x1) === 1,
+    flag_cd: ((flags >> 4) & 0x1) === 1,
+    rcode: rcodes.toString(flags & 0xf),
+    questions: new Array(buf.readUInt16BE(offset + 4)),
+    answers: new Array(buf.readUInt16BE(offset + 6)),
+    authorities: new Array(buf.readUInt16BE(offset + 8)),
+    additionals: new Array(buf.readUInt16BE(offset + 10))
   }
 }
 
-/**
- * Enable namespaces listed in `process.env.DEBUG` initially.
+header.decode.bytes = 12
+
+header.encodingLength = function () {
+  return 12
+}
+
+const runknown = exports.unknown = {}
+
+runknown.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(runknown.encodingLength(data))
+  if (!offset) offset = 0
+
+  buf.writeUInt16BE(data.length, offset)
+  data.copy(buf, offset + 2)
+
+  runknown.encode.bytes = data.length + 2
+  return buf
+}
+
+runknown.encode.bytes = 0
+
+runknown.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const len = buf.readUInt16BE(offset)
+  const data = buf.slice(offset + 2, offset + 2 + len)
+  runknown.decode.bytes = len + 2
+  return data
+}
+
+runknown.decode.bytes = 0
+
+runknown.encodingLength = function (data) {
+  return data.length + 2
+}
+
+const rns = exports.ns = {}
+
+rns.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rns.encodingLength(data))
+  if (!offset) offset = 0
+
+  name.encode(data, buf, offset + 2)
+  buf.writeUInt16BE(name.encode.bytes, offset)
+  rns.encode.bytes = name.encode.bytes + 2
+  return buf
+}
+
+rns.encode.bytes = 0
+
+rns.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const len = buf.readUInt16BE(offset)
+  const dd = name.decode(buf, offset + 2)
+
+  rns.decode.bytes = len + 2
+  return dd
+}
+
+rns.decode.bytes = 0
+
+rns.encodingLength = function (data) {
+  return name.encodingLength(data) + 2
+}
+
+const rsoa = exports.soa = {}
+
+rsoa.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rsoa.encodingLength(data))
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+  offset += 2
+  name.encode(data.mname, buf, offset)
+  offset += name.encode.bytes
+  name.encode(data.rname, buf, offset)
+  offset += name.encode.bytes
+  buf.writeUInt32BE(data.serial || 0, offset)
+  offset += 4
+  buf.writeUInt32BE(data.refresh || 0, offset)
+  offset += 4
+  buf.writeUInt32BE(data.retry || 0, offset)
+  offset += 4
+  buf.writeUInt32BE(data.expire || 0, offset)
+  offset += 4
+  buf.writeUInt32BE(data.minimum || 0, offset)
+  offset += 4
+
+  buf.writeUInt16BE(offset - oldOffset - 2, oldOffset)
+  rsoa.encode.bytes = offset - oldOffset
+  return buf
+}
+
+rsoa.encode.bytes = 0
+
+rsoa.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+
+  const data = {}
+  offset += 2
+  data.mname = name.decode(buf, offset)
+  offset += name.decode.bytes
+  data.rname = name.decode(buf, offset)
+  offset += name.decode.bytes
+  data.serial = buf.readUInt32BE(offset)
+  offset += 4
+  data.refresh = buf.readUInt32BE(offset)
+  offset += 4
+  data.retry = buf.readUInt32BE(offset)
+  offset += 4
+  data.expire = buf.readUInt32BE(offset)
+  offset += 4
+  data.minimum = buf.readUInt32BE(offset)
+  offset += 4
+
+  rsoa.decode.bytes = offset - oldOffset
+  return data
+}
+
+rsoa.decode.bytes = 0
+
+rsoa.encodingLength = function (data) {
+  return 22 + name.encodingLength(data.mname) + name.encodingLength(data.rname)
+}
+
+const rtxt = exports.txt = {}
+
+rtxt.encode = function (data, buf, offset) {
+  if (!Array.isArray(data)) data = [data]
+  for (let i = 0; i < data.length; i++) {
+    if (typeof data[i] === 'string') {
+      data[i] = Buffer.from(data[i])
+    }
+    if (!Buffer.isBuffer(data[i])) {
+      throw new Error('Must be a Buffer')
+    }
+  }
+
+  if (!buf) buf = Buffer.alloc(rtxt.encodingLength(data))
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+  offset += 2
+
+  data.forEach(function (d) {
+    buf[offset++] = d.length
+    d.copy(buf, offset, 0, d.length)
+    offset += d.length
+  })
+
+  buf.writeUInt16BE(offset - oldOffset - 2, oldOffset)
+  rtxt.encode.bytes = offset - oldOffset
+  return buf
+}
+
+rtxt.encode.bytes = 0
+
+rtxt.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+  let remaining = buf.readUInt16BE(offset)
+  offset += 2
+
+  let data = []
+  while (remaining > 0) {
+    const len = buf[offset++]
+    --remaining
+    if (remaining < len) {
+      throw new Error('Buffer overflow')
+    }
+    data.push(buf.slice(offset, offset + len))
+    offset += len
+    remaining -= len
+  }
+
+  rtxt.decode.bytes = offset - oldOffset
+  return data
+}
+
+rtxt.decode.bytes = 0
+
+rtxt.encodingLength = function (data) {
+  if (!Array.isArray(data)) data = [data]
+  let length = 2
+  data.forEach(function (buf) {
+    if (typeof buf === 'string') {
+      length += Buffer.byteLength(buf) + 1
+    } else {
+      length += buf.length + 1
+    }
+  })
+  return length
+}
+
+const rnull = exports.null = {}
+
+rnull.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rnull.encodingLength(data))
+  if (!offset) offset = 0
+
+  if (typeof data === 'string') data = Buffer.from(data)
+  if (!data) data = Buffer.alloc(0)
+
+  const oldOffset = offset
+  offset += 2
+
+  const len = data.length
+  data.copy(buf, offset, 0, len)
+  offset += len
+
+  buf.writeUInt16BE(offset - oldOffset - 2, oldOffset)
+  rnull.encode.bytes = offset - oldOffset
+  return buf
+}
+
+rnull.encode.bytes = 0
+
+rnull.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+  const len = buf.readUInt16BE(offset)
+
+  offset += 2
+
+  const data = buf.slice(offset, offset + len)
+  offset += len
+
+  rnull.decode.bytes = offset - oldOffset
+  return data
+}
+
+rnull.decode.bytes = 0
+
+rnull.encodingLength = function (data) {
+  if (!data) return 2
+  return (Buffer.isBuffer(data) ? data.length : Buffer.byteLength(data)) + 2
+}
+
+const rhinfo = exports.hinfo = {}
+
+rhinfo.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rhinfo.encodingLength(data))
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+  offset += 2
+  string.encode(data.cpu, buf, offset)
+  offset += string.encode.bytes
+  string.encode(data.os, buf, offset)
+  offset += string.encode.bytes
+  buf.writeUInt16BE(offset - oldOffset - 2, oldOffset)
+  rhinfo.encode.bytes = offset - oldOffset
+  return buf
+}
+
+rhinfo.encode.bytes = 0
+
+rhinfo.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+
+  const data = {}
+  offset += 2
+  data.cpu = string.decode(buf, offset)
+  offset += string.decode.bytes
+  data.os = string.decode(buf, offset)
+  offset += string.decode.bytes
+  rhinfo.decode.bytes = offset - oldOffset
+  return data
+}
+
+rhinfo.decode.bytes = 0
+
+rhinfo.encodingLength = function (data) {
+  return string.encodingLength(data.cpu) + string.encodingLength(data.os) + 2
+}
+
+const rptr = exports.ptr = {}
+const rcname = exports.cname = rptr
+const rdname = exports.dname = rptr
+
+rptr.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rptr.encodingLength(data))
+  if (!offset) offset = 0
+
+  name.encode(data, buf, offset + 2)
+  buf.writeUInt16BE(name.encode.bytes, offset)
+  rptr.encode.bytes = name.encode.bytes + 2
+  return buf
+}
+
+rptr.encode.bytes = 0
+
+rptr.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const data = name.decode(buf, offset + 2)
+  rptr.decode.bytes = name.decode.bytes + 2
+  return data
+}
+
+rptr.decode.bytes = 0
+
+rptr.encodingLength = function (data) {
+  return name.encodingLength(data) + 2
+}
+
+const rsrv = exports.srv = {}
+
+rsrv.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rsrv.encodingLength(data))
+  if (!offset) offset = 0
+
+  buf.writeUInt16BE(data.priority || 0, offset + 2)
+  buf.writeUInt16BE(data.weight || 0, offset + 4)
+  buf.writeUInt16BE(data.port || 0, offset + 6)
+  name.encode(data.target, buf, offset + 8)
+
+  const len = name.encode.bytes + 6
+  buf.writeUInt16BE(len, offset)
+
+  rsrv.encode.bytes = len + 2
+  return buf
+}
+
+rsrv.encode.bytes = 0
+
+rsrv.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const len = buf.readUInt16BE(offset)
+
+  const data = {}
+  data.priority = buf.readUInt16BE(offset + 2)
+  data.weight = buf.readUInt16BE(offset + 4)
+  data.port = buf.readUInt16BE(offset + 6)
+  data.target = name.decode(buf, offset + 8)
+
+  rsrv.decode.bytes = len + 2
+  return data
+}
+
+rsrv.decode.bytes = 0
+
+rsrv.encodingLength = function (data) {
+  return 8 + name.encodingLength(data.target)
+}
+
+const rcaa = exports.caa = {}
+
+rcaa.ISSUER_CRITICAL = 1 << 7
+
+rcaa.encode = function (data, buf, offset) {
+  const len = rcaa.encodingLength(data)
+
+  if (!buf) buf = Buffer.alloc(rcaa.encodingLength(data))
+  if (!offset) offset = 0
+
+  if (data.issuerCritical) {
+    data.flags = rcaa.ISSUER_CRITICAL
+  }
+
+  buf.writeUInt16BE(len - 2, offset)
+  offset += 2
+  buf.writeUInt8(data.flags || 0, offset)
+  offset += 1
+  string.encode(data.tag, buf, offset)
+  offset += string.encode.bytes
+  buf.write(data.value, offset)
+  offset += Buffer.byteLength(data.value)
+
+  rcaa.encode.bytes = len
+  return buf
+}
+
+rcaa.encode.bytes = 0
+
+rcaa.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const len = buf.readUInt16BE(offset)
+  offset += 2
+
+  const oldOffset = offset
+  const data = {}
+  data.flags = buf.readUInt8(offset)
+  offset += 1
+  data.tag = string.decode(buf, offset)
+  offset += string.decode.bytes
+  data.value = buf.toString('utf-8', offset, oldOffset + len)
+
+  data.issuerCritical = !!(data.flags & rcaa.ISSUER_CRITICAL)
+
+  rcaa.decode.bytes = len + 2
+
+  return data
+}
+
+rcaa.decode.bytes = 0
+
+rcaa.encodingLength = function (data) {
+  return string.encodingLength(data.tag) + string.encodingLength(data.value) + 2
+}
+
+const rmx = exports.mx = {}
+
+rmx.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rmx.encodingLength(data))
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+  offset += 2
+  buf.writeUInt16BE(data.preference || 0, offset)
+  offset += 2
+  name.encode(data.exchange, buf, offset)
+  offset += name.encode.bytes
+
+  buf.writeUInt16BE(offset - oldOffset - 2, oldOffset)
+  rmx.encode.bytes = offset - oldOffset
+  return buf
+}
+
+rmx.encode.bytes = 0
+
+rmx.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+
+  const data = {}
+  offset += 2
+  data.preference = buf.readUInt16BE(offset)
+  offset += 2
+  data.exchange = name.decode(buf, offset)
+  offset += name.decode.bytes
+
+  rmx.decode.bytes = offset - oldOffset
+  return data
+}
+
+rmx.encodingLength = function (data) {
+  return 4 + name.encodingLength(data.exchange)
+}
+
+const ra = exports.a = {}
+
+ra.encode = function (host, buf, offset) {
+  if (!buf) buf = Buffer.alloc(ra.encodingLength(host))
+  if (!offset) offset = 0
+
+  buf.writeUInt16BE(4, offset)
+  offset += 2
+  ip.v4.encode(host, buf, offset)
+  ra.encode.bytes = 6
+  return buf
+}
+
+ra.encode.bytes = 0
+
+ra.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  offset += 2
+  const host = ip.v4.decode(buf, offset)
+  ra.decode.bytes = 6
+  return host
+}
+
+ra.decode.bytes = 0
+
+ra.encodingLength = function () {
+  return 6
+}
+
+const raaaa = exports.aaaa = {}
+
+raaaa.encode = function (host, buf, offset) {
+  if (!buf) buf = Buffer.alloc(raaaa.encodingLength(host))
+  if (!offset) offset = 0
+
+  buf.writeUInt16BE(16, offset)
+  offset += 2
+  ip.v6.encode(host, buf, offset)
+  raaaa.encode.bytes = 18
+  return buf
+}
+
+raaaa.encode.bytes = 0
+
+raaaa.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  offset += 2
+  const host = ip.v6.decode(buf, offset)
+  raaaa.decode.bytes = 18
+  return host
+}
+
+raaaa.decode.bytes = 0
+
+raaaa.encodingLength = function () {
+  return 18
+}
+
+const roption = exports.option = {}
+
+roption.encode = function (option, buf, offset) {
+  if (!buf) buf = Buffer.alloc(roption.encodingLength(option))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const code = optioncodes.toCode(option.code)
+  buf.writeUInt16BE(code, offset)
+  offset += 2
+  if (option.data) {
+    buf.writeUInt16BE(option.data.length, offset)
+    offset += 2
+    option.data.copy(buf, offset)
+    offset += option.data.length
+  } else {
+    switch (code) {
+      // case 3: NSID.  No encode makes sense.
+      // case 5,6,7: Not implementable
+      case 8: // ECS
+        // note: do IP math before calling
+        const spl = option.sourcePrefixLength || 0
+        const fam = option.family || ip.familyOf(option.ip)
+        const ipBuf = ip.encode(option.ip, Buffer.alloc)
+        const ipLen = Math.ceil(spl / 8)
+        buf.writeUInt16BE(ipLen + 4, offset)
+        offset += 2
+        buf.writeUInt16BE(fam, offset)
+        offset += 2
+        buf.writeUInt8(spl, offset++)
+        buf.writeUInt8(option.scopePrefixLength || 0, offset++)
+
+        ipBuf.copy(buf, offset, 0, ipLen)
+        offset += ipLen
+        break
+      // case 9: EXPIRE (experimental)
+      // case 10: COOKIE.  No encode makes sense.
+      case 11: // KEEP-ALIVE
+        if (option.timeout) {
+          buf.writeUInt16BE(2, offset)
+          offset += 2
+          buf.writeUInt16BE(option.timeout, offset)
+          offset += 2
+        } else {
+          buf.writeUInt16BE(0, offset)
+          offset += 2
+        }
+        break
+      case 12: // PADDING
+        const len = option.length || 0
+        buf.writeUInt16BE(len, offset)
+        offset += 2
+        buf.fill(0, offset, offset + len)
+        offset += len
+        break
+      // case 13:  CHAIN.  Experimental.
+      case 14: // KEY-TAG
+        const tagsLen = option.tags.length * 2
+        buf.writeUInt16BE(tagsLen, offset)
+        offset += 2
+        for (const tag of option.tags) {
+          buf.writeUInt16BE(tag, offset)
+          offset += 2
+        }
+        break
+      default:
+        throw new Error(`Unknown roption code: ${option.code}`)
+    }
+  }
+
+  roption.encode.bytes = offset - oldOffset
+  return buf
+}
+
+roption.encode.bytes = 0
+
+roption.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const option = {}
+  option.code = buf.readUInt16BE(offset)
+  option.type = optioncodes.toString(option.code)
+  offset += 2
+  const len = buf.readUInt16BE(offset)
+  offset += 2
+  option.data = buf.slice(offset, offset + len)
+  switch (option.code) {
+    // case 3: NSID.  No decode makes sense.
+    case 8: // ECS
+      option.family = buf.readUInt16BE(offset)
+      offset += 2
+      option.sourcePrefixLength = buf.readUInt8(offset++)
+      option.scopePrefixLength = buf.readUInt8(offset++)
+      const padded = Buffer.alloc((option.family === 1) ? 4 : 16)
+      buf.copy(padded, 0, offset, offset + len - 4)
+      option.ip = ip.decode(padded)
+      break
+    // case 12: Padding.  No decode makes sense.
+    case 11: // KEEP-ALIVE
+      if (len > 0) {
+        option.timeout = buf.readUInt16BE(offset)
+        offset += 2
+      }
+      break
+    case 14:
+      option.tags = []
+      for (let i = 0; i < len; i += 2) {
+        option.tags.push(buf.readUInt16BE(offset))
+        offset += 2
+      }
+    // don't worry about default.  caller will use data if desired
+  }
+
+  roption.decode.bytes = len + 4
+  return option
+}
+
+roption.decode.bytes = 0
+
+roption.encodingLength = function (option) {
+  if (option.data) {
+    return option.data.length + 4
+  }
+  const code = optioncodes.toCode(option.code)
+  switch (code) {
+    case 8: // ECS
+      const spl = option.sourcePrefixLength || 0
+      return Math.ceil(spl / 8) + 8
+    case 11: // KEEP-ALIVE
+      return (typeof option.timeout === 'number') ? 6 : 4
+    case 12: // PADDING
+      return option.length + 4
+    case 14: // KEY-TAG
+      return 4 + (option.tags.length * 2)
+  }
+  throw new Error(`Unknown roption code: ${option.code}`)
+}
+
+const ropt = exports.opt = {}
+
+ropt.encode = function (options, buf, offset) {
+  if (!buf) buf = Buffer.alloc(ropt.encodingLength(options))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const rdlen = encodingLengthList(options, roption)
+  buf.writeUInt16BE(rdlen, offset)
+  offset = encodeList(options, roption, buf, offset + 2)
+
+  ropt.encode.bytes = offset - oldOffset
+  return buf
+}
+
+ropt.encode.bytes = 0
+
+ropt.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const options = []
+  let rdlen = buf.readUInt16BE(offset)
+  offset += 2
+  let o = 0
+  while (rdlen > 0) {
+    options[o++] = roption.decode(buf, offset)
+    offset += roption.decode.bytes
+    rdlen -= roption.decode.bytes
+  }
+  ropt.decode.bytes = offset - oldOffset
+  return options
+}
+
+ropt.decode.bytes = 0
+
+ropt.encodingLength = function (options) {
+  return 2 + encodingLengthList(options || [], roption)
+}
+
+const rdnskey = exports.dnskey = {}
+
+rdnskey.PROTOCOL_DNSSEC = 3
+rdnskey.ZONE_KEY = 0x80
+rdnskey.SECURE_ENTRYPOINT = 0x8000
+
+rdnskey.encode = function (key, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rdnskey.encodingLength(key))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const keydata = key.key
+  if (!Buffer.isBuffer(keydata)) {
+    throw new Error('Key must be a Buffer')
+  }
+
+  offset += 2 // Leave space for length
+  buf.writeUInt16BE(key.flags, offset)
+  offset += 2
+  buf.writeUInt8(rdnskey.PROTOCOL_DNSSEC, offset)
+  offset += 1
+  buf.writeUInt8(key.algorithm, offset)
+  offset += 1
+  keydata.copy(buf, offset, 0, keydata.length)
+  offset += keydata.length
+
+  rdnskey.encode.bytes = offset - oldOffset
+  buf.writeUInt16BE(rdnskey.encode.bytes - 2, oldOffset)
+  return buf
+}
+
+rdnskey.encode.bytes = 0
+
+rdnskey.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  var key = {}
+  var length = buf.readUInt16BE(offset)
+  offset += 2
+  key.flags = buf.readUInt16BE(offset)
+  offset += 2
+  if (buf.readUInt8(offset) !== rdnskey.PROTOCOL_DNSSEC) {
+    throw new Error('Protocol must be 3')
+  }
+  offset += 1
+  key.algorithm = buf.readUInt8(offset)
+  offset += 1
+  key.key = buf.slice(offset, oldOffset + length + 2)
+  offset += key.key.length
+  rdnskey.decode.bytes = offset - oldOffset
+  return key
+}
+
+rdnskey.decode.bytes = 0
+
+rdnskey.encodingLength = function (key) {
+  return 6 + Buffer.byteLength(key.key)
+}
+
+const rrrsig = exports.rrsig = {}
+
+rrrsig.encode = function (sig, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rrrsig.encodingLength(sig))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const signature = sig.signature
+  if (!Buffer.isBuffer(signature)) {
+    throw new Error('Signature must be a Buffer')
+  }
+
+  offset += 2 // Leave space for length
+  buf.writeUInt16BE(types.toType(sig.typeCovered), offset)
+  offset += 2
+  buf.writeUInt8(sig.algorithm, offset)
+  offset += 1
+  buf.writeUInt8(sig.labels, offset)
+  offset += 1
+  buf.writeUInt32BE(sig.originalTTL, offset)
+  offset += 4
+  buf.writeUInt32BE(sig.expiration, offset)
+  offset += 4
+  buf.writeUInt32BE(sig.inception, offset)
+  offset += 4
+  buf.writeUInt16BE(sig.keyTag, offset)
+  offset += 2
+  name.encode(sig.signersName, buf, offset)
+  offset += name.encode.bytes
+  signature.copy(buf, offset, 0, signature.length)
+  offset += signature.length
+
+  rrrsig.encode.bytes = offset - oldOffset
+  buf.writeUInt16BE(rrrsig.encode.bytes - 2, oldOffset)
+  return buf
+}
+
+rrrsig.encode.bytes = 0
+
+rrrsig.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  var sig = {}
+  var length = buf.readUInt16BE(offset)
+  offset += 2
+  sig.typeCovered = types.toString(buf.readUInt16BE(offset))
+  offset += 2
+  sig.algorithm = buf.readUInt8(offset)
+  offset += 1
+  sig.labels = buf.readUInt8(offset)
+  offset += 1
+  sig.originalTTL = buf.readUInt32BE(offset)
+  offset += 4
+  sig.expiration = buf.readUInt32BE(offset)
+  offset += 4
+  sig.inception = buf.readUInt32BE(offset)
+  offset += 4
+  sig.keyTag = buf.readUInt16BE(offset)
+  offset += 2
+  sig.signersName = name.decode(buf, offset)
+  offset += name.decode.bytes
+  sig.signature = buf.slice(offset, oldOffset + length + 2)
+  offset += sig.signature.length
+  rrrsig.decode.bytes = offset - oldOffset
+  return sig
+}
+
+rrrsig.decode.bytes = 0
+
+rrrsig.encodingLength = function (sig) {
+  return 20 +
+    name.encodingLength(sig.signersName) +
+    Buffer.byteLength(sig.signature)
+}
+
+const rrp = exports.rp = {}
+
+rrp.encode = function (data, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rrp.encodingLength(data))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  offset += 2 // Leave space for length
+  name.encode(data.mbox || '.', buf, offset)
+  offset += name.encode.bytes
+  name.encode(data.txt || '.', buf, offset)
+  offset += name.encode.bytes
+  rrp.encode.bytes = offset - oldOffset
+  buf.writeUInt16BE(rrp.encode.bytes - 2, oldOffset)
+  return buf
+}
+
+rrp.encode.bytes = 0
+
+rrp.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const data = {}
+  offset += 2
+  data.mbox = name.decode(buf, offset) || '.'
+  offset += name.decode.bytes
+  data.txt = name.decode(buf, offset) || '.'
+  offset += name.decode.bytes
+  rrp.decode.bytes = offset - oldOffset
+  return data
+}
+
+rrp.decode.bytes = 0
+
+rrp.encodingLength = function (data) {
+  return 2 + name.encodingLength(data.mbox || '.') + name.encodingLength(data.txt || '.')
+}
+
+const typebitmap = {}
+
+typebitmap.encode = function (typelist, buf, offset) {
+  if (!buf) buf = Buffer.alloc(typebitmap.encodingLength(typelist))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  var typesByWindow = []
+  for (var i = 0; i < typelist.length; i++) {
+    var typeid = types.toType(typelist[i])
+    if (typesByWindow[typeid >> 8] === undefined) {
+      typesByWindow[typeid >> 8] = []
+    }
+    typesByWindow[typeid >> 8][(typeid >> 3) & 0x1F] |= 1 << (7 - (typeid & 0x7))
+  }
+
+  for (i = 0; i < typesByWindow.length; i++) {
+    if (typesByWindow[i] !== undefined) {
+      var windowBuf = Buffer.from(typesByWindow[i])
+      buf.writeUInt8(i, offset)
+      offset += 1
+      buf.writeUInt8(windowBuf.length, offset)
+      offset += 1
+      windowBuf.copy(buf, offset)
+      offset += windowBuf.length
+    }
+  }
+
+  typebitmap.encode.bytes = offset - oldOffset
+  return buf
+}
+
+typebitmap.encode.bytes = 0
+
+typebitmap.decode = function (buf, offset, length) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  var typelist = []
+  while (offset - oldOffset < length) {
+    var window = buf.readUInt8(offset)
+    offset += 1
+    var windowLength = buf.readUInt8(offset)
+    offset += 1
+    for (var i = 0; i < windowLength; i++) {
+      var b = buf.readUInt8(offset + i)
+      for (var j = 0; j < 8; j++) {
+        if (b & (1 << (7 - j))) {
+          var typeid = types.toString((window << 8) | (i << 3) | j)
+          typelist.push(typeid)
+        }
+      }
+    }
+    offset += windowLength
+  }
+
+  typebitmap.decode.bytes = offset - oldOffset
+  return typelist
+}
+
+typebitmap.decode.bytes = 0
+
+typebitmap.encodingLength = function (typelist) {
+  var extents = []
+  for (var i = 0; i < typelist.length; i++) {
+    var typeid = types.toType(typelist[i])
+    extents[typeid >> 8] = Math.max(extents[typeid >> 8] || 0, typeid & 0xFF)
+  }
+
+  var len = 0
+  for (i = 0; i < extents.length; i++) {
+    if (extents[i] !== undefined) {
+      len += 2 + Math.ceil((extents[i] + 1) / 8)
+    }
+  }
+
+  return len
+}
+
+const rnsec = exports.nsec = {}
+
+rnsec.encode = function (record, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rnsec.encodingLength(record))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  offset += 2 // Leave space for length
+  name.encode(record.nextDomain, buf, offset)
+  offset += name.encode.bytes
+  typebitmap.encode(record.rrtypes, buf, offset)
+  offset += typebitmap.encode.bytes
+
+  rnsec.encode.bytes = offset - oldOffset
+  buf.writeUInt16BE(rnsec.encode.bytes - 2, oldOffset)
+  return buf
+}
+
+rnsec.encode.bytes = 0
+
+rnsec.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  var record = {}
+  var length = buf.readUInt16BE(offset)
+  offset += 2
+  record.nextDomain = name.decode(buf, offset)
+  offset += name.decode.bytes
+  record.rrtypes = typebitmap.decode(buf, offset, length - (offset - oldOffset))
+  offset += typebitmap.decode.bytes
+
+  rnsec.decode.bytes = offset - oldOffset
+  return record
+}
+
+rnsec.decode.bytes = 0
+
+rnsec.encodingLength = function (record) {
+  return 2 +
+    name.encodingLength(record.nextDomain) +
+    typebitmap.encodingLength(record.rrtypes)
+}
+
+const rnsec3 = exports.nsec3 = {}
+
+rnsec3.encode = function (record, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rnsec3.encodingLength(record))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const salt = record.salt
+  if (!Buffer.isBuffer(salt)) {
+    throw new Error('salt must be a Buffer')
+  }
+
+  const nextDomain = record.nextDomain
+  if (!Buffer.isBuffer(nextDomain)) {
+    throw new Error('nextDomain must be a Buffer')
+  }
+
+  offset += 2 // Leave space for length
+  buf.writeUInt8(record.algorithm, offset)
+  offset += 1
+  buf.writeUInt8(record.flags, offset)
+  offset += 1
+  buf.writeUInt16BE(record.iterations, offset)
+  offset += 2
+  buf.writeUInt8(salt.length, offset)
+  offset += 1
+  salt.copy(buf, offset, 0, salt.length)
+  offset += salt.length
+  buf.writeUInt8(nextDomain.length, offset)
+  offset += 1
+  nextDomain.copy(buf, offset, 0, nextDomain.length)
+  offset += nextDomain.length
+  typebitmap.encode(record.rrtypes, buf, offset)
+  offset += typebitmap.encode.bytes
+
+  rnsec3.encode.bytes = offset - oldOffset
+  buf.writeUInt16BE(rnsec3.encode.bytes - 2, oldOffset)
+  return buf
+}
+
+rnsec3.encode.bytes = 0
+
+rnsec3.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  var record = {}
+  var length = buf.readUInt16BE(offset)
+  offset += 2
+  record.algorithm = buf.readUInt8(offset)
+  offset += 1
+  record.flags = buf.readUInt8(offset)
+  offset += 1
+  record.iterations = buf.readUInt16BE(offset)
+  offset += 2
+  const saltLength = buf.readUInt8(offset)
+  offset += 1
+  record.salt = buf.slice(offset, offset + saltLength)
+  offset += saltLength
+  const hashLength = buf.readUInt8(offset)
+  offset += 1
+  record.nextDomain = buf.slice(offset, offset + hashLength)
+  offset += hashLength
+  record.rrtypes = typebitmap.decode(buf, offset, length - (offset - oldOffset))
+  offset += typebitmap.decode.bytes
+
+  rnsec3.decode.bytes = offset - oldOffset
+  return record
+}
+
+rnsec3.decode.bytes = 0
+
+rnsec3.encodingLength = function (record) {
+  return 8 +
+    record.salt.length +
+    record.nextDomain.length +
+    typebitmap.encodingLength(record.rrtypes)
+}
+
+const rds = exports.ds = {}
+
+rds.encode = function (digest, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rds.encodingLength(digest))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const digestdata = digest.digest
+  if (!Buffer.isBuffer(digestdata)) {
+    throw new Error('Digest must be a Buffer')
+  }
+
+  offset += 2 // Leave space for length
+  buf.writeUInt16BE(digest.keyTag, offset)
+  offset += 2
+  buf.writeUInt8(digest.algorithm, offset)
+  offset += 1
+  buf.writeUInt8(digest.digestType, offset)
+  offset += 1
+  digestdata.copy(buf, offset, 0, digestdata.length)
+  offset += digestdata.length
+
+  rds.encode.bytes = offset - oldOffset
+  buf.writeUInt16BE(rds.encode.bytes - 2, oldOffset)
+  return buf
+}
+
+rds.encode.bytes = 0
+
+rds.decode = function (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  var digest = {}
+  var length = buf.readUInt16BE(offset)
+  offset += 2
+  digest.keyTag = buf.readUInt16BE(offset)
+  offset += 2
+  digest.algorithm = buf.readUInt8(offset)
+  offset += 1
+  digest.digestType = buf.readUInt8(offset)
+  offset += 1
+  digest.digest = buf.slice(offset, oldOffset + length + 2)
+  offset += digest.digest.length
+  rds.decode.bytes = offset - oldOffset
+  return digest
+}
+
+rds.decode.bytes = 0
+
+rds.encodingLength = function (digest) {
+  return 6 + Buffer.byteLength(digest.digest)
+}
+
+const rsshfp = exports.sshfp = {}
+
+rsshfp.getFingerprintLengthForHashType = function getFingerprintLengthForHashType (hashType) {
+  switch (hashType) {
+    case 1: return 20
+    case 2: return 32
+  }
+}
+
+rsshfp.encode = function encode (record, buf, offset) {
+  if (!buf) buf = Buffer.alloc(rsshfp.encodingLength(record))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  offset += 2 // The function call starts with the offset pointer at the RDLENGTH field, not the RDATA one
+  buf[offset] = record.algorithm
+  offset += 1
+  buf[offset] = record.hash
+  offset += 1
+
+  const fingerprintBuf = Buffer.from(record.fingerprint.toUpperCase(), 'hex')
+  if (fingerprintBuf.length !== rsshfp.getFingerprintLengthForHashType(record.hash)) {
+    throw new Error('Invalid fingerprint length')
+  }
+  fingerprintBuf.copy(buf, offset)
+  offset += fingerprintBuf.byteLength
+
+  rsshfp.encode.bytes = offset - oldOffset
+  buf.writeUInt16BE(rsshfp.encode.bytes - 2, oldOffset)
+
+  return buf
+}
+
+rsshfp.encode.bytes = 0
+
+rsshfp.decode = function decode (buf, offset) {
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const record = {}
+  offset += 2 // Account for the RDLENGTH field
+  record.algorithm = buf[offset]
+  offset += 1
+  record.hash = buf[offset]
+  offset += 1
+
+  const fingerprintLength = rsshfp.getFingerprintLengthForHashType(record.hash)
+  record.fingerprint = buf.slice(offset, offset + fingerprintLength).toString('hex').toUpperCase()
+  offset += fingerprintLength
+  rsshfp.decode.bytes = offset - oldOffset
+  return record
+}
+
+rsshfp.decode.bytes = 0
+
+rsshfp.encodingLength = function (record) {
+  return 4 + Buffer.from(record.fingerprint, 'hex').byteLength
+}
+
+const renc = exports.record = function (type) {
+  switch (type.toUpperCase()) {
+    case 'A': return ra
+    case 'PTR': return rptr
+    case 'CNAME': return rcname
+    case 'DNAME': return rdname
+    case 'TXT': return rtxt
+    case 'NULL': return rnull
+    case 'AAAA': return raaaa
+    case 'SRV': return rsrv
+    case 'HINFO': return rhinfo
+    case 'CAA': return rcaa
+    case 'NS': return rns
+    case 'SOA': return rsoa
+    case 'MX': return rmx
+    case 'OPT': return ropt
+    case 'DNSKEY': return rdnskey
+    case 'RRSIG': return rrrsig
+    case 'RP': return rrp
+    case 'NSEC': return rnsec
+    case 'NSEC3': return rnsec3
+    case 'SSHFP': return rsshfp
+    case 'DS': return rds
+  }
+  return runknown
+}
+
+const answer = exports.answer = {}
+
+answer.encode = function (a, buf, offset) {
+  if (!buf) buf = Buffer.alloc(answer.encodingLength(a))
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+
+  name.encode(a.name, buf, offset)
+  offset += name.encode.bytes
+
+  buf.writeUInt16BE(types.toType(a.type), offset)
+
+  if (a.type.toUpperCase() === 'OPT') {
+    if (a.name !== '.') {
+      throw new Error('OPT name must be root.')
+    }
+    buf.writeUInt16BE(a.udpPayloadSize || 4096, offset + 2)
+    buf.writeUInt8(a.extendedRcode || 0, offset + 4)
+    buf.writeUInt8(a.ednsVersion || 0, offset + 5)
+    buf.writeUInt16BE(a.flags || 0, offset + 6)
+
+    offset += 8
+    ropt.encode(a.options || [], buf, offset)
+    offset += ropt.encode.bytes
+  } else {
+    let klass = classes.toClass(a.class === undefined ? 'IN' : a.class)
+    if (a.flush) klass |= FLUSH_MASK // the 1st bit of the class is the flush bit
+    buf.writeUInt16BE(klass, offset + 2)
+    buf.writeUInt32BE(a.ttl || 0, offset + 4)
+
+    offset += 8
+    const enc = renc(a.type)
+    enc.encode(a.data, buf, offset)
+    offset += enc.encode.bytes
+  }
+
+  answer.encode.bytes = offset - oldOffset
+  return buf
+}
+
+answer.encode.bytes = 0
+
+answer.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const a = {}
+  const oldOffset = offset
+
+  a.name = name.decode(buf, offset)
+  offset += name.decode.bytes
+  a.type = types.toString(buf.readUInt16BE(offset))
+  if (a.type === 'OPT') {
+    a.udpPayloadSize = buf.readUInt16BE(offset + 2)
+    a.extendedRcode = buf.readUInt8(offset + 4)
+    a.ednsVersion = buf.readUInt8(offset + 5)
+    a.flags = buf.readUInt16BE(offset + 6)
+    a.flag_do = ((a.flags >> 15) & 0x1) === 1
+    a.options = ropt.decode(buf, offset + 8)
+    offset += 8 + ropt.decode.bytes
+  } else {
+    const klass = buf.readUInt16BE(offset + 2)
+    a.ttl = buf.readUInt32BE(offset + 4)
+
+    a.class = classes.toString(klass & NOT_FLUSH_MASK)
+    a.flush = !!(klass & FLUSH_MASK)
+
+    const enc = renc(a.type)
+    a.data = enc.decode(buf, offset + 8)
+    offset += 8 + enc.decode.bytes
+  }
+
+  answer.decode.bytes = offset - oldOffset
+  return a
+}
+
+answer.decode.bytes = 0
+
+answer.encodingLength = function (a) {
+  const data = (a.data !== null && a.data !== undefined) ? a.data : a.options
+  return name.encodingLength(a.name) + 8 + renc(a.type).encodingLength(data)
+}
+
+const question = exports.question = {}
+
+question.encode = function (q, buf, offset) {
+  if (!buf) buf = Buffer.alloc(question.encodingLength(q))
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+
+  name.encode(q.name, buf, offset)
+  offset += name.encode.bytes
+
+  buf.writeUInt16BE(types.toType(q.type), offset)
+  offset += 2
+
+  buf.writeUInt16BE(classes.toClass(q.class === undefined ? 'IN' : q.class), offset)
+  offset += 2
+
+  question.encode.bytes = offset - oldOffset
+  return q
+}
+
+question.encode.bytes = 0
+
+question.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+  const q = {}
+
+  q.name = name.decode(buf, offset)
+  offset += name.decode.bytes
+
+  q.type = types.toString(buf.readUInt16BE(offset))
+  offset += 2
+
+  q.class = classes.toString(buf.readUInt16BE(offset))
+  offset += 2
+
+  const qu = !!(q.class & QU_MASK)
+  if (qu) q.class &= NOT_QU_MASK
+
+  question.decode.bytes = offset - oldOffset
+  return q
+}
+
+question.decode.bytes = 0
+
+question.encodingLength = function (q) {
+  return name.encodingLength(q.name) + 4
+}
+
+exports.AUTHORITATIVE_ANSWER = 1 << 10
+exports.TRUNCATED_RESPONSE = 1 << 9
+exports.RECURSION_DESIRED = 1 << 8
+exports.RECURSION_AVAILABLE = 1 << 7
+exports.AUTHENTIC_DATA = 1 << 5
+exports.CHECKING_DISABLED = 1 << 4
+exports.DNSSEC_OK = 1 << 15
+
+exports.encode = function (result, buf, offset) {
+  const allocing = !buf
+
+  if (allocing) buf = Buffer.alloc(exports.encodingLength(result))
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+
+  if (!result.questions) result.questions = []
+  if (!result.answers) result.answers = []
+  if (!result.authorities) result.authorities = []
+  if (!result.additionals) result.additionals = []
+
+  header.encode(result, buf, offset)
+  offset += header.encode.bytes
+
+  offset = encodeList(result.questions, question, buf, offset)
+  offset = encodeList(result.answers, answer, buf, offset)
+  offset = encodeList(result.authorities, answer, buf, offset)
+  offset = encodeList(result.additionals, answer, buf, offset)
+
+  exports.encode.bytes = offset - oldOffset
+
+  // just a quick sanity check
+  if (allocing && exports.encode.bytes !== buf.length) {
+    return buf.slice(0, exports.encode.bytes)
+  }
+
+  return buf
+}
+
+exports.encode.bytes = 0
+
+exports.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  const oldOffset = offset
+  const result = header.decode(buf, offset)
+  offset += header.decode.bytes
+
+  offset = decodeList(result.questions, question, buf, offset)
+  offset = decodeList(result.answers, answer, buf, offset)
+  offset = decodeList(result.authorities, answer, buf, offset)
+  offset = decodeList(result.additionals, answer, buf, offset)
+
+  exports.decode.bytes = offset - oldOffset
+
+  return result
+}
+
+exports.decode.bytes = 0
+
+exports.encodingLength = function (result) {
+  return header.encodingLength(result) +
+    encodingLengthList(result.questions || [], question) +
+    encodingLengthList(result.answers || [], answer) +
+    encodingLengthList(result.authorities || [], answer) +
+    encodingLengthList(result.additionals || [], answer)
+}
+
+exports.streamEncode = function (result) {
+  const buf = exports.encode(result)
+  const sbuf = Buffer.alloc(2)
+  sbuf.writeUInt16BE(buf.byteLength)
+  const combine = Buffer.concat([sbuf, buf])
+  exports.streamEncode.bytes = combine.byteLength
+  return combine
+}
+
+exports.streamEncode.bytes = 0
+
+exports.streamDecode = function (sbuf) {
+  const len = sbuf.readUInt16BE(0)
+  if (sbuf.byteLength < len + 2) {
+    // not enough data
+    return null
+  }
+  const result = exports.decode(sbuf.slice(2))
+  exports.streamDecode.bytes = exports.decode.bytes
+  return result
+}
+
+exports.streamDecode.bytes = 0
+
+function encodingLengthList (list, enc) {
+  let len = 0
+  for (let i = 0; i < list.length; i++) len += enc.encodingLength(list[i])
+  return len
+}
+
+function encodeList (list, enc, buf, offset) {
+  for (let i = 0; i < list.length; i++) {
+    enc.encode(list[i], buf, offset)
+    offset += enc.encode.bytes
+  }
+  return offset
+}
+
+function decodeList (list, enc, buf, offset) {
+  for (let i = 0; i < list.length; i++) {
+    list[i] = enc.decode(buf, offset)
+    offset += enc.decode.bytes
+  }
+  return offset
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/dns-packet/opcodes.js":
+/*!********************************************!*\
+  !*** ./node_modules/dns-packet/opcodes.js ***!
+  \********************************************/
+/*! default exports */
+/*! export toOpcode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export toString [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+/*
+ * Traditional DNS header OPCODEs (4-bits) defined by IANA in
+ * https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-5
  */
 
-exports.enable(load());
+exports.toString = function (opcode) {
+  switch (opcode) {
+    case 0: return 'QUERY'
+    case 1: return 'IQUERY'
+    case 2: return 'STATUS'
+    case 3: return 'OPCODE_3'
+    case 4: return 'NOTIFY'
+    case 5: return 'UPDATE'
+    case 6: return 'OPCODE_6'
+    case 7: return 'OPCODE_7'
+    case 8: return 'OPCODE_8'
+    case 9: return 'OPCODE_9'
+    case 10: return 'OPCODE_10'
+    case 11: return 'OPCODE_11'
+    case 12: return 'OPCODE_12'
+    case 13: return 'OPCODE_13'
+    case 14: return 'OPCODE_14'
+    case 15: return 'OPCODE_15'
+  }
+  return 'OPCODE_' + opcode
+}
+
+exports.toOpcode = function (code) {
+  switch (code.toUpperCase()) {
+    case 'QUERY': return 0
+    case 'IQUERY': return 1
+    case 'STATUS': return 2
+    case 'OPCODE_3': return 3
+    case 'NOTIFY': return 4
+    case 'UPDATE': return 5
+    case 'OPCODE_6': return 6
+    case 'OPCODE_7': return 7
+    case 'OPCODE_8': return 8
+    case 'OPCODE_9': return 9
+    case 'OPCODE_10': return 10
+    case 'OPCODE_11': return 11
+    case 'OPCODE_12': return 12
+    case 'OPCODE_13': return 13
+    case 'OPCODE_14': return 14
+    case 'OPCODE_15': return 15
+  }
+  return 0
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/dns-packet/optioncodes.js":
+/*!************************************************!*\
+  !*** ./node_modules/dns-packet/optioncodes.js ***!
+  \************************************************/
+/*! default exports */
+/*! export toCode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export toString [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+exports.toString = function (type) {
+  switch (type) {
+    // list at
+    // https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-11
+    case 1: return 'LLQ'
+    case 2: return 'UL'
+    case 3: return 'NSID'
+    case 5: return 'DAU'
+    case 6: return 'DHU'
+    case 7: return 'N3U'
+    case 8: return 'CLIENT_SUBNET'
+    case 9: return 'EXPIRE'
+    case 10: return 'COOKIE'
+    case 11: return 'TCP_KEEPALIVE'
+    case 12: return 'PADDING'
+    case 13: return 'CHAIN'
+    case 14: return 'KEY_TAG'
+    case 26946: return 'DEVICEID'
+  }
+  if (type < 0) {
+    return null
+  }
+  return `OPTION_${type}`
+}
+
+exports.toCode = function (name) {
+  if (typeof name === 'number') {
+    return name
+  }
+  if (!name) {
+    return -1
+  }
+  switch (name.toUpperCase()) {
+    case 'OPTION_0': return 0
+    case 'LLQ': return 1
+    case 'UL': return 2
+    case 'NSID': return 3
+    case 'OPTION_4': return 4
+    case 'DAU': return 5
+    case 'DHU': return 6
+    case 'N3U': return 7
+    case 'CLIENT_SUBNET': return 8
+    case 'EXPIRE': return 9
+    case 'COOKIE': return 10
+    case 'TCP_KEEPALIVE': return 11
+    case 'PADDING': return 12
+    case 'CHAIN': return 13
+    case 'KEY_TAG': return 14
+    case 'DEVICEID': return 26946
+    case 'OPTION_65535': return 65535
+  }
+  const m = name.match(/_(\d+)$/)
+  if (m) {
+    return parseInt(m[1], 10)
+  }
+  return -1
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/dns-packet/rcodes.js":
+/*!*******************************************!*\
+  !*** ./node_modules/dns-packet/rcodes.js ***!
+  \*******************************************/
+/*! default exports */
+/*! export toRcode [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export toString [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+/*
+ * Traditional DNS header RCODEs (4-bits) defined by IANA in
+ * https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
+ */
+
+exports.toString = function (rcode) {
+  switch (rcode) {
+    case 0: return 'NOERROR'
+    case 1: return 'FORMERR'
+    case 2: return 'SERVFAIL'
+    case 3: return 'NXDOMAIN'
+    case 4: return 'NOTIMP'
+    case 5: return 'REFUSED'
+    case 6: return 'YXDOMAIN'
+    case 7: return 'YXRRSET'
+    case 8: return 'NXRRSET'
+    case 9: return 'NOTAUTH'
+    case 10: return 'NOTZONE'
+    case 11: return 'RCODE_11'
+    case 12: return 'RCODE_12'
+    case 13: return 'RCODE_13'
+    case 14: return 'RCODE_14'
+    case 15: return 'RCODE_15'
+  }
+  return 'RCODE_' + rcode
+}
+
+exports.toRcode = function (code) {
+  switch (code.toUpperCase()) {
+    case 'NOERROR': return 0
+    case 'FORMERR': return 1
+    case 'SERVFAIL': return 2
+    case 'NXDOMAIN': return 3
+    case 'NOTIMP': return 4
+    case 'REFUSED': return 5
+    case 'YXDOMAIN': return 6
+    case 'YXRRSET': return 7
+    case 'NXRRSET': return 8
+    case 'NOTAUTH': return 9
+    case 'NOTZONE': return 10
+    case 'RCODE_11': return 11
+    case 'RCODE_12': return 12
+    case 'RCODE_13': return 13
+    case 'RCODE_14': return 14
+    case 'RCODE_15': return 15
+  }
+  return 0
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/dns-packet/types.js":
+/*!******************************************!*\
+  !*** ./node_modules/dns-packet/types.js ***!
+  \******************************************/
+/*! default exports */
+/*! export toString [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export toType [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+exports.toString = function (type) {
+  switch (type) {
+    case 1: return 'A'
+    case 10: return 'NULL'
+    case 28: return 'AAAA'
+    case 18: return 'AFSDB'
+    case 42: return 'APL'
+    case 257: return 'CAA'
+    case 60: return 'CDNSKEY'
+    case 59: return 'CDS'
+    case 37: return 'CERT'
+    case 5: return 'CNAME'
+    case 49: return 'DHCID'
+    case 32769: return 'DLV'
+    case 39: return 'DNAME'
+    case 48: return 'DNSKEY'
+    case 43: return 'DS'
+    case 55: return 'HIP'
+    case 13: return 'HINFO'
+    case 45: return 'IPSECKEY'
+    case 25: return 'KEY'
+    case 36: return 'KX'
+    case 29: return 'LOC'
+    case 15: return 'MX'
+    case 35: return 'NAPTR'
+    case 2: return 'NS'
+    case 47: return 'NSEC'
+    case 50: return 'NSEC3'
+    case 51: return 'NSEC3PARAM'
+    case 12: return 'PTR'
+    case 46: return 'RRSIG'
+    case 17: return 'RP'
+    case 24: return 'SIG'
+    case 6: return 'SOA'
+    case 99: return 'SPF'
+    case 33: return 'SRV'
+    case 44: return 'SSHFP'
+    case 32768: return 'TA'
+    case 249: return 'TKEY'
+    case 52: return 'TLSA'
+    case 250: return 'TSIG'
+    case 16: return 'TXT'
+    case 252: return 'AXFR'
+    case 251: return 'IXFR'
+    case 41: return 'OPT'
+    case 255: return 'ANY'
+  }
+  return 'UNKNOWN_' + type
+}
+
+exports.toType = function (name) {
+  switch (name.toUpperCase()) {
+    case 'A': return 1
+    case 'NULL': return 10
+    case 'AAAA': return 28
+    case 'AFSDB': return 18
+    case 'APL': return 42
+    case 'CAA': return 257
+    case 'CDNSKEY': return 60
+    case 'CDS': return 59
+    case 'CERT': return 37
+    case 'CNAME': return 5
+    case 'DHCID': return 49
+    case 'DLV': return 32769
+    case 'DNAME': return 39
+    case 'DNSKEY': return 48
+    case 'DS': return 43
+    case 'HIP': return 55
+    case 'HINFO': return 13
+    case 'IPSECKEY': return 45
+    case 'KEY': return 25
+    case 'KX': return 36
+    case 'LOC': return 29
+    case 'MX': return 15
+    case 'NAPTR': return 35
+    case 'NS': return 2
+    case 'NSEC': return 47
+    case 'NSEC3': return 50
+    case 'NSEC3PARAM': return 51
+    case 'PTR': return 12
+    case 'RRSIG': return 46
+    case 'RP': return 17
+    case 'SIG': return 24
+    case 'SOA': return 6
+    case 'SPF': return 99
+    case 'SRV': return 33
+    case 'SSHFP': return 44
+    case 'TA': return 32768
+    case 'TKEY': return 249
+    case 'TLSA': return 52
+    case 'TSIG': return 250
+    case 'TXT': return 16
+    case 'AXFR': return 252
+    case 'IXFR': return 251
+    case 'OPT': return 41
+    case 'ANY': return 255
+    case '*': return 255
+  }
+  if (name.toUpperCase().startsWith('UNKNOWN_')) return parseInt(name.slice(8))
+  return 0
+}
 
 
 /***/ }),
@@ -3795,7 +6284,7 @@ module.exports = function () {
   \************************************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__, module */
-/*! CommonJS bailout: module.exports is used directly at 597:0-14 */
+/*! CommonJS bailout: module.exports is used directly at 620:0-14 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var url = __webpack_require__(/*! url */ "url");
@@ -3815,6 +6304,11 @@ events.forEach(function (event) {
   };
 });
 
+var InvalidUrlError = createErrorType(
+  "ERR_INVALID_URL",
+  "Invalid URL",
+  TypeError
+);
 // Error types with codes
 var RedirectionError = createErrorType(
   "ERR_FR_REDIRECTION_FAILURE",
@@ -3875,10 +6369,10 @@ RedirectableRequest.prototype.write = function (data, encoding, callback) {
   }
 
   // Validate input and shift parameters if necessary
-  if (!(typeof data === "string" || typeof data === "object" && ("length" in data))) {
+  if (!isString(data) && !isBuffer(data)) {
     throw new TypeError("data should be a string, Buffer or Uint8Array");
   }
-  if (typeof encoding === "function") {
+  if (isFunction(encoding)) {
     callback = encoding;
     encoding = null;
   }
@@ -3907,11 +6401,11 @@ RedirectableRequest.prototype.write = function (data, encoding, callback) {
 // Ends the current native request
 RedirectableRequest.prototype.end = function (data, encoding, callback) {
   // Shift parameters if necessary
-  if (typeof data === "function") {
+  if (isFunction(data)) {
     callback = data;
     data = encoding = null;
   }
-  else if (typeof encoding === "function") {
+  else if (isFunction(encoding)) {
     callback = encoding;
     encoding = null;
   }
@@ -4088,7 +6582,7 @@ RedirectableRequest.prototype._performRequest = function () {
     url.format(this._options) :
     // When making a request to a proxy, […]
     // a client MUST send the target URI in absolute-form […].
-    this._currentUrl = this._options.path;
+    this._options.path;
 
   // End a redirected request
   // (The first request must be ended explicitly with RedirectableRequest#end)
@@ -4209,7 +6703,7 @@ RedirectableRequest.prototype._processResponse = function (response) {
     redirectUrl = url.resolve(currentUrl, location);
   }
   catch (cause) {
-    this.emit("error", new RedirectionError(cause));
+    this.emit("error", new RedirectionError({ cause: cause }));
     return;
   }
 
@@ -4229,7 +6723,7 @@ RedirectableRequest.prototype._processResponse = function (response) {
   }
 
   // Evaluate the beforeRedirect callback
-  if (typeof beforeRedirect === "function") {
+  if (isFunction(beforeRedirect)) {
     var responseDetails = {
       headers: response.headers,
       statusCode: statusCode,
@@ -4254,7 +6748,7 @@ RedirectableRequest.prototype._processResponse = function (response) {
     this._performRequest();
   }
   catch (cause) {
-    this.emit("error", new RedirectionError(cause));
+    this.emit("error", new RedirectionError({ cause: cause }));
   }
 };
 
@@ -4276,15 +6770,19 @@ function wrap(protocols) {
     // Executes a request, following redirects
     function request(input, options, callback) {
       // Parse parameters
-      if (typeof input === "string") {
-        var urlStr = input;
+      if (isString(input)) {
+        var parsed;
         try {
-          input = urlToOptions(new URL(urlStr));
+          parsed = urlToOptions(new URL(input));
         }
         catch (err) {
           /* istanbul ignore next */
-          input = url.parse(urlStr);
+          parsed = url.parse(input);
         }
+        if (!isString(parsed.protocol)) {
+          throw new InvalidUrlError({ input });
+        }
+        input = parsed;
       }
       else if (URL && (input instanceof URL)) {
         input = urlToOptions(input);
@@ -4294,7 +6792,7 @@ function wrap(protocols) {
         options = input;
         input = { protocol: protocol };
       }
-      if (typeof options === "function") {
+      if (isFunction(options)) {
         callback = options;
         options = null;
       }
@@ -4305,6 +6803,9 @@ function wrap(protocols) {
         maxBodyLength: exports.maxBodyLength,
       }, input, options);
       options.nativeProtocols = nativeProtocols;
+      if (!isString(options.host) && !isString(options.hostname)) {
+        options.hostname = "::1";
+      }
 
       assert.equal(options.protocol, protocol, "protocol mismatch");
       debug("options", options);
@@ -4362,21 +6863,19 @@ function removeMatchingHeaders(regex, headers) {
     undefined : String(lastValue).trim();
 }
 
-function createErrorType(code, defaultMessage) {
-  function CustomError(cause) {
+function createErrorType(code, message, baseClass) {
+  // Create constructor
+  function CustomError(properties) {
     Error.captureStackTrace(this, this.constructor);
-    if (!cause) {
-      this.message = defaultMessage;
-    }
-    else {
-      this.message = defaultMessage + ": " + cause.message;
-      this.cause = cause;
-    }
+    Object.assign(this, properties || {});
+    this.code = code;
+    this.message = this.cause ? message + ": " + this.cause.message : message;
   }
-  CustomError.prototype = new Error();
+
+  // Attach constructor and set default properties
+  CustomError.prototype = new (baseClass || Error)();
   CustomError.prototype.constructor = CustomError;
   CustomError.prototype.name = "Error [" + code + "]";
-  CustomError.prototype.code = code;
   return CustomError;
 }
 
@@ -4389,13 +6888,48 @@ function abortRequest(request) {
 }
 
 function isSubdomain(subdomain, domain) {
-  const dot = subdomain.length - domain.length - 1;
+  assert(isString(subdomain) && isString(domain));
+  var dot = subdomain.length - domain.length - 1;
   return dot > 0 && subdomain[dot] === "." && subdomain.endsWith(domain);
+}
+
+function isString(value) {
+  return typeof value === "string" || value instanceof String;
+}
+
+function isFunction(value) {
+  return typeof value === "function";
+}
+
+function isBuffer(value) {
+  return typeof value === "object" && ("length" in value);
 }
 
 // Exports
 module.exports = wrap({ http: http, https: https });
 module.exports.wrap = wrap;
+
+
+/***/ }),
+
+/***/ "./node_modules/has-flag/index.js":
+/*!****************************************!*\
+  !*** ./node_modules/has-flag/index.js ***!
+  \****************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 2:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+module.exports = (flag, argv) => {
+	argv = argv || process.argv;
+	const prefix = flag.startsWith('-') ? '' : (flag.length === 1 ? '-' : '--');
+	const pos = argv.indexOf(prefix + flag);
+	const terminatorPos = argv.indexOf('--');
+	return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
+};
 
 
 /***/ }),
@@ -31462,6 +33996,321 @@ module.exports = (path, hash) => `${BASE_URL}/${path}${hash ? '#' + hash : ''}`
 
 /***/ }),
 
+/***/ "./node_modules/multicast-dns/index.js":
+/*!*********************************************!*\
+  !*** ./node_modules/multicast-dns/index.js ***!
+  \*********************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 9:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var packet = __webpack_require__(/*! dns-packet */ "./node_modules/dns-packet/index.js")
+var dgram = __webpack_require__(/*! dgram */ "dgram")
+var thunky = __webpack_require__(/*! thunky */ "./node_modules/thunky/index.js")
+var events = __webpack_require__(/*! events */ "events")
+var os = __webpack_require__(/*! os */ "os")
+
+var noop = function () {}
+
+module.exports = function (opts) {
+  if (!opts) opts = {}
+
+  var that = new events.EventEmitter()
+  var port = typeof opts.port === 'number' ? opts.port : 5353
+  var type = opts.type || 'udp4'
+  var ip = opts.ip || opts.host || (type === 'udp4' ? '224.0.0.251' : null)
+  var me = {address: ip, port: port}
+  var memberships = {}
+  var destroyed = false
+  var interval = null
+
+  if (type === 'udp6' && (!ip || !opts.interface)) {
+    throw new Error('For IPv6 multicast you must specify `ip` and `interface`')
+  }
+
+  var socket = opts.socket || dgram.createSocket({
+    type: type,
+    reuseAddr: opts.reuseAddr !== false,
+    toString: function () {
+      return type
+    }
+  })
+
+  socket.on('error', function (err) {
+    if (err.code === 'EACCES' || err.code === 'EADDRINUSE') that.emit('error', err)
+    else that.emit('warning', err)
+  })
+
+  socket.on('message', function (message, rinfo) {
+    try {
+      message = packet.decode(message)
+    } catch (err) {
+      that.emit('warning', err)
+      return
+    }
+
+    that.emit('packet', message, rinfo)
+
+    if (message.type === 'query') that.emit('query', message, rinfo)
+    if (message.type === 'response') that.emit('response', message, rinfo)
+  })
+
+  socket.on('listening', function () {
+    if (!port) port = me.port = socket.address().port
+    if (opts.multicast !== false) {
+      that.update()
+      interval = setInterval(that.update, 5000)
+      socket.setMulticastTTL(opts.ttl || 255)
+      socket.setMulticastLoopback(opts.loopback !== false)
+    }
+  })
+
+  var bind = thunky(function (cb) {
+    if (!port || opts.bind === false) return cb(null)
+    socket.once('error', cb)
+    socket.bind(port, opts.bind || opts.interface, function () {
+      socket.removeListener('error', cb)
+      cb(null)
+    })
+  })
+
+  bind(function (err) {
+    if (err) return that.emit('error', err)
+    that.emit('ready')
+  })
+
+  that.send = function (value, rinfo, cb) {
+    if (typeof rinfo === 'function') return that.send(value, null, rinfo)
+    if (!cb) cb = noop
+    if (!rinfo) rinfo = me
+    else if (!rinfo.host && !rinfo.address) rinfo.address = me.address
+
+    bind(onbind)
+
+    function onbind (err) {
+      if (destroyed) return cb()
+      if (err) return cb(err)
+      var message = packet.encode(value)
+      socket.send(message, 0, message.length, rinfo.port, rinfo.address || rinfo.host, cb)
+    }
+  }
+
+  that.response =
+  that.respond = function (res, rinfo, cb) {
+    if (Array.isArray(res)) res = {answers: res}
+
+    res.type = 'response'
+    res.flags = (res.flags || 0) | packet.AUTHORITATIVE_ANSWER
+    that.send(res, rinfo, cb)
+  }
+
+  that.query = function (q, type, rinfo, cb) {
+    if (typeof type === 'function') return that.query(q, null, null, type)
+    if (typeof type === 'object' && type && type.port) return that.query(q, null, type, rinfo)
+    if (typeof rinfo === 'function') return that.query(q, type, null, rinfo)
+    if (!cb) cb = noop
+
+    if (typeof q === 'string') q = [{name: q, type: type || 'ANY'}]
+    if (Array.isArray(q)) q = {type: 'query', questions: q}
+
+    q.type = 'query'
+    that.send(q, rinfo, cb)
+  }
+
+  that.destroy = function (cb) {
+    if (!cb) cb = noop
+    if (destroyed) return process.nextTick(cb)
+    destroyed = true
+    clearInterval(interval)
+
+    // Need to drop memberships by hand and ignore errors.
+    // socket.close() does not cope with errors.
+    for (var iface in memberships) {
+      try {
+        socket.dropMembership(ip, iface)
+      } catch (e) {
+        // eat it
+      }
+    }
+    memberships = {}
+    socket.close(cb)
+  }
+
+  that.update = function () {
+    var ifaces = opts.interface ? [].concat(opts.interface) : allInterfaces()
+    var updated = false
+
+    for (var i = 0; i < ifaces.length; i++) {
+      var addr = ifaces[i]
+      if (memberships[addr]) continue
+
+      try {
+        socket.addMembership(ip, addr)
+        memberships[addr] = true
+        updated = true
+      } catch (err) {
+        that.emit('warning', err)
+      }
+    }
+
+    if (updated) {
+      if (socket.setMulticastInterface) {
+        try {
+          socket.setMulticastInterface(opts.interface || defaultInterface())
+        } catch (err) {
+          that.emit('warning', err)
+        }
+      }
+      that.emit('networkInterface')
+    }
+  }
+
+  return that
+}
+
+function defaultInterface () {
+  var networks = os.networkInterfaces()
+  var names = Object.keys(networks)
+
+  for (var i = 0; i < names.length; i++) {
+    var net = networks[names[i]]
+    for (var j = 0; j < net.length; j++) {
+      var iface = net[j]
+      if (isIPv4(iface.family) && !iface.internal) {
+        if (os.platform() === 'darwin' && names[i] === 'en0') return iface.address
+        return '0.0.0.0'
+      }
+    }
+  }
+
+  return '127.0.0.1'
+}
+
+function allInterfaces () {
+  var networks = os.networkInterfaces()
+  var names = Object.keys(networks)
+  var res = []
+
+  for (var i = 0; i < names.length; i++) {
+    var net = networks[names[i]]
+    for (var j = 0; j < net.length; j++) {
+      var iface = net[j]
+      if (isIPv4(iface.family)) {
+        res.push(iface.address)
+        // could only addMembership once per interface (https://nodejs.org/api/dgram.html#dgram_socket_addmembership_multicastaddress_multicastinterface)
+        break
+      }
+    }
+  }
+
+  return res
+}
+
+function isIPv4 (family) { // for backwards compat
+  return family === 4 || family === 'IPv4'
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/nanoid/index.js":
+/*!**************************************!*\
+  !*** ./node_modules/nanoid/index.js ***!
+  \**************************************/
+/*! namespace exports */
+/*! export customAlphabet [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export customRandom [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export nanoid [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export random [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export urlAlphabet [provided] [no usage info] [missing usage info prevents renaming] -> ./node_modules/nanoid/url-alphabet/index.js .urlAlphabet */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__, __webpack_require__.n, __webpack_exports__, __webpack_require__.d, __webpack_require__.r, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "nanoid": () => /* binding */ nanoid,
+/* harmony export */   "customAlphabet": () => /* binding */ customAlphabet,
+/* harmony export */   "customRandom": () => /* binding */ customRandom,
+/* harmony export */   "urlAlphabet": () => /* reexport safe */ _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__.urlAlphabet,
+/* harmony export */   "random": () => /* binding */ random
+/* harmony export */ });
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! crypto */ "crypto");
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(crypto__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./url-alphabet/index.js */ "./node_modules/nanoid/url-alphabet/index.js");
+
+
+const POOL_SIZE_MULTIPLIER = 128
+let pool, poolOffset
+let fillPool = bytes => {
+  if (!pool || pool.length < bytes) {
+    pool = Buffer.allocUnsafe(bytes * POOL_SIZE_MULTIPLIER)
+    crypto__WEBPACK_IMPORTED_MODULE_0___default().randomFillSync(pool)
+    poolOffset = 0
+  } else if (poolOffset + bytes > pool.length) {
+    crypto__WEBPACK_IMPORTED_MODULE_0___default().randomFillSync(pool)
+    poolOffset = 0
+  }
+  poolOffset += bytes
+}
+let random = bytes => {
+  fillPool((bytes -= 0))
+  return pool.subarray(poolOffset - bytes, poolOffset)
+}
+let customRandom = (alphabet, defaultSize, getRandom) => {
+  let mask = (2 << (31 - Math.clz32((alphabet.length - 1) | 1))) - 1
+  let step = Math.ceil((1.6 * mask * defaultSize) / alphabet.length)
+  return (size = defaultSize) => {
+    let id = ''
+    while (true) {
+      let bytes = getRandom(step)
+      let i = step
+      while (i--) {
+        id += alphabet[bytes[i] & mask] || ''
+        if (id.length === size) return id
+      }
+    }
+  }
+}
+let customAlphabet = (alphabet, size = 21) =>
+  customRandom(alphabet, size, random)
+let nanoid = (size = 21) => {
+  fillPool((size -= 0))
+  let id = ''
+  for (let i = poolOffset - size; i < poolOffset; i++) {
+    id += _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_1__.urlAlphabet[pool[i] & 63]
+  }
+  return id
+}
+
+
+
+/***/ }),
+
+/***/ "./node_modules/nanoid/url-alphabet/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/nanoid/url-alphabet/index.js ***!
+  \***************************************************/
+/*! namespace exports */
+/*! export urlAlphabet [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "urlAlphabet": () => /* binding */ urlAlphabet
+/* harmony export */ });
+let urlAlphabet =
+  'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict'
+
+
+
+/***/ }),
+
 /***/ "./node_modules/smartystreets-javascript-sdk/index.js":
 /*!************************************************************!*\
   !*** ./node_modules/smartystreets-javascript-sdk/index.js ***!
@@ -36568,7 +39417,221 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 
 /***/ }),
 
-/***/ "webpack/container/entry/distributed-cache":
+/***/ "./node_modules/supports-color/index.js":
+/*!**********************************************!*\
+  !*** ./node_modules/supports-color/index.js ***!
+  \**********************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 127:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+const os = __webpack_require__(/*! os */ "os");
+const hasFlag = __webpack_require__(/*! has-flag */ "./node_modules/has-flag/index.js");
+
+const env = process.env;
+
+let forceColor;
+if (hasFlag('no-color') ||
+	hasFlag('no-colors') ||
+	hasFlag('color=false')) {
+	forceColor = false;
+} else if (hasFlag('color') ||
+	hasFlag('colors') ||
+	hasFlag('color=true') ||
+	hasFlag('color=always')) {
+	forceColor = true;
+}
+if ('FORCE_COLOR' in env) {
+	forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
+}
+
+function translateLevel(level) {
+	if (level === 0) {
+		return false;
+	}
+
+	return {
+		level,
+		hasBasic: true,
+		has256: level >= 2,
+		has16m: level >= 3
+	};
+}
+
+function supportsColor(stream) {
+	if (forceColor === false) {
+		return 0;
+	}
+
+	if (hasFlag('color=16m') ||
+		hasFlag('color=full') ||
+		hasFlag('color=truecolor')) {
+		return 3;
+	}
+
+	if (hasFlag('color=256')) {
+		return 2;
+	}
+
+	if (stream && !stream.isTTY && forceColor !== true) {
+		return 0;
+	}
+
+	const min = forceColor ? 1 : 0;
+
+	if (process.platform === 'win32') {
+		// Node.js 7.5.0 is the first version of Node.js to include a patch to
+		// libuv that enables 256 color output on Windows. Anything earlier and it
+		// won't work. However, here we target Node.js 8 at minimum as it is an LTS
+		// release, and Node.js 7 is not. Windows 10 build 10586 is the first Windows
+		// release that supports 256 colors. Windows 10 build 14931 is the first release
+		// that supports 16m/TrueColor.
+		const osRelease = os.release().split('.');
+		if (
+			Number(process.versions.node.split('.')[0]) >= 8 &&
+			Number(osRelease[0]) >= 10 &&
+			Number(osRelease[2]) >= 10586
+		) {
+			return Number(osRelease[2]) >= 14931 ? 3 : 2;
+		}
+
+		return 1;
+	}
+
+	if ('CI' in env) {
+		if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'].some(sign => sign in env) || env.CI_NAME === 'codeship') {
+			return 1;
+		}
+
+		return min;
+	}
+
+	if ('TEAMCITY_VERSION' in env) {
+		return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
+	}
+
+	if (env.COLORTERM === 'truecolor') {
+		return 3;
+	}
+
+	if ('TERM_PROGRAM' in env) {
+		const version = parseInt((env.TERM_PROGRAM_VERSION || '').split('.')[0], 10);
+
+		switch (env.TERM_PROGRAM) {
+			case 'iTerm.app':
+				return version >= 3 ? 3 : 2;
+			case 'Apple_Terminal':
+				return 2;
+			// No default
+		}
+	}
+
+	if (/-256(color)?$/i.test(env.TERM)) {
+		return 2;
+	}
+
+	if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+		return 1;
+	}
+
+	if ('COLORTERM' in env) {
+		return 1;
+	}
+
+	if (env.TERM === 'dumb') {
+		return min;
+	}
+
+	return min;
+}
+
+function getSupportLevel(stream) {
+	const level = supportsColor(stream);
+	return translateLevel(level);
+}
+
+module.exports = {
+	supportsColor: getSupportLevel,
+	stdout: getSupportLevel(process.stdout),
+	stderr: getSupportLevel(process.stderr)
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/thunky/index.js":
+/*!**************************************!*\
+  !*** ./node_modules/thunky/index.js ***!
+  \**************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module */
+/*! CommonJS bailout: module.exports is used directly at 6:0-14 */
+/***/ ((module) => {
+
+"use strict";
+
+
+var nextTick = nextTickArgs
+process.nextTick(upgrade, 42) // pass 42 and see if upgrade is called with it
+
+module.exports = thunky
+
+function thunky (fn) {
+  var state = run
+  return thunk
+
+  function thunk (callback) {
+    state(callback || noop)
+  }
+
+  function run (callback) {
+    var stack = [callback]
+    state = wait
+    fn(done)
+
+    function wait (callback) {
+      stack.push(callback)
+    }
+
+    function done (err) {
+      var args = arguments
+      state = isError(err) ? run : finished
+      while (stack.length) finished(stack.shift())
+
+      function finished (callback) {
+        nextTick(apply, callback, args)
+      }
+    }
+  }
+}
+
+function isError (err) { // inlined from util so this works in the browser
+  return Object.prototype.toString.call(err) === '[object Error]'
+}
+
+function noop () {}
+
+function apply (callback, args) {
+  callback.apply(null, args)
+}
+
+function upgrade (val) {
+  if (val === 42) nextTick = process.nextTick
+}
+
+function nextTickArgs (fn, a, b) {
+  process.nextTick(function () {
+    fn(a, b)
+  })
+}
+
+
+/***/ }),
+
+/***/ "webpack/container/entry/order":
 /*!***********************!*\
   !*** container entry ***!
   \***********************/
@@ -36579,19 +39642,19 @@ module.exports = (batch, sender, Result, keyTranslationFormat) => {
 "use strict";
 var moduleMap = {
 	"./model-cache": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_multicast-dns_index_js-node_modules_ws_index_js"), __webpack_require__.e("vendors-node_modules_nanoid_index_js-node_modules_terser-webpack-plugin_dist_cjs_js-node_modu-9661aa"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_domain_ports_js"), __webpack_require__.e("src_services_index_js"), __webpack_require__.e("src_domain_index_js-node_modules_jest-worker_build_base_sync_recursive-node_modules_jest-work-8fdd7d")]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(334), __webpack_require__.e(732), __webpack_require__.e(829)]).then(() => () => (__webpack_require__(/*! ./src/domain */ "./src/domain/index.js")));
 	},
 	"./adapter-cache": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_multicast-dns_index_js-node_modules_ws_index_js"), __webpack_require__.e("src_adapters_index_js")]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867)]).then(() => () => (__webpack_require__(/*! ./src/adapters */ "./src/adapters/index.js")));
 	},
 	"./service-cache": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_multicast-dns_index_js-node_modules_ws_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_index_js"), __webpack_require__.e("src_domain_utils_js")]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(732), __webpack_require__.e(589)]).then(() => () => (__webpack_require__(/*! ./src/services */ "./src/services/index.js")));
 	},
 	"./port-cache": () => {
-		return Promise.all([__webpack_require__.e("src_domain_ports_js"), __webpack_require__.e("node_modules_nanoid_index_js")]).then(() => () => (__webpack_require__(/*! ./src/domain/ports */ "./src/domain/ports.js")));
+		return __webpack_require__.e(334).then(() => () => (__webpack_require__(/*! ./src/domain/ports */ "./src/domain/ports.js")));
 	},
 	"./event-bus": () => {
-		return Promise.all([__webpack_require__.e("vendors-node_modules_multicast-dns_index_js-node_modules_ws_index_js"), __webpack_require__.e("src_adapters_index_js"), __webpack_require__.e("src_services_event-bus_js")]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
+		return Promise.all([__webpack_require__.e(777), __webpack_require__.e(867), __webpack_require__.e(857)]).then(() => () => (__webpack_require__(/*! ./src/services/event-bus */ "./src/services/event-bus.js")));
 	}
 };
 var get = (module) => {
@@ -36642,32 +39705,6 @@ module.exports = require("assert");
 
 "use strict";
 module.exports = require("buffer");
-
-/***/ }),
-
-/***/ "child_process":
-/*!********************************!*\
-  !*** external "child_process" ***!
-  \********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("child_process");
-
-/***/ }),
-
-/***/ "constants":
-/*!****************************!*\
-  !*** external "constants" ***!
-  \****************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("constants");
 
 /***/ }),
 
@@ -36749,32 +39786,6 @@ module.exports = require("https");
 
 /***/ }),
 
-/***/ "inspector":
-/*!****************************!*\
-  !*** external "inspector" ***!
-  \****************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("inspector");
-
-/***/ }),
-
-/***/ "module":
-/*!*************************!*\
-  !*** external "module" ***!
-  \*************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("module");
-
-/***/ }),
-
 /***/ "net":
 /*!**********************!*\
   !*** external "net" ***!
@@ -36814,19 +39825,6 @@ module.exports = require("path");
 
 /***/ }),
 
-/***/ "querystring":
-/*!******************************!*\
-  !*** external "querystring" ***!
-  \******************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("querystring");
-
-/***/ }),
-
 /***/ "stream":
 /*!*************************!*\
   !*** external "stream" ***!
@@ -36837,19 +39835,6 @@ module.exports = require("querystring");
 
 "use strict";
 module.exports = require("stream");
-
-/***/ }),
-
-/***/ "string_decoder":
-/*!*********************************!*\
-  !*** external "string_decoder" ***!
-  \*********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("string_decoder");
 
 /***/ }),
 
@@ -36905,32 +39890,6 @@ module.exports = require("util");
 
 /***/ }),
 
-/***/ "vm":
-/*!*********************!*\
-  !*** external "vm" ***!
-  \*********************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("vm");
-
-/***/ }),
-
-/***/ "worker_threads":
-/*!*********************************!*\
-  !*** external "worker_threads" ***!
-  \*********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: module */
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("worker_threads");
-
-/***/ }),
-
 /***/ "zlib":
 /*!***********************!*\
   !*** external "zlib" ***!
@@ -36957,16 +39916,13 @@ module.exports = require("zlib");
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			loaded: false,
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -36974,9 +39930,6 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = __webpack_modules__;
-/******/ 	
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = __webpack_module_cache__;
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
@@ -37041,18 +39994,9 @@ module.exports = require("zlib");
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/node module decorator */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nmd = (module) => {
-/******/ 			module.paths = [];
-/******/ 			if (!module.children) module.children = [];
-/******/ 			return module;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
-/******/ 		__webpack_require__.p = "https://localhost:8001/";
+/******/ 		__webpack_require__.p = "http://localhost:8001/";
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/sharing */
@@ -37092,6 +40036,8 @@ module.exports = require("zlib");
 /******/ 					register("axios", "0.21.4", () => () => __webpack_require__(/*! ./node_modules/axios/index.js */ "./node_modules/axios/index.js"));
 /******/ 					register("axios", "0.26.1", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js"));
 /******/ 					register("kafkajs", "1.16.0", () => () => __webpack_require__(/*! ./node_modules/kafkajs/index.js */ "./node_modules/kafkajs/index.js"));
+/******/ 					register("multicast-dns", "7.2.5", () => () => __webpack_require__(/*! ./node_modules/multicast-dns/index.js */ "./node_modules/multicast-dns/index.js"));
+/******/ 					register("nanoid", "3.3.4", () => () => __webpack_require__(/*! ./node_modules/nanoid/index.js */ "./node_modules/nanoid/index.js"));
 /******/ 					register("smartystreets-javascript-sdk", "1.13.7", () => () => __webpack_require__(/*! ./node_modules/smartystreets-javascript-sdk/index.js */ "./node_modules/smartystreets-javascript-sdk/index.js"));
 /******/ 				}
 /******/ 				break;
@@ -37223,8 +40169,10 @@ module.exports = require("zlib");
 /******/ 		});
 /******/ 		var installedModules = {};
 /******/ 		var moduleToHandlerMapping = {
-/******/ 			"webpack/sharing/consume/default/kafkajs/kafkajs": () => loadStrictVersionCheckFallback("default", "kafkajs", [1,1,14,0], () => () => __webpack_require__(/*! kafkajs */ "./node_modules/kafkajs/index.js")),
 /******/ 			"webpack/sharing/consume/default/axios/axios?5326": () => loadStrictVersionCheckFallback("default", "axios", [2,0,21,1], () => () => __webpack_require__(/*! axios */ "./node_modules/axios/index.js")),
+/******/ 			"webpack/sharing/consume/default/kafkajs/kafkajs": () => loadStrictVersionCheckFallback("default", "kafkajs", [1,1,14,0], () => () => __webpack_require__(/*! kafkajs */ "./node_modules/kafkajs/index.js")),
+/******/ 			"webpack/sharing/consume/default/multicast-dns/multicast-dns": () => loadStrictVersionCheckFallback("default", "multicast-dns", [1,7,2,5], () => () => __webpack_require__(/*! multicast-dns */ "./node_modules/multicast-dns/index.js")),
+/******/ 			"webpack/sharing/consume/default/nanoid/nanoid": () => loadStrictVersionCheckFallback("default", "nanoid", [1,3,1,12], () => () => __webpack_require__(/*! nanoid */ "./node_modules/nanoid/index.js")),
 /******/ 			"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk": () => loadStrictVersionCheckFallback("default", "smartystreets-javascript-sdk", [1,1,6,0], () => () => __webpack_require__(/*! smartystreets-javascript-sdk */ "./node_modules/smartystreets-javascript-sdk/index.js")),
 /******/ 			"webpack/sharing/consume/default/axios/axios?5c0e": () => loadStrictVersionCheckFallback("default", "axios", [2,0,26,1], () => () => __webpack_require__(/*! axios */ "./node_modules/smartystreets-javascript-sdk/node_modules/axios/index.js"))
 /******/ 		};
@@ -37240,12 +40188,19 @@ module.exports = require("zlib");
 /******/ 			}
 /******/ 		});
 /******/ 		var chunkMapping = {
-/******/ 			"src_adapters_index_js": [
-/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs",
-/******/ 				"webpack/sharing/consume/default/axios/axios?5326"
+/******/ 			"334": [
+/******/ 				"webpack/sharing/consume/default/nanoid/nanoid"
 /******/ 			],
-/******/ 			"src_services_index_js": [
+/******/ 			"589": [
+/******/ 				"webpack/sharing/consume/default/nanoid/nanoid"
+/******/ 			],
+/******/ 			"732": [
 /******/ 				"webpack/sharing/consume/default/smartystreets-javascript-sdk/smartystreets-javascript-sdk"
+/******/ 			],
+/******/ 			"867": [
+/******/ 				"webpack/sharing/consume/default/axios/axios?5326",
+/******/ 				"webpack/sharing/consume/default/kafkajs/kafkajs",
+/******/ 				"webpack/sharing/consume/default/multicast-dns/multicast-dns"
 /******/ 			]
 /******/ 		};
 /******/ 		__webpack_require__.f.consumes = (chunkId, promises) => {
@@ -37335,7 +40290,7 @@ module.exports = require("zlib");
 /******/ 		  return new Promise(function(resolve, reject) {
 /******/ 		    var req = require(params.protocol.slice(0, params.protocol.length - 1)).request(params, function(res) {
 /******/ 		      if (res.statusCode < 200 || res.statusCode >= 300) {
-/******/ 		        return reject(new Error('statusCode=' + res.statusCode));
+/******/ 		        return reject(new Error('statusCode=' + res.statusCode +' '+ params));
 /******/ 		      }
 /******/ 		      var body = [];
 /******/ 		      res.on('data', function(chunk) {
@@ -37360,7 +40315,7 @@ module.exports = require("zlib");
 /******/ 		// object to store loaded chunks
 /******/ 		// "0" means "already loaded", Promise means loading
 /******/ 		var installedChunks = {
-/******/ 			"distributed-cache": 0
+/******/ 			637: 0
 /******/ 		};
 /******/ 		
 /******/ 		var installChunk = (chunk) => {
@@ -37420,10 +40375,10 @@ module.exports = require("zlib");
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-/******/ 	// module cache are used so entry inlining is disabled
+/******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__("webpack/container/entry/distributed-cache");
+/******/ 	return __webpack_require__("webpack/container/entry/order");
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.js.map

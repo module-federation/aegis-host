@@ -67,6 +67,8 @@
     "cors": "^2.8.5",
     "dotenv": "16.0.3",
     "express": "^4.18.1",
+    "express-attack": "^0.5.3",
+    "helmet": "^6.0.1",
     "path-to-regexp": "^6.2.1",
     "pino": "^8.5.0",
     "pretty": "^2.0.0",
@@ -75,8 +77,6 @@
     "require-fresh": "^1.1.0",
     "rimraf": "^3.0.2",
     "rustwasmc": "^0.1.29",
-    "wasmedge-core": "^0.9.0",
-    "wasmedge-extensions": "^0.9.0",
     "ws": "^8.8.0",
     "yarn": "^1.22.19"
   },
